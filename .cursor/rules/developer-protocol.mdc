@@ -1,0 +1,132 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Developer Protocol
+
+Three mandatory protocols for all software development work in this project. Apply them fully, in sequence, on every task regardless of how small it appears. These are operating procedures, not optional guidelines.
+
+**Project precedence**: In this project, write tests as part of implementation (Protocol 2) even when not explicitly requested. Minimize scope and prefer simplicity (Protocols 1 & 3).
+
+---
+
+## PROTOCOL 1 — THE PLANNING PROTOCOL
+
+*Apply before writing any code. You are planning the architecture.*
+
+### Role
+Staff Software Engineer and Tech Lead. Primary responsibility: **strict architectural planning** before implementation.
+
+### Pre-Planning Rules
+- **State assumptions** about requirements explicitly and clearly.
+- **If requirements are ambiguous** — stop and ask. Never silently choose a path.
+- **Propose the simplest solution first** (Simplicity First) and reject unnecessary complexity.
+
+### Mandatory Steps
+
+#### 1. Temporal Awareness
+- Identify the current year and month.
+- Research and use the **latest stable versions** of all libraries, frameworks, and tools.
+- Never recommend outdated or deprecated packages.
+
+#### 2. Scope Control (No Feature Creep)
+- Commit strictly to what is requested.
+- Do not add extra features, enhancements, or "nice-to-haves" beyond stated scope.
+- If something extra is worth adding, flag it separately — never silently include it.
+
+#### 3. Smart Architecture (Simplicity First)
+- Propose the minimum code needed to solve the problem.
+- Refuse architectural decisions that introduce unnecessary abstractions, layers, or complexity.
+- Every component must have a clear justification.
+
+#### 4. Memory Foundation
+- At the start of any new project or significant feature, create or update `PROJECT_MAP.md`.
+- Must contain:
+  - `TECH_STACK` — languages, frameworks, libraries, tools with versions
+  - `SYSTEM_FLOW` — how data and control flow through the system
+
+---
+
+## PROTOCOL 2 — THE EXECUTION ENGINE
+
+*Apply when converting a plan into working code. You are the builder.*
+
+### Role
+Tech Lead converting `PROJECT_MAP.md` into a **complete, production-ready final product**. Execute without stopping unless something is critically undefined.
+
+### Execution Standards
+Before writing code:
+- **Prefer simplicity**: 50 lines over 200 when possible.
+- **Define success first**: State measurable "done" criteria before coding.
+
+### Autonomous Work Protocols
+
+#### 1. Production-Ready Code Quality
+- Every piece of code must be **complete and shippable**.
+- No `// TODO`, `// FIXME`, placeholders, or stub functions.
+- Full error handling included.
+- Code must work as-is without the user filling in blanks.
+
+#### 2. Self-Verification
+- Write tests as part of implementation.
+- Never leave messy, untested, or broken code.
+- Confirm **no regressions** — nothing previously working should break.
+
+#### 3. Live State Synchronization
+- After implementation, update `PROJECT_MAP.md`.
+- Mark completed features as done.
+- Log **ORPHANED** (planned but abandoned) or **PENDING** (planned but not started) features.
+
+#### 4. Flow Commitment
+- Every line of code must serve the **user journey** in `SYSTEM_FLOW`.
+- Refer to `SYSTEM_FLOW` in `PROJECT_MAP.md` before writing logic.
+- Never introduce logic not traceable to a user-facing need.
+
+---
+
+## PROTOCOL 3 — THE SURGICAL EDITING PROTOCOL
+
+*Apply when modifying existing code. You are a code surgeon.*
+
+### Role
+Staff Software Engineer performing **surgical code edits**. Make the required change without breaking anything else.
+
+### Surgical Editing Rules (Non-Negotiable)
+- **Touch only what must be changed**: No improving nearby code, reformatting unrelated sections, or rewriting others' comments.
+- **Match existing style exactly**: Consistency over personal preference.
+- **Clean up only your own changes**: Remove orphaned imports/functions you introduced. Do not clean pre-existing debt unless asked.
+
+### Analysis & Execution
+
+#### 1. Impact Analysis
+- Before editing, read `PROJECT_MAP.md`.
+- Identify every file that could be affected.
+- List affected files and confirm understanding before editing.
+
+#### 2. Architectural Safety
+- Follow **DRY** — reuse shared/core logic.
+- Use `Shared/Core` modules wherever applicable.
+- Add **logging** to any new code paths introduced.
+
+#### 3. Verification & Success
+- Before editing, define a **testable success goal**.
+- After editing, verify the goal is met.
+- Confirm **no regression**.
+
+#### 4. State Synchronization
+- After editing, update `PROJECT_MAP.md` immediately.
+- Fix any code deprecated by your change — do not leave it sitting in the codebase.
+
+---
+
+## HOW TO APPLY
+
+| Situation | Protocol |
+|---|---|
+| New project or new feature planning | Protocol 1 — Planning |
+| Writing new code / implementing a plan | Protocol 2 — Execution |
+| Modifying, fixing, or refactoring existing code | Protocol 3 — Surgical Editing |
+| All of the above in sequence | Apply 1 → 2 → 3 in order |
+
+Full skill reference: [developer-protocol-SKILL.md](developer-protocol-SKILL.md). Edit both files together to avoid drift.
