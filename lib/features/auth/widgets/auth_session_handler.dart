@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/deep_links/deep_link_service.dart';
+import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../profile/data/profile_repository.dart';
 import '../providers/auth_provider.dart';
 
-/// Handles OAuth deep-link callbacks and keeps auth state in sync.
+/// Handles OAuth callbacks and sello.iq deep-link navigation.
 class AuthSessionHandler extends ConsumerStatefulWidget {
   const AuthSessionHandler({super.key, required this.child});
 
@@ -33,18 +35,49 @@ class _AuthSessionHandlerState extends ConsumerState<AuthSessionHandler> {
     try {
       final initial = await _appLinks.getInitialLink();
       if (initial != null) {
-        await _handleOAuthCallback(initial, fromColdStart: true);
+        await _handleIncomingLink(initial, fromColdStart: true);
       }
     } catch (e) {
       if (kDebugMode) debugPrint('Initial deep link error: $e');
     }
 
     _appLinks.uriLinkStream.listen(
-      (uri) => _handleOAuthCallback(uri, fromColdStart: false),
+      (uri) => _handleIncomingLink(uri, fromColdStart: false),
       onError: (Object e) {
         if (kDebugMode) debugPrint('Deep link stream error: $e');
       },
     );
+  }
+
+  Future<void> _handleIncomingLink(
+    Uri uri, {
+    required bool fromColdStart,
+  }) async {
+    if (_isAuthCallback(uri)) {
+      await _handleOAuthCallback(uri, fromColdStart: fromColdStart);
+      return;
+    }
+
+    final target = DeepLinkService.resolve(uri);
+    if (target == null) return;
+
+    final path = DeepLinkService.routeFor(target);
+    if (kDebugMode) {
+      debugPrint(
+        'Deep link navigation${fromColdStart ? ' (cold start)' : ''}: $path',
+      );
+    }
+
+    void navigate() {
+      if (!mounted) return;
+      ref.read(routerProvider).go(path);
+    }
+
+    if (fromColdStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => navigate());
+    } else {
+      navigate();
+    }
   }
 
   Future<void> _handleOAuthCallback(
@@ -77,7 +110,7 @@ class _AuthSessionHandlerState extends ConsumerState<AuthSessionHandler> {
       }
       if (kDebugMode) debugPrint('OAuth callback failed: $e');
       ref.read(authNotifierProvider.notifier).onOAuthFailed(
-            'تعذّر تسجيل الدخول بـ Google. حاول مرة أخرى.',
+            'تعذّر تسجيل الدخول. حاول مرة أخرى.',
           );
     } catch (e) {
       if (kDebugMode) debugPrint('OAuth callback error: $e');

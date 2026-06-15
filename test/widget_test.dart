@@ -41,7 +41,7 @@ void main() {
   });
 
   test('AppConstants has Arabic name', () {
-    expect(AppConstants.appNameAr, 'سوق العراق');
+    expect(AppConstants.appNameAr, 'Sello');
     expect(AppConstants.bundleId, 'com.iraq.marketplace.souqiq');
   });
 }

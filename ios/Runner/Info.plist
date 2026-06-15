@@ -11,17 +11,17 @@
 	<key>NSCameraUsageDescription</key>
 	<string>نحتاج الكاميرا لالتقاط صور الإعلان</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>يحتاج سوق العراق إلى موقعك لعرض الإعلانات القريبة</string>
+	<string>يحتاج Sello إلى موقعك لعرض الإعلانات القريبة</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>يحتاج سوق العراق إلى موقعك لعرض الإعلانات القريبة</string>
+	<string>يحتاج Sello إلى موقعك لعرض الإعلانات القريبة</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>يحتاج سوق العراق إلى موقعك لعرض الإعلانات القريبة</string>
+	<string>يحتاج Sello إلى موقعك لعرض الإعلانات القريبة</string>
 	<key>GOOGLE_MAPS_API_KEY</key>
 	<string>$(GOOGLE_MAPS_API_KEY)</string>
 	<key>GMSApiKey</key>
 	<string>$(GOOGLE_MAPS_API_KEY)</string>
 	<key>CFBundleDisplayName</key>
-	<string>سوق العراق</string>
+	<string>Sello</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -29,7 +29,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Souq IQ</string>
+	<string>Sello</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -38,6 +38,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

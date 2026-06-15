@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/digit_input_formatter.dart';
+import 'auth_form_styles.dart';
 
 class OtpInput extends ConsumerStatefulWidget {
   const OtpInput({
@@ -129,9 +131,25 @@ class OtpInputState extends ConsumerState<OtpInput> {
                 inputFormatters: [
                   WesternDigitsInputFormatter(maxLength: 1),
                 ],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   counterText: '',
-                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: AuthFormStyles.fieldFill,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
                 ),
                 onChanged: (v) => _onChanged(index, v),
               ),

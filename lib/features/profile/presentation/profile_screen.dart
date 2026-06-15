@@ -1,22 +1,29 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_governorates.dart';
-import '../../../core/l10n/fallback_localizations.dart';
 import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/arabic_number.dart';
+import '../../../services/share_service.dart';
 import '../../../shared/models/profile_model.dart';
 import '../../../shared/models/profile_stats_model.dart';
+import '../../../widgets/profile_share_card.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
+import '../../../widgets/user_avatar.dart';
 import '../../home/widgets/listing_card.dart';
 import '../providers/profile_provider.dart';
+import '../widgets/profile_menu_tile.dart';
+import '../../verification/widgets/verification_status_banner.dart';
+import '../../../shared/widgets/verified_badge.dart';
+import '../../../widgets/star_display.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key, this.userId});
@@ -29,12 +36,15 @@ class ProfileScreen extends ConsumerWidget {
     final currentUserId = ref.watch(currentUserIdProvider);
     final targetId = userId ?? currentUserId;
     final isOwnProfile = userId == null || userId == currentUserId;
-
     final strings = ref.watch(appLocalizationsProvider);
 
     if (targetId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(strings.profile)),
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.background,
+          title: Text(strings.profile),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -60,6 +70,7 @@ class ProfileScreen extends ConsumerWidget {
     final listingsAsync = ref.watch(sellerListingsPreviewProvider(targetId));
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: profileAsync.when(
         loading: () => const LoadingWidget(),
         error: (e, _) => AppErrorWidget(
@@ -77,56 +88,39 @@ class ProfileScreen extends ConsumerWidget {
             return AppErrorWidget(message: strings.profileNotFound);
           }
 
+          if (isOwnProfile) {
+            return _OwnProfileView(
+              profile: profile,
+              statsAsync: statsAsync,
+              strings: strings,
+            );
+          }
+
           return CustomScrollView(
             slivers: [
               SliverAppBar(
                 pinned: true,
-                title: Text(isOwnProfile ? strings.myAccount : profile.fullName),
-                leading: isOwnProfile
-                    ? null
-                    : BackButton(onPressed: () => context.pop()),
-                automaticallyImplyLeading: !isOwnProfile,
-                actions: isOwnProfile
-                    ? [
-                        IconButton(
-                          icon: const Icon(Icons.settings_outlined),
-                          onPressed: () => context.push(AppRoutes.settings),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined),
-                          onPressed: () => context.push(AppRoutes.editProfile),
-                        ),
-                      ]
-                    : null,
+                backgroundColor: AppColors.background,
+                foregroundColor: AppColors.textDark,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                surfaceTintColor: Colors.transparent,
+                title: Text(
+                  profile.fullName,
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                leading: BackButton(onPressed: () => context.pop()),
               ),
               SliverToBoxAdapter(
-                child: _ProfileHeader(
-                  profile: profile,
-                  statsAsync: statsAsync,
-                  isOwnProfile: isOwnProfile,
-                  memberSinceLabel: strings.memberSince(
-                    DateFormat('MMMM yyyy', intlLocaleFor(strings.localeName))
-                        .format(profile.createdAt),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: _ProfileHeaderCard(
+                    profile: profile,
+                    statsAsync: statsAsync,
+                    isOwnProfile: false,
                   ),
-                  listingsLabel: strings.listingsLabel,
-                  viewsLabel: strings.viewsLabel,
-                  activeLabel: strings.activeLabel,
-                  onAvatarTap: isOwnProfile
-                      ? () => context.push(AppRoutes.editProfile)
-                      : null,
                 ),
               ),
-              if (isOwnProfile)
-                SliverToBoxAdapter(
-                  child: _QuickActionsRow(
-                    myListingsLabel: strings.myListings,
-                    favoritesLabel: strings.favorites,
-                    messagesLabel: strings.messages,
-                    onMyListings: () => context.push(AppRoutes.myListings),
-                    onFavorites: () => context.push(AppRoutes.favorites),
-                    onMessages: () => context.go(AppRoutes.conversations),
-                  ),
-                ),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -135,22 +129,24 @@ class ProfileScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           strings.listingsOf(profile.fullName),
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: GoogleFonts.cairo(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
                         ),
                       ),
                       listingsAsync.when(
                         data: (items) => Text(
                           arabicNumber(items.length),
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: GoogleFonts.cairo(
+                            color: AppColors.textMuted,
+                            fontSize: 13,
+                          ),
                         ),
                         loading: () => const SizedBox.shrink(),
                         error: (_, _) => const SizedBox.shrink(),
                       ),
-                      if (isOwnProfile)
-                        TextButton(
-                          onPressed: () => context.push(AppRoutes.myListings),
-                          child: Text(strings.viewAllListings),
-                        ),
                     ],
                   ),
                 ),
@@ -170,7 +166,7 @@ class ProfileScreen extends ConsumerWidget {
                     return SliverFillRemaining(
                       hasScrollBody: false,
                       child: _EmptyListings(
-                        isOwnProfile: isOwnProfile,
+                        isOwnProfile: false,
                         emptyOwnMessage: strings.noListingsYet,
                         emptyOtherMessage: strings.noActiveListings,
                         addFirstLabel: strings.addFirstListing,
@@ -205,119 +201,317 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({
+class _OwnProfileView extends ConsumerStatefulWidget {
+  const _OwnProfileView({
+    required this.profile,
+    required this.statsAsync,
+    required this.strings,
+  });
+
+  final ProfileModel profile;
+  final AsyncValue<ProfileStats> statsAsync;
+  final AppLocalizations strings;
+
+  @override
+  ConsumerState<_OwnProfileView> createState() => _OwnProfileViewState();
+}
+
+class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
+  final GlobalKey _profileShareRepaintKey = GlobalKey();
+  bool _sharing = false;
+
+  int get _activeListings =>
+      widget.statsAsync.value?.activeListings ?? 0;
+
+  bool get _canShareProfile => _activeListings >= 1;
+
+  Future<void> _shareProfile() async {
+    if (_sharing || !_canShareProfile) return;
+
+    setState(() => _sharing = true);
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      await WidgetsBinding.instance.endOfFrame;
+      await ShareService.shareProfileCard(
+        repaintKey: _profileShareRepaintKey,
+        profile: widget.profile,
+        listingCount: _activeListings,
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تعذّر إنشاء البطاقة، حاول مرة أخرى'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = widget.profile;
+    final strings = widget.strings;
+
+    return Stack(
+      children: [
+        CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              backgroundColor: AppColors.background,
+              foregroundColor: AppColors.textDark,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              surfaceTintColor: Colors.transparent,
+              title: Text(
+                strings.myAccount,
+                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.favorite_border),
+                onPressed: () => context.push(AppRoutes.favorites),
+              ),
+              actions: [
+                if (_canShareProfile)
+                  IconButton(
+                    icon: const Icon(Icons.share_rounded),
+                    onPressed: _sharing ? null : _shareProfile,
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.settings_outlined),
+                  onPressed: () => context.push(AppRoutes.settings),
+                ),
+              ],
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: _ProfileHeaderCard(
+                  profile: profile,
+                  statsAsync: widget.statsAsync,
+                  isOwnProfile: true,
+                  onAvatarTap: () => context.push(AppRoutes.editProfile),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: VerificationStatusBanner(profile: profile),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: _OwnProfileMenu(
+                statsAsync: widget.statsAsync,
+                onMyListings: () => context.push(AppRoutes.myListings),
+                onSmartAlerts: () => context.push(AppRoutes.smartAlerts),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          ],
+        ),
+        if (_sharing)
+          Positioned.fill(
+            child: ColoredBox(
+              color: Colors.black26,
+              child: Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+            ),
+          ),
+        if (_canShareProfile)
+          Positioned(
+            left: -10000,
+            top: 0,
+            child: ProfileShareCard(
+              repaintKey: _profileShareRepaintKey,
+              profile: profile,
+              listingCount: _activeListings,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ProfileHeaderCard extends StatelessWidget {
+  const _ProfileHeaderCard({
     required this.profile,
     required this.statsAsync,
     required this.isOwnProfile,
-    required this.memberSinceLabel,
-    required this.listingsLabel,
-    required this.viewsLabel,
-    required this.activeLabel,
     this.onAvatarTap,
   });
 
   final ProfileModel profile;
   final AsyncValue<ProfileStats> statsAsync;
   final bool isOwnProfile;
-  final String memberSinceLabel;
-  final String listingsLabel;
-  final String viewsLabel;
-  final String activeLabel;
   final VoidCallback? onAvatarTap;
+
+  String get _locationLine {
+    final parts = <String>[];
+    if (profile.governorate != null) {
+      parts.add(governorateNameAr(profile.governorate!));
+    }
+    if (profile.city != null && profile.city!.trim().isNotEmpty) {
+      parts.add(profile.city!.trim());
+    }
+    return parts.join('، ');
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.all(24),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.microShadow,
+            blurRadius: 40,
+            offset: Offset(0, 12),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           GestureDetector(
             onTap: onAvatarTap,
             child: Stack(
+              clipBehavior: Clip.none,
               alignment: Alignment.bottomRight,
               children: [
-                CircleAvatar(
-                  radius: 45,
-                  backgroundImage: profile.avatarUrl != null
-                      ? CachedNetworkImageProvider(profile.avatarUrl!)
-                      : null,
-                  child: profile.avatarUrl == null
-                      ? Text(
-                          profile.fullName.isNotEmpty
-                              ? profile.fullName[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(fontSize: 36),
-                        )
-                      : null,
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.25),
+                      width: 3,
+                    ),
+                  ),
+                  child: UserAvatar(
+                    avatarSeed: profile.effectiveAvatarSeed,
+                    size: 72,
+                  ),
                 ),
                 if (isOwnProfile)
-                  const CircleAvatar(
-                    radius: 14,
-                    child: Icon(Icons.camera_alt, size: 14),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: AppColors.microShadow,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.settings,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Flexible(
                 child: Text(
                   profile.fullName,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
                   textAlign: TextAlign.center,
+                  style: GoogleFonts.cairo(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                  ),
                 ),
               ),
-              if (profile.isVerified) ...[
+              if (profile.isVerifiedSeller) ...[
                 const SizedBox(width: 6),
-                Icon(Icons.verified, color: theme.colorScheme.primary, size: 22),
+                const VerifiedBadge(size: 20),
               ],
             ],
           ),
-          if (isOwnProfile && profile.phone != null) ...[
-            const SizedBox(height: 4),
-            Text(profile.phone!, style: theme.textTheme.bodyMedium),
-          ],
-          if (profile.governorate != null) ...[
-            const SizedBox(height: 4),
-            Text(governorateNameAr(profile.governorate!)),
-          ],
-          const SizedBox(height: 4),
-          Text(
-            memberSinceLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.outline,
+          if (profile.ratingCount > 0) ...[
+            const SizedBox(height: 8),
+            starDisplay(
+              rating: profile.avgRating,
+              count: profile.ratingCount,
+              starSize: 16,
+              onTap: () => context.push('/ratings/${profile.id}'),
             ),
-          ),
+          ],
+          if (_locationLine.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              _locationLine,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                color: AppColors.textMuted,
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           statsAsync.when(
             loading: () => const SizedBox(
-              height: 48,
-              child: Center(child: CircularProgressIndicator()),
+              height: 52,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
             error: (_, _) => const SizedBox.shrink(),
-            data: (stats) => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _StatItem(
-                  value: arabicNumber(stats.totalListings),
-                  label: listingsLabel,
-                ),
-                _StatItem(
-                  value: arabicNumber(stats.totalViews),
-                  label: viewsLabel,
-                ),
-                _StatItem(
-                  value: arabicNumber(stats.activeListings),
-                  label: activeLabel,
-                ),
-              ],
+            data: (stats) => _ProfileStatsRow(stats: stats),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileStatsRow extends StatelessWidget {
+  const _ProfileStatsRow({required this.stats});
+
+  final ProfileStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(top: 16),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _StatColumn(
+              value: arabicNumber(stats.activeListings),
+              label: 'إعلان',
+            ),
+          ),
+          Container(width: 1, height: 32, color: AppColors.borderLight),
+          Expanded(
+            child: _StatColumn(
+              value: formatCompactArabic(stats.totalViews),
+              label: 'مشاهدة',
+            ),
+          ),
+          Container(width: 1, height: 32, color: AppColors.borderLight),
+          Expanded(
+            child: _StatColumn(
+              value: '0',
+              label: 'متابع',
             ),
           ),
         ],
@@ -326,8 +520,8 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-class _StatItem extends StatelessWidget {
-  const _StatItem({required this.value, required this.label});
+class _StatColumn extends StatelessWidget {
+  const _StatColumn({required this.value, required this.label});
 
   final String value;
   final String label;
@@ -338,90 +532,61 @@ class _StatItem extends StatelessWidget {
       children: [
         Text(
           value,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: GoogleFonts.cairo(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textDark,
+          ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+          style: GoogleFonts.cairo(
+            fontSize: 11,
+            color: AppColors.textMuted,
+          ),
         ),
       ],
     );
   }
 }
 
-class _QuickActionsRow extends StatelessWidget {
-  const _QuickActionsRow({
-    required this.myListingsLabel,
-    required this.favoritesLabel,
-    required this.messagesLabel,
+class _OwnProfileMenu extends StatelessWidget {
+  const _OwnProfileMenu({
+    required this.statsAsync,
     required this.onMyListings,
-    required this.onFavorites,
-    required this.onMessages,
+    required this.onSmartAlerts,
   });
 
-  final String myListingsLabel;
-  final String favoritesLabel;
-  final String messagesLabel;
+  final AsyncValue<ProfileStats> statsAsync;
   final VoidCallback onMyListings;
-  final VoidCallback onFavorites;
-  final VoidCallback onMessages;
+  final VoidCallback onSmartAlerts;
 
   @override
   Widget build(BuildContext context) {
+    final adsBadge = statsAsync.maybeWhen(
+      data: (s) => arabicNumber(s.activeListings),
+      orElse: () => null,
+    );
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
         children: [
-          Expanded(
-            child: _QuickActionChip(
-              icon: Icons.list_alt,
-              label: myListingsLabel,
-              onTap: onMyListings,
-            ),
+          ProfileMenuEmojiTile(
+            title: 'إعلاناتي المعروضة',
+            emoji: '📋',
+            badge: adsBadge,
+            onTap: onMyListings,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _QuickActionChip(
-              icon: Icons.favorite_border,
-              label: favoritesLabel,
-              onTap: onFavorites,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _QuickActionChip(
-              icon: Icons.chat_bubble_outline,
-              label: messagesLabel,
-              onTap: onMessages,
-            ),
+          const SizedBox(height: 10),
+          ProfileMenuTile(
+            title: 'تنبيهاتي الذكية',
+            icon: Icons.notifications_none_outlined,
+            onTap: onSmartAlerts,
           ),
         ],
       ),
-    );
-  }
-}
-
-class _QuickActionChip extends StatelessWidget {
-  const _QuickActionChip({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 18),
-      label: Text(label, style: const TextStyle(fontSize: 12)),
     );
   }
 }
@@ -451,12 +616,16 @@ class _EmptyListings extends StatelessWidget {
           Icon(
             Icons.post_add,
             size: 72,
-            color: Theme.of(context).colorScheme.outline,
+            color: AppColors.textMuted.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
             isOwnProfile ? emptyOwnMessage : emptyOtherMessage,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: GoogleFonts.cairo(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
           ),
           if (isOwnProfile) ...[
             const SizedBox(height: 16),

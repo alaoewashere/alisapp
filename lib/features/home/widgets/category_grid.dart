@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/theme/app_decorations.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
 import '../../../shared/widgets/error_widget.dart';
@@ -20,6 +21,17 @@ class CategoryGrid extends StatelessWidget {
   final ValueChanged<int?> onSelected;
   final ValueChanged<CategoryModel>? onCategoryTap;
 
+  static String emojiFor(String iconName) {
+    return switch (iconName) {
+      'home' => '🏢',
+      'directions_car' => '🚗',
+      'devices' => '📱',
+      'work' => '💼',
+      'handyman' => '🔧',
+      _ => '📦',
+    };
+  }
+
   static IconData iconFor(String iconName) {
     return switch (iconName) {
       'home' => Icons.home_outlined,
@@ -33,32 +45,25 @@ class CategoryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayCategories = categories.take(6).toList();
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
-          _CategoryChip(
-            label: context.l10n.all,
-            icon: Icons.apps,
-            selected: selectedId == null,
-            onTap: () => onSelected(null),
-          ),
-          const SizedBox(width: 8),
-          ...categories.map(
-            (c) => Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: _CategoryChip(
-                label: c.nameAr,
-                icon: iconFor(c.icon),
-                selected: selectedId == c.id,
-                onTap: () {
-                  onSelected(c.id);
-                  onCategoryTap?.call(c);
-                },
-              ),
+          for (var i = 0; i < displayCategories.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            _CategoryPill(
+              label: displayCategories[i].nameAr,
+              emoji: emojiFor(displayCategories[i].icon),
+              selected: selectedId == displayCategories[i].id,
+              onTap: () {
+                onSelected(displayCategories[i].id);
+                onCategoryTap?.call(displayCategories[i]);
+              },
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -89,46 +94,61 @@ class CategoryGridSection extends StatelessWidget {
         onCategoryTap: onCategoryTap,
       ),
       loading: () => const CategoryGridShimmer(),
-      error: (e, _) => AppErrorWidget(
-        message: 'فشل تحميل التصنيفات',
-        onRetry: () {},
-      ),
+      error: (e, _) =>
+          AppErrorWidget(message: 'فشل تحميل التصنيفات', onRetry: () {}),
     );
   }
 }
 
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
+class _CategoryPill extends StatelessWidget {
+  const _CategoryPill({
     required this.label,
-    required this.icon,
+    required this.emoji,
     required this.selected,
     required this.onTap,
   });
 
   final String label;
-  final IconData icon;
+  final String emoji;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return FilterChip(
-      avatar: Icon(
-        icon,
-        size: 18,
-        color: selected ? scheme.onPrimary : scheme.primary,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDecorations.chipRadius),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: selected ? AppColors.premiumGradient : null,
+            color: selected ? null : AppColors.glassFill,
+            borderRadius: BorderRadius.circular(AppDecorations.chipRadius),
+            border: Border.all(
+              color: selected ? Colors.transparent : AppColors.glassBorder,
+              width: 0.5,
+            ),
+            boxShadow: selected ? AppDecorations.cardShadow : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 14)),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: selected ? Colors.white : AppColors.textDark,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      label: Text(label),
-      selected: selected,
-      showCheckmark: false,
-      selectedColor: scheme.primary,
-      labelStyle: TextStyle(
-        color: selected ? scheme.onPrimary : scheme.onSurface,
-        fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-      ),
-      onSelected: (_) => onTap(),
     );
   }
 }

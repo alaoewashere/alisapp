@@ -4,7 +4,16 @@ import '../../shared/models/category_model.dart';
 import '../../shared/models/listing_model.dart';
 
 /// Root category slugs that use the full drill-down browse tree.
-const categoryBrowseRootSlugs = {'real_estate', 'cars', 'electronics', 'buy_sell'};
+const categoryBrowseRootSlugs = {
+  'real_estate',
+  'cars',
+  'electronics',
+  'buy_sell',
+  'tutoring',
+  'jobs',
+  'pets',
+  'home_help',
+};
 
 bool isCategoryBrowseRoot(CategoryModel? category) {
   return category != null && categoryBrowseRootSlugs.contains(category.slug);
@@ -137,6 +146,18 @@ CategoryModel? categoryById(int id, List<CategoryModel> all) {
   return null;
 }
 
+/// Root-to-leaf path for a category id (empty when [categoryId] is unknown).
+List<CategoryModel> buildCategoryPath(int categoryId, List<CategoryModel> all) {
+  final byId = {for (final c in all) c.id: c};
+  final path = <CategoryModel>[];
+  var current = byId[categoryId];
+  while (current != null) {
+    path.insert(0, current);
+    current = current.parentId != null ? byId[current.parentId] : null;
+  }
+  return path;
+}
+
 /// Resolves a search browse row to a live DB category (slug first, then cached id).
 CategoryModel? resolveBrowseCategory(
   String slug,
@@ -175,6 +196,10 @@ const categoryFallbackSubtitles = <String, String>{
   'electronics': 'هواتف ذكية ، أجهزة لوحية ، لابتوب وكمبيوتر ، مكيفات',
   'elec_smartphones': 'Apple , Samsung , Huawei , Xiaomi',
   'buy_sell': 'موبايلات ، كمبيوتر ، ملابس ، أثاث',
+  'tutoring': 'مدرسة ، جامعة ، لغات ، قرآن',
+  'jobs': 'تقنية ، هندسة ، طب ، نفط',
+  'pets': 'كلاب ، قطط ، طيور ، مزرعة',
+  'home_help': 'تنظيف ، طبخ ، مربيات ، سائق',
 };
 
 String subtitleForCategory(CategoryModel category, List<CategoryModel> all) {

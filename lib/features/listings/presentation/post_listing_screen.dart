@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../presentation/car_paint_condition_screen.dart';
 import '../providers/post_listing_provider.dart';
 import '../widgets/steps/step1_category.dart';
 import '../widgets/steps/step2_details.dart';
 import '../widgets/steps/step3_location.dart';
 import '../widgets/steps/step4_photos.dart';
 import '../widgets/steps/step5_review.dart';
+import '../widgets/steps/step_contact_preferences.dart';
+import '../widgets/steps/step_listing_package.dart';
 
 class PostListingScreen extends ConsumerWidget {
   const PostListingScreen({super.key});
@@ -21,6 +26,8 @@ class PostListingScreen extends ConsumerWidget {
     final notifier = ref.read(postListingProvider.notifier);
 
     return Scaffold(
+      backgroundColor:
+          state.currentStep == state.photosStep ? Colors.white : null,
       appBar: AppBar(
         title: const Text('نشر إعلان'),
         leading: IconButton(
@@ -43,7 +50,10 @@ class PostListingScreen extends ConsumerWidget {
         children: [
           Column(
             children: [
-              _StepIndicator(currentStep: state.currentStep),
+              _StepIndicator(
+                currentStep: state.currentStep,
+                totalSteps: state.maxStep,
+              ),
               Expanded(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
@@ -62,20 +72,19 @@ class PostListingScreen extends ConsumerWidget {
                   },
                   child: KeyedSubtree(
                     key: ValueKey(state.currentStep),
-                    child: _buildStep(context, ref, state.currentStep),
+                    child: _buildStep(context, ref, state),
                   ),
                 ),
               ),
               _BottomActions(
-                currentStep: state.currentStep,
-                isLoading: state.isLoading,
+                state: state,
                 onNext: () async {
                   final userId = ref.read(currentUserIdProvider);
                   if (userId == null) {
                     await requireAuth(context, ref);
                     return;
                   }
-                  if (state.currentStep < 5) {
+                  if (state.currentStep < state.maxStep) {
                     notifier.nextStep();
                   }
                 },
@@ -90,13 +99,32 @@ class PostListingScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStep(BuildContext context, WidgetRef ref, int step) {
-    return switch (step) {
+  Widget _buildStep(BuildContext context, WidgetRef ref, PostListingState state) {
+    if (state.isVehicleListing) {
+      return switch (state.currentStep) {
+        1 => const Step1Category(),
+        2 => const Step2Details(),
+        3 => const CarPaintConditionScreen(),
+        4 => const Step3Location(),
+        5 => const Step4Photos(),
+        6 => const StepContactPreferences(),
+        7 => const StepListingPackage(),
+        8 => Step5Review(
+            onPublish: () => _handlePublish(context, ref),
+            onSaveDraft: () => _handleSaveDraft(context, ref),
+          ),
+        _ => const SizedBox.shrink(),
+      };
+    }
+
+    return switch (state.currentStep) {
       1 => const Step1Category(),
       2 => const Step2Details(),
       3 => const Step3Location(),
       4 => const Step4Photos(),
-      5 => Step5Review(
+      5 => const StepContactPreferences(),
+      6 => const StepListingPackage(),
+      7 => Step5Review(
           onPublish: () => _handlePublish(context, ref),
           onSaveDraft: () => _handleSaveDraft(context, ref),
         ),
@@ -141,9 +169,13 @@ class PostListingScreen extends ConsumerWidget {
 }
 
 class _StepIndicator extends StatelessWidget {
-  const _StepIndicator({required this.currentStep});
+  const _StepIndicator({
+    required this.currentStep,
+    required this.totalSteps,
+  });
 
   final int currentStep;
+  final int totalSteps;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +184,7 @@ class _StepIndicator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(5, (i) {
+        children: List.generate(totalSteps, (i) {
           final step = i + 1;
           final active = step == currentStep;
           final done = step < currentStep;
@@ -210,42 +242,96 @@ class _PublishOverlay extends StatelessWidget {
 
 class _BottomActions extends StatelessWidget {
   const _BottomActions({
-    required this.currentStep,
-    required this.isLoading,
+    required this.state,
     required this.onNext,
     required this.onPublish,
     required this.onSaveDraft,
   });
 
-  final int currentStep;
-  final bool isLoading;
+  final PostListingState state;
   final VoidCallback onNext;
   final VoidCallback onPublish;
   final VoidCallback onSaveDraft;
 
   @override
   Widget build(BuildContext context) {
+    if (state.currentStep == state.packageStep) {
+      return const SizedBox.shrink();
+    }
+
+    final isPhotosStep = state.currentStep == state.photosStep;
+    final isDetailsStep = state.currentStep == 2;
+    final titleValid = state.title.trim().length >= 5;
+    final canProceed = (!isPhotosStep || state.images.isNotEmpty) &&
+        (!isDetailsStep || titleValid);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (currentStep < 5)
-              CustomButton(
-                label: 'التالي',
-                loading: isLoading,
-                onPressed: isLoading ? null : onNext,
+            if (state.currentStep < state.maxStep)
+              SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: FilledButton(
+                  onPressed: state.isLoading
+                      ? null
+                      : () {
+                          if (!canProceed) {
+                            final message = isDetailsStep
+                                ? 'العنوان يجب أن يكون 5 أحرف على الأقل'
+                                : 'يرجى إضافة صورة واحدة على الأقل';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  message,
+                                  style: AppTextStyles.subheading.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                          onNext();
+                        },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: canProceed && !state.isLoading
+                        ? AppColors.primary
+                        : const Color(0xFFCCCCCC),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: const Color(0xFFCCCCCC),
+                    disabledForegroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: state.isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          'التالي',
+                          style: AppTextStyles.button,
+                        ),
+                ),
               )
             else ...[
               CustomButton(
                 label: 'نشر الإعلان',
-                loading: isLoading,
-                onPressed: isLoading ? null : onPublish,
+                loading: state.isLoading,
+                onPressed: state.isLoading ? null : onPublish,
               ),
               const SizedBox(height: 8),
               TextButton(
-                onPressed: isLoading ? null : onSaveDraft,
+                onPressed: state.isLoading ? null : onSaveDraft,
                 child: const Text('حفظ كمسودة'),
               ),
             ],

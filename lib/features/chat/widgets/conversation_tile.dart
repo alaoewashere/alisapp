@@ -1,9 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../core/utils/currency_formatter.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/chat_date_utils.dart';
 import '../../../shared/models/conversation_model.dart';
+import 'chat_user_avatar.dart';
+import 'message_bubble.dart';
 
+/// Modern card-style row for a single conversation in the inbox.
 class ConversationTile extends StatelessWidget {
   const ConversationTile({
     super.key,
@@ -18,159 +22,133 @@ class ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final hasUnread = conversation.unreadCount > 0;
     final time = conversation.lastMessageTime ?? conversation.createdAt;
+    final lastTime = conversation.lastMessageTime ?? conversation.createdAt;
+    final isOnline = DateTime.now().difference(lastTime).inMinutes < 30;
 
     return Material(
-      color: hasUnread
-          ? theme.colorScheme.primaryContainer.withValues(alpha: 0.08)
-          : null,
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 26,
-                    backgroundImage: conversation.otherUserAvatar != null
-                        ? CachedNetworkImageProvider(
-                            conversation.otherUserAvatar!,
-                          )
-                        : null,
-                    child: conversation.otherUserAvatar == null
-                        ? const Icon(Icons.person)
-                        : null,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: theme.colorScheme.surface,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            conversation.otherUserName ?? 'مستخدم',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight:
-                                  hasUnread ? FontWeight.bold : FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          formatRelativeTimeAr(time),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.outline,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (conversation.listingTitle != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        conversation.listingTitle!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.outline,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            conversation.lastMessage ?? 'ابدأ المحادثة',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight:
-                                  hasUnread ? FontWeight.w600 : FontWeight.normal,
-                              color: hasUnread
-                                  ? theme.colorScheme.onSurface
-                                  : theme.colorScheme.outline,
-                            ),
-                          ),
-                        ),
-                        if (hasUnread)
-                          Container(
-                            margin: const EdgeInsets.only(right: 4),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
-                              vertical: 2,
-                            ),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 20,
-                              minHeight: 20,
-                            ),
-                            child: Center(
-                              child: Text(
-                                conversation.unreadCount > 99
-                                    ? '99+'
-                                    : '${conversation.unreadCount}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: conversation.listingImage != null
-                    ? CachedNetworkImage(
-                        imageUrl: conversation.listingImage!,
-                        width: 52,
-                        height: 52,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        width: 52,
-                        height: 52,
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        child: const Icon(Icons.storefront_outlined),
-                      ),
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderLight),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.microShadow,
+                blurRadius: 12,
+                offset: Offset(0, 4),
               ),
             ],
           ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                ChatUserAvatar(
+                  avatarSeed: conversation.otherUserAvatarSeed,
+                  size: 48,
+                  online: isOnline,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              conversation.otherUserName ?? 'مستخدم',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.cairo(
+                                fontSize: 14,
+                                fontWeight: hasUnread
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            formatConversationTimeAr(time),
+                            style: GoogleFonts.cairo(
+                              fontSize: 10,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              conversation.lastMessage ?? 'ابدأ المحادثة',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.tajawal(
+                                fontSize: 13,
+                                fontWeight:
+                                    hasUnread ? FontWeight.w600 : FontWeight.normal,
+                                color: hasUnread
+                                    ? AppColors.textDark
+                                    : AppColors.textMuted,
+                              ),
+                            ),
+                          ),
+                          if (hasUnread) ...[
+                            const SizedBox(width: 8),
+                            _UnreadBadge(count: conversation.unreadCount),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (conversation.listingImage != null &&
+                    conversation.listingImage!.isNotEmpty) ...[
+                  const SizedBox(width: 10),
+                  ChatListingThumb(url: conversation.listingImage, size: 36),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UnreadBadge extends StatelessWidget {
+  const _UnreadBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = count > 99 ? '99+' : '$count';
+    return Container(
+      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: const BoxDecoration(
+        color: AppColors.approved,
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
         ),
       ),
     );

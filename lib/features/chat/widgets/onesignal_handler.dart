@@ -20,7 +20,18 @@ class OneSignalService {
 
     OneSignal.Notifications.addClickListener((event) {
       final data = event.notification.additionalData;
-      final conversationId = data?['conversation_id'] as String?;
+      if (data == null) return;
+
+      final alertType = data['type'] as String?;
+      if (alertType == 'smart_alert') {
+        final referenceNo = data['reference_no'];
+        if (referenceNo != null) {
+          _pendingDeepLink = '/listing/$referenceNo';
+        }
+        return;
+      }
+
+      final conversationId = data['conversation_id'] as String?;
       if (conversationId != null && conversationId.isNotEmpty) {
         _pendingDeepLink = '/chat/$conversationId';
       }

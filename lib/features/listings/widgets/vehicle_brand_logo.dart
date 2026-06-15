@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../core/utils/svg_sanitizer.dart';
 import '../../../core/utils/vehicle_brand_style.dart';
 import '../../../shared/models/category_model.dart';
 
@@ -124,11 +126,12 @@ class _SvgBrandLogoState extends State<_SvgBrandLogo> {
         Uri.parse(url),
         headers: const {
           'Accept': 'image/svg+xml,*/*',
-          'User-Agent': 'SouqIQ/1.0',
+          'User-Agent': 'Sello/1.0',
         },
       );
       if (response.statusCode != 200) return null;
-      return response.bodyBytes;
+      final cleaned = sanitizeSvgMarkup(utf8.decode(response.bodyBytes));
+      return utf8.encode(cleaned);
     } catch (_) {
       return null;
     }

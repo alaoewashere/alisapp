@@ -10,8 +10,8 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "لوحة تحكم سوق العراق",
-  description: "لوحة تحكم إدارة سوق العراق",
+  title: "لوحة تحكم Sello",
+  description: "لوحة تحكم إدارة Sello",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

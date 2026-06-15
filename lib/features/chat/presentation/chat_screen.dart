@@ -1,18 +1,20 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../shared/models/conversation_model.dart';
-import '../../../core/utils/currency_formatter.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/chat_date_utils.dart';
 import '../../../core/utils/phone_links.dart';
 import '../../../core/supabase/supabase_client.dart';
+import '../../../shared/models/conversation_model.dart';
 import '../../../shared/models/message_model.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
+import '../../../widgets/user_avatar.dart';
 import '../providers/chat_provider.dart';
+import '../widgets/listing_context_card.dart';
 import '../widgets/message_bubble.dart';
 
 final _networkStatusProvider = StreamProvider<List<ConnectivityResult>>((ref) {
@@ -71,13 +73,14 @@ class ChatScreen extends ConsumerWidget {
     });
 
     return Scaffold(
+      backgroundColor: AppColors.chatBackground,
       resizeToAvoidBottomInset: true,
       appBar: conversationAsync.when(
-        loading: () => AppBar(title: const Text('محادثة')),
-        error: (_, _) => AppBar(title: const Text('محادثة')),
+        loading: () => _buildLoadingAppBar(context),
+        error: (_, _) => _buildLoadingAppBar(context),
         data: (conversation) {
           if (conversation == null) {
-            return AppBar(title: const Text('محادثة'));
+            return _buildLoadingAppBar(context);
           }
           return _ChatAppBar(conversation: conversation);
         },
@@ -94,6 +97,13 @@ class ChatScreen extends ConsumerWidget {
               ),
               actions: const [SizedBox.shrink()],
             ),
+          conversationAsync.maybeWhen(
+            data: (conversation) {
+              if (conversation == null) return const SizedBox.shrink();
+              return ListingContextCard(conversation: conversation);
+            },
+            orElse: () => const SizedBox.shrink(),
+          ),
           Expanded(
             child: messagesAsync.when(
               loading: () => const _MessagesShimmer(),
@@ -105,20 +115,52 @@ class ChatScreen extends ConsumerWidget {
               data: (streamMessages) {
                 final merged = _mergeMessages(streamMessages, pending);
                 if (merged.isEmpty) {
-                  return const Center(
-                    child: Text('ابدأ المحادثة'),
+                  return Center(
+                    child: Text(
+                      'ابدأ المحادثة',
+                      style: GoogleFonts.tajawal(
+                        fontSize: 14,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
                   );
                 }
+                final otherSeed = conversationAsync.value?.otherUserAvatarSeed;
                 return _MessagesList(
                   conversationId: conversationId,
                   messages: merged,
                   userId: userId,
+                  otherUserAvatarSeed: otherSeed,
                 );
               },
             ),
           ),
           _ChatInputBar(conversationId: conversationId),
         ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildLoadingAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0.5,
+      leadingWidth: 40,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, size: 18, color: AppColors.textDark),
+        onPressed: () {
+          if (context.canPop()) {
+            context.pop();
+          }
+        },
+      ),
+      title: Text(
+        'محادثة',
+        style: GoogleFonts.cairo(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textDark,
+        ),
       ),
     );
   }
@@ -147,65 +189,125 @@ class ChatScreen extends ConsumerWidget {
   }
 }
 
-class _ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
+class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _ChatAppBar({required this.conversation});
 
   final ConversationModel conversation;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 52);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  bool get _isOnline {
+    final last = conversation.lastMessageTime ?? conversation.createdAt;
+    return DateTime.now().difference(last).inMinutes < 30;
+  }
+
+  void _showChatOptions(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.storefront_outlined),
+              title: const Text('عرض الإعلان'),
+              onTap: () {
+                Navigator.pop(ctx);
+                context.push('/listing/${conversation.listingId}');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.block_outlined),
+              title: const Text('حظر المستخدم'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('ميزة الحظر قريباً')),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.flag_outlined),
+              title: const Text('الإبلاغ عن المحادثة'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('تم استلام بلاغك')),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final c = conversation;
-    final theme = Theme.of(context);
+    final name = c.otherUserName ?? 'مستخدم';
 
     return AppBar(
-      titleSpacing: 0,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: Colors.white,
+      elevation: 0.5,
+      scrolledUnderElevation: 0.5,
+      surfaceTintColor: Colors.transparent,
+      leadingWidth: 40,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, size: 18, color: AppColors.textDark),
+        onPressed: () {
+          if (context.canPop()) {
+            context.pop();
+          }
+        },
+      ),
+      title: Row(
         children: [
-          Row(
+          Stack(
+            clipBehavior: Clip.none,
             children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundImage: c.otherUserAvatar != null
-                    ? CachedNetworkImageProvider(c.otherUserAvatar!)
-                    : null,
-                child: c.otherUserAvatar == null
-                    ? const Icon(Icons.person, size: 16)
-                    : null,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  c.otherUserName ?? 'مستخدم',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          InkWell(
-            onTap: () => context.push('/listing/${c.listingId}'),
-            child: Row(
-              children: [
-                ChatListingThumb(url: c.listingImage, size: 28),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    c.listingTitle ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall,
+              UserAvatar(avatarSeed: c.otherUserAvatarSeed, size: 38),
+              if (_isOnline)
+                Positioned(
+                  bottom: 1,
+                  right: 1,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: AppColors.approved,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
                   ),
                 ),
-                if (c.listingPrice != null)
+            ],
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cairo(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                if (_isOnline)
                   Text(
-                    formatIQD(c.listingPrice!),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.primary,
+                    'متصل الآن',
+                    style: GoogleFonts.tajawal(
+                      fontSize: 11,
+                      color: AppColors.approved,
                     ),
                   ),
               ],
@@ -216,29 +318,17 @@ class _ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
       actions: [
         if (c.otherUserPhone != null && c.otherUserPhone!.isNotEmpty)
           IconButton(
-            icon: const Icon(Icons.phone_outlined),
+            icon: const Icon(Icons.call_outlined, color: AppColors.textDark, size: 22),
             onPressed: () => launchPhoneCall(c.otherUserPhone),
+          )
+        else
+          IconButton(
+            icon: const Icon(Icons.call_outlined, color: AppColors.textDark, size: 22),
+            onPressed: () {},
           ),
-        PopupMenuButton<String>(
-          onSelected: (value) async {
-            switch (value) {
-              case 'listing':
-                context.push('/listing/${c.listingId}');
-              case 'block':
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('ميزة الحظر قريباً')),
-                );
-              case 'report':
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم استلام بلاغك')),
-                );
-            }
-          },
-          itemBuilder: (_) => const [
-            PopupMenuItem(value: 'listing', child: Text('عرض الإعلان')),
-            PopupMenuItem(value: 'block', child: Text('حظر المستخدم')),
-            PopupMenuItem(value: 'report', child: Text('الإبلاغ عن المحادثة')),
-          ],
+        IconButton(
+          icon: const Icon(Icons.more_horiz, color: AppColors.textDark, size: 22),
+          onPressed: () => _showChatOptions(context),
         ),
       ],
     );
@@ -250,11 +340,13 @@ class _MessagesList extends ConsumerWidget {
     required this.conversationId,
     required this.messages,
     required this.userId,
+    this.otherUserAvatarSeed,
   });
 
   final String conversationId;
   final List<MessageModel> messages;
   final String? userId;
+  final String? otherUserAvatarSeed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -268,7 +360,7 @@ class _MessagesList extends ConsumerWidget {
 
     return ListView.builder(
       controller: controller,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
       itemCount: messages.length,
       itemBuilder: (context, index) {
         final message = messages[index];
@@ -278,12 +370,12 @@ class _MessagesList extends ConsumerWidget {
         final showDate = prev == null ||
             !isSameChatDay(prev.createdAt, message.createdAt);
 
-        final isFirstInGroup =
-            prev == null || prev.senderId != message.senderId ||
-                !isSameChatDay(prev.createdAt, message.createdAt);
-        final isLastInGroup =
-            next == null || next.senderId != message.senderId ||
-                !isSameChatDay(next.createdAt, message.createdAt);
+        final isFirstInGroup = prev == null ||
+            prev.senderId != message.senderId ||
+            !isSameChatDay(prev.createdAt, message.createdAt);
+        final isLastInGroup = next == null ||
+            next.senderId != message.senderId ||
+            !isSameChatDay(next.createdAt, message.createdAt);
 
         return Column(
           children: [
@@ -294,6 +386,7 @@ class _MessagesList extends ConsumerWidget {
                 currentUserId: userId!,
                 isFirstInGroup: isFirstInGroup,
                 isLastInGroup: isLastInGroup,
+                otherUserAvatarSeed: otherUserAvatarSeed,
               ),
           ],
         );
@@ -321,12 +414,23 @@ class _ChatInputBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(chatInputControllerProvider(conversationId));
-    final theme = Theme.of(context);
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)
+          .add(EdgeInsets.only(bottom: bottomInset > 0 ? 0 : 8)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
         child: ValueListenableBuilder<TextEditingValue>(
           valueListenable: controller,
           builder: (context, value, _) {
@@ -334,53 +438,70 @@ class _ChatInputBar extends ConsumerWidget {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.emoji_emotions_outlined,
-                    color: theme.colorScheme.outline,
+                if (hasText)
+                  GestureDetector(
+                    onTap: () => _send(ref),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.send_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
                   ),
-                ),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 120),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                     child: TextField(
                       controller: controller,
-                      textDirection: TextDirection.rtl,
-                      maxLines: 5,
-                      minLines: 1,
+                      style: GoogleFonts.tajawal(
+                        fontSize: 14,
+                        color: AppColors.textDark,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'اكتب رسالة...',
-                        filled: true,
-                        fillColor: theme.colorScheme.surfaceContainerHighest,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
+                        hintStyle: GoogleFonts.tajawal(
+                          fontSize: 14,
+                          color: AppColors.textMuted,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
                       ),
+                      maxLines: null,
+                      textDirection: TextDirection.rtl,
                       onSubmitted: hasText ? (_) => _send(ref) : null,
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                Material(
-                  color: hasText
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(24),
-                  child: InkWell(
-                    onTap: hasText ? () => _send(ref) : null,
-                    borderRadius: BorderRadius.circular(24),
-                    child: const SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: Icon(Icons.send, color: Colors.white),
+                if (!hasText)
+                  IconButton(
+                    icon: const Icon(
+                      Icons.mic_none_rounded,
+                      color: AppColors.textMuted,
+                      size: 24,
                     ),
+                    onPressed: () {},
                   ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.sentiment_satisfied_outlined,
+                    color: AppColors.textMuted,
+                    size: 24,
+                  ),
+                  onPressed: () {},
                 ),
               ],
             );
@@ -398,7 +519,7 @@ class _MessagesShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
-      children: [
+      children: const [
         ShimmerBox(height: 48, width: 220),
         SizedBox(height: 8),
         ShimmerBox(height: 48, width: 180),

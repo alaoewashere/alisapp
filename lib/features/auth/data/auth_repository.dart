@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -8,6 +9,7 @@ import '../../../core/utils/result.dart';
 import '../../../core/utils/validators.dart';
 import '../../../shared/models/profile_model.dart';
 import '../domain/auth_result.dart';
+import 'apple_sign_in.dart';
 import 'auth_errors.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -22,6 +24,94 @@ class AuthRepository {
   User? get currentUser => _client.auth.currentUser;
 
   Session? getSession() => _client.auth.currentSession;
+
+  Future<Result<bool>> sendWhatsAppOtp(String phoneE164) async {
+    try {
+      final phone = Validators.normalizeE164(phoneE164);
+      if (kDebugMode) {
+        debugPrint('sendWhatsAppOtp → $phone');
+      }
+      final response = await _client.functions.invoke(
+        'send-whatsapp-otp',
+        body: {'phone': phone},
+      );
+      if (response.status == 200) {
+        if (kDebugMode) {
+          debugPrint('sendWhatsAppOtp ← WhatsApp OTP dispatched');
+        }
+        return const Success(true);
+      }
+      return const Failure('فشل إرسال الرمز، حاول مجدداً');
+    } catch (e) {
+      return Failure('فشل إرسال الرمز، حاول مجدداً', cause: e);
+    }
+  }
+
+  Future<Result<bool>> resendWhatsAppOtp(String phoneE164) =>
+      sendWhatsAppOtp(phoneE164);
+
+  Future<Result<AuthResult>> verifyWhatsAppOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    try {
+      final e164 = Validators.normalizeE164(phone);
+      if (kDebugMode) {
+        debugPrint('verifyWhatsAppOtp → $e164');
+      }
+      final response = await _client.functions.invoke(
+        'verify-whatsapp-otp',
+        body: {'phone': e164, 'code': otp.trim()},
+      );
+
+      final data = response.data;
+      if (response.status != 200 ||
+          data is! Map ||
+          data['status'] != 'approved') {
+        return const Failure('رمز غير صحيح');
+      }
+
+      final tokenHash = data['token_hash'] as String?;
+      if (tokenHash == null || tokenHash.isEmpty) {
+        return const Failure('تعذّر إنشاء الجلسة. حاول مرة أخرى.');
+      }
+
+      final verifyResponse = await _client.auth.verifyOTP(
+        tokenHash: tokenHash,
+        type: OtpType.magiclink,
+      );
+
+      Session? session = verifyResponse.session;
+      for (var i = 0; i < 3; i++) {
+        session ??= _client.auth.currentSession;
+        if (session != null) break;
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      if (session == null) {
+        if (kDebugMode) {
+          debugPrint('verifyWhatsAppOtp: session not established after retries');
+        }
+        return const Failure('تعذّر إنشاء الجلسة. حاول مرة أخرى.');
+      }
+
+      final user = session.user;
+      if (kDebugMode) {
+        debugPrint('verifyWhatsAppOtp: session established for ${user.id}');
+      }
+
+      final profile = await _fetchProfile(user.id);
+      final isNewUser = profile == null || !profile.isComplete;
+
+      return Success(
+        AuthResult(user: user, isNewUser: isNewUser),
+      );
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('رمز غير صحيح', cause: e);
+    }
+  }
 
   Future<Result<bool>> sendOTP(String phoneE164) async {
     try {
@@ -89,6 +179,163 @@ class AuthRepository {
     }
   }
 
+  Future<Result<bool>> signInWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      if (kDebugMode) {
+        debugPrint('signInWithPassword → $email');
+      }
+      final response = await _client.auth.signInWithPassword(
+        email: email.trim(),
+        password: password,
+      );
+
+      if (response.session == null) {
+        return const Failure('تعذّر تسجيل الدخول. تحقق من البريد وكلمة المرور.');
+      }
+
+      if (kDebugMode) {
+        debugPrint('signInWithPassword ← session for ${response.user?.id}');
+      }
+      return const Success(true);
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('تعذّر تسجيل الدخول. حاول مرة أخرى.', cause: e);
+    }
+  }
+
+  Future<Result<bool>> signUpWithPassword({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+  }) async {
+    try {
+      final fullName = '$firstName $lastName'.trim();
+      if (kDebugMode) {
+        debugPrint(
+          'signUpWithPassword → email=$email '
+          'firstName=$firstName lastName=$lastName fullName=$fullName',
+        );
+      }
+      final response = await _client.auth.signUp(
+        email: email.trim(),
+        password: password,
+        data: {
+          'first_name': firstName,
+          'last_name': lastName,
+          'full_name': fullName,
+        },
+      );
+
+      if (response.session == null) {
+        return const Failure('تعذّر إنشاء الحساب. حاول مرة أخرى.');
+      }
+
+      final userId = response.user!.id;
+      final profileResult = await _upsertSignupProfile(
+        userId: userId,
+        email: email.trim(),
+        fullName: fullName,
+      );
+      if (profileResult case Failure(:final message)) {
+        return Failure(message);
+      }
+
+      if (kDebugMode) {
+        debugPrint('signUpWithPassword ← session for $userId');
+      }
+      return const Success(true);
+    } on AuthException catch (e, st) {
+      logAuthError(e, st);
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e, st) {
+      logAuthError(e, st);
+      return Failure(authErrorMessage(e), cause: e);
+    }
+  }
+
+  Future<Result<bool>> resetPasswordForEmail(String email) async {
+    try {
+      await _client.auth.resetPasswordForEmail(email.trim());
+      return const Success(true);
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('تعذّر إرسال رمز التحقق.', cause: e);
+    }
+  }
+
+  Future<Result<bool>> resendPhoneOtp(String phoneE164) async {
+    try {
+      await _client.auth.resend(
+        type: OtpType.sms,
+        phone: Validators.normalizeE164(phoneE164),
+      );
+      return const Success(true);
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('تعذّر إعادة إرسال الرمز.', cause: e);
+    }
+  }
+
+  Future<Result<bool>> resendEmailOtp(String email) async {
+    try {
+      await _client.auth.resend(
+        type: OtpType.email,
+        email: email.trim(),
+      );
+      return const Success(true);
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('تعذّر إعادة إرسال الرمز.', cause: e);
+    }
+  }
+
+  Future<Result<AuthResult>> verifyEmailOTP({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await _client.auth.verifyOTP(
+        email: email.trim(),
+        token: otp.trim(),
+        type: OtpType.email,
+      );
+
+      Session? session = response.session ?? _client.auth.currentSession;
+      if (session == null) {
+        return const Failure('رمز غير صحيح');
+      }
+
+      final user = session.user;
+      final profile = await _fetchProfile(user.id);
+      final isNewUser = profile == null || !profile.isComplete;
+
+      return Success(AuthResult(user: user, isNewUser: isNewUser));
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('رمز غير صحيح', cause: e);
+    }
+  }
+
+  Future<Result<bool>> updatePassword(String password) async {
+    try {
+      await _client.auth.updateUser(UserAttributes(password: password));
+      return const Success(true);
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('تعذّر تحديث كلمة المرور.', cause: e);
+    }
+  }
+
   Future<Result<bool>> signInWithGoogle() async {
     try {
       if (kDebugMode) {
@@ -104,6 +351,48 @@ class AuthRepository {
       return Failure(authErrorMessage(e), cause: e);
     } catch (e) {
       return Failure(authErrorMessage(e), cause: e);
+    }
+  }
+
+  Future<Result<bool>> signInWithApple() async {
+    try {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+        if (kDebugMode) {
+          debugPrint('signInWithApple → native iOS');
+        }
+        final response = await signInWithAppleNative(_client.auth);
+        if (response.session == null) {
+          return const Failure('تعذّر تسجيل الدخول بـ Apple. حاول مرة أخرى.');
+        }
+        if (kDebugMode) {
+          debugPrint(
+            'signInWithApple ← native session for ${response.user?.id}',
+          );
+        }
+        return const Success(true);
+      }
+
+      if (kDebugMode) {
+        debugPrint('signInWithApple → launching OAuth');
+      }
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.apple,
+        redirectTo: AppConstants.authRedirectUri,
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+      return const Success(true);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        return const Failure('تم إلغاء تسجيل الدخول.');
+      }
+      return Failure(
+        'تعذّر تسجيل الدخول بـ Apple. حاول مرة أخرى.',
+        cause: e,
+      );
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e), cause: e);
+    } catch (e) {
+      return Failure('تعذّر تسجيل الدخول بـ Apple. حاول مرة أخرى.', cause: e);
     }
   }
 
@@ -179,6 +468,34 @@ class AuthRepository {
         .maybeSingle();
     if (data == null) return null;
     return ProfileModel.fromJson(data);
+  }
+
+  Future<Result<bool>> _upsertSignupProfile({
+    required String userId,
+    required String email,
+    required String fullName,
+  }) async {
+    try {
+      final createdAt = DateTime.now().toUtc().toIso8601String();
+      await _client.from('profiles').upsert({
+        'id': userId,
+        'email': email,
+        'full_name': fullName,
+        'display_name': fullName,
+        'created_at': createdAt,
+      });
+      if (kDebugMode) {
+        debugPrint('_upsertSignupProfile ← profile for $userId');
+      }
+      return const Success(true);
+    } on PostgrestException catch (e) {
+      if (kDebugMode) {
+        debugPrint('_upsertSignupProfile failed: ${e.message}');
+      }
+      return Failure('تعذّر حفظ الملف الشخصي.', cause: e);
+    } catch (e) {
+      return Failure('تعذّر حفظ الملف الشخصي.', cause: e);
+    }
   }
 
   String _mimeForExtension(String ext) {

@@ -5,6 +5,9 @@ import {
   FolderTree,
   LayoutDashboard,
   Settings,
+  ShieldCheck,
+  ShoppingBag,
+  Star,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -20,7 +23,10 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { href: "/dashboard", label: "نظرة عامة", icon: LayoutDashboard },
   { href: "/dashboard/listings", label: "الإعلانات", icon: FileText },
+  { href: "/dashboard/purchases", label: "المشتريات", icon: ShoppingBag },
   { href: "/dashboard/users", label: "المستخدمون", icon: Users },
+  { href: "/dashboard/verification", label: "التوثيق", icon: ShieldCheck },
+  { href: "/dashboard/ratings", label: "التقييمات", icon: Star },
   { href: "/dashboard/reports", label: "البلاغات", icon: Flag, badge: "reports" },
   { href: "/dashboard/categories", label: "الفئات", icon: FolderTree },
   { href: "/dashboard/analytics", label: "التحليلات", icon: BarChart3 },

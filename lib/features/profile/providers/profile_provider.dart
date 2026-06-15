@@ -109,6 +109,26 @@ class ProfileNotifier extends Notifier<AsyncValue<void>> {
     }
   }
 
+  Future<Result<ProfileModel>> updateAvatarSeed(String seed) async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) {
+      return const Failure('يجب تسجيل الدخول أولاً');
+    }
+    state = const AsyncLoading();
+    try {
+      final saved = await ref
+          .read(profileRepositoryProvider)
+          .updateAvatarSeed(userId, seed);
+      ref.invalidate(currentProfileProvider);
+      ref.invalidate(myProfileProvider);
+      state = const AsyncData(null);
+      return Success(saved);
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return Failure('$e');
+    }
+  }
+
   Future<Result<void>> removeAvatar() async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {

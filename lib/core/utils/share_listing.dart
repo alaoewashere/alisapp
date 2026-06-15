@@ -4,12 +4,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../shared/models/listing_model.dart';
+import 'listing_display_title.dart';
 
 const _shareBaseUrl = 'https://souqiq.com/listing';
 
 Future<void> shareListingUrl(ListingModel listing) async {
   final text = StringBuffer()
-    ..writeln(listing.titleAr)
+    ..writeln(listingDisplayTitle(listing))
     ..writeln(listing.formattedPrice)
     ..write('$_shareBaseUrl/${listing.id}');
 

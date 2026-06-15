@@ -141,6 +141,118 @@ void main() {
     );
   });
 
+  test('isCategoryBrowseRoot includes tutoring', () {
+    expect(
+      isCategoryBrowseRoot(
+        const CategoryModel(
+          id: 5,
+          slug: 'tutoring',
+          nameAr: 'دروس خصوصية',
+          icon: 'menu_book',
+        ),
+      ),
+      isTrue,
+    );
+  });
+
+  test('subtitleForCategory shows custom subtitle for tutoring root', () {
+    const tutoring = CategoryModel(
+      id: 5,
+      slug: 'tutoring',
+      nameAr: 'دروس خصوصية',
+      icon: 'menu_book',
+    );
+
+    expect(
+      subtitleForCategory(tutoring, const []),
+      'مدرسة ، جامعة ، لغات ، قرآن',
+    );
+  });
+
+  test('isCategoryBrowseRoot includes jobs', () {
+    expect(
+      isCategoryBrowseRoot(
+        const CategoryModel(
+          id: 6,
+          slug: 'jobs',
+          nameAr: 'فرص العمل',
+          icon: 'work',
+        ),
+      ),
+      isTrue,
+    );
+  });
+
+  test('subtitleForCategory shows custom subtitle for jobs root', () {
+    const jobs = CategoryModel(
+      id: 6,
+      slug: 'jobs',
+      nameAr: 'فرص العمل',
+      icon: 'work',
+    );
+
+    expect(
+      subtitleForCategory(jobs, const []),
+      'تقنية ، هندسة ، طب ، نفط',
+    );
+  });
+
+  test('isCategoryBrowseRoot includes pets', () {
+    expect(
+      isCategoryBrowseRoot(
+        const CategoryModel(
+          id: 7,
+          slug: 'pets',
+          nameAr: 'الحيوانات',
+          icon: 'pets',
+        ),
+      ),
+      isTrue,
+    );
+  });
+
+  test('subtitleForCategory shows custom subtitle for pets root', () {
+    const pets = CategoryModel(
+      id: 7,
+      slug: 'pets',
+      nameAr: 'الحيوانات',
+      icon: 'pets',
+    );
+
+    expect(
+      subtitleForCategory(pets, const []),
+      'كلاب ، قطط ، طيور ، مزرعة',
+    );
+  });
+
+  test('isCategoryBrowseRoot includes home_help', () {
+    expect(
+      isCategoryBrowseRoot(
+        const CategoryModel(
+          id: 8,
+          slug: 'home_help',
+          nameAr: 'مساعدة منزلية',
+          icon: 'child_care',
+        ),
+      ),
+      isTrue,
+    );
+  });
+
+  test('subtitleForCategory shows custom subtitle for home_help root', () {
+    const homeHelp = CategoryModel(
+      id: 8,
+      slug: 'home_help',
+      nameAr: 'مساعدة منزلية',
+      icon: 'child_care',
+    );
+
+    expect(
+      subtitleForCategory(homeHelp, const []),
+      'تنظيف ، طبخ ، مربيات ، سائق',
+    );
+  });
+
   test('isVehicleBrandListParent matches electronics AC branch', () {
     expect(
       isVehicleBrandListParent(

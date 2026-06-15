@@ -103,7 +103,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In ar, this message translates to:
-  /// **'سوق العراق'**
+  /// **'Sello'**
   String get appName;
 
   /// No description provided for @home.
@@ -757,7 +757,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchHint.
   ///
   /// In ar, this message translates to:
-  /// **'ابحث في سوق العراق...'**
+  /// **'ابحث في Sello...'**
   String get searchHint;
 
   /// No description provided for @otpSent.

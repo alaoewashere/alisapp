@@ -1,12 +1,32 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/supabase/supabase_client.dart';
+import '../../../core/utils/animal_listing_utils.dart';
+import '../../../core/utils/category_tree.dart';
+import '../../../core/utils/electronics_listing_utils.dart';
+import '../../../core/utils/general_listing_utils.dart';
+import '../../../core/utils/home_service_listing_utils.dart';
+import '../../../core/utils/job_listing_utils.dart';
+import '../../../core/utils/real_estate_listing_utils.dart';
+import '../../../core/utils/tutoring_listing_utils.dart';
+import '../../../core/utils/vehicle_listing_utils.dart';
+import '../../../services/video_service.dart';
+import '../../../shared/models/animal_listing_metadata.dart';
 import '../../../shared/models/category_model.dart';
+import '../../../shared/models/electronics_listing_metadata.dart';
+import '../../../shared/models/general_listing_metadata.dart';
+import '../../../shared/models/home_service_listing_metadata.dart';
+import '../../../shared/models/job_listing_metadata.dart';
 import '../../../shared/models/listing_model.dart';
+import '../../../shared/models/real_estate_listing_metadata.dart';
+import '../../../shared/models/tutoring_listing_metadata.dart';
+import '../../../shared/models/vehicle_listing_metadata.dart';
 import '../../home/providers/home_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../data/listings_repository.dart';
+import '../models/edit_listing_snapshot.dart';
 import 'listing_detail_provider.dart';
 import 'listings_provider.dart';
 import 'post_listing_provider.dart';
@@ -19,6 +39,11 @@ class EditListingState {
     this.listingId,
     this.existingImages = const [],
     this.removedImageIds = const [],
+    this.loadedPrice,
+    this.snapshot,
+    this.existingVideoUrl,
+    this.existingVideoThumbnailUrl,
+    this.canUploadVideo = false,
   });
 
   final bool loaded;
@@ -27,6 +52,11 @@ class EditListingState {
   final String? listingId;
   final List<ListingImage> existingImages;
   final List<String> removedImageIds;
+  final double? loadedPrice;
+  final EditListingSnapshot? snapshot;
+  final String? existingVideoUrl;
+  final String? existingVideoThumbnailUrl;
+  final bool canUploadVideo;
 
   EditListingState copyWith({
     bool? loaded,
@@ -35,6 +65,11 @@ class EditListingState {
     String? listingId,
     List<ListingImage>? existingImages,
     List<String>? removedImageIds,
+    double? loadedPrice,
+    EditListingSnapshot? snapshot,
+    String? existingVideoUrl,
+    String? existingVideoThumbnailUrl,
+    bool? canUploadVideo,
     bool clearError = false,
   }) {
     return EditListingState(
@@ -44,6 +79,12 @@ class EditListingState {
       listingId: listingId ?? this.listingId,
       existingImages: existingImages ?? this.existingImages,
       removedImageIds: removedImageIds ?? this.removedImageIds,
+      loadedPrice: loadedPrice ?? this.loadedPrice,
+      snapshot: snapshot ?? this.snapshot,
+      existingVideoUrl: existingVideoUrl ?? this.existingVideoUrl,
+      existingVideoThumbnailUrl:
+          existingVideoThumbnailUrl ?? this.existingVideoThumbnailUrl,
+      canUploadVideo: canUploadVideo ?? this.canUploadVideo,
     );
   }
 }
@@ -70,24 +111,21 @@ class EditListingNotifier extends Notifier<EditListingState> {
       }
 
       final all = await ref.read(allCategoriesProvider.future);
-      CategoryModel? parent;
-      CategoryModel? sub;
+      CategoryModel? leaf;
       for (final c in all) {
         if (c.id == listing.categoryId) {
-          if (c.isParent) {
-            parent = c;
-          } else {
-            sub = c;
-            for (final p in all) {
-              if (p.id == c.parentId) parent = p;
-            }
-          }
+          leaf = c;
           break;
         }
       }
+      final categoryPath =
+          leaf != null ? buildCategoryPath(leaf.id, all) : <CategoryModel>[];
+
+      final package = _listingPackage(listing);
 
       ref.read(postListingProvider.notifier).applyLoadedState(
             PostListingState(
+              currentStep: 1,
               title: listing.titleAr,
               description: listing.descriptionAr,
               price: listing.price,
@@ -97,16 +135,56 @@ class EditListingNotifier extends Notifier<EditListingState> {
               city: listing.city,
               latitude: listing.latitude,
               longitude: listing.longitude,
-              selectedCategory: parent,
-              selectedSubcategory: sub,
-              expandedParentId: parent?.id,
+              locationAddress: listing.locationAddress,
+              categoryPath: categoryPath,
+              selectedCategory:
+                  categoryPath.isNotEmpty ? categoryPath.last : null,
+              contactPreference: listing.contactPreference,
+              listingPackage: package,
+              vehicleDetails:
+                  listing.vehicleMetadata ?? const VehicleListingMetadata(),
+              realEstateDetails: listing.realEstateMetadata ??
+                  const RealEstateListingMetadata(),
+              electronicsDetails: listing.electronicsMetadata ??
+                  (hasElectronicsSubForm(categoryPath)
+                      ? deriveElectronicsDetailsFromPath(
+                          categoryPath,
+                          electronicsFormKind(categoryPath),
+                        )
+                      : const ElectronicsListingMetadata()),
+              generalDetails: listing.generalMetadata ??
+                  (isGeneralMarketplaceCategoryPath(categoryPath)
+                      ? initialGeneralDetailsForPath(categoryPath)
+                      : const GeneralListingMetadata()),
+              tutoringDetails: listing.tutoringMetadata ??
+                  (isTutoringCategoryPath(categoryPath)
+                      ? deriveTutoringDetailsFromPath(categoryPath)
+                      : const TutoringListingMetadata()),
+              jobDetails: listing.jobMetadata ??
+                  (isJobCategoryPath(categoryPath)
+                      ? deriveJobDetailsFromPath(categoryPath)
+                      : const JobListingMetadata()),
+              animalDetails: listing.animalMetadata ??
+                  (isAnimalCategoryPath(categoryPath)
+                      ? deriveAnimalDetailsFromPath(categoryPath)
+                      : const AnimalListingMetadata()),
+              homeServiceDetails: listing.homeServiceMetadata ??
+                  (isHomeServiceCategoryPath(categoryPath)
+                      ? deriveHomeServiceDetailsFromPath(categoryPath)
+                      : const HomeServiceListingMetadata()),
             ),
           );
 
       state = EditListingState(
         loaded: true,
+        loading: false,
         listingId: listingId,
         existingImages: listing.images,
+        loadedPrice: listing.price,
+        snapshot: EditListingSnapshot.fromListing(listing),
+        existingVideoUrl: listing.videoUrl,
+        existingVideoThumbnailUrl: listing.videoThumbnailUrl,
+        canUploadVideo: package.allowsListingVideo,
       );
     } catch (_) {
       state = state.copyWith(
@@ -114,6 +192,16 @@ class EditListingNotifier extends Notifier<EditListingState> {
         error: 'تعذّر تحميل الإعلان',
       );
     }
+  }
+
+  ListingPackage _listingPackage(ListingModel listing) {
+    final metaPackage = listing.metadata['listing_package'] as String?;
+    if (metaPackage != null) {
+      return ListingPackage.fromString(metaPackage);
+    }
+    if (listing.isPremiumListing) return ListingPackage.premium;
+    if (listing.isProListing) return ListingPackage.pro;
+    return ListingPackage.standard;
   }
 
   void removeExistingImage(String imageId) {
@@ -128,10 +216,56 @@ class EditListingNotifier extends Notifier<EditListingState> {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return false;
 
+    final snapshot = state.snapshot;
+    if (snapshot == null) return false;
+
+    final postNotifier = ref.read(postListingProvider.notifier);
+    final postState = ref.read(postListingProvider);
+    _syncCategoryMetadata(postNotifier, postState);
     final post = ref.read(postListingProvider);
+
+    if (post.title.trim().isEmpty) {
+      postNotifier.setValidationError('أدخل عنوان الإعلان');
+      return false;
+    }
+
+    if (state.existingImages.isEmpty && post.images.isEmpty) {
+      postNotifier.setValidationError('أضف صورة واحدة على الأقل');
+      return false;
+    }
+
     state = state.copyWith(loading: true, clearError: true);
 
     try {
+      final city = normalizeEditListingCity(
+        governorate: post.governorate ?? '',
+        city: post.city,
+      );
+
+      final categoryMetadata = _categoryMetadataForSave(post);
+      final metadata = mergeEditListingMetadata(
+        original: snapshot.metadata,
+        categoryMetadata: categoryMetadata,
+      );
+
+      final fieldUpdates = buildEditListingFieldUpdates(
+        original: snapshot,
+        title: post.title,
+        description: post.description,
+        price: post.price ?? 0,
+        isNegotiable: post.isNegotiable,
+        condition: post.condition,
+        governorate: post.governorate ?? '',
+        city: city,
+        latitude: post.latitude,
+        longitude: post.longitude,
+        locationAddress: post.locationAddress,
+        contactPreference: post.contactPreference,
+        metadata: metadata,
+      );
+
+      debugPrint('Edit listing fieldUpdates: $fieldUpdates');
+
       final newPaths = <String>[];
       if (post.images.isNotEmpty) {
         final batchId = DateTime.now().millisecondsSinceEpoch;
@@ -168,21 +302,43 @@ class EditListingNotifier extends Notifier<EditListingState> {
         order++;
       }
 
-      await ref.read(listingsRepositoryProvider).updateListing(
-            listingId: listingId,
-            categoryId: post.effectiveCategory!.id,
-            title: post.title.trim(),
-            description: post.description.trim(),
-            price: post.price ?? 0,
-            isNegotiable: post.isNegotiable,
-            condition: post.condition,
-            city: post.city.trim(),
-            governorate: post.governorate ?? '',
-            latitude: post.latitude,
-            longitude: post.longitude,
-            imageRows: imageRows,
-            removedImageIds: state.removedImageIds,
-          );
+      final imagesDirty = imagesChanged(
+        original: snapshot,
+        currentImageIds: state.existingImages.map((i) => i.id).toList(),
+        removedImageIds: state.removedImageIds,
+        newImageCount: post.images.length,
+      );
+
+      if (fieldUpdates.isEmpty && !imagesDirty && post.pendingVideoFile == null) {
+        state = state.copyWith(loading: false);
+        return true;
+      }
+
+      if (fieldUpdates.isNotEmpty || imagesDirty) {
+        await ref.read(listingsRepositoryProvider).patchListing(
+              listingId: listingId,
+              userId: userId,
+              fields: fieldUpdates,
+              imageRows: imageRows,
+              removedImageIds: state.removedImageIds,
+              imagesDirty: imagesDirty,
+            );
+      }
+
+      if (post.pendingVideoFile != null &&
+          post.listingPackage.allowsListingVideo) {
+        final upload = await ref.read(videoServiceProvider).uploadVideo(
+              videoFile: post.pendingVideoFile!,
+              listingId: listingId,
+              onProgress: (_) {},
+            );
+        await ref.read(listingsRepositoryProvider).updateListingVideo(
+              listingId: listingId,
+              videoUrl: upload.videoUrl,
+              thumbnailUrl: upload.thumbnailUrl,
+              durationSeconds: upload.durationSeconds,
+            );
+      }
 
       ref.invalidate(listingDetailProvider(listingId));
       ref.invalidate(recentListingsProvider);
@@ -190,10 +346,63 @@ class EditListingNotifier extends Notifier<EditListingState> {
       ref.read(postListingProvider.notifier).reset();
       state = state.copyWith(loading: false);
       return true;
-    } catch (_) {
+    } catch (e, stackTrace) {
+      debugPrint('Edit listing error: $e');
+      debugPrint('Stack trace: $stackTrace');
       state = state.copyWith(loading: false, error: 'تعذّر حفظ التعديلات');
       return false;
     }
+  }
+
+  void _syncCategoryMetadata(
+    PostListingNotifier postNotifier,
+    PostListingState postState,
+  ) {
+    if (postState.isVehicleListing) {
+      postNotifier.syncVehicleListingCopy();
+    } else if (postState.isRealEstateListing) {
+      postNotifier.syncRealEstateListingCopy();
+    } else if (postState.isElectronicsListing) {
+      postNotifier.syncElectronicsListingCopy();
+    } else if (postState.isGeneralMarketplaceListing) {
+      postNotifier.syncGeneralListingCopy();
+    } else if (postState.isTutoringListing) {
+      postNotifier.syncTutoringListingCopy();
+    } else if (postState.isJobListing) {
+      postNotifier.syncJobListingCopy();
+    } else if (postState.isAnimalListing) {
+      postNotifier.syncAnimalListingCopy();
+    } else if (postState.isHomeServiceListing) {
+      postNotifier.syncHomeServiceListingCopy();
+    }
+  }
+
+  Map<String, dynamic>? _categoryMetadataForSave(PostListingState post) {
+    if (post.isVehicleListing) {
+      return vehicleMetadataForStorage(post.vehicleDetails);
+    }
+    if (post.isRealEstateListing) {
+      return realEstateMetadataForStorage(post.realEstateDetails);
+    }
+    if (post.isElectronicsListing) {
+      return electronicsMetadataForStorage(post.electronicsDetails);
+    }
+    if (post.isGeneralMarketplaceListing) {
+      return generalMetadataForStorage(post.generalDetails);
+    }
+    if (post.isTutoringListing) {
+      return tutoringMetadataForStorage(post.tutoringDetails);
+    }
+    if (post.isJobListing) {
+      return jobMetadataForStorage(post.jobDetails);
+    }
+    if (post.isAnimalListing) {
+      return animalMetadataForStorage(post.animalDetails);
+    }
+    if (post.isHomeServiceListing) {
+      return homeServiceMetadataForStorage(post.homeServiceDetails);
+    }
+    return null;
   }
 
   String _storagePathFromUrl(ListingImage img) {

@@ -113,6 +113,58 @@ class Validators {
     return null;
   }
 
+  static String? email(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'أدخل البريد الإلكتروني';
+    }
+    final pattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    if (!pattern.hasMatch(value.trim())) {
+      return 'بريد إلكتروني غير صالح';
+    }
+    return null;
+  }
+
+  static String? password(String? value, {int minLength = 8}) {
+    if (value == null || value.isEmpty) {
+      return 'أدخل كلمة المرور';
+    }
+    if (value.length < minLength) {
+      return 'كلمة المرور يجب أن تكون $minLength أحرف على الأقل';
+    }
+    return null;
+  }
+
+  /// Matches Supabase Auth password policy (lower, upper, digit, symbol).
+  static String? signUpPassword(String? value, {int minLength = 8}) {
+    final basic = password(value, minLength: minLength);
+    if (basic != null) return basic;
+
+    final text = value!;
+    if (!RegExp(r'[a-z]').hasMatch(text)) {
+      return 'أضف حرفاً صغيراً (a-z) إلى كلمة المرور';
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(text)) {
+      return 'أضف حرفاً كبيراً (A-Z) إلى كلمة المرور';
+    }
+    if (!RegExp(r'[0-9]').hasMatch(text)) {
+      return 'أضف رقماً (0-9) إلى كلمة المرور';
+    }
+    if (!RegExp(r'[^a-zA-Z0-9]').hasMatch(text)) {
+      return 'أضف رمزاً خاصاً (!@#...) إلى كلمة المرور';
+    }
+    return null;
+  }
+
+  static String? confirmPassword(String? value, String password) {
+    if (value == null || value.isEmpty) {
+      return 'أكّد كلمة المرور';
+    }
+    if (value != password) {
+      return 'كلمتا المرور غير متطابقتين';
+    }
+    return null;
+  }
+
   static int parsePrice(String value) {
     return int.parse(value.replaceAll(',', '').replaceAll(' ', ''));
   }

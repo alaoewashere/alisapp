@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../constants/display_locale.dart';
 import '../providers/locale_provider.dart';
 
 /// Resolves localized strings for the current [localeProvider] value.
@@ -21,6 +22,26 @@ Locale normalizeAppLocale(Locale locale) {
       return const Locale('ku');
     default:
       return const Locale('ar');
+  }
+}
+
+/// [MaterialApp.locale] — Arabic/Kurdish UI strings with Western digits (0–9).
+Locale materialDisplayLocale(Locale appLocale) {
+  switch (normalizeAppLocale(appLocale).languageCode) {
+    case 'en':
+      return const Locale('en');
+    default:
+      return const Locale('ar', 'US');
+  }
+}
+
+/// intl [DateFormat] locale tag — Western digits for Arabic/Kurdish modes.
+String intlDisplayLocale(Locale appLocale) {
+  switch (normalizeAppLocale(appLocale).languageCode) {
+    case 'en':
+      return DisplayLocale.intlEnglish;
+    default:
+      return DisplayLocale.intlWesternArabic;
   }
 }
 

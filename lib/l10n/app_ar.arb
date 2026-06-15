@@ -1,6 +1,6 @@
 {
   "@@locale": "ar",
-  "appName": "سوق العراق",
+  "appName": "Sello",
   "home": "الرئيسية",
   "search": "بحث",
   "favorites": "المفضلة",
@@ -119,7 +119,7 @@
   "categories": "الفئات",
   "featured": "مميز",
   "sold": "مباع",
-  "searchHint": "ابحث في سوق العراق...",
+  "searchHint": "ابحث في Sello...",
   "otpSent": "تم إرسال رمز التحقق. تحقق من رسائلك.",
   "newOtpSent": "تم إرسال رمز جديد"
 }

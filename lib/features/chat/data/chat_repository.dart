@@ -6,6 +6,17 @@ import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/models/message_model.dart';
 
+/// Result of opening or creating a listing-scoped conversation.
+class ConversationCreateResult {
+  const ConversationCreateResult({
+    required this.conversation,
+    required this.isNew,
+  });
+
+  final ConversationModel conversation;
+  final bool isNew;
+}
+
 final chatRepositoryProvider = Provider<ChatRepository>((ref) {
   return ChatRepository(ref.watch(supabaseClientProvider));
 });
@@ -21,8 +32,8 @@ class ChatRepository {
       title, title_ar, price_iqd, price,
       listing_images(storage_path, url, sort_order, is_primary)
     ),
-    buyer:profiles!conversations_buyer_id_fkey(full_name, display_name, avatar_url, phone),
-    seller:profiles!conversations_seller_id_fkey(full_name, display_name, avatar_url, phone)
+    buyer:profiles!conversations_buyer_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone),
+    seller:profiles!conversations_seller_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone)
   ''';
 
   String _publicUrl(String path) {
@@ -114,7 +125,7 @@ class ChatRepository {
     );
   }
 
-  Future<ConversationModel> getOrCreateConversation({
+  Future<ConversationCreateResult> getOrCreateConversation({
     required String listingId,
     required String buyerId,
     required String sellerId,
@@ -133,9 +144,12 @@ class ChatRepository {
         .maybeSingle();
 
     if (existing != null) {
-      return _mapConversationRow(
-        Map<String, dynamic>.from(existing),
-        buyerId,
+      return ConversationCreateResult(
+        conversation: await _mapConversationRow(
+          Map<String, dynamic>.from(existing),
+          buyerId,
+        ),
+        isNew: false,
       );
     }
 
@@ -145,9 +159,12 @@ class ChatRepository {
       'seller_id': sellerId,
     }).select(_conversationSelect).single();
 
-    return _mapConversationRow(
-      Map<String, dynamic>.from(inserted),
-      buyerId,
+    return ConversationCreateResult(
+      conversation: await _mapConversationRow(
+        Map<String, dynamic>.from(inserted),
+        buyerId,
+      ),
+      isNew: true,
     );
   }
 

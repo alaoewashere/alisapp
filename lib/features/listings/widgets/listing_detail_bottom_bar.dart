@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
+import '../../../widgets/rate_dialog.dart';
+import '../../profile/data/profile_repository.dart';
 import '../../../core/supabase/supabase_client.dart';
+import '../../../core/utils/listing_display_title.dart';
 import '../../../core/utils/phone_links.dart';
 import '../../../shared/models/listing_model.dart';
-import '../../chat/data/chat_repository.dart';
+import '../../chat/providers/chat_provider.dart';
+import '../widgets/listing_owner_package_panel.dart';
 import '../providers/listing_detail_provider.dart';
 
 const _whatsappGreen = Color(0xFF25D366);
-const _primaryGreen = Color(0xFF2E7D32);
 
 class ListingDetailBottomBar extends ConsumerWidget {
   const ListingDetailBottomBar({
     super.key,
     required this.listing,
     required this.isOwner,
+    this.onShareWhatsApp,
+    this.shareEnabled = true,
   });
 
   final ListingModel listing;
   final bool isOwner;
+  final VoidCallback? onShareWhatsApp;
+  final bool shareEnabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,8 +41,23 @@ class ListingDetailBottomBar extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: isOwner
-              ? _OwnerActions(listing: listing)
-              : _BuyerActions(listing: listing),
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ListingOwnerPackagePanel(listing: listing),
+                    _OwnerActions(
+                      listing: listing,
+                      onShareWhatsApp: onShareWhatsApp,
+                      shareEnabled: shareEnabled,
+                    ),
+                  ],
+                )
+              : _BuyerActions(
+                  listing: listing,
+                  onShareWhatsApp: onShareWhatsApp,
+                  shareEnabled: shareEnabled,
+                ),
         ),
       ),
     );
@@ -41,9 +65,15 @@ class ListingDetailBottomBar extends ConsumerWidget {
 }
 
 class _BuyerActions extends ConsumerWidget {
-  const _BuyerActions({required this.listing});
+  const _BuyerActions({
+    required this.listing,
+    this.onShareWhatsApp,
+    this.shareEnabled = true,
+  });
 
   final ListingModel listing;
+  final VoidCallback? onShareWhatsApp;
+  final bool shareEnabled;
 
   bool get _hasPhone =>
       listing.sellerPhone != null && listing.sellerPhone!.trim().isNotEmpty;
@@ -55,7 +85,7 @@ class _BuyerActions extends ConsumerWidget {
         if (_hasPhone) ...[
           Expanded(
             child: _ActionButton(
-              label: 'واتساب',
+              label: 'مراسلة',
               icon: Icons.chat,
               backgroundColor: _whatsappGreen.withValues(alpha: 0.12),
               foregroundColor: _whatsappGreen,
@@ -76,13 +106,38 @@ class _BuyerActions extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
         ],
+        if (onShareWhatsApp != null) ...[
+          Expanded(
+            child: _ActionButton(
+              label: 'واتساب',
+              icon: Icons.share_rounded,
+              backgroundColor: _whatsappGreen,
+              foregroundColor: Colors.white,
+              onPressed: shareEnabled ? onShareWhatsApp : null,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
         Expanded(
-          child: _ActionButton(
-            label: 'تواصل',
-            icon: Icons.message_outlined,
-            backgroundColor: _primaryGreen,
-            foregroundColor: Colors.white,
-            onPressed: () => _openChat(context, ref),
+          child: ElevatedButton.icon(
+            onPressed: () => _startChatWithSeller(context, ref),
+            icon: const Icon(Icons.chat_bubble_outline, size: 18),
+            label: Text(
+              'راسل البائع',
+              style: GoogleFonts.cairo(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              minimumSize: const Size(0, 56),
+            ),
           ),
         ),
       ],
@@ -95,7 +150,7 @@ class _BuyerActions extends ConsumerWidget {
 
     final launched = await launchWhatsApp(
       phone,
-      message: 'مرحباً، أنا مهتم بإعلانك: ${listing.titleAr}',
+      message: 'مرحباً، أنا مهتم بإعلانك: ${listingDisplayTitle(listing)}',
     );
     if (!launched && context.mounted) {
       _showSnack(context, 'واتساب غير مثبت');
@@ -112,7 +167,7 @@ class _BuyerActions extends ConsumerWidget {
     }
   }
 
-  Future<void> _openChat(BuildContext context, WidgetRef ref) async {
+  Future<void> _startChatWithSeller(BuildContext context, WidgetRef ref) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {
       await requireAuth(context, ref);
@@ -124,11 +179,10 @@ class _BuyerActions extends ConsumerWidget {
     }
     try {
       final conversation =
-          await ref.read(chatRepositoryProvider).getOrCreateConversation(
+          await ref.read(chatNotifierProvider.notifier).startChatFromListing(
                 listingId: listing.id,
-                buyerId: userId,
                 sellerId: listing.userId,
-                listingTitle: listing.titleAr,
+                listingTitle: listingDisplayTitle(listing),
               );
       if (context.mounted) context.push('/chat/${conversation.id}');
     } catch (_) {
@@ -143,9 +197,15 @@ class _BuyerActions extends ConsumerWidget {
 }
 
 class _OwnerActions extends ConsumerWidget {
-  const _OwnerActions({required this.listing});
+  const _OwnerActions({
+    required this.listing,
+    this.onShareWhatsApp,
+    this.shareEnabled = true,
+  });
 
   final ListingModel listing;
+  final VoidCallback? onShareWhatsApp;
+  final bool shareEnabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -153,6 +213,18 @@ class _OwnerActions extends ConsumerWidget {
 
     return Row(
       children: [
+        if (onShareWhatsApp != null) ...[
+          Expanded(
+            child: _ActionButton(
+              label: 'واتساب',
+              icon: Icons.share_rounded,
+              backgroundColor: _whatsappGreen,
+              foregroundColor: Colors.white,
+              onPressed: shareEnabled ? onShareWhatsApp : null,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
         Expanded(
           child: _ActionButton(
             label: 'تعديل',
@@ -162,7 +234,7 @@ class _OwnerActions extends ConsumerWidget {
             borderColor: Theme.of(context).colorScheme.outline,
             onPressed: loading
                 ? null
-                : () => context.push('/listing/${listing.id}/edit'),
+                : () => context.push(AppRoutes.editListingPath(listing.id)),
           ),
         ),
         const SizedBox(width: 8),
@@ -194,45 +266,62 @@ class _OwnerActions extends ConsumerWidget {
   Future<void> _confirmSold(BuildContext context, WidgetRef ref) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('تم البيع'),
         content: const Text('هل تريد وضع علامة "مباع" على هذا الإعلان؟'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('إلغاء'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('تأكيد'),
           ),
         ],
       ),
     );
     if (ok != true || !context.mounted) return;
-    await ref.read(listingDetailActionsProvider.notifier).markAsSold(listing.id);
-    if (context.mounted) {
-      ref.invalidate(listingDetailProvider(listing.id));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم وضع علامة مباع')),
-      );
+    final lastBuyerId = await ref
+        .read(listingDetailActionsProvider.notifier)
+        .markAsSold(listing.id);
+    if (!context.mounted) return;
+
+    ref.invalidate(listingDetailProvider(listing.id));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('تم وضع علامة مباع')),
+    );
+
+    if (lastBuyerId != null) {
+      final buyer = await ref.read(profileRepositoryProvider).getProfile(lastBuyerId);
+      if (buyer != null && context.mounted) {
+        await showRateDialog(
+          context: context,
+          ref: ref,
+          listingId: listing.id,
+          reviewedId: lastBuyerId,
+          reviewedName: buyer.fullName,
+          reviewedAvatarSeed: buyer.effectiveAvatarSeed,
+          subtitle: 'قيّم المشتري',
+        );
+      }
     }
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('حذف الإعلان'),
         content: const Text('هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('إلغاء'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('حذف'),
           ),
         ],

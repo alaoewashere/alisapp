@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/models/message_model.dart';
+import '../../listings/data/listings_repository.dart';
 import '../data/chat_repository.dart';
 
 export '../data/chat_repository.dart';
@@ -87,6 +88,37 @@ class ChatNotifier extends Notifier<AsyncValue<void>> {
   @override
   AsyncValue<void> build() => const AsyncData(null);
 
+  Future<ConversationModel> startChatFromListing({
+    required String listingId,
+    required String sellerId,
+    required String listingTitle,
+  }) async {
+    final buyerId = ref.read(currentUserIdProvider);
+    if (buyerId == null) throw StateError('Not authenticated');
+
+    final result = await ref.read(chatRepositoryProvider).getOrCreateConversation(
+          listingId: listingId,
+          buyerId: buyerId,
+          sellerId: sellerId,
+          listingTitle: listingTitle,
+        );
+
+    if (result.isNew) {
+      final intro = 'مرحباً، أنا مهتم بإعلانك: $listingTitle';
+      await ref.read(chatRepositoryProvider).sendMessage(
+            conversationId: result.conversation.id,
+            senderId: buyerId,
+            content: intro,
+          );
+      await ref.read(listingsRepositoryProvider).incrementContacts(listingId);
+      debugPrint(
+        'chat: sent listing intro for conversation ${result.conversation.id}',
+      );
+    }
+
+    return result.conversation;
+  }
+
   Future<ConversationModel> getOrCreateConversation({
     required String listingId,
     required String sellerId,
@@ -95,12 +127,13 @@ class ChatNotifier extends Notifier<AsyncValue<void>> {
     final buyerId = ref.read(currentUserIdProvider);
     if (buyerId == null) throw StateError('Not authenticated');
 
-    return ref.read(chatRepositoryProvider).getOrCreateConversation(
+    final result = await ref.read(chatRepositoryProvider).getOrCreateConversation(
           listingId: listingId,
           buyerId: buyerId,
           sellerId: sellerId,
           listingTitle: listingTitle,
         );
+    return result.conversation;
   }
 
   Future<void> sendMessage({

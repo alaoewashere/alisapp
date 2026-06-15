@@ -1,15 +1,18 @@
 class AppConstants {
   AppConstants._();
 
-  static const appNameAr = 'سوق العراق';
-  static const appNameEn = 'Souq IQ';
+  static const appNameAr = 'Sello';
+  static const appNameEn = 'Sello';
   static const bundleId = 'com.iraq.marketplace.souqiq';
   static const countryCode = '+964';
   static const maxListingPhotos = 10;
   static const listingsPageSize = 20;
   static const messagesPageSize = 50;
   static const storageBucket = 'listing-images';
+  static const listingVideosBucket = 'listing-videos';
   static const brandLogosBucket = 'brand-logos';
+  static const maxListingVideoBytes = 200 * 1024 * 1024;
+  static const maxListingVideoDurationSeconds = 60;
   static const authRedirectUri = 'com.iraq.marketplace.souqiq://login-callback';
   static const authRedirectScheme = 'com.iraq.marketplace.souqiq';
 

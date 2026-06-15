@@ -1,5 +1,5 @@
 name: my_app
-description: "سوق العراق — Iraq Classifieds Marketplace"
+description: "Sello — Iraq Classifieds Marketplace"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -54,12 +54,17 @@ dependencies:
   shimmer: ^3.0.0
   url_launcher: ^6.3.2
   country_code_picker: ^3.4.1
+  country_picker: ^2.0.26
   path: ^1.9.1
   path_provider: ^2.1.5
   flutter_image_compress: ^2.4.0
   reorderables: ^0.6.0
   photo_view: ^0.15.0
   share_plus: ^12.0.1
+  fl_chart: ^0.68.0
+  screenshot: ^2.1.0
+  video_player: ^2.8.3
+  chewie: ^1.7.5
   onesignal_flutter: ^5.3.4
   shared_preferences: ^2.5.3
   package_info_plus: ^8.3.0
@@ -67,7 +72,11 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   google_fonts: ^6.2.1
   http: ^1.4.0
-
+  freezed_annotation: ^3.1.0
+  flutter_colorpicker: ^1.1.0
+  sign_in_with_apple: ^8.1.0
+  crypto: ^3.0.7
+  video_thumbnail: ^0.5.6
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,6 +88,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   mocktail: ^1.0.5
+  freezed: ^3.2.5
+  build_runner: ^2.15.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -94,7 +105,15 @@ flutter:
 
   assets:
     - .env
+    - assets/app_logo.png
+    - assets/images/
+    - assets/images/forgot_password.jpg
+    - assets/images/car_diagram.png
+    - assets/images/car_paint_masks/
     - assets/icons/google.svg
+    - assets/icons/apple.svg
+    - assets/icons/facebook.svg
+    - assets/icons/marketplace_hero.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

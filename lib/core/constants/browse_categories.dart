@@ -18,6 +18,7 @@ class BrowseCategoryStyle {
   final String fallbackSubtitle;
   final Color color;
   final IconData icon;
+
   /// Used when the slug is not yet in Supabase.
   final int fallbackOrder;
 }
@@ -56,52 +57,36 @@ const browseCategoryStyles = [
     fallbackOrder: 4,
   ),
   BrowseCategoryStyle(
-    slug: 'industry',
-    nameAr: 'الآلات والصناعة',
-    fallbackSubtitle: 'معدات ، زراعة ، طاقة...',
-    color: Color(0xFF1A237E),
-    icon: Icons.precision_manufacturing_rounded,
-    fallbackOrder: 5,
-  ),
-  BrowseCategoryStyle(
-    slug: 'services',
-    nameAr: 'الخدمات والحرف',
-    fallbackSubtitle: 'صيانة ، نقل ، تصميم...',
-    color: Color(0xFF1E88E5),
-    icon: Icons.handyman_rounded,
-    fallbackOrder: 6,
-  ),
-  BrowseCategoryStyle(
     slug: 'tutoring',
     nameAr: 'دروس خصوصية',
-    fallbackSubtitle: 'رياضيات ، لغات ، جامعي...',
+    fallbackSubtitle: 'مدرسة ، جامعة ، لغات ، قرآن...',
     color: Color(0xFF43A047),
     icon: Icons.menu_book_rounded,
-    fallbackOrder: 7,
+    fallbackOrder: 5,
   ),
   BrowseCategoryStyle(
     slug: 'jobs',
     nameAr: 'فرص العمل',
-    fallbackSubtitle: 'محاماة ، تعليم ، تقنية...',
+    fallbackSubtitle: 'تقنية ، هندسة ، طب ، نفط...',
     color: Color(0xFF7CB342),
     icon: Icons.work_rounded,
-    fallbackOrder: 8,
+    fallbackOrder: 6,
   ),
   BrowseCategoryStyle(
     slug: 'pets',
     nameAr: 'الحيوانات',
-    fallbackSubtitle: 'حيوانات أليفة ، أعلاف...',
+    fallbackSubtitle: 'كلاب ، قطط ، طيور ، مزرعة...',
     color: Color(0xFF00ACC1),
     icon: Icons.pets_rounded,
-    fallbackOrder: 9,
+    fallbackOrder: 7,
   ),
   BrowseCategoryStyle(
     slug: 'home_help',
     nameAr: 'مساعدة منزلية',
-    fallbackSubtitle: 'مربيات ، تنظيف ، طباخين...',
+    fallbackSubtitle: 'تنظيف ، طبخ ، مربيات ، سائق...',
     color: Color(0xFFFB8C00),
     icon: Icons.child_care_rounded,
-    fallbackOrder: 10,
+    fallbackOrder: 8,
   ),
 ];
 
@@ -161,8 +146,10 @@ List<BrowseCategoryItem> buildBrowseCategoryItems(List<CategoryModel> all) {
   }).toList();
 
   items.sort((a, b) {
-    final order = _browseDisplayOrder(a.style, bySlug)
-        .compareTo(_browseDisplayOrder(b.style, bySlug));
+    final order = _browseDisplayOrder(
+      a.style,
+      bySlug,
+    ).compareTo(_browseDisplayOrder(b.style, bySlug));
     if (order != 0) return order;
     return a.style.slug.compareTo(b.style.slug);
   });

@@ -47,7 +47,20 @@ class CategoriesRepository {
 
   /// Direct children of [parentId] (always queries DB — used for drill-down).
   Future<List<CategoryModel>> fetchChildren(int parentId) async {
+    return getChildCategories(parentId);
+  }
+
+  Future<List<CategoryModel>> getChildCategories(int parentId) async {
     return getSubcategories(parentId);
+  }
+
+  Future<bool> hasChildren(int categoryId) async {
+    final data = await _client
+        .from('categories')
+        .select('id')
+        .eq('parent_id', categoryId)
+        .limit(1);
+    return (data as List).isNotEmpty;
   }
 
   Future<List<CategoryModel>> getSubcategories(int parentId) async {

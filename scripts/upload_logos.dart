@@ -20,7 +20,7 @@ import 'dart:typed_data';
 import 'package:supabase/supabase.dart';
 
 const _bucket = 'brand-logos';
-const _userAgent = 'SouqIQ/1.0 (https://github.com/souqiq; dev@souqiq.app)';
+const _userAgent = 'Sello/1.0 (https://github.com/souqiq; dev@souqiq.app)';
 const _downloadDelay = Duration(milliseconds: 1200);
 
 /// Brand display name (categories.name_ar) → Wikipedia Commons SVG source URL.

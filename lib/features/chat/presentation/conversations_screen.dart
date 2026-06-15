@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
 import '../providers/chat_provider.dart';
+import '../widgets/active_users_strip.dart';
 import '../widgets/conversation_tile.dart';
 
 class ConversationsScreen extends ConsumerWidget {
@@ -15,12 +17,14 @@ class ConversationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.watch(currentUserIdProvider);
-    final unreadAsync = ref.watch(unreadCountProvider);
-    final unread = unreadAsync.value ?? 0;
 
     if (userId == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('رسائلي')),
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.background,
+          title: const Text('رسائلي'),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -40,26 +44,14 @@ class ConversationsScreen extends ConsumerWidget {
     final conversationsAsync = ref.watch(conversationsStreamProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Text('رسائلي'),
-            if (unread > 0) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  unread > 99 ? '99+' : '$unread',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ],
-          ],
-        ),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textDark,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        title: const Text('رسائلي'),
       ),
       body: conversationsAsync.when(
         loading: () => const LoadingWidget(message: 'جاري التحميل...'),
@@ -69,47 +61,41 @@ class ConversationsScreen extends ConsumerWidget {
         ),
         data: (conversations) {
           if (conversations.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.chat_bubble_outline,
-                      size: 80,
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'لا توجد رسائل بعد',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'ابدأ بالتواصل مع البائعين',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return const _EmptyInbox();
           }
 
-          return ListView.separated(
-            itemCount: conversations.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final conversation = conversations[index];
-              return ConversationTile(
-                conversation: conversation,
-                onTap: () => context.push('/chat/${conversation.id}'),
-                onLongPress: () => _showDeleteDialog(context, ref, conversation.id),
-              );
-            },
+          final activeUsers = extractActiveChatUsers(conversations, userId);
+          final activeCount = countRecentlyActiveConversations(conversations);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ActiveUsersStrip(
+                users: activeUsers,
+                activeCount: activeCount,
+                onUserTap: (user) {
+                  if (user.conversationId != null) {
+                    context.push('/chat/${user.conversationId}');
+                  }
+                },
+              ),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  itemCount: conversations.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final conversation = conversations[index];
+                    return ConversationTile(
+                      conversation: conversation,
+                      onTap: () => context.push('/chat/${conversation.id}'),
+                      onLongPress: () =>
+                          _showDeleteDialog(context, ref, conversation.id),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -142,5 +128,43 @@ class ConversationsScreen extends ConsumerWidget {
     if (ok == true) {
       await ref.read(chatNotifierProvider.notifier).deleteConversation(conversationId);
     }
+  }
+}
+
+class _EmptyInbox extends StatelessWidget {
+  const _EmptyInbox();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 80,
+              color: AppColors.textMuted.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'لا توجد رسائل بعد',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppColors.textDark,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'ابدأ بالتواصل مع البائعين',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textMuted,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

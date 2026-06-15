@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
+import '../../../core/theme/app_decorations.dart';
 import '../../../shared/models/category_model.dart';
-import '../../../shared/widgets/shimmer_loading.dart';
-import 'category_browse_row.dart';
 
 class CategoryBrowseList extends StatelessWidget {
   const CategoryBrowseList({
@@ -19,23 +20,104 @@ class CategoryBrowseList extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = buildBrowseCategoryItems(categories);
 
-    return ListView.separated(
-      padding: EdgeInsets.zero,
-      itemCount: items.length,
-      separatorBuilder: (_, _) => Divider(
-        height: 1,
-        thickness: 1,
-        indent: 16,
-        endIndent: 16,
-        color: Colors.grey.shade200,
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 0.88,
       ),
+      itemCount: items.length,
       itemBuilder: (_, index) {
         final item = items[index];
-        return CategoryBrowseRow(
+        return _BrowseCategoryBentoCard(
           item: item,
           onTap: () => onCategoryTap(item),
         );
       },
+    );
+  }
+}
+
+class _BrowseCategoryBentoCard extends StatelessWidget {
+  const _BrowseCategoryBentoCard({
+    required this.item,
+    required this.onTap,
+  });
+
+  final BrowseCategoryItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = item.style;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
+            border: Border.all(color: AppColors.borderLight),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x08000000),
+                blurRadius: 12,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: style.color.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(style.icon, size: 26, color: style.color),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  style.nameAr,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                    height: 1.25,
+                  ),
+                ),
+                if (item.subtitle.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    item.subtitle,
+                    textAlign: TextAlign.center,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.cairo(
+                      fontSize: 11,
+                      color: AppColors.textMuted,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -45,32 +127,20 @@ class CategoryBrowseListShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: EdgeInsets.zero,
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 0.88,
+      ),
       itemCount: 8,
-      separatorBuilder: (_, _) => Divider(height: 1, color: Colors.grey.shade200),
-      itemBuilder: (_, _) => const SizedBox(
-        height: 72,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              ShimmerBox(width: 48, height: 48),
-              SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ShimmerBox(width: 120, height: 16),
-                    SizedBox(height: 8),
-                    ShimmerBox(width: 200, height: 12),
-                  ],
-                ),
-              ),
-            ],
-          ),
+      itemBuilder: (_, _) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
+          border: Border.all(color: AppColors.borderLight),
         ),
       ),
     );

@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
+import '../../../core/supabase/supabase_client.dart';
+import '../../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/category_navigation.dart';
 import '../../../core/utils/category_tree.dart';
@@ -44,23 +47,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     ref.read(searchQueryProvider.notifier).set(q);
     _controller.text = q;
 
-    final filter = ref.read(filterProvider).copyWith(
-          query: q.isEmpty ? null : q,
-        );
+    final filter = ref
+        .read(filterProvider)
+        .copyWith(query: q.isEmpty ? null : q);
     ref.read(filterProvider.notifier).setFilter(filter);
     ref.read(searchResultsProvider.notifier).search(filter);
     context.push(AppRoutes.searchResults);
   }
 
-  Future<void> _openCategory(BrowseCategoryItem item, List<CategoryModel> all) async {
+  Future<void> _openCategory(
+    BrowseCategoryItem item,
+    List<CategoryModel> all,
+  ) async {
     var category = resolveBrowseCategory(
       item.style.slug,
       all,
       categoryId: item.categoryId,
     );
 
-    category ??=
-        await ref.read(categoriesRepositoryProvider).fetchBySlug(item.style.slug);
+    category ??= await ref
+        .read(categoriesRepositoryProvider)
+        .fetchBySlug(item.style.slug);
 
     if (category != null) {
       if (mounted) openCategoryDestination(context, category);
@@ -116,49 +123,61 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     final baseTheme = Theme.of(context);
     final cairoTheme = baseTheme.copyWith(
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: AppColors.background,
       textTheme: GoogleFonts.cairoTextTheme(baseTheme.textTheme),
     );
 
     return Theme(
       data: cairoTheme,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _SearchHeader(
-                controller: _controller,
-                focusNode: _focusNode,
-                query: query,
-                canPop: canPop,
-                filterCount: filter.activeFilterCount,
-                onQueryChanged: ref.read(searchQueryProvider.notifier).set,
-                onClear: () {
-                  _controller.clear();
-                  ref.read(searchQueryProvider.notifier).clear();
-                },
-                onSubmit: _submit,
-                onFilterTap: _openFilters,
-              ),
-              Expanded(
-                child: showSuggestions
-                    ? _SuggestionsBody(
-                        query: debounced,
-                        suggestionsAsync: suggestionsAsync,
-                        onSubmit: _submit,
-                      )
-                    : categoriesAsync.when(
-                        loading: () => const CategoryBrowseListShimmer(),
-                        error: (e, _) => Center(child: Text('$e')),
-                        data: (categories) => CategoryBrowseList(
-                          categories: categories,
-                          onCategoryTap: (item) => _openCategory(item, categories),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SearchHeader(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  query: query,
+                  canPop: canPop,
+                  filterCount: filter.activeFilterCount,
+                  onQueryChanged: ref.read(searchQueryProvider.notifier).set,
+                  onClear: () {
+                    _controller.clear();
+                    ref.read(searchQueryProvider.notifier).clear();
+                  },
+                  onSubmit: _submit,
+                  onFilterTap: _openFilters,
+                  onAlertsTap: () {
+                    final userId = ref.read(currentUserIdProvider);
+                    if (userId == null) {
+                      showGuestBottomSheet(context);
+                      return;
+                    }
+                    context.push(AppRoutes.smartAlerts);
+                  },
+                ),
+                Expanded(
+                  child: showSuggestions
+                      ? _SuggestionsBody(
+                          query: debounced,
+                          suggestionsAsync: suggestionsAsync,
+                          onSubmit: _submit,
+                        )
+                      : categoriesAsync.when(
+                          loading: () => const CategoryBrowseListShimmer(),
+                          error: (e, _) => Center(child: Text('$e')),
+                          data: (categories) => CategoryBrowseList(
+                            categories: categories,
+                            onCategoryTap: (item) =>
+                                _openCategory(item, categories),
+                          ),
                         ),
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -177,6 +196,7 @@ class _SearchHeader extends StatelessWidget {
     required this.onClear,
     required this.onSubmit,
     required this.onFilterTap,
+    required this.onAlertsTap,
   });
 
   final TextEditingController controller;
@@ -188,6 +208,7 @@ class _SearchHeader extends StatelessWidget {
   final VoidCallback onClear;
   final void Function([String? query]) onSubmit;
   final VoidCallback onFilterTap;
+  final VoidCallback onAlertsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +237,7 @@ class _SearchHeader extends StatelessWidget {
                 textAlign: TextAlign.right,
                 style: GoogleFonts.cairo(fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: 'ابحث في سوق العراق...',
+                  hintText: 'ابحث في Sello...',
                   hintStyle: GoogleFonts.cairo(
                     color: Colors.grey.shade500,
                     fontSize: 15,
@@ -244,6 +265,11 @@ class _SearchHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
+          IconButton(
+            icon: const Icon(Icons.notifications_none_outlined),
+            tooltip: 'تنبيهاتي الذكية',
+            onPressed: onAlertsTap,
+          ),
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -262,7 +288,10 @@ class _SearchHeader extends StatelessWidget {
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
                     child: Text(
                       '$filterCount',
                       textAlign: TextAlign.center,
@@ -308,8 +337,7 @@ class _SuggestionsBody extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search_off,
-                      size: 64, color: Colors.grey.shade400),
+                  Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 12),
                   Text('لا توجد اقتراحات', style: GoogleFonts.cairo()),
                   const SizedBox(height: 16),
@@ -325,7 +353,8 @@ class _SuggestionsBody extends StatelessWidget {
 
         return ListView.separated(
           itemCount: suggestions.length,
-          separatorBuilder: (_, _) => Divider(height: 1, color: Colors.grey.shade200),
+          separatorBuilder: (_, _) =>
+              Divider(height: 1, color: Colors.grey.shade200),
           itemBuilder: (_, i) {
             final s = suggestions[i];
             return ListTile(

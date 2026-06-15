@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,18 +45,34 @@ User? get currentUser => supabase.auth.currentUser;
 final supabaseClientProvider = Provider<SupabaseClient>((ref) => supabase);
 
 final authStateProvider = StreamProvider<AuthState>((ref) {
-  return ref.watch(supabaseClientProvider).auth.onAuthStateChange;
+  final stream = ref.watch(supabaseClientProvider).auth.onAuthStateChange;
+  return stream.handleError((Object error, StackTrace stackTrace) {
+    if (kDebugMode) {
+      debugPrint('authStateProvider stream error (ignored): $error');
+    }
+  });
 });
 
 final currentSessionProvider = Provider<Session?>((ref) {
-  ref.watch(authStateProvider);
-  return ref.watch(supabaseClientProvider).auth.currentSession;
+  final auth = ref.watch(authStateProvider);
+  // Never fail dependents when Realtime/auth stream hiccups — use local snapshot.
+  return auth.when(
+    data: (_) => ref.watch(supabaseClientProvider).auth.currentSession,
+    loading: () => ref.watch(supabaseClientProvider).auth.currentSession,
+    error: (_, _) => ref.watch(supabaseClientProvider).auth.currentSession,
+  );
 });
 
 final currentUserIdProvider = Provider<String?>((ref) {
-  ref.watch(authStateProvider);
+  final auth = ref.watch(authStateProvider);
   final client = ref.watch(supabaseClientProvider);
-  return client.auth.currentSession?.user.id ?? client.auth.currentUser?.id;
+  return auth.when(
+    data: (_) => client.auth.currentSession?.user.id ?? client.auth.currentUser?.id,
+    loading: () =>
+        client.auth.currentSession?.user.id ?? client.auth.currentUser?.id,
+    error: (_, _) =>
+        client.auth.currentSession?.user.id ?? client.auth.currentUser?.id,
+  );
 });
 
 final isAuthenticatedProvider = Provider<bool>((ref) {

@@ -4,6 +4,7 @@ class MessageModel {
     required this.conversationId,
     required this.senderId,
     required this.content,
+    this.imageUrl,
     this.isRead = false,
     required this.createdAt,
     this.isPending = false,
@@ -13,6 +14,7 @@ class MessageModel {
   final String conversationId;
   final String senderId;
   final String content;
+  final String? imageUrl;
   final bool isRead;
   final DateTime createdAt;
   final bool isPending;
@@ -24,6 +26,7 @@ class MessageModel {
     String? conversationId,
     String? senderId,
     String? content,
+    String? imageUrl,
     bool? isRead,
     DateTime? createdAt,
     bool? isPending,
@@ -33,6 +36,7 @@ class MessageModel {
       conversationId: conversationId ?? this.conversationId,
       senderId: senderId ?? this.senderId,
       content: content ?? this.content,
+      imageUrl: imageUrl ?? this.imageUrl,
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
       isPending: isPending ?? this.isPending,
@@ -45,6 +49,7 @@ class MessageModel {
       conversationId: json['conversation_id'] as String,
       senderId: json['sender_id'] as String,
       content: json['content'] as String? ?? json['body'] as String? ?? '',
+      imageUrl: json['image_url'] as String?,
       isRead: json['is_read'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
     );

@@ -1,4 +1,4 @@
-// Hand-maintained subset of the Souq IQ Supabase schema used by the admin
+// Hand-maintained subset of the Sello Supabase schema used by the admin
 // dashboard. Mirrors supabase/migrations. Regenerate with the Supabase CLI
 // (`supabase gen types typescript`) if you prefer full coverage.
 
@@ -97,6 +97,18 @@ export type FavoriteRow = {
   created_at: string;
 }
 
+export type ListingPurchaseRow = {
+  id: string;
+  user_id: string;
+  listing_id: string;
+  package_type: "pro" | "premium";
+  price: number;
+  purchased_at: string;
+  user_name: string;
+  user_phone: string | null;
+  user_email: string | null;
+}
+
 export type BoostRow = {
   id: string;
   listing_id: string;
@@ -165,6 +177,7 @@ export type Database = {
       reports: Table<ReportRow>;
       favorites: Table<FavoriteRow>;
       boosts: Table<BoostRow>;
+      listing_purchases: Table<ListingPurchaseRow>;
       search_logs: Table<SearchLogRow>;
       admin_users: Table<AdminUserRow>;
       app_settings: Table<AppSettingRow>;

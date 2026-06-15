@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/supabase/supabase_client.dart';
+import '../../../core/utils/listing_package_utils.dart';
 import '../../../shared/models/filter_model.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/models/report_model.dart';
@@ -23,14 +25,14 @@ class ListingsRepository {
   static const _listingSelect = '''
     *,
     categories(name_ar),
-    profiles!listings_user_id_fkey(full_name, display_name, avatar_url, phone),
+    profiles!listings_user_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone, is_verified, verification_status, avg_rating, rating_count),
     listing_images(id, listing_id, storage_path, sort_order, is_primary, url)
   ''';
 
   static const _listingDetailSelect = '''
     *,
     categories(name_ar, parent_id, parent:categories!categories_parent_id_fkey(name_ar)),
-    profiles!listings_user_id_fkey(full_name, display_name, avatar_url, phone, is_verified, created_at),
+    profiles!listings_user_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone, is_verified, verification_status, created_at, avg_rating, rating_count),
     listing_images(id, listing_id, storage_path, sort_order, is_primary, url)
   ''';
 
@@ -45,11 +47,17 @@ class ListingsRepository {
         .select(_listingSelect)
         .eq('status', 'approved')
         .eq('availability', 'active')
-        .eq('is_featured', true)
+        .or(
+          'is_featured.eq.true,'
+          'metadata->>listing_package.eq.premium,'
+          'metadata->>listing_package.eq.مميز,'
+          'metadata->>listing_package.eq.featured',
+        )
         .order('created_at', ascending: false)
         .limit(limit);
 
-    return _mapListings(data, null);
+    final listings = await _mapListings(data, null);
+    return listings.where((listing) => listing.isPremiumListing).toList();
   }
 
   Future<List<ListingModel>> getRecentListings({
@@ -61,10 +69,19 @@ class ListingsRepository {
         .select(_listingSelect)
         .eq('status', 'approved')
         .eq('availability', 'active')
+        .eq('is_featured', false)
+        .or(
+          'metadata->>listing_package.is.null,'
+          'metadata->>listing_package.eq.standard,'
+          'metadata->>listing_package.eq.pro',
+        )
         .order('created_at', ascending: false)
-        .limit(limit);
+        .limit(limit + 10);
 
-    return _mapListings(data, userIdForFavorites);
+    final listings = await _mapListings(data, userIdForFavorites);
+    return _sortByPackagePriority(
+      listings.where((listing) => !listing.isPremiumListing).take(limit).toList(),
+    );
   }
 
   Future<List<ListingModel>> getListingsByCategory(
@@ -85,7 +102,9 @@ class ListingsRepository {
         .order('created_at', ascending: false)
         .range(page * pageSize, (page + 1) * pageSize - 1);
 
-    return _mapListings(data, userIdForFavorites);
+    return _sortByPackagePriority(
+      await _mapListings(data, userIdForFavorites),
+    );
   }
 
   Future<List<ListingModel>> searchListings(
@@ -101,7 +120,9 @@ class ListingsRepository {
       (page + 1) * pageSize - 1,
     );
 
-    return _mapListings(data, userIdForFavorites);
+    return _sortByPackagePriority(
+      await _mapListings(data, userIdForFavorites),
+    );
   }
 
   Future<int> countSearchResults(FilterModel filter) async {
@@ -212,6 +233,31 @@ class ListingsRepository {
     return listings.isEmpty ? null : listings.first;
   }
 
+  Future<ListingModel?> getListingByReferenceNo(
+    int referenceNo, {
+    String? userIdForFavorites,
+  }) async {
+    dynamic data;
+    try {
+      data = await _client
+          .from('listings')
+          .select(_listingDetailSelect)
+          .eq('reference_no', referenceNo)
+          .maybeSingle();
+    } catch (_) {
+      data = await _client
+          .from('listings')
+          .select(_listingSelect)
+          .eq('reference_no', referenceNo)
+          .maybeSingle();
+    }
+
+    if (data == null) return null;
+
+    final listings = await _mapListings([data], userIdForFavorites);
+    return listings.isEmpty ? null : listings.first;
+  }
+
   Future<List<ListingModel>> getSellerListings(
     String sellerId, {
     String? excludeId,
@@ -246,6 +292,91 @@ class ListingsRepository {
     return (data as List).length;
   }
 
+  Future<void> patchListing({
+    required String listingId,
+    required String userId,
+    required Map<String, dynamic> fields,
+    required List<Map<String, dynamic>> imageRows,
+    required List<String> removedImageIds,
+    required bool imagesDirty,
+  }) async {
+    final sanitized = _sanitizeListingUpdateFields(fields);
+    if (sanitized.isNotEmpty) {
+      sanitized['updated_at'] = DateTime.now().toIso8601String();
+      debugPrint('patchListing fields: $sanitized');
+      final data = await _client
+          .from('listings')
+          .update(sanitized)
+          .eq('id', listingId)
+          .eq('user_id', userId)
+          .select('id');
+      if ((data as List).isEmpty) {
+        throw StateError(
+          'Listing update rejected — not found or not owned by current user',
+        );
+      }
+    }
+
+    if (!imagesDirty) return;
+
+    if (removedImageIds.isNotEmpty) {
+      await _client
+          .from('listing_images')
+          .delete()
+          .inFilter('id', removedImageIds);
+    }
+
+    if (imageRows.isNotEmpty) {
+      final withId = imageRows.where((r) => r.containsKey('id')).toList();
+      final withoutId = imageRows.where((r) => !r.containsKey('id')).toList();
+      for (final row in withId) {
+        await _client.from('listing_images').update({
+          'sort_order': row['sort_order'],
+          'is_primary': row['is_primary'],
+        }).eq('id', row['id']);
+      }
+      if (withoutId.isNotEmpty) {
+        await _client.from('listing_images').insert(withoutId);
+      }
+    }
+  }
+
+  Map<String, dynamic> _sanitizeListingUpdateFields(Map<String, dynamic> raw) {
+    const blockedKeys = {'user_id', 'reference_no', 'created_at', 'id'};
+    final sanitized = <String, dynamic>{};
+
+    for (final entry in raw.entries) {
+      if (blockedKeys.contains(entry.key)) continue;
+      final value = entry.value;
+      if (value == null) continue;
+
+      if (entry.key == 'price' || entry.key == 'price_iqd') {
+        sanitized[entry.key] = (value as num).round();
+        continue;
+      }
+
+      if (entry.key == 'is_negotiable') {
+        sanitized[entry.key] = value == true;
+        continue;
+      }
+
+      if (value is String && value.trim().isEmpty) {
+        if (entry.key == 'title' ||
+            entry.key == 'title_ar' ||
+            entry.key == 'description' ||
+            entry.key == 'description_ar' ||
+            entry.key == 'governorate' ||
+            entry.key == 'city') {
+          continue;
+        }
+      }
+
+      sanitized[entry.key] = value;
+    }
+
+    return sanitized;
+  }
+
   Future<void> updateListing({
     required String listingId,
     required int categoryId,
@@ -258,8 +389,10 @@ class ListingsRepository {
     required String governorate,
     double? latitude,
     double? longitude,
+    String? locationAddress,
     required List<Map<String, dynamic>> imageRows,
     required List<String> removedImageIds,
+    Map<String, dynamic>? metadata,
   }) async {
     await _client.from('listings').update({
       'category_id': categoryId,
@@ -275,6 +408,9 @@ class ListingsRepository {
       'governorate': governorate,
       'latitude': latitude,
       'longitude': longitude,
+      if (locationAddress != null && locationAddress.trim().isNotEmpty)
+        'location_address': locationAddress.trim(),
+      if (metadata != null) 'metadata': metadata,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', listingId);
 
@@ -308,8 +444,34 @@ class ListingsRepository {
   }
 
   Future<void> softDeleteListing(String listingId) async {
+    try {
+      await _client.storage.from(AppConstants.listingVideosBucket).remove([
+        '$listingId/video.mp4',
+        '$listingId/thumb.jpg',
+      ]);
+    } catch (_) {
+      // Video may not exist for this listing.
+    }
     await _client.from('listings').update({
       'availability': 'deleted',
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', listingId);
+  }
+
+  Future<void> updateListingVideo({
+    required String listingId,
+    required String videoUrl,
+    required String thumbnailUrl,
+    required int durationSeconds,
+  }) async {
+    final listing = await getListingById(listingId);
+    final metadata = Map<String, dynamic>.from(listing?.metadata ?? {});
+    metadata['video_duration_seconds'] = durationSeconds;
+
+    await _client.from('listings').update({
+      'video_url': videoUrl,
+      'video_thumbnail_url': thumbnailUrl,
+      'metadata': metadata,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', listingId);
   }
@@ -543,34 +705,92 @@ class ListingsRepository {
     required String governorate,
     double? latitude,
     double? longitude,
+    String? locationAddress,
     required List<String> imageStoragePaths,
     required bool asDraft,
     String listingType = 'sale',
+    Map<String, dynamic>? metadata,
+    ListingContactPreference? contactPreference,
+    ListingPackage listingPackage = ListingPackage.standard,
   }) async {
     final listingId = _uuid.v4();
     final priceIqd = price.round();
+    final row = _listingInsertRow(
+      listingId: listingId,
+      userId: userId,
+      categoryId: categoryId,
+      title: title,
+      description: description,
+      priceIqd: priceIqd,
+      isNegotiable: isNegotiable,
+      condition: condition,
+      city: city,
+      governorate: governorate,
+      latitude: latitude,
+      longitude: longitude,
+      locationAddress: locationAddress,
+      listingType: listingType,
+      metadata: metadata,
+      contactPreference: contactPreference,
+      listingPackage: listingPackage,
+      includeContactColumn: contactPreference != null,
+    );
 
-    await _client.from('listings').insert({
-      'id': listingId,
-      'user_id': userId,
-      'category_id': categoryId,
-      'title': title,
-      'title_ar': title,
-      'description': description,
-      'description_ar': description,
-      'price_iqd': priceIqd,
-      'price': priceIqd,
-      'currency': 'IQD',
-      'is_negotiable': isNegotiable,
-      if (condition != null) 'condition': condition.value,
-      'city': city,
-      'governorate': governorate,
-      'latitude': ?latitude,
-      'longitude': ?longitude,
-      'listing_type': listingType,
-      'status': 'pending',
-      'availability': 'active',
-    });
+    if (kDebugMode) {
+      debugPrint('createListingRecord insert payload: $row');
+    }
+
+    try {
+      await _insertListingRow(row);
+    } on PostgrestException catch (e) {
+      debugPrint(
+        'createListingRecord insert failed: code=${e.code} message=${e.message} details=${e.details}',
+      );
+      if (e.code == 'PGRST204') {
+        var includeContact = contactPreference != null;
+        var includeVerifiedSeller = true;
+        if (contactPreference != null &&
+            _isMissingColumnError(e, 'contact_preference')) {
+          includeContact = false;
+        }
+        if (_isMissingColumnError(e, 'is_verified_seller')) {
+          includeVerifiedSeller = false;
+        }
+        if (!includeContact || !includeVerifiedSeller) {
+          final fallbackRow = _listingInsertRow(
+            listingId: listingId,
+            userId: userId,
+            categoryId: categoryId,
+            title: title,
+            description: description,
+            priceIqd: priceIqd,
+            isNegotiable: isNegotiable,
+            condition: condition,
+            city: city,
+            governorate: governorate,
+            latitude: latitude,
+            longitude: longitude,
+            locationAddress: locationAddress,
+            listingType: listingType,
+            metadata: metadata,
+            contactPreference: contactPreference,
+            listingPackage: listingPackage,
+            includeContactColumn: includeContact,
+            includeVerifiedSellerColumn: includeVerifiedSeller,
+          );
+          if (kDebugMode) {
+            debugPrint(
+              'createListingRecord retry with reduced columns: $fallbackRow',
+            );
+          }
+          await _insertListingRow(fallbackRow);
+        } else {
+          rethrow;
+        }
+      } else {
+        rethrow;
+      }
+    }
 
     if (imageStoragePaths.isNotEmpty) {
       final imageRows = <Map<String, dynamic>>[];
@@ -586,6 +806,144 @@ class ListingsRepository {
     }
 
     return listingId;
+  }
+
+  Future<void> recordListingPurchase({
+    required String userId,
+    required String listingId,
+    required String packageType,
+    required num price,
+    required String userName,
+    String? userPhone,
+    String? userEmail,
+  }) async {
+    await _client.from('listing_purchases').insert({
+      'user_id': userId,
+      'listing_id': listingId,
+      'package_type': packageType,
+      'price': price,
+      'user_name': userName,
+      'user_phone': userPhone,
+      'user_email': userEmail,
+    });
+  }
+
+  Map<String, dynamic> _listingInsertRow({
+    required String listingId,
+    required String userId,
+    required int categoryId,
+    required String title,
+    required String description,
+    required int priceIqd,
+    required bool isNegotiable,
+    required ListingCondition? condition,
+    required String city,
+    required String governorate,
+    double? latitude,
+    double? longitude,
+    String? locationAddress,
+    required String listingType,
+    Map<String, dynamic>? metadata,
+    ListingContactPreference? contactPreference,
+    ListingPackage listingPackage = ListingPackage.standard,
+    required bool includeContactColumn,
+    bool includeVerifiedSellerColumn = true,
+  }) {
+    final metadataWithContact = _metadataWithContactPreference(
+      metadata,
+      contactPreference,
+    );
+    final metadataWithPackage = _metadataWithListingPackage(
+      metadataWithContact,
+      listingPackage,
+    );
+    final verifiedSeller = listingPackage == ListingPackage.pro ||
+        listingPackage == ListingPackage.premium;
+    final metadataFinal = _metadataWithVerifiedSeller(
+      metadataWithPackage,
+      verifiedSeller,
+      includeVerifiedSellerColumn: includeVerifiedSellerColumn,
+    );
+
+    return {
+      'id': listingId,
+      'user_id': userId,
+      'category_id': categoryId,
+      'title': title,
+      'title_ar': title,
+      'description': description,
+      'description_ar': description,
+      'price_iqd': priceIqd,
+      'price': priceIqd,
+      'currency': 'IQD',
+      'is_negotiable': isNegotiable,
+      if (condition != null) 'condition': condition.value,
+      'city': city,
+      'governorate': governorate,
+      'latitude': latitude,
+      'longitude': longitude,
+      if (locationAddress != null && locationAddress.trim().isNotEmpty)
+        'location_address': locationAddress.trim(),
+      'listing_type': listingType,
+      'status': 'pending',
+      'availability': 'active',
+      'is_featured': listingPackage.isFeatured,
+      'is_boosted': listingPackage.isBoosted,
+      'expires_at': calculateListingExpiry(listingPackage).toIso8601String(),
+      if (includeVerifiedSellerColumn) 'is_verified_seller': verifiedSeller,
+      if (metadataFinal != null && metadataFinal.isNotEmpty)
+        'metadata': metadataFinal,
+      if (includeContactColumn && contactPreference != null)
+        'contact_preference': contactPreference.value,
+    };
+  }
+
+  Map<String, dynamic>? _metadataWithContactPreference(
+    Map<String, dynamic>? metadata,
+    ListingContactPreference? contactPreference,
+  ) {
+    if (contactPreference == null &&
+        (metadata == null || metadata.isEmpty)) {
+      return metadata;
+    }
+    final merged = Map<String, dynamic>.from(metadata ?? {});
+    if (contactPreference != null) {
+      merged['contact_preference'] = contactPreference.value;
+    }
+    return merged.isEmpty ? null : merged;
+  }
+
+  Map<String, dynamic>? _metadataWithListingPackage(
+    Map<String, dynamic>? metadata,
+    ListingPackage listingPackage,
+  ) {
+    final merged = Map<String, dynamic>.from(metadata ?? {});
+    merged['listing_package'] = listingPackage.value;
+    return merged.isEmpty ? null : merged;
+  }
+
+  Map<String, dynamic>? _metadataWithVerifiedSeller(
+    Map<String, dynamic>? metadata,
+    bool verifiedSeller, {
+    required bool includeVerifiedSellerColumn,
+  }) {
+    if (includeVerifiedSellerColumn || !verifiedSeller) return metadata;
+    final merged = Map<String, dynamic>.from(metadata ?? {});
+    merged['is_verified_seller'] = true;
+    return merged.isEmpty ? null : merged;
+  }
+
+  Future<void> _insertListingRow(Map<String, dynamic> row) async {
+    await _client.from('listings').insert(row);
+  }
+
+  bool _isMissingColumnError(PostgrestException error, String column) {
+    final haystack =
+        '${error.code} ${error.message} ${error.details}'.toLowerCase();
+    return haystack.contains(column.toLowerCase()) &&
+        (haystack.contains('column') ||
+            haystack.contains('schema cache') ||
+            haystack.contains('could not find'));
   }
 
   /// Saves a listing as draft (status pending, may have partial data).
@@ -627,17 +985,34 @@ class ListingsRepository {
   void incrementViews(String listingId) {
     () async {
       try {
-        final row = await _client
-            .from('listings')
-            .select('views_count')
-            .eq('id', listingId)
-            .maybeSingle();
-        if (row == null) return;
-        await _client.from('listings').update({
-          'views_count': (row['views_count'] as int? ?? 0) + 1,
-        }).eq('id', listingId);
+        await _client.rpc('increment_listing_views', params: {
+          'listing_id': listingId,
+        });
       } catch (_) {}
     }();
+  }
+
+  Future<void> incrementContacts(String listingId) async {
+    try {
+      await _client.rpc('increment_listing_contacts', params: {
+        'listing_id': listingId,
+      });
+    } catch (_) {}
+  }
+
+  Future<void> updateAutoRenew({
+    required String listingId,
+    required bool autoRenew,
+  }) async {
+    await _client.from('listings').update({
+      'auto_renew': autoRenew,
+    }).eq('id', listingId);
+  }
+
+  List<ListingModel> _sortByPackagePriority(List<ListingModel> listings) {
+    final sorted = [...listings];
+    sortListingsByPackagePriority(sorted);
+    return sorted;
   }
 
   /// Builds filter chain only — never call order/limit/range before this returns.

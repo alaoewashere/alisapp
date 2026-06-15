@@ -1,16 +1,22 @@
-const _arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+import 'package:intl/intl.dart';
 
-/// Formats [n] with Arabic-Indic digits (e.g. 125 → ١٢٥).
-String arabicNumber(int n) {
-  final s = n.toString();
-  final buffer = StringBuffer();
-  for (var i = 0; i < s.length; i++) {
-    final c = s[i];
-    if (c.codeUnitAt(0) >= 48 && c.codeUnitAt(0) <= 57) {
-      buffer.write(_arabicDigits[c.codeUnitAt(0) - 48]);
-    } else {
-      buffer.write(c);
-    }
+/// Western digits (0–9) for all UI locales — use instead of Eastern Arabic numerals.
+String arabicNumber(int n) => NumberFormat('#,###', 'en_US').format(n);
+
+/// Compact count for profile stats (e.g. 1500 → 1.5 ألف).
+String formatCompactArabic(int n) {
+  if (n >= 1000000) {
+    return '${_compactDecimal(n / 1000000)} مليون';
   }
-  return buffer.toString();
+  if (n >= 1000) {
+    return '${_compactDecimal(n / 1000)} ألف';
+  }
+  return arabicNumber(n);
+}
+
+String _compactDecimal(double value) {
+  if (value == value.roundToDouble()) {
+    return value.round().toString();
+  }
+  return value.toStringAsFixed(1);
 }

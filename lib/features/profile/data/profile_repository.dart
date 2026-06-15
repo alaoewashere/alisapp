@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/username_utils.dart';
 import '../../../shared/models/profile_model.dart';
 import '../../../shared/models/profile_stats_model.dart';
 import '../../auth/data/auth_repository.dart';
@@ -107,11 +108,60 @@ class ProfileRepository {
     }).eq('id', userId);
   }
 
+  Future<ProfileModel> updateAvatarSeed(String userId, String seed) async {
+    final data = await _client
+        .from('profiles')
+        .update({
+          'avatar_seed': seed,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', userId)
+        .select()
+        .single();
+    return ProfileModel.fromJson(data);
+  }
+
   Future<void> deleteAccount(String userId) async {
     await _client.from('profiles').update({
       'is_deleted': true,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', userId);
     await _client.auth.signOut();
+  }
+
+  /// Returns whether [username] is free (case-insensitive), optionally
+  /// ignoring [excludeUserId] (for edit-profile checks).
+  Future<bool> isUsernameAvailable(
+    String username, {
+    String? excludeUserId,
+  }) async {
+    final normalized = normalizeUsername(username);
+    if (!isValidUsernameLength(normalized)) return false;
+
+    var query = _client
+        .from('profiles')
+        .select('id')
+        .eq('username', normalized);
+
+    if (excludeUserId != null) {
+      query = query.neq('id', excludeUserId);
+    }
+
+    final row = await query.maybeSingle();
+    return row == null;
+  }
+
+  Future<ProfileModel> updateUsername(String userId, String username) async {
+    final normalized = normalizeUsername(username);
+    final data = await _client
+        .from('profiles')
+        .update({
+          'username': normalized,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', userId)
+        .select()
+        .single();
+    return ProfileModel.fromJson(data);
   }
 }

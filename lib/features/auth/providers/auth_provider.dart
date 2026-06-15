@@ -17,6 +17,11 @@ enum AuthFlowStatus {
   error,
 }
 
+enum OAuthLoading {
+  google,
+  apple,
+}
+
 class AuthFlowState {
   const AuthFlowState({
     this.status = AuthFlowStatus.initial,
@@ -24,6 +29,7 @@ class AuthFlowState {
     this.phone,
     this.lastAuthResult,
     this.isGuest = false,
+    this.oauthLoading,
   });
 
   final AuthFlowStatus status;
@@ -31,6 +37,7 @@ class AuthFlowState {
   final String? phone;
   final AuthResult? lastAuthResult;
   final bool isGuest;
+  final OAuthLoading? oauthLoading;
 
   AuthFlowState copyWith({
     AuthFlowStatus? status,
@@ -38,8 +45,10 @@ class AuthFlowState {
     String? phone,
     AuthResult? lastAuthResult,
     bool? isGuest,
+    OAuthLoading? oauthLoading,
     bool clearError = false,
     bool clearPhone = false,
+    bool clearOAuthLoading = false,
   }) {
     return AuthFlowState(
       status: status ?? this.status,
@@ -47,6 +56,8 @@ class AuthFlowState {
       phone: clearPhone ? null : (phone ?? this.phone),
       lastAuthResult: lastAuthResult ?? this.lastAuthResult,
       isGuest: isGuest ?? this.isGuest,
+      oauthLoading:
+          clearOAuthLoading ? null : (oauthLoading ?? this.oauthLoading),
     );
   }
 }
@@ -146,11 +157,190 @@ class AuthNotifier extends Notifier<AuthFlowState> {
     }
   }
 
+  Future<Result<AuthResult>> verifyWhatsAppOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      isGuest: false,
+      clearError: true,
+      phone: phone,
+    );
+
+    final result = await ref.read(authRepositoryProvider).verifyWhatsAppOtp(
+          phone: phone,
+          otp: otp,
+        );
+
+    switch (result) {
+      case Success(:final value):
+        state = state.copyWith(
+          status: AuthFlowStatus.authenticated,
+          isGuest: false,
+          lastAuthResult: value,
+          clearError: true,
+        );
+        ref.invalidate(currentProfileProvider);
+        return Success(value);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+        );
+        return Failure(message);
+    }
+  }
+
+  Future<Result<bool>> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      isGuest: false,
+      clearError: true,
+      clearPhone: true,
+    );
+
+    final result = await ref.read(authRepositoryProvider).signInWithPassword(
+          email: email,
+          password: password,
+        );
+
+    switch (result) {
+      case Success():
+        ref.invalidate(currentProfileProvider);
+        state = state.copyWith(
+          status: AuthFlowStatus.authenticated,
+          isGuest: false,
+          clearError: true,
+        );
+        return const Success(true);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+        );
+        return Failure(message);
+    }
+  }
+
+  Future<Result<bool>> signUpWithEmailPassword({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+  }) async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      isGuest: false,
+      clearError: true,
+      clearPhone: true,
+    );
+
+    final result = await ref.read(authRepositoryProvider).signUpWithPassword(
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+        );
+
+    switch (result) {
+      case Success():
+        ref.invalidate(currentProfileProvider);
+        state = state.copyWith(
+          status: AuthFlowStatus.authenticated,
+          isGuest: false,
+          clearError: true,
+        );
+        return const Success(true);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+        );
+        return Failure(message);
+    }
+  }
+
+  Future<Result<bool>> resetPasswordForEmail(String email) async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      clearError: true,
+      clearPhone: true,
+    );
+    final result =
+        await ref.read(authRepositoryProvider).resetPasswordForEmail(email);
+    switch (result) {
+      case Success():
+        state = state.copyWith(status: AuthFlowStatus.initial, clearError: true);
+        return const Success(true);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+        );
+        return Failure(message);
+    }
+  }
+
+  Future<Result<AuthResult>> verifyEmailOTP({
+    required String email,
+    required String otp,
+  }) async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      isGuest: false,
+      clearError: true,
+      clearPhone: true,
+    );
+    final result = await ref.read(authRepositoryProvider).verifyEmailOTP(
+          email: email,
+          otp: otp,
+        );
+    switch (result) {
+      case Success(:final value):
+        ref.invalidate(currentProfileProvider);
+        state = state.copyWith(
+          status: AuthFlowStatus.authenticated,
+          isGuest: false,
+          lastAuthResult: value,
+          clearError: true,
+        );
+        return Success(value);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+        );
+        return Failure(message);
+    }
+  }
+
+  Future<Result<bool>> updatePassword(String password) async {
+    state = state.copyWith(status: AuthFlowStatus.loading, clearError: true);
+    final result =
+        await ref.read(authRepositoryProvider).updatePassword(password);
+    switch (result) {
+      case Success():
+        state = state.copyWith(status: AuthFlowStatus.initial, clearError: true);
+        return const Success(true);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+        );
+        return Failure(message);
+    }
+  }
+
   Future<Result<bool>> signInWithGoogle() async {
     state = state.copyWith(
       status: AuthFlowStatus.loading,
       isGuest: false,
       clearError: true,
+      oauthLoading: OAuthLoading.google,
     );
 
     final result = await ref.read(authRepositoryProvider).signInWithGoogle();
@@ -162,6 +352,45 @@ class AuthNotifier extends Notifier<AuthFlowState> {
         state = state.copyWith(
           status: AuthFlowStatus.error,
           errorMessage: message,
+          clearOAuthLoading: true,
+        );
+        return Failure(message);
+    }
+  }
+
+  Future<Result<bool>> signInWithApple() async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      isGuest: false,
+      clearError: true,
+      oauthLoading: OAuthLoading.apple,
+    );
+
+    final result = await ref.read(authRepositoryProvider).signInWithApple();
+
+    switch (result) {
+      case Success():
+        ref.invalidate(currentProfileProvider);
+        state = state.copyWith(
+          status: AuthFlowStatus.authenticated,
+          isGuest: false,
+          clearError: true,
+          clearOAuthLoading: true,
+        );
+        return const Success(true);
+      case Failure(:final message):
+        if (message == 'تم إلغاء تسجيل الدخول.') {
+          state = state.copyWith(
+            status: AuthFlowStatus.initial,
+            clearOAuthLoading: true,
+            clearError: true,
+          );
+          return Failure(message);
+        }
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+          clearOAuthLoading: true,
         );
         return Failure(message);
     }
@@ -172,6 +401,7 @@ class AuthNotifier extends Notifier<AuthFlowState> {
       status: AuthFlowStatus.authenticated,
       isGuest: false,
       clearError: true,
+      clearOAuthLoading: true,
     );
   }
 
@@ -179,12 +409,16 @@ class AuthNotifier extends Notifier<AuthFlowState> {
     state = state.copyWith(
       status: AuthFlowStatus.error,
       errorMessage: message,
+      clearOAuthLoading: true,
     );
   }
 
   void clearOAuthLoading() {
-    if (state.status == AuthFlowStatus.loading) {
-      state = state.copyWith(status: AuthFlowStatus.initial);
+    if (state.status == AuthFlowStatus.loading || state.oauthLoading != null) {
+      state = state.copyWith(
+        status: AuthFlowStatus.initial,
+        clearOAuthLoading: true,
+      );
     }
   }
 
@@ -232,6 +466,11 @@ final isGuestProvider = Provider<bool>((ref) {
 final isGoogleSignInLoadingProvider = Provider<bool>((ref) {
   final auth = ref.watch(authNotifierProvider);
   return auth.status == AuthFlowStatus.loading &&
-      auth.phone == null &&
-      !auth.isGuest;
+      auth.oauthLoading == OAuthLoading.google;
+});
+
+final isAppleSignInLoadingProvider = Provider<bool>((ref) {
+  final auth = ref.watch(authNotifierProvider);
+  return auth.status == AuthFlowStatus.loading &&
+      auth.oauthLoading == OAuthLoading.apple;
 });

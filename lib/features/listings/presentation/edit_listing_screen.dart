@@ -1,156 +1,240 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../shared/widgets/custom_button.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../shared/models/category_model.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
+import '../providers/edit_listing_form_mode.dart';
 import '../providers/edit_listing_provider.dart';
 import '../providers/post_listing_provider.dart';
-import '../widgets/edit_step4_photos.dart';
-import '../widgets/steps/step1_category.dart';
+import '../widgets/edit_listing_photos_section.dart';
+import '../widgets/edit_listing_video_section.dart';
+import '../widgets/price_change_confirm_dialog.dart';
 import '../widgets/steps/step2_details.dart';
 import '../widgets/steps/step3_location.dart';
-import '../widgets/steps/step5_review.dart';
+import '../widgets/steps/step_contact_preferences.dart';
 
-class EditListingScreen extends ConsumerWidget {
+class EditListingScreen extends ConsumerStatefulWidget {
   const EditListingScreen({super.key, required this.listingId});
 
   final String listingId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final edit = ref.watch(editListingProvider(listingId));
+  ConsumerState<EditListingScreen> createState() => _EditListingScreenState();
+}
+
+class _EditListingScreenState extends ConsumerState<EditListingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(isEditListingFormProvider.notifier).setEnabled(true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    ref.read(isEditListingFormProvider.notifier).setEnabled(false);
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final edit = ref.read(editListingProvider(widget.listingId));
+    final post = ref.read(postListingProvider);
+    final newPrice = (post.price ?? 0).round();
+    final loadedPrice = (edit.loadedPrice ?? post.price ?? 0).round();
+
+    if (loadedPrice != newPrice) {
+      final confirmed = await showPriceChangeConfirmDialog(context);
+      if (!confirmed || !mounted) return;
+    }
+
+    final ok =
+        await ref.read(editListingProvider(widget.listingId).notifier).save();
+
+    if (!mounted) return;
+
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'تم حفظ التعديلات ✓',
+            style: GoogleFonts.cairo(),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      context.pop();
+    } else {
+      final validationError = ref.read(postListingProvider).error;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            validationError ?? 'حدث خطأ، حاول مرة أخرى',
+            style: GoogleFonts.cairo(),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final edit = ref.watch(editListingProvider(widget.listingId));
     final post = ref.watch(postListingProvider);
 
     if (edit.loading && !edit.loaded) {
       return const Scaffold(body: LoadingWidget(message: 'جاري التحميل...'));
     }
+
     if (edit.error != null && !edit.loaded) {
       return Scaffold(
         appBar: AppBar(title: const Text('تعديل الإعلان')),
         body: AppErrorWidget(
           message: edit.error!,
-          onRetry: () => ref.invalidate(editListingProvider(listingId)),
+          onRetry: () => ref.invalidate(editListingProvider(widget.listingId)),
         ),
       );
     }
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('تعديل الإعلان'),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textDark,
+        elevation: 0,
+        title: Text(
+          'تعديل الإعلان',
+          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (post.currentStep > 1) {
-              ref.read(postListingProvider.notifier).previousStep();
-            } else {
-              ref.read(postListingProvider.notifier).reset();
-              context.pop();
-            }
-          },
+          onPressed: edit.loading
+              ? null
+              : () {
+                  ref.read(postListingProvider.notifier).reset();
+                  context.pop();
+                },
         ),
       ),
       body: Column(
         children: [
-          _StepIndicator(currentStep: post.currentStep),
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: KeyedSubtree(
-                key: ValueKey(post.currentStep),
-                child: switch (post.currentStep) {
-                  1 => const Step1Category(),
-                  2 => const Step2Details(),
-                  3 => const Step3Location(),
-                  4 => EditStep4Photos(listingId: listingId),
-                  5 => Step5Review(
-                      onPublish: () => _save(context, ref),
-                      onSaveDraft: () {},
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (post.categoryPath.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      child: _ReadOnlyCategoryBanner(path: post.categoryPath),
                     ),
-                  _ => const SizedBox.shrink(),
-                },
+                  const Step2Details(),
+                  const Step3Location(),
+                  const StepContactPreferences(),
+                  EditListingPhotosSection(listingId: widget.listingId),
+                  EditListingVideoSection(
+                    existingVideoUrl: edit.existingVideoUrl,
+                    existingThumbnailUrl: edit.existingVideoThumbnailUrl,
+                    canUploadVideo: edit.canUploadVideo,
+                  ),
+                  if (post.error != null)
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        post.error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: post.currentStep < 5
-                  ? CustomButton(
-                      label: 'التالي',
-                      loading: edit.loading,
-                      onPressed: edit.loading
-                          ? null
-                          : () => _nextStep(ref, post.currentStep),
-                    )
-                  : CustomButton(
-                      label: 'حفظ التعديلات',
-                      loading: edit.loading,
-                      onPressed: edit.loading ? null : () => _save(context, ref),
-                    ),
+            minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: edit.loading ? null : _save,
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                ),
+                child: edit.loading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'حفظ التعديلات',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  Future<void> _save(BuildContext context, WidgetRef ref) async {
-    final ok = await ref.read(editListingProvider(listingId).notifier).save();
-    if (!context.mounted) return;
-    if (ok) {
-      context.pop();
-      context.push('/listing/$listingId');
-    }
-  }
-
-  void _nextStep(WidgetRef ref, int step) {
-    final postNotifier = ref.read(postListingProvider.notifier);
-    if (step == 4) {
-      final edit = ref.read(editListingProvider(listingId));
-      final post = ref.read(postListingProvider);
-      if (edit.existingImages.isEmpty && post.images.isEmpty) {
-        postNotifier.setValidationError('أضف صورة واحدة على الأقل');
-        return;
-      }
-      if (edit.existingImages.isNotEmpty && post.images.isEmpty) {
-        postNotifier.goToStep(5);
-        return;
-      }
-    }
-    postNotifier.nextStep();
-  }
 }
 
-class _StepIndicator extends StatelessWidget {
-  const _StepIndicator({required this.currentStep});
+class _ReadOnlyCategoryBanner extends StatelessWidget {
+  const _ReadOnlyCategoryBanner({required this.path});
 
-  final int currentStep;
+  final List<CategoryModel> path;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(5, (i) {
-          final step = i + 1;
-          final active = step == currentStep;
-          final done = step < currentStep;
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: active ? 12 : 8,
-            height: active ? 12 : 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: active || done
-                  ? colorScheme.primary
-                  : colorScheme.outlineVariant,
+    final labels = path.map((c) => c.nameAr).join(' > ');
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'الفئة',
+            style: GoogleFonts.cairo(
+              fontSize: 12,
+              color: AppColors.textMuted,
             ),
-          );
-        }),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            labels,
+            style: GoogleFonts.cairo(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+        ],
       ),
     );
   }

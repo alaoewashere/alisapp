@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Souq IQ",
+  "appName": "Sello",
   "home": "Home",
   "search": "Search",
   "favorites": "Favorites",
@@ -109,7 +109,7 @@
   "categories": "Categories",
   "featured": "Featured",
   "sold": "Sold",
-  "searchHint": "Search Souq IQ...",
+  "searchHint": "Search Sello...",
   "otpSent": "Verification code sent. Check your messages.",
   "newOtpSent": "New code sent"
 }

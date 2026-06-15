@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Souq IQ';
+  String get appName => 'Sello';
 
   @override
   String get home => 'Home';
@@ -343,7 +343,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sold => 'Sold';
 
   @override
-  String get searchHint => 'Search Souq IQ...';
+  String get searchHint => 'Search Sello...';
 
   @override
   String get otpSent => 'Verification code sent. Check your messages.';

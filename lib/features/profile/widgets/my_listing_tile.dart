@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/listing_display_title.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../listings/data/listings_repository.dart';
 import '../providers/profile_provider.dart';
@@ -63,7 +65,7 @@ class MyListingTile extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      listing.titleAr,
+                      listingDisplayTitle(listing),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -140,7 +142,7 @@ class _ActionsColumn extends ConsumerWidget {
       children: switch (statusKey) {
         'active' => [
             _action(Icons.edit_outlined, 'تعديل', () {
-              context.push('/listing/${listing.id}/edit');
+              context.push(AppRoutes.editListingPath(listing.id));
             }),
             _action(Icons.check_circle_outline, 'مباع', () async {
               final ok = await _confirm(
@@ -180,7 +182,7 @@ class _ActionsColumn extends ConsumerWidget {
                     .cloneListingForRepost(listing.id, userId);
                 _refresh(ref);
                 if (context.mounted) {
-                  context.push('/listing/$newId/edit');
+                  context.push(AppRoutes.editListingPath(newId));
                 }
               } catch (e) {
                 if (context.mounted) {
@@ -220,16 +222,16 @@ class _ActionsColumn extends ConsumerWidget {
   ) {
     return showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: Text(body),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('إلغاء'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('تأكيد'),
           ),
         ],

@@ -4,6 +4,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 import '../../../shared/models/listing_model.dart';
+import '../../../shared/widgets/premium_listing_badge.dart';
 
 class ListingDetailGallery extends StatefulWidget {
   const ListingDetailGallery({
@@ -156,6 +157,12 @@ class _ListingDetailGalleryState extends State<ListingDetailGallery> {
                   ),
           ),
         ),
+        if (widget.listing.isPremiumListing)
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 52,
+            right: 16,
+            child: const PremiumListingHeroBadge(),
+          ),
         if (count > 1)
           Positioned(
             bottom: 16,

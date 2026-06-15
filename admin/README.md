@@ -1,6 +1,6 @@
-# سوق العراق — لوحة التحكم (Souq IQ Admin)
+# Sello — لوحة التحكم (Sello Admin)
 
-Admin dashboard for the Souq IQ marketplace. Next.js 14 (App Router) + TypeScript +
+Admin dashboard for the Sello marketplace. Next.js 14 (App Router) + TypeScript +
 Tailwind CSS + Supabase. Connects to the **same Supabase project** as the Flutter app.
 
 ## Stack

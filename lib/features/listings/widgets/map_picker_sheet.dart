@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/config/maps_config.dart';
+import '../../../core/utils/map_geocoding_service.dart';
 import '../../../core/utils/map_location_service.dart';
 
 class MapPickerSheet extends StatefulWidget {
@@ -103,9 +104,29 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
     }
   }
 
-  void _confirm() {
+  bool _confirming = false;
+
+  Future<void> _confirm() async {
+    if (_confirming) return;
+    setState(() => _confirming = true);
+
     final pos = _position ?? _initialPosition ?? baghdadLatLng;
-    Navigator.pop(context, (pos.latitude, pos.longitude));
+    String? address;
+    try {
+      address = await reverseGeocodeLatLng(pos);
+    } catch (e) {
+      if (kDebugMode) debugPrint('Reverse geocode failed: $e');
+    }
+
+    if (!mounted) return;
+    Navigator.pop(
+      context,
+      MapPickerResult(
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+        address: address,
+      ),
+    );
   }
 
   @override
@@ -159,8 +180,14 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
                   ),
                   const SizedBox(height: 8),
                   FilledButton(
-                    onPressed: _confirm,
-                    child: const Text('تأكيد الموقع'),
+                    onPressed: _confirming ? null : _confirm,
+                    child: _confirming
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('تأكيد الموقع'),
                   ),
                 ],
               ),

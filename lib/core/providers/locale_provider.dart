@@ -4,7 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n_provider.dart';
 
-const _localeKey = 'locale';
+const appLanguageKey = 'app_language';
+const languageOnboardingCompleteKey = 'language_onboarding_complete';
+const _legacyLocaleKey = 'locale';
 
 const supportedAppLocales = [
   Locale('ar'),
@@ -21,7 +23,9 @@ class LocaleNotifier extends Notifier<Locale> {
 
   Future<void> _loadSaved() async {
     final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(_localeKey) ?? 'ar';
+    final code = prefs.getString(appLanguageKey) ??
+        prefs.getString(_legacyLocaleKey) ??
+        'ar';
     state = _localeFromCode(code);
   }
 
@@ -43,8 +47,19 @@ class LocaleNotifier extends Notifier<Locale> {
     final normalized = normalizeAppLocale(locale);
     state = normalized;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey, normalized.languageCode);
+    await prefs.setString(appLanguageKey, normalized.languageCode);
   }
+
+  Future<void> markOnboardingComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(languageOnboardingCompleteKey, true);
+  }
+}
+
+/// True after the user finishes the first-launch language picker.
+Future<bool> isLanguageOnboardingComplete() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(languageOnboardingCompleteKey) ?? false;
 }
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale>(

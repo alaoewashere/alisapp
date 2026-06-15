@@ -98,7 +98,7 @@ export async function warnSeller(formData: FormData): Promise<ActionResult> {
     user_id: sellerId,
     listing_id: listingId || null,
     type: "warning",
-    title: "تحذير من إدارة سوق العراق",
+    title: "تحذير من إدارة Sello",
     body: reason,
   });
 

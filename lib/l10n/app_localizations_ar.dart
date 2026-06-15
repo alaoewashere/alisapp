@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appName => 'سوق العراق';
+  String get appName => 'Sello';
 
   @override
   String get home => 'الرئيسية';
@@ -342,7 +342,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sold => 'مباع';
 
   @override
-  String get searchHint => 'ابحث في سوق العراق...';
+  String get searchHint => 'ابحث في Sello...';
 
   @override
   String get otpSent => 'تم إرسال رمز التحقق. تحقق من رسائلك.';

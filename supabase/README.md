@@ -1,4 +1,4 @@
-# Supabase Setup — سوق العراق (Souq IQ)
+# Supabase Setup — Sello
 
 ## 1. Create Project
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../../l10n/app_localizations.dart';
+import 'l10n_provider.dart';
 
 /// Flutter's built-in Material/Cupertino delegates do not support Kurdish (`ku`).
 /// Map framework locales to the closest supported locale while [AppLocalizations]
@@ -13,16 +14,16 @@ Locale frameworkLocaleFor(Locale locale) {
       return const Locale('en');
     case 'ku':
     case 'ckb':
-      // Arabic: RTL + full Material/Cupertino coverage for Kurdish UI mode.
-      return const Locale('ar');
+      // Arabic framework + Western digits for Kurdish UI mode.
+      return const Locale('ar', 'US');
     default:
-      return const Locale('ar');
+      return const Locale('ar', 'US');
   }
 }
 
-/// intl [DateFormat] does not support `ku`; reuse the framework fallback locale.
+/// intl [DateFormat] locale — Western digits (0–9) for Arabic/Kurdish.
 String intlLocaleFor(String languageCode) =>
-    frameworkLocaleFor(Locale(languageCode)).languageCode;
+    intlDisplayLocale(Locale(languageCode));
 
 class FallbackMaterialLocalizationsDelegate
     extends LocalizationsDelegate<MaterialLocalizations> {

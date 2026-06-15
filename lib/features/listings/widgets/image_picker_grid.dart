@@ -1,193 +1,297 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
-/// Reusable photo grid with add, remove, and drag-to-reorder.
+import '../../../core/constants/app_colors.dart';
+
+/// Modern 3-column photo grid for listing create/edit flows.
 class ImagePickerGrid extends StatelessWidget {
   const ImagePickerGrid({
     super.key,
     required this.images,
     required this.onAdd,
+    required this.onAddBatch,
     required this.onRemove,
     required this.onReorder,
     required this.maxImages,
+    this.onLimitReached,
   });
 
   final List<File> images;
   final Future<void> Function(File file) onAdd;
+  final Future<void> Function(List<File> files) onAddBatch;
   final void Function(int index) onRemove;
   final void Function(int oldIndex, int newIndex) onReorder;
   final int maxImages;
+  final VoidCallback? onLimitReached;
 
-  Future<void> _pickSource(BuildContext context, ImageSource source) async {
-    Navigator.pop(context);
-    final picker = ImagePicker();
-    XFile? picked;
-    if (source == ImageSource.camera) {
-      picked = await picker.pickImage(source: ImageSource.camera);
-    } else {
-      if (images.length >= maxImages) return;
-      final remaining = maxImages - images.length;
-      final multi = await picker.pickMultiImage();
-      for (var i = 0; i < multi.length && i < remaining; i++) {
-        await onAdd(File(multi[i].path));
-      }
+  Future<void> _pickMultiple(BuildContext context) async {
+    if (images.length >= maxImages) {
+      onLimitReached?.call();
       return;
     }
-    if (picked != null) {
-      await onAdd(File(picked.path));
-    }
-  }
 
-  void _showSourcePicker(BuildContext context) {
-    if (images.length >= maxImages) return;
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('الكاميرا'),
-              onTap: () => _pickSource(ctx, ImageSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('معرض الصور'),
-              onTap: () => _pickSource(ctx, ImageSource.gallery),
-            ),
-          ],
-        ),
-      ),
-    );
+    final picker = ImagePicker();
+    final picked = await picker.pickMultiImage(imageQuality: 85);
+    if (picked.isEmpty) return;
+
+    final remaining = maxImages - images.length;
+    final files = picked.take(remaining).map((x) => File(x.path)).toList();
+
+    if (picked.length > remaining) {
+      onLimitReached?.call();
+    }
+
+    if (files.length == 1) {
+      await onAdd(files.first);
+    } else if (files.isNotEmpty) {
+      await onAddBatch(files);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final slots = <Widget>[];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const horizontalPadding = 16.0;
+        const spacing = 8.0;
+        final width = constraints.maxWidth;
+        final cellSize = (width - horizontalPadding * 2 - spacing * 2) / 3;
 
-    if (images.length < maxImages) {
-      slots.add(
-        _AddSlot(
-          key: const ValueKey('add_slot'),
-          onTap: () => _showSourcePicker(context),
-        ),
-      );
-    }
+        final slots = <Widget>[];
 
-    for (var i = 0; i < images.length; i++) {
-      slots.add(
-        _ImageSlot(
-          key: ValueKey(images[i].path),
-          file: images[i],
-          isPrimary: i == 0,
-          onRemove: () => onRemove(i),
-        ),
-      );
-    }
-
-    return ReorderableWrap(
-      spacing: 8,
-      runSpacing: 8,
-      onReorder: (oldIndex, newIndex) {
-        final addSlotOffset = images.length < maxImages ? 1 : 0;
-        final oldImageIndex = oldIndex - addSlotOffset;
-        var newImageIndex = newIndex - addSlotOffset;
-        if (oldImageIndex < 0 || oldImageIndex >= images.length) return;
-        if (newImageIndex < 0) newImageIndex = 0;
-        if (newImageIndex >= images.length) {
-          newImageIndex = images.length - 1;
+        if (images.length < maxImages) {
+          slots.add(
+            _AddPhotoCell(
+              key: const ValueKey('listing_photo_add'),
+              size: cellSize,
+              onTap: () => _pickMultiple(context),
+            ),
+          );
         }
-        onReorder(oldImageIndex, newImageIndex);
+
+        for (var i = 0; i < images.length; i++) {
+          slots.add(
+            _PhotoCell(
+              key: ValueKey('listing_photo_${images[i].path}_$i'),
+              file: images[i],
+              size: cellSize,
+              isCover: i == 0,
+              onRemove: () => onRemove(i),
+            ),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: ReorderableWrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            needsLongPressDraggable: true,
+            buildDraggableFeedback: (context, constraints, child) {
+              return Material(
+                elevation: 8,
+                shadowColor: AppColors.primary.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(12),
+                child: Transform.scale(scale: 1.05, child: child),
+              );
+            },
+            onReorder: (oldIndex, newIndex) {
+              final addOffset = images.length < maxImages ? 1 : 0;
+              final oldImageIndex = oldIndex - addOffset;
+              var newImageIndex = newIndex - addOffset;
+              if (oldImageIndex < 0 || oldImageIndex >= images.length) return;
+              if (newImageIndex < 0) newImageIndex = 0;
+              if (newImageIndex >= images.length) {
+                newImageIndex = images.length - 1;
+              }
+              onReorder(oldImageIndex, newImageIndex);
+            },
+            children: slots,
+          ),
+        );
       },
-      needsLongPressDraggable: true,
-      children: slots,
     );
   }
 }
 
-class _AddSlot extends StatelessWidget {
-  const _AddSlot({super.key, required this.onTap});
+class _AddPhotoCell extends StatelessWidget {
+  const _AddPhotoCell({
+    super.key,
+    required this.size,
+    required this.onTap,
+  });
 
+  final double size;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 100,
-      height: 100,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      width: size,
+      height: size,
+      child: GestureDetector(
+        onTap: onTap,
+        child: CustomPaint(
+          painter: _DashedBorderPainter(
+            color: AppColors.primary,
+            radius: 12,
+            strokeWidth: 1.5,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0FAF4),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 22),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'إضافة صورة',
+                  style: GoogleFonts.cairo(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        child: const Icon(Icons.add, size: 32),
       ),
     );
   }
 }
 
-class _ImageSlot extends StatelessWidget {
-  const _ImageSlot({
+class _PhotoCell extends StatelessWidget {
+  const _PhotoCell({
     super.key,
     required this.file,
-    required this.isPrimary,
+    required this.size,
+    required this.isCover,
     required this.onRemove,
   });
 
   final File file;
-  final bool isPrimary;
+  final double size;
+  final bool isCover;
   final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 100,
-      height: 100,
+      width: size,
+      height: size,
       child: Stack(
         fit: StackFit.expand,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             child: Image.file(file, fit: BoxFit.cover),
           ),
-          if (isPrimary)
-            Positioned(
-              bottom: 4,
-              right: 4,
-              left: 4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'الصورة الرئيسية',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 9),
-                ),
-              ),
-            ),
           Positioned(
-            top: 0,
-            left: 0,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-              icon: const Icon(Icons.close, size: 18, color: Colors.white),
-              style: IconButton.styleFrom(
-                backgroundColor: Colors.black54,
+            top: 6,
+            right: 6,
+            child: GestureDetector(
+              onTap: onRemove,
+              child: Container(
+                width: 22,
+                height: 22,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 14),
               ),
-              onPressed: onRemove,
             ),
           ),
+          if (isCover)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 22,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Color(0x80000000),
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                ),
+                child: Text(
+                  'الغلاف',
+                  style: GoogleFonts.cairo(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
+  }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  _DashedBorderPainter({
+    required this.color,
+    required this.radius,
+    required this.strokeWidth,
+  });
+
+  final Color color;
+  final double radius;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          Radius.circular(radius),
+        ),
+      );
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    const dashWidth = 6.0;
+    const dashSpace = 4.0;
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final next = distance + dashWidth;
+        final extractPath = metric.extractPath(
+          distance,
+          next.clamp(0, metric.length),
+        );
+        canvas.drawPath(extractPath, paint);
+        distance = next + dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.radius != radius ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }

@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'app.dart';
+import 'core/config/groq_config.dart';
 import 'core/config/maps_config.dart';
 import 'core/constants/app_strings.dart';
 import 'core/supabase/supabase_client.dart';
@@ -21,14 +23,18 @@ Future<void> main() async {
     );
   }
   await initializeSupabase();
+  await SharedPreferences.getInstance();
   final oneSignalAppId = dotenv.env['ONESIGNAL_APP_ID'];
   await OneSignalService.initialize(oneSignalAppId);
   if (kDebugMode && oneSignalAppId != null && oneSignalAppId.isNotEmpty) {
-    debugPrint('OneSignal: initialized with app id ${oneSignalAppId.substring(0, 8)}...');
+    debugPrint(
+      'OneSignal: initialized with app id ${oneSignalAppId.substring(0, 8)}...',
+    );
   } else if (kDebugMode) {
     debugPrint('OneSignal: ONESIGNAL_APP_ID not set in .env — push disabled');
   }
   MapsConfig.logStatus();
+  GroqConfig.logStatus();
 
   runApp(
     ProviderScope(

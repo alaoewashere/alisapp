@@ -26,17 +26,9 @@ class SouqIqApp extends ConsumerWidget {
       title: strings.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      locale: normalized,
+      locale: materialDisplayLocale(normalized),
       supportedLocales: AppLocalizations.supportedLocales,
-      localeResolutionCallback: (deviceLocale, supported) {
-        if (deviceLocale == null) return normalized;
-        for (final supportedLocale in supported) {
-          if (supportedLocale.languageCode == deviceLocale.languageCode) {
-            return supportedLocale;
-          }
-        }
-        return normalized;
-      },
+      localeResolutionCallback: (_, _) => materialDisplayLocale(normalized),
       localizationsDelegates: appLocalizationDelegates(
         CountryLocalizations.delegate,
       ),
@@ -45,9 +37,7 @@ class SouqIqApp extends ConsumerWidget {
         return Directionality(
           textDirection: localeTextDirection(normalized),
           child: AuthSessionHandler(
-            child: OneSignalHandler(
-              child: child ?? const SizedBox.shrink(),
-            ),
+            child: OneSignalHandler(child: child ?? const SizedBox.shrink()),
           ),
         );
       },

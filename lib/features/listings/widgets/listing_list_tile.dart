@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_governorates.dart';
+import '../../../core/utils/listing_display_title.dart';
 import '../../../shared/models/listing_model.dart';
+import '../../../shared/widgets/premium_listing_badge.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/widgets/guest_bottom_sheet.dart';
 import '../../home/providers/home_provider.dart';
@@ -34,24 +36,34 @@ class ListingListTile extends ConsumerWidget {
                 child: SizedBox(
                   width: 100,
                   height: 100,
-                  child: listing.coverImageUrl != null
-                      ? CachedNetworkImage(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      if (listing.coverImageUrl != null)
+                        CachedNetworkImage(
                           imageUrl: listing.coverImageUrl!,
                           fit: BoxFit.cover,
                           placeholder: (_, _) => Shimmer.fromColors(
                             baseColor: Theme.of(context)
                                 .colorScheme
                                 .surfaceContainerHighest,
-                            highlightColor: Theme.of(context).colorScheme.surface,
+                            highlightColor:
+                                Theme.of(context).colorScheme.surface,
                             child: const ColoredBox(color: Colors.white),
                           ),
                         )
-                      : ColoredBox(
+                      else
+                        ColoredBox(
                           color: Theme.of(context)
                               .colorScheme
                               .surfaceContainerHighest,
                           child: const Icon(Icons.image),
                         ),
+                      if (listing.isPremiumListing)
+                        const PremiumListingCardRibbon(),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -60,7 +72,7 @@ class ListingListTile extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      listing.titleAr,
+                      listingDisplayTitle(listing),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(

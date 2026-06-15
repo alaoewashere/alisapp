@@ -10,8 +10,11 @@ import '../../../shared/models/filter_model.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
 import '../../home/widgets/listing_card.dart';
+import '../../../models/smart_alert.dart';
+import '../providers/post_listing_provider.dart';
 import '../providers/search_provider.dart';
 import '../widgets/filter_sheet.dart';
+import '../../../screens/smart_alerts/my_alerts_screen.dart';
 import '../widgets/listing_list_tile.dart';
 
 class SearchResultsScreen extends ConsumerWidget {
@@ -22,6 +25,7 @@ class SearchResultsScreen extends ConsumerWidget {
     final filter = ref.watch(filterProvider);
     final results = ref.watch(searchResultsProvider);
     final isGrid = ref.watch(searchViewModeProvider);
+    final categoriesAsync = ref.watch(allCategoriesProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -82,6 +86,21 @@ class SearchResultsScreen extends ConsumerWidget {
             onToggleView: () =>
                 ref.read(searchViewModeProvider.notifier).toggle(),
           ),
+          if (filter.hasFilters)
+            categoriesAsync.when(
+              data: (categories) => SmartAlertSaveBanner(
+                draft: smartAlertDraftFromFilter(
+                  filter,
+                  allCategories: categories,
+                ),
+              ),
+              loading: () => SmartAlertSaveBanner(
+                draft: smartAlertDraftFromFilter(filter),
+              ),
+              error: (_, _) => SmartAlertSaveBanner(
+                draft: smartAlertDraftFromFilter(filter),
+              ),
+            ),
           if (filter.activeFilterCount > 0)
             _ActiveFiltersRow(filter: filter),
           Expanded(

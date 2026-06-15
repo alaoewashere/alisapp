@@ -84,6 +84,7 @@ class EditStep4Photos extends ConsumerWidget {
             maxImages: AppConstants.maxListingPhotos -
                 edit.existingImages.length,
             onAdd: postNotifier.addImage,
+            onAddBatch: postNotifier.addImages,
             onRemove: postNotifier.removeImage,
             onReorder: postNotifier.reorderImages,
           ),

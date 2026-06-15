@@ -1,6 +1,6 @@
 {
   "@@locale": "ku",
-  "appName": "سوقی عێراق",
+  "appName": "Sello",
   "home": "سەرەکی",
   "search": "گەڕان",
   "favorites": "دڵخوازەکان",
@@ -109,7 +109,7 @@
   "categories": "پۆلەکان",
   "featured": "تایبەت",
   "sold": "فرۆشراو",
-  "searchHint": "گەڕان لە سوقی عێراق...",
+  "searchHint": "گەڕان لە Sello...",
   "otpSent": "کۆد نێردرا. پەیامەکانت بپشکنە.",
   "newOtpSent": "کۆدی نوێ نێردرا"
 }

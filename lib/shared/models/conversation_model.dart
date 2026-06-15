@@ -9,6 +9,7 @@ class ConversationModel {
     this.listingPrice,
     this.otherUserName,
     this.otherUserAvatar,
+    this.otherUserAvatarSeed,
     this.otherUserPhone,
     this.lastMessage,
     this.lastMessageTime,
@@ -25,6 +26,7 @@ class ConversationModel {
   final double? listingPrice;
   final String? otherUserName;
   final String? otherUserAvatar;
+  final String? otherUserAvatarSeed;
   final String? otherUserPhone;
   final String? lastMessage;
   final DateTime? lastMessageTime;
@@ -44,6 +46,7 @@ class ConversationModel {
     double? listingPrice,
     String? otherUserName,
     String? otherUserAvatar,
+    String? otherUserAvatarSeed,
     String? otherUserPhone,
     String? lastMessage,
     DateTime? lastMessageTime,
@@ -60,6 +63,8 @@ class ConversationModel {
       listingPrice: listingPrice ?? this.listingPrice,
       otherUserName: otherUserName ?? this.otherUserName,
       otherUserAvatar: otherUserAvatar ?? this.otherUserAvatar,
+      otherUserAvatarSeed:
+          otherUserAvatarSeed ?? this.otherUserAvatarSeed,
       otherUserPhone: otherUserPhone ?? this.otherUserPhone,
       lastMessage: lastMessage ?? this.lastMessage,
       lastMessageTime: lastMessageTime ?? this.lastMessageTime,
@@ -96,6 +101,7 @@ class ConversationModel {
           otherProfile?['display_name'] as String? ??
           'مستخدم',
       otherUserAvatar: otherProfile?['avatar_url'] as String?,
+      otherUserAvatarSeed: otherProfile?['avatar_seed'] as String?,
       otherUserPhone: otherProfile?['phone'] as String?,
       lastMessage: json['last_message'] as String?,
       lastMessageTime: json['last_message_at'] != null

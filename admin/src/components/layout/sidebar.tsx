@@ -24,7 +24,7 @@ export function Sidebar({ email, role, reportsCount }: SidebarProps) {
           <Store className="size-5" />
         </div>
         <div className="leading-tight">
-          <p className="font-bold text-foreground">سوق العراق</p>
+          <p className="font-bold text-foreground">Sello</p>
           <p className="text-xs text-muted-foreground">لوحة التحكم</p>
         </div>
       </div>

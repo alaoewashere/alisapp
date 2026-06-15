@@ -9,7 +9,7 @@ class AppLocalizationsKu extends AppLocalizations {
   AppLocalizationsKu([String locale = 'ku']) : super(locale);
 
   @override
-  String get appName => 'سوقی عێراق';
+  String get appName => 'Sello';
 
   @override
   String get home => 'سەرەکی';
@@ -342,7 +342,7 @@ class AppLocalizationsKu extends AppLocalizations {
   String get sold => 'فرۆشراو';
 
   @override
-  String get searchHint => 'گەڕان لە سوقی عێراق...';
+  String get searchHint => 'گەڕان لە Sello...';
 
   @override
   String get otpSent => 'کۆد نێردرا. پەیامەکانت بپشکنە.';
