@@ -31,11 +31,12 @@ void main() {
       ),
     );
 
-    await tester.pump(const Duration(milliseconds: 800));
+    await tester.pump();
 
     expect(find.text('أنشئ حسابك'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsNWidgets(2));
     expect(find.text('تخطي'), findsOneWidget);
+    expect(find.byType(ClipPath), findsNothing);
     expect(find.text('الاسم الأول'), findsOneWidget);
     expect(find.text('الاسم الأخير'), findsOneWidget);
     expect(find.text('تأكيد كلمة المرور'), findsOneWidget);
@@ -52,7 +53,7 @@ void main() {
       ),
     );
 
-    await tester.pump(const Duration(milliseconds: 800));
+    await tester.pump();
 
     await tester.enterText(
       find.byKey(const Key('signup_first_name')),

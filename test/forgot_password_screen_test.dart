@@ -20,17 +20,17 @@ void main() {
         child: MaterialApp.router(routerConfig: router),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump();
 
     expect(find.text('نسيت كلمة المرور؟'), findsOneWidget);
-    expect(find.text('أدخل بريدك الإلكتروني لاستقبال رمز التحقق'), findsOneWidget);
+    expect(find.text('اختر طريقة استعادة حسابك'), findsOneWidget);
     expect(find.text('متابعة عبر البريد الإلكتروني'), findsOneWidget);
     expect(find.text('متابعة عبر الهاتف'), findsOneWidget);
     expect(find.text('إرسال'), findsOneWidget);
     expect(find.text('البريد الإلكتروني'), findsOneWidget);
   });
 
-  testWidgets('Send without email shows validation snackbar', (tester) async {
+  testWidgets('Send without email shows inline validation error', (tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: MaterialApp(
@@ -38,11 +38,10 @@ void main() {
         ),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump();
 
     await tester.tap(find.text('إرسال'));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.textContaining('البريد'), findsWidgets);
   });

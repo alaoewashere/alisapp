@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/constants/app_colors.dart';
+
 class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
@@ -19,10 +21,13 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = loading
-        ? const SizedBox(
+        ? SizedBox(
             width: 20,
             height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: outlined ? AppColors.volt : AppColors.canvas,
+            ),
           )
         : Text(label);
 

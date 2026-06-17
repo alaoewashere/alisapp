@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -13,6 +13,7 @@ import '../../core/supabase/supabase_client.dart';
 import '../../features/auth/widgets/auth_form_styles.dart';
 import '../../features/profile/data/profile_repository.dart';
 import '../../features/verification/data/verification_repository.dart';
+import '../../shared/widgets/sello_app_bar.dart';
 
 /// Screen 3 — capture and upload ID images.
 class VerificationUploadScreen extends ConsumerStatefulWidget {
@@ -85,7 +86,7 @@ class _VerificationUploadScreenState
         SnackBar(
           content: Text(
             'يرجى تصوير الوجه الخلفي للوثيقة',
-            style: GoogleFonts.cairo(),
+            style: AppFonts.cairo(),
           ),
         ),
       );
@@ -126,7 +127,7 @@ class _VerificationUploadScreenState
         SnackBar(
           content: Text(
             'تعذّر إرسال الطلب، حاول مرة أخرى',
-            style: GoogleFonts.cairo(),
+            style: AppFonts.cairo(),
           ),
         ),
       );
@@ -142,11 +143,11 @@ class _VerificationUploadScreenState
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
+      appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         title: Text(
           'صوّر الوثيقة',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
       body: Directionality(
@@ -156,7 +157,7 @@ class _VerificationUploadScreenState
           children: [
             Text(
               VerificationDocumentType.labelAr(widget.documentType),
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 14,
                 color: AppColors.textMuted,
               ),
@@ -206,7 +207,7 @@ class _UploadFrame extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textDark,
@@ -263,7 +264,7 @@ class _UploadFrame extends StatelessWidget {
                         const SizedBox(height: 10),
                         Text(
                           'التقاط صورة',
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primary,

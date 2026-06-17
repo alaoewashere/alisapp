@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../core/utils/arabic_number.dart';
 import '../../models/smart_alert.dart';
+import '../../shared/widgets/app_back_button.dart';
 import '../../services/smart_alert_service.dart';
 
 class MyAlertsScreen extends ConsumerWidget {
@@ -26,12 +27,9 @@ class MyAlertsScreen extends ConsumerWidget {
         elevation: 0,
         title: Text(
           'تنبيهاتي الذكية',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_forward),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBackButton(onPressed: () => context.pop()),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -46,13 +44,13 @@ class MyAlertsScreen extends ConsumerWidget {
               onPressed: () => context.push(AppRoutes.createSmartAlert),
               backgroundColor: AppColors.primary,
               icon: const Icon(Icons.notifications_active_outlined),
-              label: Text('تنبيه جديد', style: GoogleFonts.cairo()),
+              label: Text('تنبيه جديد', style: AppFonts.cairo()),
             ),
       body: userId == null
           ? Center(
               child: Text(
                 'سجّل الدخول لإدارة التنبيهات',
-                style: GoogleFonts.cairo(color: AppColors.textMuted),
+                style: AppFonts.cairo(color: AppColors.textMuted),
               ),
             )
           : alertsAsync.when(
@@ -121,7 +119,7 @@ class _EmptyAlerts extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'لا توجد تنبيهات بعد',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textDark,
@@ -142,7 +140,7 @@ class _EmptyAlerts extends StatelessWidget {
               ),
               child: Text(
                 'أنشئ تنبيهاً الآن',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                style: AppFonts.cairo(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -184,9 +182,9 @@ class _AlertCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.fieldCarbon,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.glassBorder),
           boxShadow: const [
             BoxShadow(
               color: AppColors.microShadow,
@@ -207,7 +205,7 @@ class _AlertCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           alert.title,
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: AppColors.textDark,
@@ -227,7 +225,7 @@ class _AlertCard extends StatelessWidget {
                           ),
                           child: Text(
                             alert.category!,
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.cairo(
                               fontSize: 11,
                               color: AppColors.badgeText,
                             ),
@@ -238,7 +236,7 @@ class _AlertCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     alert.summaryLine,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 13,
                       color: AppColors.textMuted,
                     ),
@@ -246,7 +244,7 @@ class _AlertCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     alert.lastTriggeredLabel,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 12,
                       color: AppColors.textMuted.withValues(alpha: 0.85),
                     ),
@@ -264,7 +262,7 @@ class _AlertCard extends StatelessWidget {
                       ),
                       child: Text(
                         '${arabicNumber(alert.triggerCount)} إعلان مطابق',
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primary,
@@ -325,7 +323,7 @@ class SmartAlertSaveBanner extends ConsumerWidget {
               Expanded(
                 child: Text(
                   'احفظ هذا البحث كتنبيه ذكي 🔔',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,

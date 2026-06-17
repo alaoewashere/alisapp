@@ -160,6 +160,7 @@ class AuthNotifier extends Notifier<AuthFlowState> {
   Future<Result<AuthResult>> verifyWhatsAppOtp({
     required String phone,
     required String otp,
+    String? purpose,
   }) async {
     state = state.copyWith(
       status: AuthFlowStatus.loading,
@@ -171,6 +172,7 @@ class AuthNotifier extends Notifier<AuthFlowState> {
     final result = await ref.read(authRepositoryProvider).verifyWhatsAppOtp(
           phone: phone,
           otp: otp,
+          purpose: purpose,
         );
 
     switch (result) {
@@ -231,6 +233,7 @@ class AuthNotifier extends Notifier<AuthFlowState> {
     required String password,
     required String firstName,
     required String lastName,
+    String? username,
   }) async {
     state = state.copyWith(
       status: AuthFlowStatus.loading,
@@ -244,6 +247,7 @@ class AuthNotifier extends Notifier<AuthFlowState> {
           password: password,
           firstName: firstName,
           lastName: lastName,
+          username: username,
         );
 
     switch (result) {

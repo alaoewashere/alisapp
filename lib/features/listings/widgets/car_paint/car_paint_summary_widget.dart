@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/car_paint_panels.dart';
 import '../../../../core/utils/car_paint_utils.dart';
 import 'car_paint_widget.dart';
@@ -87,9 +88,9 @@ class CarPaintLegendRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: CarPaintColors.panelStroke),
+        border: Border.all(color: const Color(0x20FFFFFF)),
       ),
       child: Wrap(
         spacing: 16,
@@ -106,7 +107,7 @@ class CarPaintLegendRow extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: item.$1,
                       borderRadius: BorderRadius.circular(2),
-                      border: Border.all(color: CarPaintColors.panelStroke),
+                      border: Border.all(color: const Color(0x20FFFFFF)),
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -114,6 +115,7 @@ class CarPaintLegendRow extends StatelessWidget {
                     item.$2,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w500,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                 ],

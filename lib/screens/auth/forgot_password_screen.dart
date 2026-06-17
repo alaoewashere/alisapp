@@ -1,7 +1,8 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
@@ -9,6 +10,8 @@ import '../../core/utils/result.dart';
 import '../../core/utils/validators.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/widgets/auth_form_styles.dart';
+import '../../shared/widgets/app_back_button.dart';
+import '../../features/auth/widgets/auth_hero_header.dart';
 
 enum _RecoveryMethod { email, phone }
 
@@ -20,59 +23,81 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
       _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
-    with SingleTickerProviderStateMixin {
-  static const _titleColor = Color(0xFF111111);
-  static const _instructionColor = Color(0xFF555555);
-
-  late final AnimationController _entranceController;
-  late final Animation<double> _fadeAnimation;
-  late final Animation<Offset> _slideAnimation;
-
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   _RecoveryMethod _selectedMethod = _RecoveryMethod.email;
   late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+  late Country _selectedCountry;
   bool _sending = false;
+  String? _inlineError;
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
-    _entranceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _entranceController,
-      curve: Curves.easeOut,
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutCubic),
-    );
-    _entranceController.forward();
+    _phoneController = TextEditingController();
+    _selectedCountry = Country.parse('IQ');
   }
 
   @override
   void dispose() {
     _emailController.dispose();
-    _entranceController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
+  void _goBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.login);
+    }
+  }
+
+  void _pickCountry() {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      countryListTheme: CountryListThemeData(
+        bottomSheetHeight: MediaQuery.sizeOf(context).height * 0.85,
+      ),
+      onSelect: (country) => setState(() => _selectedCountry = country),
+    );
+  }
+
   Future<void> _onSendPressed() async {
+    setState(() => _inlineError = null);
+
     if (_selectedMethod == _RecoveryMethod.email) {
       final email = _emailController.text.trim();
       final emailError = Validators.email(email);
       if (emailError != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(emailError)),
-        );
+        setState(() => _inlineError = emailError);
         return;
       }
 
       setState(() => _sending = true);
+      final registered =
+          await ref.read(authRepositoryProvider).isEmailRegistered(email);
+      if (!mounted) return;
+
+      switch (registered) {
+        case Success(:final value):
+          if (!value) {
+            setState(() {
+              _sending = false;
+              _inlineError = 'هذا البريد غير مسجل لدينا';
+            });
+            return;
+          }
+        case Failure(:final message):
+          setState(() {
+            _sending = false;
+            _inlineError = message;
+          });
+          return;
+      }
+
       final result = await ref
           .read(authNotifierProvider.notifier)
           .resetPasswordForEmail(email);
@@ -82,24 +107,69 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
       switch (result) {
         case Success():
           context.push(
-            '${AppRoutes.emailVerify}?email=${Uri.encodeComponent(email)}',
+            '${AppRoutes.passwordResetEmailSent}?email=${Uri.encodeComponent(email)}',
           );
         case Failure(:final message):
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message)),
-          );
+          setState(() => _inlineError = message);
       }
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'تم إرسال رمز التحقق',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
-        ),
-      ),
+    final isoCode = _selectedCountry.countryCode;
+    final localDigits = Validators.normalizeLocalDigits(
+      _phoneController.text,
+      isoCode,
+      phoneCode: _selectedCountry.phoneCode,
     );
+    final phoneError = Validators.localPhone(localDigits, isoCode);
+    if (phoneError != null) {
+      setState(() => _inlineError = phoneError);
+      return;
+    }
+
+    final fullPhone = Validators.formatE164(
+      '+${_selectedCountry.phoneCode}',
+      localDigits,
+    );
+
+    setState(() => _sending = true);
+    final registered =
+        await ref.read(authRepositoryProvider).isPhoneRegistered(fullPhone);
+    if (!mounted) return;
+
+    switch (registered) {
+      case Success(:final value):
+        if (!value) {
+          setState(() {
+            _sending = false;
+            _inlineError = 'هذا الرقم غير مسجل لدينا';
+          });
+          return;
+        }
+      case Failure(:final message):
+        setState(() {
+          _sending = false;
+          _inlineError = message;
+        });
+        return;
+    }
+
+    final sendResult =
+        await ref.read(authRepositoryProvider).sendWhatsAppOtp(
+              fullPhone,
+              purpose: 'password_reset',
+            );
+    if (!mounted) return;
+    setState(() => _sending = false);
+
+    switch (sendResult) {
+      case Success():
+        context.push(
+          '${AppRoutes.phoneVerify}?phone=${Uri.encodeComponent(fullPhone)}&purpose=password_reset',
+        );
+      case Failure(:final message):
+        setState(() => _inlineError = message);
+    }
   }
 
   @override
@@ -107,147 +177,214 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: true,
-          leading: IconButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go(AppRoutes.login);
-              }
-            },
-            icon: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: _titleColor,
-              size: 20,
+        backgroundColor: AppColors.canvas,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AuthDarkHeader(
+              title: 'نسيت كلمة المرور؟',
+              subtitle: 'اختر طريقة استعادة حسابك',
+              leading: AppBackButton(onPressed: _goBack),
+              titleStyle: AppFonts.sans(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppColors.pureWhite,
+                height: 1.2,
+              ),
             ),
-          ),
-          title: Text(
-            'نسيت كلمة المرور؟',
-            style: GoogleFonts.cairo(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: _titleColor,
-            ),
-          ),
-        ),
-        body: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 24),
-                  Center(
-                    child: Image.asset(
-                      'assets/images/forgot_password.jpg',
-                      width: 260,
-                      height: 220,
-                      fit: BoxFit.contain,
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _RecoveryOptionCard(
+                      selected: _selectedMethod == _RecoveryMethod.email,
+                      icon: Icons.email_outlined,
+                      label: 'متابعة عبر البريد الإلكتروني',
+                      sublabel: 'بريدك المرتبط بالحساب',
+                      onTap: () {
+                        setState(() {
+                          _selectedMethod = _RecoveryMethod.email;
+                          _inlineError = null;
+                        });
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Text(
-                      'أدخل بريدك الإلكتروني لاستقبال رمز التحقق',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
-                        fontSize: 15,
-                        height: 1.5,
-                        color: _instructionColor,
-                      ),
+                    const SizedBox(height: 12),
+                    _RecoveryOptionCard(
+                      selected: _selectedMethod == _RecoveryMethod.phone,
+                      icon: Icons.phone_outlined,
+                      label: 'متابعة عبر الهاتف',
+                      sublabel: 'هاتفك المرتبط بالحساب',
+                      onTap: () {
+                        setState(() {
+                          _selectedMethod = _RecoveryMethod.phone;
+                          _inlineError = null;
+                        });
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 28),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: [
-                        _RecoveryOptionCard(
-                          selected: _selectedMethod == _RecoveryMethod.email,
-                          icon: Icons.email_outlined,
-                          label: 'متابعة عبر البريد الإلكتروني',
-                          sublabel: 'بريدك المرتبط بالحساب',
-                          onTap: () {
-                            setState(() => _selectedMethod = _RecoveryMethod.email);
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        _RecoveryOptionCard(
-                          selected: _selectedMethod == _RecoveryMethod.phone,
-                          icon: Icons.phone_outlined,
-                          label: 'متابعة عبر الهاتف',
-                          sublabel: 'هاتفك المرتبط بالحساب',
-                          onTap: () {
-                            setState(() => _selectedMethod = _RecoveryMethod.phone);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (_selectedMethod == _RecoveryMethod.email) ...[
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: AuthPillField(
+                    if (_selectedMethod == _RecoveryMethod.email) ...[
+                      const SizedBox(height: 20),
+                      AuthPillField(
                         label: 'البريد الإلكتروني',
                         controller: _emailController,
                         hintText: 'example@email.com',
                         keyboardType: TextInputType.emailAddress,
+                        grouped: false,
+                        loginStyle: true,
+                        onChanged: (_) {
+                          if (_inlineError != null) {
+                            setState(() => _inlineError = null);
+                          }
+                        },
                       ),
+                    ],
+                    if (_selectedMethod == _RecoveryMethod.phone) ...[
+                      const SizedBox(height: 20),
+                      Text(
+                        'رقم الهاتف',
+                        style: AppFonts.sans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.pureWhite.withValues(alpha: 0.85),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _ForgotPasswordPhoneField(
+                        controller: _phoneController,
+                        country: _selectedCountry,
+                        enabled: !_sending,
+                        onPickCountry: _pickCountry,
+                        onChanged: (_) {
+                          if (_inlineError != null) {
+                            setState(() => _inlineError = null);
+                          }
+                        },
+                      ),
+                    ],
+                    if (_inlineError != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        _inlineError!,
+                        style: AppFonts.sans(
+                          fontSize: 13,
+                          color: AppColors.rejected,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 28),
+                    AuthPrimaryButton(
+                      label: 'إرسال',
+                      loading: _sending,
+                      loginStyle: true,
+                      onPressed: _sending ? null : _onSendPressed,
                     ),
                   ],
-                  const SizedBox(height: 36),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: SizedBox(
-                      height: 54,
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: _sending ? null : _onSendPressed,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          textStyle: GoogleFonts.cairo(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        child: _sending
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('إرسال'),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _RecoveryOptionCard extends StatefulWidget {
+class _ForgotPasswordPhoneField extends StatelessWidget {
+  const _ForgotPasswordPhoneField({
+    required this.controller,
+    required this.country,
+    required this.enabled,
+    required this.onPickCountry,
+    required this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final Country country;
+  final bool enabled;
+  final VoidCallback onPickCountry;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x15FFFFFF)),
+      ),
+      child: Row(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: enabled ? onPickCountry : null,
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                child: Row(
+                  children: [
+                    Text(country.flagEmoji, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(width: 6),
+                    Text(
+                      '+${country.phoneCode}',
+                      style: AppFonts.sans(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 20,
+                      color: AppColors.pureWhite.withValues(alpha: 0.5),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 28,
+            color: const Color(0x15FFFFFF),
+          ),
+          Expanded(
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: TextField(
+                controller: controller,
+                keyboardType: TextInputType.phone,
+                enabled: enabled,
+                cursorColor: AppColors.volt,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: AppColors.pureWhite,
+                ),
+                decoration: AuthFormStyles.loginFieldDecoration(
+                  hintText: '7XXXXXXXXX',
+                ).copyWith(
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  filled: false,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                ),
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecoveryOptionCard extends StatelessWidget {
   const _RecoveryOptionCard({
     required this.selected,
     required this.icon,
@@ -263,89 +400,58 @@ class _RecoveryOptionCard extends StatefulWidget {
   final VoidCallback onTap;
 
   @override
-  State<_RecoveryOptionCard> createState() => _RecoveryOptionCardState();
-}
-
-class _RecoveryOptionCardState extends State<_RecoveryOptionCard> {
-  static const _cardBorderUnselected = Color(0xFFE0E0E0);
-  static const _cardFillSelected = Color(0xFFF0FAF4);
-  static const _iconCircleBg = Color(0xFFE8F5EE);
-  static const _titleColor = Color(0xFF111111);
-  static const _sublabelColor = Color(0xFF888888);
-
-  bool _pressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) {
-        setState(() => _pressed = false);
-        widget.onTap();
-      },
-      onTapCancel: () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.97 : 1,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOut,
-        child: Material(
-          color: widget.selected ? _cardFillSelected : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: BorderSide(
-              color: widget.selected ? AppColors.primary : _cardBorderUnselected,
-              width: 1.5,
-            ),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            height: 68,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: const BoxDecoration(
-                      color: _iconCircleBg,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      color: AppColors.primary,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.label,
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: _titleColor,
-                            height: 1.2,
-                          ),
+    return Material(
+      color: AppColors.fieldCarbon,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(
+          color: selected ? AppColors.volt : const Color(0x15FFFFFF),
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: 68,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: selected ? AppColors.volt : AppColors.pureWhite,
+                  size: 22,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: AppFonts.sans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.pureWhite,
+                          height: 1.2,
                         ),
-                        Text(
-                          widget.sublabel,
-                          style: GoogleFonts.cairo(
-                            fontSize: 12,
-                            color: _sublabelColor,
-                            height: 1.2,
-                          ),
+                      ),
+                      Text(
+                        sublabel,
+                        style: AppFonts.sans(
+                          fontSize: 12,
+                          color: AppColors.pureWhite.withValues(alpha: 0.55),
+                          height: 1.2,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  _RecoveryRadio(selected: widget.selected),
-                ],
-              ),
+                ),
+                _RecoveryRadio(selected: selected),
+              ],
             ),
           ),
         ),
@@ -359,8 +465,6 @@ class _RecoveryRadio extends StatelessWidget {
 
   final bool selected;
 
-  static const _radioOutline = Color(0xFFCCCCCC);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -368,9 +472,9 @@ class _RecoveryRadio extends StatelessWidget {
       height: 22,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: selected ? AppColors.primary : Colors.transparent,
+        color: selected ? AppColors.volt : Colors.transparent,
         border: Border.all(
-          color: selected ? AppColors.primary : _radioOutline,
+          color: selected ? AppColors.volt : AppColors.pureWhite.withValues(alpha: 0.35),
           width: 2,
         ),
       ),
@@ -380,7 +484,7 @@ class _RecoveryRadio extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.canvas,
                   shape: BoxShape.circle,
                 ),
               ),

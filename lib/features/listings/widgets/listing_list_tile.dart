@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../../core/utils/cached_network_image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,8 +8,10 @@ import '../../../core/constants/app_governorates.dart';
 import '../../../core/utils/listing_display_title.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/premium_listing_badge.dart';
+import '../../../shared/widgets/pro_listing_badge.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/widgets/guest_bottom_sheet.dart';
+import '../../favorites/providers/favorites_provider.dart';
 import '../../home/providers/home_provider.dart';
 
 class ListingListTile extends ConsumerWidget {
@@ -19,8 +21,10 @@ class ListingListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final overrides = ref.watch(favoriteOverridesProvider);
-    final isFavorite = overrides[listing.id] ?? listing.isFavorite;
+    final isFavorite = ref.watch(
+          toggleFavoriteProvider.select((ids) => ids.contains(listing.id)),
+        ) ||
+        listing.isFavorite;
     final isGuest = ref.watch(isGuestProvider);
 
     return Card(
@@ -41,8 +45,11 @@ class ListingListTile extends ConsumerWidget {
                     clipBehavior: Clip.hardEdge,
                     children: [
                       if (listing.coverImageUrl != null)
-                        CachedNetworkImage(
+                        cachedListingImage(
+                          context: context,
                           imageUrl: listing.coverImageUrl!,
+                          width: 100,
+                          height: 100,
                           fit: BoxFit.cover,
                           placeholder: (_, _) => Shimmer.fromColors(
                             baseColor: Theme.of(context)
@@ -62,6 +69,12 @@ class ListingListTile extends ConsumerWidget {
                         ),
                       if (listing.isPremiumListing)
                         const PremiumListingCardRibbon(),
+                      if (listing.isProListing && !listing.isPremiumListing)
+                        const Positioned(
+                          top: 8,
+                          right: 8,
+                          child: ProListingCardBadge(),
+                        ),
                     ],
                   ),
                 ),

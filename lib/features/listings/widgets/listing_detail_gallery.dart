@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
+import '../../../core/utils/cached_network_image_utils.dart';
 import '../../../shared/models/listing_model.dart';
+import '../../../shared/widgets/app_back_button.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../../../shared/widgets/premium_listing_badge.dart';
+import '../../../shared/widgets/pro_listing_badge.dart';
 
 class ListingDetailGallery extends StatefulWidget {
   const ListingDetailGallery({
     super.key,
     required this.listing,
+    required this.isFavorite,
     required this.onBack,
     required this.onShare,
     required this.onFavorite,
@@ -17,6 +22,7 @@ class ListingDetailGallery extends StatefulWidget {
   });
 
   final ListingModel listing;
+  final bool isFavorite;
   final VoidCallback onBack;
   final VoidCallback onShare;
   final VoidCallback onFavorite;
@@ -98,28 +104,27 @@ class _ListingDetailGalleryState extends State<ListingDetailGallery> {
               setState(() => _index = i);
               _preloadAround(i);
             },
-            itemBuilder: (_, i) => GestureDetector(
-              onTap: () => _openZoom(i),
-              child: CachedNetworkImage(
-                imageUrl: urls[i],
-                fit: BoxFit.cover,
-                placeholder: (_, _) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (_, _, _) => const Icon(Icons.broken_image),
-              ),
-            ),
+            itemBuilder: (_, i) {
+              final width = MediaQuery.sizeOf(context).width;
+              return GestureDetector(
+                onTap: () => _openZoom(i),
+                child: cachedListingImage(
+                  context: context,
+                  imageUrl: urls[i],
+                  width: width,
+                  height: 300,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (_, _, _) => const Icon(Icons.broken_image),
+                ),
+              );
+            },
           ),
         Positioned(
           top: MediaQuery.paddingOf(context).top + 8,
           right: 8,
-          child: IconButton.filled(
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.black45,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: widget.onBack,
-            icon: const Icon(Icons.arrow_back),
-          ),
+          child: AppBackButton(onPressed: widget.onBack),
         ),
         Positioned(
           top: MediaQuery.paddingOf(context).top + 8,
@@ -149,11 +154,10 @@ class _ListingDetailGalleryState extends State<ListingDetailGallery> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Icon(
-                    widget.listing.isFavorite
+                    widget.isFavorite
                         ? Icons.favorite
                         : Icons.favorite_border,
-                    color:
-                        widget.listing.isFavorite ? Colors.red : Colors.white,
+                    color: widget.isFavorite ? Colors.red : Colors.white,
                   ),
           ),
         ),
@@ -162,6 +166,12 @@ class _ListingDetailGalleryState extends State<ListingDetailGallery> {
             top: MediaQuery.paddingOf(context).top + 52,
             right: 16,
             child: const PremiumListingHeroBadge(),
+          )
+        else if (widget.listing.isProListing)
+          Positioned(
+            top: MediaQuery.paddingOf(context).top + 52,
+            right: 16,
+            child: const ProListingHeroBadge(),
           ),
         if (count > 1)
           Positioned(
@@ -215,7 +225,7 @@ class _ZoomGalleryState extends State<_ZoomGallery> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
+      appBar: SelloAppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         title: Text('${_index + 1}/${widget.urls.length}'),

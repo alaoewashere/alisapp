@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../shared/models/real_estate_listing_metadata.dart';
 import '../../constants/listing_form_options.dart';
 import '../../constants/real_estate_listing_options.dart';
@@ -100,7 +101,7 @@ class _Step2RealEstateDetailsState extends ConsumerState<Step2RealEstateDetails>
             TextField(
               controller: _areaController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [appDigitsOnly()],
               textDirection: TextDirection.ltr,
               decoration: const InputDecoration(
                 labelText: 'المساحة (م²) *',
@@ -188,7 +189,7 @@ class _Step2RealEstateDetailsState extends ConsumerState<Step2RealEstateDetails>
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [appDigitsOnly()],
               textDirection: TextDirection.ltr,
               decoration: const InputDecoration(
                 labelText: 'السعر *',

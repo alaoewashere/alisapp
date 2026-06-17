@@ -142,6 +142,13 @@ void main() {
       expect(restored.transmission, 'أوتوماتيك');
       expect(restored.selectedSpecs, original.selectedSpecs);
     });
+
+    test('serializes year as integer in metadata json', () {
+      const original = VehicleListingMetadata(year: 2022, engine: '2.0T');
+      final json = original.toJson();
+      expect(json['year'], 2022);
+      expect(VehicleListingMetadata.fromJson(json).year, 2022);
+    });
   });
 
   group('vehicle display formatting', () {

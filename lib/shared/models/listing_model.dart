@@ -86,6 +86,13 @@ enum ListingPackage {
         ListingPackage.premium => 'إعلان مميز',
       };
 
+  /// Short pill label for package badges (مجاني / برو / مميز).
+  String get badgeLabelAr => switch (this) {
+        ListingPackage.standard => 'مجاني',
+        ListingPackage.pro => 'برو',
+        ListingPackage.premium => 'مميز',
+      };
+
   static ListingPackage fromString(String? value) {
     if (value == null || value.isEmpty) return ListingPackage.standard;
     return switch (value) {
@@ -108,6 +115,12 @@ enum ListingPackage {
         ListingPackage.premium => 'premium',
         ListingPackage.standard => null,
       };
+
+  /// Paid standard listing when monthly free quota is exhausted.
+  String? purchasePackageTypeFor({required bool paidStandard}) {
+    if (this == ListingPackage.standard && paidStandard) return 'standard';
+    return purchasePackageType;
+  }
 }
 
 extension ListingConditionX on ListingCondition {
@@ -379,6 +392,12 @@ class ListingModel {
   String get description => descriptionAr;
   int get priceIqd => price.round();
   ListingDisplayStatus get status => displayStatus;
+
+  bool get isPendingModeration =>
+      moderationStatus != ListingModerationStatus.approved;
+
+  /// Edit / delete / sold / share — only after admin approval.
+  bool get isOwnerActionsEnabled => !isPendingModeration;
 
   String get formattedPrice => formatIQD(price);
 

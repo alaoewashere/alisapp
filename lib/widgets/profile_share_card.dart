@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_governorates.dart';
@@ -101,7 +101,7 @@ class ProfileShareCard extends StatelessWidget {
                                     profile.fullName,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.cairo(
+                                    style: AppFonts.cairo(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textDark,
@@ -113,7 +113,7 @@ class ProfileShareCard extends StatelessWidget {
                             const SizedBox(height: 6),
                             Text(
                               '${arabicNumber(listingCount)} إعلاناً على سيلو',
-                              style: GoogleFonts.cairo(
+                              style: AppFonts.cairo(
                                 fontSize: 15,
                                 color: AppColors.textMuted,
                               ),
@@ -126,7 +126,7 @@ class ProfileShareCard extends StatelessWidget {
                                 children: [
                                   Text(
                                     _cityLabel,
-                                    style: GoogleFonts.cairo(
+                                    style: AppFonts.cairo(
                                       fontSize: 14,
                                       color: AppColors.textMuted,
                                     ),
@@ -152,7 +152,7 @@ class ProfileShareCard extends StatelessWidget {
                               ),
                               child: Text(
                                 sellerLink,
-                                style: GoogleFonts.robotoMono(
+                                style: AppFonts.robotoMono(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -225,7 +225,7 @@ class _InitialAvatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         initial,
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: size * 0.42,
           fontWeight: FontWeight.bold,
           color: AppColors.primary,

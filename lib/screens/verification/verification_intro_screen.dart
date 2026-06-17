@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
+import '../../shared/widgets/app_back_button.dart';
 import '../../features/auth/widgets/auth_form_styles.dart';
 import '../../features/auth/widgets/auth_hero_header.dart';
 
@@ -24,11 +25,7 @@ class VerificationIntroScreen extends StatelessWidget {
               showLogo: false,
               title: 'توثيق الحساب',
               subtitle: 'قبل المتابعة، يرجى توثيق هويتك',
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 20),
-              ),
+              leading: AppBackButton(onPressed: () => context.pop()),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -51,7 +48,7 @@ class VerificationIntroScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     Text(
                       'لماذا التوثيق؟',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textDark,
@@ -62,7 +59,7 @@ class VerificationIntroScreen extends StatelessWidget {
                       'توثيق حسابك يمنحك شارة الثقة الزرقاء ويزيد من ثقة المشترين في إعلاناتك. '
                       'نراجع وثائقك بسرية تامة ولا نشاركها مع أي طرف.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 14,
                         height: 1.6,
                         color: AppColors.textMuted,
@@ -114,7 +111,7 @@ class _Bullet extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 13,
                 color: AppColors.textDark,
                 height: 1.45,

@@ -138,7 +138,111 @@ void main() {
 
       final state = container.read(postListingProvider);
       expect(state.categoryPath, isEmpty);
+      expect(state.categoryDrillStack, isEmpty);
       expect(state.selectedCategory, isNull);
+    });
+
+    test('popCategoryDrillLevel pops one drill level', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(postListingProvider.notifier);
+      const root = CategoryModel(
+        id: 1,
+        slug: 'cars',
+        nameAr: 'المركبات',
+        icon: 'category',
+      );
+      const child = CategoryModel(
+        id: 2,
+        slug: 'veh_auto',
+        nameAr: 'سيارات',
+        icon: 'category',
+        parentId: 1,
+      );
+      const brand = CategoryModel(
+        id: 3,
+        slug: 'mercedes',
+        nameAr: 'Mercedes-Benz',
+        icon: 'brand',
+        parentId: 2,
+      );
+      const rootChildren = [child];
+      const brandChildren = [brand];
+
+      notifier.selectCategoryAtDrillDepth(0, root);
+      notifier.pushCategoryDrillLevel(rootChildren);
+      notifier.selectCategoryAtDrillDepth(1, child);
+      notifier.pushCategoryDrillLevel(brandChildren);
+
+      expect(container.read(postListingProvider).categoryPath, [root, child]);
+      expect(container.read(postListingProvider).categoryDrillStack.length, 2);
+      expect(container.read(postListingProvider).canPopCategoryDrill, isTrue);
+
+      notifier.popCategoryDrillLevel();
+
+      final state = container.read(postListingProvider);
+      expect(state.categoryPath, [root]);
+      expect(state.categoryDrillStack, [rootChildren]);
+      expect(state.canPopCategoryDrill, isTrue);
+
+      notifier.popCategoryDrillLevel();
+
+      final rootState = container.read(postListingProvider);
+      expect(rootState.categoryPath, isEmpty);
+      expect(rootState.categoryDrillStack, isEmpty);
+      expect(rootState.canPopCategoryDrill, isFalse);
+    });
+
+    test('jumpCategoryDrillToDepth trims path and stack', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(postListingProvider.notifier);
+      const root = CategoryModel(
+        id: 1,
+        slug: 'cars',
+        nameAr: 'المركبات',
+        icon: 'category',
+      );
+      const child = CategoryModel(
+        id: 2,
+        slug: 'veh_auto',
+        nameAr: 'سيارات',
+        icon: 'category',
+        parentId: 1,
+      );
+      const brand = CategoryModel(
+        id: 3,
+        slug: 'mercedes',
+        nameAr: 'Mercedes-Benz',
+        icon: 'brand',
+        parentId: 2,
+      );
+      const rootChildren = [child];
+      const brandChildren = [brand];
+      const modelChildren = [
+        CategoryModel(
+          id: 4,
+          slug: 'a_class',
+          nameAr: 'A-Class',
+          icon: 'model',
+          parentId: 3,
+        ),
+      ];
+
+      notifier.selectCategoryAtDrillDepth(0, root);
+      notifier.pushCategoryDrillLevel(rootChildren);
+      notifier.selectCategoryAtDrillDepth(1, child);
+      notifier.pushCategoryDrillLevel(brandChildren);
+      notifier.selectCategoryAtDrillDepth(2, brand);
+      notifier.pushCategoryDrillLevel(modelChildren);
+
+      notifier.jumpCategoryDrillToDepth(2);
+
+      final state = container.read(postListingProvider);
+      expect(state.categoryPath, [root, child]);
+      expect(state.categoryDrillStack, [rootChildren, brandChildren]);
     });
 
     test('selectCategoryAtDrillDepth replaces root when switching categories', () {

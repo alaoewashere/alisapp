@@ -82,6 +82,52 @@ export function FilterSelect({ param, options, allLabel = "الكل", className 
   );
 }
 
+/** Pill-style tab filters (e.g. listing moderation status). */
+export function FilterPills({
+  param,
+  options,
+  allLabel = "الكل",
+}: {
+  param: string;
+  options: { value: string; label: string }[];
+  allLabel?: string;
+}) {
+  const searchParams = useSearchParams();
+  const update = useUpdateParams();
+  const current = searchParams.get(param) ?? "";
+
+  function pillClass(active: boolean) {
+    return cn(
+      "rounded-full px-4 py-2 text-sm font-bold transition-colors",
+      active
+        ? "bg-volt text-canvas"
+        : "border border-white/20 bg-field text-white hover:bg-[#202023]",
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        className={pillClass(!current)}
+        onClick={() => update({ [param]: null })}
+      >
+        {allLabel}
+      </button>
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={pillClass(current === opt.value)}
+          onClick={() => update({ [param]: opt.value })}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function DateRangeFilter() {
   const searchParams = useSearchParams();
   const update = useUpdateParams();

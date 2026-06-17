@@ -1,36 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../models/listing_model.dart';
+import 'package_badge.dart';
 
-/// Compact «بروفايل موثق» badge for pro listing cards.
+/// Compact pro pill for listing cards.
 class ProListingCardBadge extends StatelessWidget {
   const ProListingCardBadge({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.secondary, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.verified, color: AppColors.secondary, size: 12),
-          const SizedBox(width: 3),
-          Text(
-            'بروفايل موثق',
-            style: GoogleFonts.cairo(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
-              color: AppColors.secondary,
-            ),
-          ),
-        ],
-      ),
+    return const PackageBadge(
+      package: ListingPackage.pro,
+      size: PackageBadgeSize.compact,
     );
   }
 }
@@ -41,28 +22,22 @@ class ProListingChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.secondary.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.secondary, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.verified, color: AppColors.secondary, size: 12),
-          const SizedBox(width: 4),
-          Text(
-            'بروفايل موثق',
-            style: GoogleFonts.cairo(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.secondary,
-            ),
-          ),
-        ],
-      ),
+    return const PackageBadge(
+      package: ListingPackage.pro,
+      size: PackageBadgeSize.medium,
+    );
+  }
+}
+
+/// Pro badge overlay on the listing detail photo hero.
+class ProListingHeroBadge extends StatelessWidget {
+  const ProListingHeroBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const PackageBadge(
+      package: ListingPackage.pro,
+      size: PackageBadgeSize.large,
     );
   }
 }

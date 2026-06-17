@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/arabic_number.dart';
@@ -94,7 +94,7 @@ class ActiveUsersStrip extends StatelessWidget {
                   children: [
                     Text(
                       'الرسائل والمحادثات',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textDark,
@@ -103,7 +103,7 @@ class ActiveUsersStrip extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'تواصل مباشرة مع المشترين والبائعين',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 11,
                         color: AppColors.textMuted,
                       ),
@@ -124,7 +124,7 @@ class ActiveUsersStrip extends StatelessWidget {
                   ),
                   child: Text(
                     '${arabicNumber(activeCount)} نشط',
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: AppColors.badgeText,

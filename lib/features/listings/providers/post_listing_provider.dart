@@ -11,6 +11,7 @@ import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/image_compression.dart';
 import '../../../core/utils/animal_listing_utils.dart';
 import '../../../core/utils/electronics_listing_utils.dart';
+import '../../../core/utils/free_posts_quota.dart';
 import '../../../core/utils/general_listing_utils.dart';
 import '../../../core/utils/home_service_listing_utils.dart';
 import '../../../core/utils/job_listing_utils.dart';
@@ -39,6 +40,7 @@ class PostListingState {
   const PostListingState({
     this.currentStep = 1,
     this.categoryPath = const [],
+    this.categoryDrillStack = const [],
     this.selectedCategory,
     this.selectedSubcategory,
     this.expandedParentId,
@@ -79,10 +81,14 @@ class PostListingState {
     this.videoDurationSeconds,
     this.videoProcessingProgress = 0,
     this.isVideoProcessing = false,
+    this.freePostsUsedThisMonth = -1,
   });
 
   final int currentStep;
   final List<CategoryModel> categoryPath;
+
+  /// Child category grids for each drill-down level (empty at root).
+  final List<List<CategoryModel>> categoryDrillStack;
   final CategoryModel? selectedCategory;
   final CategoryModel? selectedSubcategory;
   final int? expandedParentId;
@@ -126,6 +132,17 @@ class PostListingState {
   final int? videoDurationSeconds;
   final double videoProcessingProgress;
   final bool isVideoProcessing;
+  final int freePostsUsedThisMonth;
+
+  bool get freePostQuotaLoaded => freePostsUsedThisMonth >= 0;
+
+  int get freePostsRemaining =>
+      freePostQuotaLoaded ? remainingFreePosts(freePostsUsedThisMonth) : 0;
+
+  bool get standardRequiresPaidPublish =>
+      listingPackage == ListingPackage.standard &&
+      freePostQuotaLoaded &&
+      standardListingRequiresPayment(freePostsUsedThisMonth);
 
   CategoryModel? get effectiveCategory =>
       selectedCategory ?? selectedSubcategory;
@@ -153,10 +170,14 @@ class PostListingState {
   String get categoryPathLabel =>
       categoryPath.map((c) => c.nameAr).join(' > ');
 
+  bool get canPopCategoryDrill => categoryDrillStack.isNotEmpty;
+
   PostListingState copyWith({
     int? currentStep,
     List<CategoryModel>? categoryPath,
     bool clearCategoryPath = false,
+    List<List<CategoryModel>>? categoryDrillStack,
+    bool clearCategoryDrillStack = false,
     CategoryModel? selectedCategory,
     CategoryModel? selectedSubcategory,
     int? expandedParentId,
@@ -202,6 +223,7 @@ class PostListingState {
     int? videoDurationSeconds,
     double? videoProcessingProgress,
     bool? isVideoProcessing,
+    int? freePostsUsedThisMonth,
     bool clearVideo = false,
     bool clearError = false,
     bool clearCategory = false,
@@ -213,6 +235,9 @@ class PostListingState {
       categoryPath: clearCategoryPath
           ? const []
           : (categoryPath ?? this.categoryPath),
+      categoryDrillStack: clearCategoryDrillStack
+          ? const []
+          : (categoryDrillStack ?? this.categoryDrillStack),
       selectedCategory:
           clearCategory ? null : (selectedCategory ?? this.selectedCategory),
       selectedSubcategory: clearSubcategory
@@ -271,6 +296,8 @@ class PostListingState {
       videoProcessingProgress:
           videoProcessingProgress ?? this.videoProcessingProgress,
       isVideoProcessing: isVideoProcessing ?? this.isVideoProcessing,
+      freePostsUsedThisMonth:
+          freePostsUsedThisMonth ?? this.freePostsUsedThisMonth,
     );
   }
 }
@@ -378,10 +405,14 @@ class PostListingNotifier extends Notifier<PostListingState> {
             ...current.sublist(0, depth.clamp(0, current.length)),
             category,
           ];
+    final trimmedStack = depth < state.categoryDrillStack.length
+        ? state.categoryDrillStack.sublist(0, depth)
+        : state.categoryDrillStack;
 
     state = CategoryDetailsDefaults.withEmptyCategoryDetails(
       state.copyWith(
         categoryPath: newPath,
+        categoryDrillStack: trimmedStack,
         clearCategory: true,
         clearSubcategory: true,
         clearExpandedParent: true,
@@ -391,13 +422,71 @@ class PostListingNotifier extends Notifier<PostListingState> {
     );
   }
 
+  void pushCategoryDrillLevel(List<CategoryModel> children) {
+    if (children.isEmpty) return;
+    state = state.copyWith(
+      categoryDrillStack: [...state.categoryDrillStack, children],
+      clearError: true,
+    );
+  }
+
+  void popCategoryDrillLevel() {
+    if (!state.canPopCategoryDrill) return;
+
+    final newStack = state.categoryDrillStack.sublist(
+      0,
+      state.categoryDrillStack.length - 1,
+    );
+    final newPathLength =
+        state.categoryPath.length > 0 ? state.categoryPath.length - 1 : 0;
+
+    state = state.copyWith(
+      categoryDrillStack: newStack,
+      categoryPath: newPathLength > 0
+          ? state.categoryPath.sublist(0, newPathLength)
+          : const [],
+      clearCategoryPath: newPathLength <= 0,
+      clearError: true,
+    );
+  }
+
+  void jumpCategoryDrillToDepth(int targetDepth) {
+    if (targetDepth <= 0) {
+      state = state.copyWith(
+        clearCategoryPath: true,
+        clearCategoryDrillStack: true,
+        clearError: true,
+      );
+      return;
+    }
+
+    final path = state.categoryPath;
+    final stack = state.categoryDrillStack;
+    state = state.copyWith(
+      categoryPath: path.length > targetDepth
+          ? path.sublist(0, targetDepth)
+          : path,
+      categoryDrillStack: stack.length > targetDepth
+          ? stack.sublist(0, targetDepth)
+          : stack,
+      clearError: true,
+    );
+  }
+
   void trimCategoryPath(int length) {
     if (length <= 0) {
-      state = state.copyWith(clearCategoryPath: true, clearError: true);
+      state = state.copyWith(
+        clearCategoryPath: true,
+        clearCategoryDrillStack: true,
+        clearError: true,
+      );
       return;
     }
     state = state.copyWith(
       categoryPath: state.categoryPath.sublist(0, length),
+      categoryDrillStack: state.categoryDrillStack.length > length
+          ? state.categoryDrillStack.sublist(0, length)
+          : state.categoryDrillStack,
       clearError: true,
     );
   }
@@ -406,6 +495,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
     state = CategoryDetailsDefaults.withEmptyCategoryDetails(
       state.copyWith(
         clearCategoryPath: true,
+        clearCategoryDrillStack: true,
         clearCategory: true,
         clearSubcategory: true,
         clearExpandedParent: true,
@@ -820,6 +910,20 @@ class PostListingNotifier extends Notifier<PostListingState> {
       clearVideo: !package.allowsListingVideo,
       clearError: true,
     );
+  }
+
+  Future<void> refreshFreePostQuota() async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+    try {
+      final used =
+          await ref.read(listingsRepositoryProvider).fetchMonthlyFreePostCount(
+                userId,
+              );
+      state = state.copyWith(freePostsUsedThisMonth: used);
+    } catch (e, stackTrace) {
+      debugPrint('refreshFreePostQuota failed: $e\n$stackTrace');
+    }
   }
 
   void confirmListingPackage() {
@@ -1244,22 +1348,47 @@ class PostListingNotifier extends Notifier<PostListingState> {
             );
       }
 
-      final packageType = state.listingPackage.purchasePackageType;
+      final paidStandard = state.standardRequiresPaidPublish;
+      final packageType = state.listingPackage.purchasePackageTypeFor(
+        paidStandard: paidStandard,
+      );
       if (packageType != null) {
-        final profile = await ref.read(currentProfileProvider.future);
-        final email = ref.read(supabaseClientProvider).auth.currentUser?.email;
-        final option = ListingPackageConfig.optionFor(state.listingPackage);
-        await ref.read(listingsRepositoryProvider).recordListingPurchase(
-              userId: userId,
-              listingId: id,
-              packageType: packageType,
-              price: option.priceIqd,
-              userName: profile?.fullName.trim().isNotEmpty == true
-                  ? profile!.fullName
-                  : '—',
-              userPhone: profile?.phone,
-              userEmail: email,
-            );
+        try {
+          final profile = await ref.read(currentProfileProvider.future);
+          final email =
+              ref.read(supabaseClientProvider).auth.currentUser?.email;
+          final price = ListingPackageConfig.purchasePriceIqd(
+            state.listingPackage,
+            standardOverQuota: paidStandard,
+          );
+          await ref.read(listingsRepositoryProvider).recordListingPurchase(
+                userId: userId,
+                listingId: id,
+                packageType: packageType,
+                price: price,
+                userName: profile?.fullName.trim().isNotEmpty == true
+                    ? profile!.fullName
+                    : '—',
+                userPhone: profile?.phone,
+                userEmail: email,
+              );
+        } catch (e, stackTrace) {
+          // Listing is already saved; package activation can be retried by admin.
+          debugPrint(
+            'recordListingPurchase failed for listing $id: $e\n$stackTrace',
+          );
+        }
+      } else if (state.listingPackage == ListingPackage.standard &&
+          !paidStandard) {
+        try {
+          await ref
+              .read(listingsRepositoryProvider)
+              .incrementMonthlyFreePostCount(userId);
+        } catch (e, stackTrace) {
+          debugPrint(
+            'incrementMonthlyFreePostCount failed for $userId: $e\n$stackTrace',
+          );
+        }
       }
 
       state = state.copyWith(

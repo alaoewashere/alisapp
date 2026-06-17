@@ -8,6 +8,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../shared/widgets/error_widget.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/my_listing_tile.dart';
@@ -60,7 +61,7 @@ class _MyListingsScreenState extends ConsumerState<MyListingsScreen>
 
     if (userId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(strings.myListings)),
+        appBar: SelloAppBar(title: Text(strings.myListings)),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -80,7 +81,7 @@ class _MyListingsScreenState extends ConsumerState<MyListingsScreen>
     final countsAsync = ref.watch(myListingsCountsProvider);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: SelloAppBar(
         title: Text(strings.myListings),
         bottom: TabBar(
           controller: _tabController,

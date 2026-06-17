@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/verification_constants.dart';
@@ -61,7 +61,7 @@ class VerificationStatusBanner extends StatelessWidget {
               onPressed: () => context.push(AppRoutes.verificationIntro),
               child: Text(
                 'إعادة المحاولة',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
                 ),
@@ -93,7 +93,7 @@ class VerificationStatusBanner extends StatelessWidget {
               Expanded(
                 child: Text(
                   'وثّق حسابك للحصول على شارة الثقة 🔒',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,
@@ -142,7 +142,7 @@ class _BannerShell extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: textColor,

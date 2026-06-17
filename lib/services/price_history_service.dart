@@ -8,6 +8,11 @@ final priceHistoryServiceProvider = Provider<PriceHistoryService>((ref) {
   return PriceHistoryService(ref.watch(supabaseClientProvider));
 });
 
+final priceHistoryProvider =
+    FutureProvider.family<PriceHistoryData, String>((ref, listingId) {
+  return ref.watch(priceHistoryServiceProvider).getHistory(listingId);
+});
+
 class PriceHistoryService {
   PriceHistoryService(this._client);
 

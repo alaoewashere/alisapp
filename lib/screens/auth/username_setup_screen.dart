@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/constants/app_assets.dart';
@@ -93,7 +93,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
       setState(() => _availabilityState = UsernameState.idle);
       return;
     }
-    if (text.length < 3) {
+    if (!isValidUsernameFormat(normalizeUsername(text))) {
       setState(() => _availabilityState = UsernameState.tooShort);
       return;
     }
@@ -104,7 +104,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
 
   Future<void> _checkAvailability(String username) async {
     final normalized = normalizeUsername(username);
-    if (!isValidUsernameLength(normalized)) {
+    if (!isValidUsernameFormat(normalized)) {
       if (mounted) {
         setState(() => _availabilityState = UsernameState.tooShort);
       }
@@ -197,7 +197,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         body: FadeTransition(
           opacity: _fadeAnimation,
           child: SlideTransition(
@@ -252,7 +252,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                     Text(
                       'اختر اسم المستخدم',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: _textDark,
@@ -264,7 +264,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                       child: Text(
                         'سيظهر هذا الاسم في ملفك الشخصي وإعلاناتك',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 14,
                           color: _textMuted,
                           height: 1.4,
@@ -286,14 +286,14 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                         child: TextField(
                           controller: _usernameController,
                           focusNode: _focusNode,
-                          maxLength: 30,
+                          maxLength: 20,
                           keyboardType: TextInputType.text,
                           inputFormatters: [
                             FilteringTextInputFormatter.allow(
                               RegExp(r'[a-zA-Z0-9_]'),
                             ),
                           ],
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 16,
                             color: _textDark,
                           ),
@@ -305,7 +305,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                               padding: const EdgeInsets.only(right: 4),
                               child: Text(
                                 '@',
-                                style: GoogleFonts.cairo(
+                                style: AppFonts.cairo(
                                   fontSize: 16,
                                   color: _textMuted,
                                 ),
@@ -316,7 +316,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                               minHeight: 0,
                             ),
                             hintText: 'اسم_المستخدم',
-                            hintStyle: GoogleFonts.cairo(
+                            hintStyle: AppFonts.cairo(
                               fontSize: 16,
                               color: _hintColor,
                             ),
@@ -330,7 +330,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                     Text(
                       'يمكن استخدام الأحرف الإنجليزية والأرقام والشرطة السفلية فقط',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 12,
                         color: _rulesColor,
                         height: 1.4,
@@ -362,7 +362,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                               )
                             : Text(
                                 'متابعة',
-                                style: GoogleFonts.cairo(
+                                style: AppFonts.cairo(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -375,7 +375,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                         onPressed: _isSaving ? null : _skip,
                         child: Text(
                           'تخطى الآن',
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 13,
                             color: _textMuted,
                           ),

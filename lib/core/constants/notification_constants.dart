@@ -1,12 +1,12 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-/// OneSignal credentials — set in `.env` for local dev; DB trigger reads
-/// `push_config` table (update via Supabase SQL after deploy).
+/// OneSignal app id for client SDK — set via dart-define or local `.env`.
 String get kOneSignalAppId =>
-    dotenv.env['ONESIGNAL_APP_ID'] ?? 'YOUR_ONESIGNAL_APP_ID';
-
-String get kOneSignalRestApiKey =>
-    dotenv.env['ONESIGNAL_REST_API_KEY'] ?? 'YOUR_ONESIGNAL_REST_API_KEY';
+    const String.fromEnvironment('ONESIGNAL_APP_ID').isNotEmpty
+        ? const String.fromEnvironment('ONESIGNAL_APP_ID')
+        : (dotenv.isInitialized
+            ? (dotenv.env['ONESIGNAL_APP_ID'] ?? 'YOUR_ONESIGNAL_APP_ID')
+            : 'YOUR_ONESIGNAL_APP_ID');
 
 /// Free-tier cap on concurrently active smart alerts.
 const kSmartAlertFreeLimit = 3;

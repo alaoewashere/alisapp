@@ -54,18 +54,14 @@ class SouqlyColors {
 }
 
 // ------------------------------------------------------------
-//  2. TYPOGRAPHY — Cairo Font Family
-//  Add to pubspec.yaml:
-//    dependencies:
-//      google_fonts: ^6.1.0
-//  Or manually add the Cairo font under assets/fonts/
+//  2. TYPOGRAPHY — Thmanyah Sans (bundled under assets/fonts/)
 // ------------------------------------------------------------
 class SouqlyTypography {
   SouqlyTypography._();
 
   // Cairo Semibold — 24pt (large headings, Arabic welcome)
   static const TextStyle displayLarge = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w600,
     fontSize: 24,
     color: SouqlyColors.text,
@@ -74,7 +70,7 @@ class SouqlyTypography {
 
   // Cairo Semibold — 18pt (section headings)
   static const TextStyle headlineMedium = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w600,
     fontSize: 18,
     color: SouqlyColors.text,
@@ -83,7 +79,7 @@ class SouqlyTypography {
 
   // Cairo Regular — 16pt (body, primary content)
   static const TextStyle bodyLarge = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w400,
     fontSize: 16,
     color: SouqlyColors.text,
@@ -92,7 +88,7 @@ class SouqlyTypography {
 
   // Cairo Regular — 14pt (secondary body, labels)
   static const TextStyle bodyMedium = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w400,
     fontSize: 14,
     color: SouqlyColors.text,
@@ -101,7 +97,7 @@ class SouqlyTypography {
 
   // Cairo Regular — 12pt (captions, metadata)
   static const TextStyle bodySmall = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w400,
     fontSize: 12,
     color: SouqlyColors.border,
@@ -110,7 +106,7 @@ class SouqlyTypography {
 
   // Convenience: Arabic text style (RTL-aware)
   static const TextStyle arabic = TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w600,
     fontSize: 20,
     color: SouqlyColors.text,
@@ -141,7 +137,7 @@ souqlyElevatedButtonTheme = ElevatedButtonThemeData(
         backgroundColor: SouqlyColors.primary,
         foregroundColor: SouqlyColors.onPrimary,
         textStyle: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'ThmanyahSans',
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
@@ -164,7 +160,7 @@ final ElevatedButtonThemeData souqlySecondaryButtonTheme =
         backgroundColor: SouqlyColors.border,
         foregroundColor: SouqlyColors.onPrimary,
         textStyle: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'ThmanyahSans',
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
@@ -181,7 +177,7 @@ final OutlinedButtonThemeData souqlyOutlinedButtonTheme =
         foregroundColor: SouqlyColors.ghostText,
         side: const BorderSide(color: SouqlyColors.ghostBorder, width: 1.5),
         textStyle: const TextStyle(
-          fontFamily: 'Cairo',
+          fontFamily: 'ThmanyahSans',
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
@@ -195,7 +191,7 @@ final TextButtonThemeData souqlyTextButtonTheme = TextButtonThemeData(
   style: TextButton.styleFrom(
     foregroundColor: SouqlyColors.primary,
     textStyle: const TextStyle(
-      fontFamily: 'Cairo',
+      fontFamily: 'ThmanyahSans',
       fontWeight: FontWeight.w600,
       fontSize: 14,
     ),
@@ -209,12 +205,12 @@ const InputDecorationTheme souqlyInputDecorationTheme = InputDecorationTheme(
   filled: true,
   fillColor: SouqlyColors.secondary,
   hintStyle: TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontSize: 14,
     color: SouqlyColors.inputEmpty,
   ),
   labelStyle: TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontSize: 14,
     color: SouqlyColors.border,
   ),
@@ -239,7 +235,7 @@ const InputDecorationTheme souqlyInputDecorationTheme = InputDecorationTheme(
     borderSide: BorderSide(color: SouqlyColors.inputError, width: 2),
   ),
   errorStyle: TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontSize: 12,
     color: SouqlyColors.inputError,
   ),
@@ -256,12 +252,12 @@ const BottomNavigationBarThemeData souqlyBottomNavTheme =
       selectedItemColor: SouqlyColors.primary,
       unselectedItemColor: SouqlyColors.border,
       selectedLabelStyle: TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'ThmanyahSans',
         fontSize: 11,
         fontWeight: FontWeight.w600,
       ),
       unselectedLabelStyle: TextStyle(
-        fontFamily: 'Cairo',
+        fontFamily: 'ThmanyahSans',
         fontSize: 11,
         fontWeight: FontWeight.w400,
       ),
@@ -281,7 +277,7 @@ const AppBarTheme souqlyAppBarTheme = AppBarTheme(
   shadowColor: Colors.transparent,
   surfaceTintColor: Colors.transparent,
   titleTextStyle: TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontWeight: FontWeight.w600,
     fontSize: 18,
     color: SouqlyColors.primary,
@@ -321,12 +317,12 @@ final ChipThemeData souqlyChipTheme = ChipThemeData(
   selectedColor: SouqlyColors.primary,
   disabledColor: SouqlyColors.background,
   labelStyle: const TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontSize: 13,
     color: SouqlyColors.text,
   ),
   secondaryLabelStyle: const TextStyle(
-    fontFamily: 'Cairo',
+    fontFamily: 'ThmanyahSans',
     fontSize: 13,
     color: SouqlyColors.secondary,
   ),
@@ -393,7 +389,7 @@ final ThemeData souqlyTheme = ThemeData(
   useMaterial3: true,
   colorScheme: souqlyColorScheme,
   scaffoldBackgroundColor: SouqlyColors.secondary,
-  fontFamily: 'Cairo',
+  fontFamily: 'ThmanyahSans',
   textTheme: souqlyTextTheme,
   appBarTheme: souqlyAppBarTheme,
   elevatedButtonTheme: souqlyElevatedButtonTheme,
@@ -430,7 +426,7 @@ final ThemeData souqlyTheme = ThemeData(
 //
 //  PUBSPEC.YAML — add Cairo font:
 //  dependencies:
-//    google_fonts: ^6.1.0
+//    fonts: ThmanyahSans under assets/fonts/
 //
 //  OR manually:
 //  flutter:

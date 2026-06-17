@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/l10n/l10n_provider.dart';
@@ -49,7 +49,7 @@ class GoogleSignInButton extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     context.l10n.signInWithGoogle,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,

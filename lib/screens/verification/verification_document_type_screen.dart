@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/verification_constants.dart';
 import '../../core/router/app_router.dart';
+import '../../shared/widgets/sello_app_bar.dart';
 
 /// Screen 2 — pick document type.
 class VerificationDocumentTypeScreen extends StatefulWidget {
@@ -23,11 +24,11 @@ class _VerificationDocumentTypeScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
+      appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         title: Text(
           'اختر نوع الوثيقة',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
       body: Directionality(
@@ -108,7 +109,7 @@ class _DocumentTypeTile extends StatelessWidget {
               const Spacer(),
               Text(
                 label,
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textDark,

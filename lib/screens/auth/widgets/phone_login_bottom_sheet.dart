@@ -2,7 +2,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
@@ -64,6 +64,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
     final localDigits = Validators.normalizeLocalDigits(
       _phoneController.text,
       isoCode,
+      phoneCode: _selectedCountry.phoneCode,
     );
     final error = Validators.localPhone(localDigits, isoCode);
     if (error != null) {
@@ -126,7 +127,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                 const SizedBox(height: 20),
                 Text(
                   'متابعة برقم الهاتف',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFF111111),
@@ -135,7 +136,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                 const SizedBox(height: 8),
                 Text(
                   'سنرسل لك رمز تحقق عبر واتساب',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     color: const Color(0xFF888888),
                   ),
@@ -172,7 +173,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                                   const SizedBox(width: 6),
                                   Text(
                                     '+${_selectedCountry.phoneCode}',
-                                    style: GoogleFonts.cairo(
+                                    style: AppFonts.cairo(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFF111111),
@@ -202,13 +203,13 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
                               enabled: !_loading,
-                              style: GoogleFonts.cairo(
+                              style: AppFonts.cairo(
                                 fontSize: 16,
                                 color: const Color(0xFF111111),
                               ),
                               decoration: InputDecoration(
                                 hintText: '5XXXXXXXX',
-                                hintStyle: GoogleFonts.cairo(
+                                hintStyle: AppFonts.cairo(
                                   color: AppColors.textMuted
                                       .withValues(alpha: 0.75),
                                 ),
@@ -249,7 +250,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                           )
                         : Text(
                             'إرسال الرمز',
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),

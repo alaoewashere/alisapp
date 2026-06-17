@@ -6,6 +6,7 @@ import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/widgets/error_widget.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
 import '../../home/widgets/listing_card.dart';
 import '../providers/favorites_provider.dart';
@@ -21,7 +22,7 @@ class FavoritesScreen extends ConsumerWidget {
 
     if (userId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(strings.favorites)),
+        appBar: SelloAppBar(title: Text(strings.favorites)),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -41,7 +42,7 @@ class FavoritesScreen extends ConsumerWidget {
     final favoritesAsync = ref.watch(favoritesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(strings.favorites)),
+      appBar: SelloAppBar(title: Text(strings.favorites)),
       body: favoritesAsync.when(
         loading: () => const Padding(
           padding: EdgeInsets.all(12),

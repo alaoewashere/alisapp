@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 
@@ -31,9 +31,9 @@ class ProfileMenuTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.fieldCarbon,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.glassBorder),
             boxShadow: const [
               BoxShadow(
                 color: AppColors.microShadow,
@@ -64,7 +64,7 @@ class ProfileMenuTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
@@ -84,7 +84,7 @@ class ProfileMenuTile extends StatelessWidget {
                     ),
                     child: Text(
                       badge!,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: AppColors.badgeText,
@@ -131,9 +131,9 @@ class ProfileMenuEmojiTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.fieldCarbon,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.glassBorder),
             boxShadow: const [
               BoxShadow(
                 color: AppColors.microShadow,
@@ -150,7 +150,7 @@ class ProfileMenuEmojiTile extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: AppColors.surfaceMuted,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   alignment: Alignment.center,
@@ -160,7 +160,7 @@ class ProfileMenuEmojiTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
@@ -180,7 +180,7 @@ class ProfileMenuEmojiTile extends StatelessWidget {
                     ),
                     child: Text(
                       badge!,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: AppColors.badgeText,

@@ -3,19 +3,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/auth_navigation.dart';
 import '../../core/utils/result.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import '../../shared/widgets/app_back_button.dart';
 import 'widgets/otp_four_box_input.dart';
 
 class PhoneVerifyScreen extends ConsumerStatefulWidget {
-  const PhoneVerifyScreen({super.key, required this.phone});
+  const PhoneVerifyScreen({
+    super.key,
+    required this.phone,
+    this.purpose,
+  });
 
   final String phone;
+  final String? purpose;
 
   @override
   ConsumerState<PhoneVerifyScreen> createState() => _PhoneVerifyScreenState();
@@ -56,8 +62,10 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
   }
 
   Future<void> _resend() async {
-    final result =
-        await ref.read(authRepositoryProvider).resendWhatsAppOtp(widget.phone);
+    final result = await ref.read(authRepositoryProvider).resendWhatsAppOtp(
+          widget.phone,
+          purpose: widget.purpose,
+        );
     if (!mounted) return;
     switch (result) {
       case Success():
@@ -67,7 +75,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
           SnackBar(
             content: Text(
               'تم إرسال رمز جديد',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+              style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
         );
@@ -87,12 +95,17 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
         await ref.read(authNotifierProvider.notifier).verifyWhatsAppOtp(
               phone: widget.phone,
               otp: code,
+              purpose: widget.purpose,
             );
     if (!mounted) return;
     setState(() => _verifying = false);
 
     switch (result) {
       case Success():
+        if (widget.purpose == 'password_reset') {
+          if (mounted) context.go(AppRoutes.resetPassword);
+          return;
+        }
         final route = await resolvePostAuthRoute(ref);
         if (mounted) context.go(route);
       case Failure():
@@ -103,7 +116,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
           SnackBar(
             content: Text(
               'رمز غير صحيح',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+              style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
         );
@@ -118,23 +131,18 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
           centerTitle: true,
-          leading: IconButton(
+          leading: AppBackButton(
             onPressed: _verifying ? null : () => context.pop(),
-            icon: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Color(0xFF111111),
-              size: 20,
-            ),
           ),
           title: Text(
             'التحقق من الرقم',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF111111),
@@ -148,7 +156,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
               const SizedBox(height: 32),
               Text(
                 'أدخل الرمز الذي أرسلناه إلى',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 14,
                   color: const Color(0xFF888888),
                 ),
@@ -156,7 +164,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
               const SizedBox(height: 8),
               Text(
                 widget.phone,
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF111111),
@@ -181,7 +189,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
                     child: Text(
                       'تم إرسال الرمز عبر واتساب إلى ${widget.phone}',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 12,
                         color: const Color(0xFF888888),
                       ),
@@ -193,7 +201,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
               if (_secondsLeft > 0)
                 Text(
                   '00:${_secondsLeft.toString().padLeft(2, '0')}',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFF5A623),
@@ -204,7 +212,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
                   onPressed: _verifying ? null : _resend,
                   child: Text(
                     'إعادة الإرسال',
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -235,7 +243,7 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
                         )
                       : Text(
                           'التحقق',
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../theme/app_form_fields.dart';
 import '../../../../theme/app_text_styles.dart';
 import '../../../../shared/models/listing_model.dart';
@@ -87,7 +89,7 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
                 TextField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  inputFormatters: [appDigitsOnly()],
                   textDirection: TextDirection.ltr,
                   style: AppTextStyles.price.copyWith(fontSize: 15),
                   decoration: AppFormDecorations.underline(
@@ -163,15 +165,12 @@ class _ConditionToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return OutlinedButton(
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        backgroundColor: selected
-            ? colorScheme.primaryContainer
-            : Colors.transparent,
+        backgroundColor: selected ? AppColors.volt : AppColors.fieldCarbon,
         side: BorderSide(
-          color: selected ? colorScheme.primary : colorScheme.outline,
+          color: selected ? AppColors.volt : AppColors.glassBorder,
           width: selected ? 2 : 1,
         ),
         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -180,7 +179,7 @@ class _ConditionToggle extends StatelessWidget {
         label,
         style: TextStyle(
           fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-          color: selected ? colorScheme.primary : colorScheme.onSurface,
+          color: selected ? AppColors.canvas : AppColors.pureWhite,
         ),
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import '../core/constants/app_colors.dart';
@@ -8,6 +8,7 @@ import '../core/constants/display_locale.dart';
 import '../core/utils/arabic_number.dart';
 import '../models/rating.dart';
 import '../services/rating_service.dart';
+import '../shared/widgets/sello_app_bar.dart';
 import '../widgets/star_display.dart';
 import '../widgets/user_avatar.dart';
 import '../features/profile/providers/profile_provider.dart';
@@ -92,11 +93,11 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
+      appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         title: Text(
           'التقييمات',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
       body: profileAsync.when(
@@ -146,7 +147,7 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Text(
                       'لا توجد تقييمات بعد',
-                      style: GoogleFonts.cairo(color: AppColors.textMuted),
+                      style: AppFonts.cairo(color: AppColors.textMuted),
                     ),
                   ),
                 )
@@ -193,7 +194,7 @@ class _RatingsHeader extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           profileName,
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -230,7 +231,7 @@ class _StarBreakdownChart extends StatelessWidget {
                 width: 36,
                 child: Text(
                   '$stars ★',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     color: AppColors.textMuted,
                   ),
@@ -253,7 +254,7 @@ class _StarBreakdownChart extends StatelessWidget {
                 child: Text(
                   arabicNumber(count),
                   textAlign: TextAlign.end,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 12,
                     color: AppColors.textMuted,
                   ),
@@ -285,9 +286,9 @@ class _ReviewTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.glassBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -305,7 +306,7 @@ class _ReviewTile extends StatelessWidget {
                   children: [
                     Text(
                       rating.reviewerName ?? 'مستخدم',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -321,7 +322,7 @@ class _ReviewTile extends StatelessWidget {
               ),
               Text(
                 _dateLabel,
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 11,
                   color: AppColors.textMuted,
                 ),
@@ -333,7 +334,7 @@ class _ReviewTile extends StatelessWidget {
             reviewText != null && reviewText.isNotEmpty
                 ? reviewText
                 : 'لم يترك تعليقاً',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 13,
               height: 1.5,
               color: reviewText != null && reviewText.isNotEmpty

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
@@ -17,6 +17,7 @@ import '../providers/post_listing_provider.dart';
 import '../providers/search_provider.dart';
 import '../widgets/category_browse_list.dart';
 import '../widgets/filter_sheet.dart';
+import '../../../shared/widgets/app_bottom_nav.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -124,7 +125,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final baseTheme = Theme.of(context);
     final cairoTheme = baseTheme.copyWith(
       scaffoldBackgroundColor: AppColors.background,
-      textTheme: GoogleFonts.cairoTextTheme(baseTheme.textTheme),
+      textTheme: AppFonts.cairoTextTheme(baseTheme.textTheme),
     );
 
     return Theme(
@@ -227,19 +228,23 @@ class _SearchHeader extends StatelessWidget {
             child: Container(
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(10),
+                color: AppColors.surfaceMuted,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.glassBorder),
               ),
               child: TextField(
                 controller: controller,
                 focusNode: focusNode,
                 textDirection: TextDirection.rtl,
                 textAlign: TextAlign.right,
-                style: GoogleFonts.cairo(fontSize: 15),
+                style: AppFonts.cairo(
+                  fontSize: 15,
+                  color: AppColors.pureWhite,
+                ),
                 decoration: InputDecoration(
                   hintText: 'ابحث في Sello...',
-                  hintStyle: GoogleFonts.cairo(
-                    color: Colors.grey.shade500,
+                  hintStyle: AppFonts.cairo(
+                    color: AppColors.textMuted,
                     fontSize: 15,
                   ),
                   border: InputBorder.none,
@@ -249,7 +254,7 @@ class _SearchHeader extends StatelessWidget {
                   ),
                   prefixIcon: Icon(
                     Icons.search,
-                    color: Colors.grey.shade600,
+                    color: AppColors.textMuted,
                     size: 22,
                   ),
                   suffixIcon: query.isNotEmpty
@@ -295,7 +300,7 @@ class _SearchHeader extends StatelessWidget {
                     child: Text(
                       '$filterCount',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         color: Colors.white,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
@@ -339,11 +344,11 @@ class _SuggestionsBody extends StatelessWidget {
                 children: [
                   Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 12),
-                  Text('لا توجد اقتراحات', style: GoogleFonts.cairo()),
+                  Text('لا توجد اقتراحات', style: AppFonts.cairo()),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: () => onSubmit(query),
-                    child: Text('بحث عن "$query"', style: GoogleFonts.cairo()),
+                    child: Text('بحث عن "$query"', style: AppFonts.cairo()),
                   ),
                 ],
               ),
@@ -352,6 +357,9 @@ class _SuggestionsBody extends StatelessWidget {
         }
 
         return ListView.separated(
+          padding: EdgeInsets.only(
+            bottom: AppBottomNavLayout.scrollBottomPadding(context),
+          ),
           itemCount: suggestions.length,
           separatorBuilder: (_, _) =>
               Divider(height: 1, color: Colors.grey.shade200),
@@ -379,12 +387,12 @@ class _HighlightedText extends StatelessWidget {
   Widget build(BuildContext context) {
     final index = text.toLowerCase().indexOf(query.toLowerCase());
     if (index < 0) {
-      return Text(text, style: GoogleFonts.cairo());
+      return Text(text, style: AppFonts.cairo());
     }
 
     return RichText(
       text: TextSpan(
-        style: GoogleFonts.cairo(color: const Color(0xFF212121), fontSize: 15),
+        style: AppFonts.cairo(color: const Color(0xFF212121), fontSize: 15),
         children: [
           TextSpan(text: text.substring(0, index)),
           TextSpan(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/l10n/l10n_provider.dart';
@@ -22,16 +22,9 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen>
-    with SingleTickerProviderStateMixin {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-  late final AnimationController _heroController;
-  late final Animation<Offset> _heroSlideAnimation;
-  late final Animation<double> _logoFadeAnimation;
-  late final Animation<double> _logoScaleAnimation;
-  late final Animation<double> _textFadeAnimation;
-  late final Animation<Offset> _textSlideAnimation;
   bool _obscurePassword = true;
 
   @override
@@ -39,48 +32,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-
-    _heroController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
-    _heroSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _heroController, curve: Curves.easeOutCubic),
-    );
-
-    _logoFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _heroController, curve: Curves.easeOut),
-    );
-
-    _logoScaleAnimation = Tween<double>(begin: 0.7, end: 1).animate(
-      CurvedAnimation(parent: _heroController, curve: Curves.easeOutBack),
-    );
-
-    const textInterval = Interval(0.375, 1, curve: Curves.easeOut);
-
-    _textFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _heroController, curve: textInterval),
-    );
-
-    _textSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _heroController, curve: textInterval),
-    );
-
-    _heroController.forward();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _heroController.dispose();
     super.dispose();
   }
 
@@ -152,25 +109,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     final canSubmit = !emailLoading && !oauthLoading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.canvas,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AuthHeroHeader(
+          AuthDarkHeader(
             title: 'مرحباً بك',
             subtitle: strings.guestSignInPrompt,
-            heroSlideAnimation: _heroSlideAnimation,
-            logoFadeAnimation: _logoFadeAnimation,
-            logoScaleAnimation: _logoScaleAnimation,
-            textFadeAnimation: _textFadeAnimation,
-            textSlideAnimation: _textSlideAnimation,
           ),
           Expanded(
             child: Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
+                    padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Column(
@@ -182,14 +134,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           hintText: 'example@email.com',
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
+                          grouped: false,
+                          loginStyle: true,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         AuthPillField(
                           label: 'كلمة المرور',
                           controller: _passwordController,
                           hintText: '••••••••',
                           obscureText: _obscurePassword,
                           textInputAction: TextInputAction.done,
+                          grouped: false,
+                          loginStyle: true,
                           suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -207,7 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         ),
                         const SizedBox(height: 8),
                         Align(
-                          alignment: Alignment.centerLeft,
+                          alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: canSubmit
                                 ? () => context.go(AppRoutes.forgotPassword)
@@ -219,10 +175,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                             ),
                             child: Text(
                               'نسيت كلمة المرور؟',
-                              style: GoogleFonts.cairo(
+                              style: AppFonts.sans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textMuted,
+                                color: AppColors.volt,
                               ),
                             ),
                           ),
@@ -233,9 +189,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           loading: emailLoading,
                           onPressed: canSubmit ? _signIn : null,
                         ),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 20),
                         AuthOrDivider(label: strings.orDivider),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 20),
                         AuthSocialLoginRow(
                           googleLoading: googleLoading,
                           appleLoading: appleLoading,
@@ -268,7 +224,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         children: [
                           Text(
                             'ليس لديك حساب؟ ',
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.sans(
                               fontSize: 15,
                               color: AppColors.textMuted,
                             ),
@@ -279,7 +235,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 : null,
                             child: Text(
                               'سجّل الآن',
-                              style: GoogleFonts.cairo(
+                              style: AppFonts.sans(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary,

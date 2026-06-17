@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
@@ -9,9 +9,11 @@ import '../../../core/utils/category_tree.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/error_widget.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../data/categories_repository.dart';
 import '../providers/post_listing_provider.dart';
 import '../widgets/category_bento_grid.dart';
+import '../widgets/category_tree_row.dart';
 
 /// Drill-down category browser (used for العقارات and any category with children).
 class CategoryBrowseScreen extends ConsumerWidget {
@@ -31,11 +33,11 @@ class CategoryBrowseScreen extends ConsumerWidget {
     return Theme(
       data: Theme.of(context).copyWith(
         scaffoldBackgroundColor: AppColors.background,
-        textTheme: GoogleFonts.cairoTextTheme(Theme.of(context).textTheme),
+        textTheme: AppFonts.cairoTextTheme(Theme.of(context).textTheme),
       ),
       child: Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
+        appBar: SelloAppBar(
           backgroundColor: AppColors.background,
           foregroundColor: AppColors.textDark,
           elevation: 0,
@@ -74,7 +76,7 @@ class CategoryBrowseScreen extends ConsumerWidget {
   }
 }
 
-class _CategoryTreeBody extends ConsumerStatefulWidget {
+class _CategoryTreeBody extends ConsumerWidget {
   const _CategoryTreeBody({
     required this.categoryId,
     required this.listParentId,
@@ -87,29 +89,16 @@ class _CategoryTreeBody extends ConsumerStatefulWidget {
   final List<CategoryModel> all;
   final ListingType? listingType;
 
-  @override
-  ConsumerState<_CategoryTreeBody> createState() => _CategoryTreeBodyState();
-}
-
-class _CategoryTreeBodyState extends ConsumerState<_CategoryTreeBody> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(categoryBrowseChildrenProvider(widget.listParentId));
-      ref.invalidate(allCategoriesProvider);
-    });
-  }
-
   Future<void> _onTap(
     BuildContext context,
+    WidgetRef ref,
     CategoryModel category,
   ) async {
     final typeParam =
-        (widget.listingType ?? defaultListingTypeForCategory(category))?.value;
+        (listingType ?? defaultListingTypeForCategory(category))?.value;
 
     var openBrowse =
-        shouldNavigateToCategoryBrowse(category, widget.all);
+        shouldNavigateToCategoryBrowse(category, all);
     if (!openBrowse && isKnownBrowseBranch(category)) {
       final kids = await ref
           .read(categoriesRepositoryProvider)
@@ -133,15 +122,15 @@ class _CategoryTreeBodyState extends ConsumerState<_CategoryTreeBody> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final current = categoryById(widget.categoryId, widget.all);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = categoryById(categoryId, all);
     final childrenAsync =
-        ref.watch(categoryBrowseChildrenProvider(widget.listParentId));
+        ref.watch(categoryBrowseChildrenProvider(listParentId));
     final showBrandStyle = isVehicleBrandListParent(current) ||
         (current?.slug == vehicleRentalSlug &&
-            widget.listParentId != widget.categoryId);
+            listParentId != categoryId);
     final countsAsync = ref.watch(
-      categoryListingCountsProvider(widget.listingType?.value),
+      categoryListingCountsProvider(listingType?.value),
     );
 
     return childrenAsync.when(
@@ -149,14 +138,14 @@ class _CategoryTreeBodyState extends ConsumerState<_CategoryTreeBody> {
       error: (e, _) => AppErrorWidget(
         message: '$e',
         onRetry: () =>
-            ref.invalidate(categoryBrowseChildrenProvider(widget.listParentId)),
+            ref.invalidate(categoryBrowseChildrenProvider(listParentId)),
       ),
       data: (children) {
         if (children.isEmpty) {
           return Center(
             child: Text(
               'لا توجد فئات فرعية',
-              style: GoogleFonts.cairo(color: AppColors.textMuted),
+              style: AppFonts.cairo(color: AppColors.textMuted),
             ),
           );
         }
@@ -165,22 +154,46 @@ class _CategoryTreeBodyState extends ConsumerState<_CategoryTreeBody> {
           data: (counts) => counts,
           orElse: () => const <int, int>{},
         );
+        final countsLoading = countsAsync.isLoading;
+        final categoryName = current?.nameAr ?? 'الفئات';
+        final typeParam =
+            (listingType ?? defaultListingTypeForCategory(current))?.value;
+        final allListingsCount = subtreeListingCount(
+          categoryId,
+          all,
+          directCounts,
+        );
 
-        return CategoryBentoGrid(
-          categories: children,
-          all: widget.all,
-          showBrandStyle: showBrandStyle,
-          listingCounts: directCounts,
-          onTap: (category) => _onTap(context, category),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CategoryAllListingsRow(
+              categoryNameAr: categoryName,
+              listingCount: countsLoading ? null : allListingsCount,
+              loading: countsLoading,
+              onTap: () {
+                if (context.mounted) {
+                  context.push(
+                    AppRoutes.listingsPath(
+                      '$categoryId',
+                      listingType: typeParam,
+                    ),
+                  );
+                }
+              },
+            ),
+            Expanded(
+              child: CategoryBentoGrid(
+                categories: children,
+                all: all,
+                showBrandStyle: showBrandStyle,
+                listingCounts: directCounts,
+                onTap: (category) => _onTap(context, ref, category),
+              ),
+            ),
+          ],
         );
       },
     );
   }
-}
-
-class CategoryBrowseShimmer extends StatelessWidget {
-  const CategoryBrowseShimmer({super.key});
-
-  @override
-  Widget build(BuildContext context) => const CategoryBentoGridShimmer();
 }

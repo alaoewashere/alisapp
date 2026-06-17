@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -11,6 +11,8 @@ import '../../core/providers/locale_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/supabase/supabase_client.dart';
 import '../../core/utils/result.dart';
+import '../../core/providers/session_reset.dart';
+import '../../shared/widgets/app_back_button.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../shared/widgets/shimmer_loading.dart';
 import '../../widgets/user_avatar.dart';
@@ -23,7 +25,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  static const _pageBg = Color(0xFFF5F5F5);
+  static const _pageBg = AppColors.background;
   static const _labelDark = Color(0xFF111111);
   static const _labelMuted = Color(0xFF888888);
   static const _chevronColor = Color(0xFFBBBBBB);
@@ -92,22 +94,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(
           'تسجيل الخروج',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
         content: Text(
           'هل أنت متأكد أنك تريد تسجيل الخروج؟',
-          style: GoogleFonts.cairo(fontSize: 14),
+          style: AppFonts.cairo(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('إلغاء', style: GoogleFonts.cairo()),
+            child: Text('إلغاء', style: AppFonts.cairo()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               'خروج',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),
@@ -120,6 +122,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (confirmed != true || !mounted) return;
 
     await supabase.auth.signOut();
+    invalidateSessionProviders(ref);
     if (mounted) context.go(AppRoutes.phone);
   }
 
@@ -129,25 +132,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(
           'حذف الحساب',
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontWeight: FontWeight.bold,
             color: Colors.red,
           ),
         ),
         content: Text(
           'هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.',
-          style: GoogleFonts.cairo(fontSize: 14),
+          style: AppFonts.cairo(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('إلغاء', style: GoogleFonts.cairo()),
+            child: Text('إلغاء', style: AppFonts.cairo()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               'حذف',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),
@@ -182,6 +185,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     await supabase.auth.signOut();
+    invalidateSessionProviders(ref);
     if (mounted) context.go(AppRoutes.phone);
   }
 
@@ -198,7 +202,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             Text(
               'عن التطبيق',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: _labelDark,
@@ -209,7 +213,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'Sello — سوقك المحلي للإعلانات المبوبة في العراق. '
               'اشترِ وبيع بسهولة عبر تطبيق واحد.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 14,
                 color: _labelMuted,
                 height: 1.5,
@@ -218,7 +222,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 16),
             Text(
               'الإصدار $_appVersion',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 13,
                 color: _chevronColor,
               ),
@@ -240,21 +244,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       child: Scaffold(
         backgroundColor: _pageBg,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
           centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: _labelDark,
-              size: 20,
-            ),
-            onPressed: () => context.pop(),
-          ),
+          leading: AppBackButton(onPressed: () => context.pop()),
           title: Text(
             'الإعدادات',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: _labelDark,
@@ -277,7 +274,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 padding: const EdgeInsets.only(right: 4, bottom: 8),
                 child: Text(
                   'إعدادات أخرى',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     color: _labelMuted,
                   ),
@@ -311,7 +308,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         Text(
                           currentLanguage,
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 13,
                             color: _labelMuted,
                           ),
@@ -345,7 +342,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         SnackBar(
                           content: Text(
                             'قريباً',
-                            style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+                            style: AppFonts.cairo(fontWeight: FontWeight.w600),
                           ),
                         ),
                       );
@@ -408,7 +405,7 @@ class _ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.fieldCarbon,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -425,10 +422,10 @@ class _ProfileCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF111111),
+                        color: AppColors.textDark,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -437,9 +434,9 @@ class _ProfileCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         email,
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 13,
-                          color: const Color(0xFF888888),
+                          color: AppColors.textMuted,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -450,7 +447,7 @@ class _ProfileCard extends StatelessWidget {
               ),
               const Icon(
                 Icons.chevron_left,
-                color: Color(0xFFBBBBBB),
+                color: AppColors.textMuted,
                 size: 20,
               ),
             ],
@@ -467,7 +464,7 @@ class _ProfileCardShimmer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(14),
       ),
       child: const Row(
@@ -514,7 +511,7 @@ class _SettingsGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(14),
       ),
       clipBehavior: Clip.antiAlias,
@@ -531,7 +528,7 @@ class _SettingsDivider extends StatelessWidget {
     return const Divider(
       height: 1,
       thickness: 1,
-      color: Color(0xFFF0F0F0),
+      color: AppColors.borderLight,
       indent: 16,
       endIndent: 16,
     );
@@ -543,7 +540,7 @@ class _SettingsRow extends StatelessWidget {
     required this.icon,
     required this.label,
     this.iconColor = AppColors.primary,
-    this.labelColor = const Color(0xFF111111),
+    this.labelColor = AppColors.textDark,
     this.iconContainerOpacity = 0.15,
     this.trailing,
     this.onTap,
@@ -583,7 +580,7 @@ class _SettingsRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 14,
                       color: labelColor,
                     ),

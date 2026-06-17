@@ -10,6 +10,8 @@ import '../../../shared/widgets/loading_widget.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/active_users_strip.dart';
 import '../widgets/conversation_tile.dart';
+import '../../../shared/widgets/app_bottom_nav.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 
 class ConversationsScreen extends ConsumerWidget {
   const ConversationsScreen({super.key});
@@ -21,7 +23,7 @@ class ConversationsScreen extends ConsumerWidget {
     if (userId == null) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
+        appBar: SelloAppBar(
           backgroundColor: AppColors.background,
           title: const Text('رسائلي'),
         ),
@@ -45,7 +47,7 @@ class ConversationsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
+      appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textDark,
         elevation: 0,
@@ -81,7 +83,12 @@ class ConversationsScreen extends ConsumerWidget {
               ),
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    0,
+                    16,
+                    AppBottomNavLayout.scrollBottomPadding(context),
+                  ),
                   itemCount: conversations.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {

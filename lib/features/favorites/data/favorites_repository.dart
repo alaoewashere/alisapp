@@ -22,27 +22,28 @@ class FavoritesRepository {
         .from('favorites')
         .select('''
           listing_id,
-          listings(
+            listings!inner(
             *,
             categories(name_ar),
-            profiles!listings_user_id_fkey(display_name),
             listing_images(id, listing_id, storage_path, sort_order)
           )
         ''')
         .eq('user_id', userId)
+        .eq('listings.status', 'approved')
         .order('created_at', ascending: false);
 
     final listings = <Map<String, dynamic>>[];
     for (final row in data as List) {
       final listing = row['listings'] as Map<String, dynamic>?;
-      if (listing != null && listing['status'] == 'approved') {
+      if (listing != null) {
         listing['is_favorite'] = true;
         listings.add(listing);
       }
     }
 
     final repo = ListingsRepository(_client);
-    return _mapFavoriteListings(listings, repo);
+    final enriched = await repo.enrichListingMaps(listings);
+    return _mapFavoriteListings(enriched, repo);
   }
 
   Future<Set<String>> getFavoriteIds(String userId) async {

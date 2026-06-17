@@ -1,25 +1,22 @@
-import 'dart:async';
-
-import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/dicebear_avatars.dart';
+import '../../core/router/app_router.dart';
+import '../../shared/widgets/app_back_button.dart';
 import '../../theme/app_form_fields.dart';
 import '../../theme/app_text_styles.dart';
-import '../../core/supabase/supabase_client.dart';
 import '../../core/utils/result.dart';
 import '../../core/utils/validators.dart';
-import '../../core/utils/username_utils.dart';
+import '../../core/supabase/supabase_client.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../shared/models/profile_model.dart';
-import '../../shared/widgets/username_availability_indicator.dart';
 import '../../widgets/avatar_picker_sheet.dart';
 import '../../widgets/user_avatar.dart';
+import 'widgets/edit_profile_phone_sheet.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -29,109 +26,43 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
-  static const _pageBg = Color(0xFFF5F5F5);
-  static const _textDark = Color(0xFF111111);
-  static const _disabledText = Color(0xFFAAAAAA);
+  static const _groupSpacing = 16.0;
+  static const _labelGap = 6.0;
+  static const _hintGap = 4.0;
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _usernameController = TextEditingController();
 
-  late Country _selectedCountry;
   var _loading = true;
   var _isSaving = false;
   String _avatarSeed = DiceBearAvatars.defaultSeed;
   ProfileModel? _profile;
-  String? _originalUsername;
-  UsernameState _usernameState = UsernameState.idle;
-  Timer? _usernameDebounce;
 
   @override
   void initState() {
     super.initState();
-    _selectedCountry = Country.parse('IQ');
-    _usernameController.addListener(_onUsernameChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadProfile());
   }
 
   @override
   void dispose() {
-    _usernameDebounce?.cancel();
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
-    _usernameController.dispose();
     super.dispose();
-  }
-
-  void _onUsernameChanged() {
-    final text = _usernameController.text;
-    _usernameDebounce?.cancel();
-
-    if (text.isEmpty) {
-      setState(() => _usernameState = UsernameState.idle);
-      return;
-    }
-
-    final normalized = normalizeUsername(text);
-    if (normalizeUsername(_originalUsername ?? '') == normalized) {
-      setState(() => _usernameState = UsernameState.available);
-      return;
-    }
-
-    if (text.length < 3) {
-      setState(() => _usernameState = UsernameState.tooShort);
-      return;
-    }
-
-    _usernameDebounce = Timer(const Duration(milliseconds: 600), () {
-      _checkUsernameAvailability(text);
-    });
-  }
-
-  Future<void> _checkUsernameAvailability(String username) async {
-    final userId = ref.read(currentUserIdProvider);
-    if (userId == null) return;
-
-    final normalized = normalizeUsername(username);
-    if (!isValidUsernameLength(normalized)) {
-      if (mounted) setState(() => _usernameState = UsernameState.tooShort);
-      return;
-    }
-
-    if (normalizeUsername(_originalUsername ?? '') == normalized) {
-      if (mounted) setState(() => _usernameState = UsernameState.available);
-      return;
-    }
-
-    setState(() => _usernameState = UsernameState.checking);
-
-    try {
-      final available = await ref
-          .read(profileRepositoryProvider)
-          .isUsernameAvailable(normalized, excludeUserId: userId);
-      if (!mounted) return;
-      setState(() {
-        _usernameState =
-            available ? UsernameState.available : UsernameState.taken;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _usernameState = UsernameState.idle);
-    }
   }
 
   Future<void> _loadProfile() async {
     try {
       final userId = ref.read(currentUserIdProvider);
-      final user = supabase.auth.currentUser;
-      if (userId == null || user == null) {
+      if (userId == null) {
         if (mounted) context.pop();
         return;
       }
 
-      final profile = await ref.read(profileRepositoryProvider).getProfile(userId);
+      final profile = await ref
+          .read(profileRepositoryProvider)
+          .getProfile(userId);
       if (!mounted) return;
 
       if (profile == null) {
@@ -142,14 +73,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         return;
       }
 
+      final authEmail = supabase.auth.currentUser?.email?.trim();
+      final email = (profile.email?.trim().isNotEmpty == true)
+          ? profile.email!.trim()
+          : (authEmail?.isNotEmpty == true ? authEmail! : '');
+
       setState(() {
         _profile = profile;
         _nameController.text = profile.fullName;
-        _emailController.text = user.email ?? '';
-        _usernameController.text = profile.username ?? '';
-        _originalUsername = profile.username;
+        _emailController.text = email;
         _avatarSeed = profile.effectiveAvatarSeed;
-        _initPhoneFromE164(profile.phone);
         _loading = false;
       });
     } catch (_) {
@@ -162,47 +95,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
   }
 
-  void _initPhoneFromE164(String? phone) {
-    if (phone == null || phone.trim().isEmpty) return;
-    final e164 = Validators.normalizeE164(phone);
-    for (final country in ['IQ', 'SA', 'AE', 'JO', 'KW']) {
-      final c = Country.parse(country);
-      final dial = '+${c.phoneCode}';
-      if (e164.startsWith(dial)) {
-        _selectedCountry = c;
-        _phoneController.text = e164.substring(dial.length);
-        return;
-      }
-    }
-    _phoneController.text = e164.replaceFirst('+', '');
-  }
+  Future<void> _openPhoneVerification() async {
+    final profile = _profile;
+    if (profile == null || _isSaving) return;
 
-  String? _buildPhoneE164() {
-    final local = _phoneController.text.trim();
-    if (local.isEmpty) return null;
-    final localDigits = Validators.normalizeLocalDigits(
-      local,
-      _selectedCountry.countryCode,
+    final phoneE164 = await showEditProfilePhoneSheet(
+      context,
+      ref,
+      initialPhoneE164: profile.phoneVerified ? profile.phone : null,
     );
-    final error = Validators.localPhone(localDigits, _selectedCountry.countryCode);
-    if (error != null) return null;
-    return Validators.formatE164(
-      '+${_selectedCountry.phoneCode}',
-      localDigits,
-    );
-  }
 
-  void _pickCountry() {
-    showCountryPicker(
-      context: context,
-      showPhoneCode: true,
-      countryListTheme: CountryListThemeData(
-        bottomSheetHeight: MediaQuery.sizeOf(context).height * 0.85,
-      ),
-      onSelect: (Country country) {
-        setState(() => _selectedCountry = country);
-      },
+    if (!mounted || phoneE164 == null || phoneE164.isEmpty) return;
+
+    await context.push(
+      '${AppRoutes.profilePhoneVerify}?phone=${Uri.encodeComponent(phoneE164)}',
     );
+
+    if (!mounted) return;
+    await _loadProfile();
   }
 
   Future<void> _showAvatarPicker() async {
@@ -235,51 +145,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final profile = _profile;
     if (profile == null) return;
 
-    final phoneE164 = _buildPhoneE164();
-    if (_phoneController.text.trim().isNotEmpty && phoneE164 == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('رقم الهاتف غير صالح')),
-      );
-      return;
-    }
-
-    final usernameRaw = _usernameController.text.trim();
-    String? usernameToSave;
-    if (usernameRaw.isNotEmpty) {
-      final normalized = normalizeUsername(usernameRaw);
-      final unchanged =
-          normalizeUsername(_originalUsername ?? '') == normalized;
-      if (!unchanged) {
-        if (_usernameState == UsernameState.taken) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('اسم المستخدم محجوز')),
-          );
-          return;
-        }
-        if (_usernameState == UsernameState.checking ||
-            _usernameState == UsernameState.tooShort ||
-            _usernameState == UsernameState.idle) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('اختر اسم مستخدم صالح')),
-          );
-          return;
-        }
-      }
-      usernameToSave = normalized;
-    }
-
     setState(() => _isSaving = true);
 
     try {
       final updated = profile.copyWith(
         fullName: _nameController.text.trim(),
-        phone: phoneE164,
-        username: usernameToSave,
         avatarSeed: _avatarSeed,
       );
 
-      final result =
-          await ref.read(profileNotifierProvider.notifier).updateProfile(updated);
+      final result = await ref
+          .read(profileNotifierProvider.notifier)
+          .updateProfile(updated);
 
       if (!mounted) return;
       setState(() => _isSaving = false);
@@ -290,7 +166,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             SnackBar(
               content: Text(
                 'تم حفظ التغييرات بنجاح',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+                style: AppFonts.cairo(fontWeight: FontWeight.w600),
               ),
               backgroundColor: Colors.green,
             ),
@@ -312,21 +188,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = _profile;
+    final emailDisplay = _emailController.text.trim();
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: _pageBg,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
           centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: _textDark,
-              size: 20,
-            ),
+          leading: AppBackButton(
             onPressed: _isSaving ? null : () => context.pop(),
           ),
           title: Text(
@@ -344,7 +218,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     )
                   : Text(
                       'حفظ',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -358,7 +232,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             : Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -366,120 +240,130 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         avatarSeed: _avatarSeed,
                         onTap: _isSaving ? null : _showAvatarPicker,
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 20),
                       _EditField(
                         label: 'الاسم الكامل',
+                        labelGap: _labelGap,
+                        spacing: _groupSpacing,
                         child: TextFormField(
                           controller: _nameController,
                           style: AppTextStyles.input,
                           textInputAction: TextInputAction.next,
-                          validator: (v) =>
-                              v == null || v.trim().isEmpty ? 'أدخل الاسم' : null,
+                          validator: (v) => v == null || v.trim().isEmpty
+                              ? 'أدخل الاسم'
+                              : null,
                           decoration: AppFormDecorations.underline(
                             hintText: 'الاسم الكامل',
                           ),
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _EditField(
-                            label: 'اسم المستخدم',
-                            child: Directionality(
-                              textDirection: TextDirection.ltr,
-                              child: TextFormField(
-                                controller: _usernameController,
-                                maxLength: 30,
-                                keyboardType: TextInputType.text,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                    RegExp(r'[a-zA-Z0-9_]'),
-                                  ),
-                                ],
-                                style: AppTextStyles.input,
-                                decoration: AppFormDecorations.underline(
-                                  hintText: 'username',
-                                ).copyWith(
-                                  counterText: '',
-                                  prefixText: '@ ',
-                                  prefixStyle: AppTextStyles.caption.copyWith(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (_usernameState != UsernameState.idle)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: UsernameAvailabilityIndicator(
-                                state: _usernameState,
-                              ),
-                            ),
-                        ],
-                      ),
-                      _EditField(
-                        label: 'البريد الإلكتروني',
-                        child: TextFormField(
-                          controller: _emailController,
-                          enabled: false,
-                          style: AppTextStyles.input.copyWith(color: _disabledText),
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: AppFormDecorations.underline(),
-                        ),
-                      ),
-                      _EditField(
-                        label: 'رقم الهاتف',
-                        child: Directionality(
-                          textDirection: TextDirection.ltr,
-                          child: Row(
+                      if (profile != null)
+                        _EditField(
+                          label: 'اسم المستخدم',
+                          labelGap: _labelGap,
+                          spacing: _groupSpacing,
+                          hintGap: _hintGap,
+                          hint: Row(
                             children: [
-                              Material(
-                                color: const Color(0xFFF5F5F5),
-                                borderRadius: BorderRadius.circular(8),
-                                child: InkWell(
-                                  onTap: _isSaving ? null : _pickCountry,
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 8,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          _selectedCountry.flagEmoji,
-                                          style: const TextStyle(fontSize: 18),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '+${_selectedCountry.phoneCode}',
-                                          style: GoogleFonts.cairo(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: _textDark,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                              Icon(
+                                Icons.lock_outline,
+                                size: 12,
+                                color: AppColors.textMuted,
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _phoneController,
-                                  keyboardType: TextInputType.phone,
-                                  style: AppTextStyles.input,
-                                  decoration: AppFormDecorations.underline(
-                                    hintText: 'رقم الهاتف',
-                                  ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'لا يمكن تغيير اسم المستخدم',
+                                style: AppFonts.cairo(
+                                  fontSize: 11,
+                                  color: AppColors.textMuted,
                                 ),
                               ),
                             ],
                           ),
+                          child: _ReadOnlyFieldBox(
+                            child: Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  profile.hasUsername
+                                      ? '@${profile.username}'
+                                      : '—',
+                                  style: AppTextStyles.input.copyWith(
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      _EditField(
+                        label: 'البريد الإلكتروني',
+                        labelGap: _labelGap,
+                        spacing: _groupSpacing,
+                        child: _ReadOnlyFieldBox(
+                          child: Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                emailDisplay.isNotEmpty
+                                    ? emailDisplay
+                                    : 'example@email.com',
+                                style: AppTextStyles.input.copyWith(
+                                  color: emailDisplay.isNotEmpty
+                                      ? AppColors.textMuted
+                                      : AppColors.textMuted
+                                          .withValues(alpha: 0.55),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
+                      if (profile != null)
+                        _EditField(
+                          label: 'رقم الهاتف',
+                          labelGap: _labelGap,
+                          spacing: _groupSpacing,
+                          hintGap: _hintGap,
+                          hint: GestureDetector(
+                            onTap: _isSaving ? null : _openPhoneVerification,
+                            child: Text(
+                              profile.phoneVerified
+                                  ? 'تغيير الرقم'
+                                  : '✓ تحقق من الرقم',
+                              style: AppFonts.cairo(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                          child: _ReadOnlyFieldBox(
+                            child: Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  profile.phoneVerified &&
+                                          profile.phone != null &&
+                                          profile.phone!.trim().isNotEmpty
+                                      ? Validators.normalizeE164(
+                                          profile.phone!,
+                                        )
+                                      : 'لم يتم التحقق',
+                                  style: AppTextStyles.input.copyWith(
+                                    color: profile.phoneVerified
+                                        ? AppColors.textDark
+                                        : AppColors.textMuted
+                                            .withValues(alpha: 0.55),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -489,11 +373,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 }
 
+class _ReadOnlyFieldBox extends StatelessWidget {
+  const _ReadOnlyFieldBox({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.glassBorder),
+      ),
+      child: child,
+    );
+  }
+}
+
 class _AvatarSection extends StatelessWidget {
-  const _AvatarSection({
-    required this.avatarSeed,
-    required this.onTap,
-  });
+  const _AvatarSection({required this.avatarSeed, required this.onTap});
 
   final String avatarSeed;
   final VoidCallback? onTap;
@@ -515,9 +416,9 @@ class _AvatarSection extends StatelessWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.fieldCarbon,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: AppColors.fieldCarbon, width: 2),
                     boxShadow: const [
                       BoxShadow(
                         color: Color(0x14000000),
@@ -542,7 +443,7 @@ class _AvatarSection extends StatelessWidget {
           onTap: onTap,
           child: Text(
             'تغيير الصورة',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 13,
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
@@ -555,20 +456,52 @@ class _AvatarSection extends StatelessWidget {
 }
 
 class _EditField extends StatelessWidget {
-  const _EditField({required this.label, required this.child});
+  const _EditField({
+    required this.label,
+    required this.child,
+    this.hint,
+    this.labelGap = 6,
+    this.hintGap = 4,
+    this.spacing = 16,
+  });
 
   final String label;
   final Widget child;
+  final Widget? hint;
+  final double labelGap;
+  final double hintGap;
+  final double spacing;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: EdgeInsets.only(bottom: spacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AppFieldGroupLabel(label: label, required: true),
-          AppFormFieldGroup(children: [child]),
+          Padding(
+            padding: EdgeInsets.only(bottom: labelGap),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              children: [
+                Text(label, style: AppTextStyles.subheading),
+                const SizedBox(width: 4),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          child,
+          if (hint != null) ...[
+            SizedBox(height: hintGap),
+            hint!,
+          ],
         ],
       ),
     );

@@ -4,32 +4,44 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 158 64% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 94%;
-    --secondary-foreground: 222 47% 18%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 92%;
-    --accent-foreground: 222 47% 18%;
-    --destructive: 0 72% 51%;
+    /* Mapped from lib/theme/tokens.ts — Sello dark fintech */
+    --background: 240 4% 8%;
+    --foreground: 0 0% 100%;
+    --card: 240 3% 10%;
+    --card-foreground: 0 0% 100%;
+    --primary: 72 100% 61%;
+    --primary-foreground: 240 4% 8%;
+    --secondary: 240 3% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 3% 13%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 240 3% 14%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 88%;
-    --ring: 158 64% 35%;
-    --radius: 0.6rem;
+    --border: 0 0% 100%;
+    --border-opacity: 0.08;
+    --input: 240 3% 10%;
+    --ring: 72 100% 61%;
+    --radius: 1rem;
   }
 
   * {
-    @apply border-border;
+    @apply border-border/10;
   }
 
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  select,
+  select option {
+    background-color: #18181a;
+    color: #ffffff;
+  }
+
+  .admin-dark-select {
+    color-scheme: dark;
   }
 }

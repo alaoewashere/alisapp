@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
@@ -68,7 +68,7 @@ class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
                 const SizedBox(height: 28),
                 Text(
                   'تم الإرسال بنجاح',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
@@ -78,7 +78,7 @@ class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
                 Text(
                   'سيتم مراجعة طلبك خلال 24 ساعة وسيصلك إشعار عند الموافقة',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 14,
                     height: 1.55,
                     color: AppColors.textMuted,

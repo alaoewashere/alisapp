@@ -39,16 +39,32 @@ class Validators {
   }
 
   /// Strips country prefix and leading zero for local entry (e.g. 0790… → 790…).
-  static String normalizeLocalDigits(String input, String isoCountryCode) {
+  static String normalizeLocalDigits(
+    String input,
+    String isoCountryCode, {
+    String? phoneCode,
+  }) {
     var digits = input.replaceAll(RegExp(r'\D'), '');
+
+    if (phoneCode != null) {
+      final code = phoneCode.replaceAll(RegExp(r'\D'), '');
+      if (code.isNotEmpty &&
+          digits.startsWith(code) &&
+          digits.length > code.length + 4) {
+        digits = digits.substring(code.length);
+      }
+    }
+
     if (isoCountryCode == 'IQ') {
       if (digits.startsWith('964')) {
         digits = digits.substring(3);
       }
-      while (digits.startsWith('0') && digits.length > 1) {
-        digits = digits.substring(1);
-      }
     }
+
+    while (digits.startsWith('0') && digits.length > 1) {
+      digits = digits.substring(1);
+    }
+
     return digits;
   }
 

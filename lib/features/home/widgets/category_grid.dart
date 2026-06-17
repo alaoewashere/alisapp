@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/category_asset_icons.dart';
+import '../../../core/constants/category_fallback_icon.dart';
 import '../../../core/theme/app_decorations.dart';
+import '../../../shared/widgets/category_asset_image.dart';
 import '../../../shared/models/category_model.dart';
-import '../../../shared/widgets/shimmer_loading.dart';
-import '../../../shared/widgets/error_widget.dart';
 
 class CategoryGrid extends StatelessWidget {
   const CategoryGrid({
@@ -21,6 +21,8 @@ class CategoryGrid extends StatelessWidget {
   final ValueChanged<int?> onSelected;
   final ValueChanged<CategoryModel>? onCategoryTap;
 
+  static const packagePlaceholderEmoji = '📦';
+
   static String emojiFor(String iconName) {
     return switch (iconName) {
       'home' => '🏢',
@@ -28,8 +30,13 @@ class CategoryGrid extends StatelessWidget {
       'devices' => '📱',
       'work' => '💼',
       'handyman' => '🔧',
-      _ => '📦',
+      _ => packagePlaceholderEmoji,
     };
+  }
+
+  /// True when [iconName] resolves to the generic package placeholder (not a dedicated emoji).
+  static bool isPackagePlaceholderIcon(String iconName) {
+    return emojiFor(iconName) == packagePlaceholderEmoji;
   }
 
   static IconData iconFor(String iconName) {
@@ -56,7 +63,8 @@ class CategoryGrid extends StatelessWidget {
             if (i > 0) const SizedBox(width: 8),
             _CategoryPill(
               label: displayCategories[i].nameAr,
-              emoji: emojiFor(displayCategories[i].icon),
+              slug: displayCategories[i].slug,
+              iconName: displayCategories[i].icon,
               selected: selectedId == displayCategories[i].id,
               onTap: () {
                 onSelected(displayCategories[i].id);
@@ -70,51 +78,25 @@ class CategoryGrid extends StatelessWidget {
   }
 }
 
-class CategoryGridSection extends StatelessWidget {
-  const CategoryGridSection({
-    super.key,
-    required this.categoriesAsync,
-    required this.selectedId,
-    required this.onSelected,
-    this.onCategoryTap,
-  });
-
-  final AsyncValue<List<CategoryModel>> categoriesAsync;
-  final int? selectedId;
-  final ValueChanged<int?> onSelected;
-  final ValueChanged<CategoryModel>? onCategoryTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return categoriesAsync.when(
-      data: (categories) => CategoryGrid(
-        categories: categories,
-        selectedId: selectedId,
-        onSelected: onSelected,
-        onCategoryTap: onCategoryTap,
-      ),
-      loading: () => const CategoryGridShimmer(),
-      error: (e, _) =>
-          AppErrorWidget(message: 'فشل تحميل التصنيفات', onRetry: () {}),
-    );
-  }
-}
-
 class _CategoryPill extends StatelessWidget {
   const _CategoryPill({
     required this.label,
-    required this.emoji,
+    required this.slug,
+    required this.iconName,
     required this.selected,
     required this.onTap,
   });
 
   final String label;
-  final String emoji;
+  final String slug;
+  final String iconName;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final assetPath = CategoryAssetIcons.displayAssetForSlug(slug);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -135,14 +117,38 @@ class _CategoryPill extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 14)),
+              if (assetPath != null)
+                CategoryAssetImage(
+                  assetPath: assetPath,
+                  size: 24,
+                  showPlate: false,
+                  fallback: Text(
+                    CategoryGrid.emojiFor(iconName),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                )
+              else if (CategoryGrid.isPackagePlaceholderIcon(iconName))
+                CategoryAssetImage(
+                  assetPath: CategoryFallbackIcon.assetPath,
+                  size: 24,
+                  showPlate: false,
+                  fallback: Text(
+                    CategoryGrid.packagePlaceholderEmoji,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                )
+              else
+                Text(
+                  CategoryGrid.emojiFor(iconName),
+                  style: const TextStyle(fontSize: 14),
+                ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: selected ? Colors.white : AppColors.textDark,
+                  color: selected ? AppColors.canvas : AppColors.textDark,
                 ),
               ),
             ],

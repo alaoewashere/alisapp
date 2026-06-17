@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ListingsTable } from "@/components/tables/listings-table";
 import {
   DateRangeFilter,
+  FilterPills,
   FilterSelect,
   Pagination,
   TableSearch,
@@ -75,17 +76,18 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
   return (
     <div className="space-y-4">
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-3 p-4">
-          <TableSearch placeholder="بحث بعنوان الإعلان..." />
-          <FilterSelect
+        <CardContent className="flex flex-col gap-4 p-4">
+          <FilterPills
             param="status"
-            allLabel="كل الحالات"
+            allLabel="الكل"
             options={[
-              { value: "approved", label: "مقبول" },
               { value: "pending", label: "قيد المراجعة" },
+              { value: "approved", label: "مقبول" },
               { value: "rejected", label: "مرفوض" },
             ]}
           />
+          <div className="flex flex-wrap items-center gap-3">
+            <TableSearch placeholder="بحث بعنوان الإعلان..." />
           <FilterSelect
             param="governorate"
             allLabel="كل المحافظات"
@@ -97,6 +99,7 @@ export default async function ListingsPage({ searchParams }: { searchParams: Sea
             options={categories.map((c) => ({ value: String(c.id), label: c.name_ar }))}
           />
           <DateRangeFilter />
+          </div>
         </CardContent>
       </Card>
 

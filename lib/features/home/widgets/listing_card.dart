@@ -1,9 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../../core/utils/cached_network_image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -13,21 +13,20 @@ import '../../../core/utils/listing_display_title.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../models/rating.dart';
 import '../../../shared/models/listing_model.dart';
+import '../../../shared/widgets/listing_card_favorite_button.dart';
+import '../../../shared/widgets/package_badge.dart';
 import '../../../shared/widgets/verified_badge.dart';
 import '../../../widgets/star_display.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../../auth/widgets/guest_bottom_sheet.dart';
-import '../../favorites/providers/favorites_provider.dart';
 
 const _cardRadius = 16.0;
 const _imageHeight = 130.0;
 
 BoxDecoration listingCardDecoration() => BoxDecoration(
-      color: Colors.white,
+      color: AppColors.fieldCarbon,
       borderRadius: BorderRadius.circular(_cardRadius),
       border: Border.all(
-        color: Colors.grey.withValues(alpha: 0.15),
-        width: 0.5,
+        color: AppColors.glassBorder,
+        width: 1,
       ),
     );
 
@@ -66,9 +65,6 @@ class ListingCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final favoriteIds = ref.watch(toggleFavoriteProvider);
-    final isFavorite = favoriteIds.contains(listing.id) || listing.isFavorite;
-    final isGuest = ref.watch(isGuestProvider);
     final isSold = listing.displayStatus == ListingDisplayStatus.sold;
     final category = listingCategoryLabel(listing);
     final location = listingLocationLabel(listing);
@@ -77,7 +73,8 @@ class ListingCard extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _openDetail(context),
       onLongPress: () => _openDetail(context),
-      child: DecoratedBox(
+      child: RepaintBoundary(
+        child: DecoratedBox(
         decoration: listingCardDecoration(),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(_cardRadius),
@@ -93,19 +90,7 @@ class ListingCard extends ConsumerWidget {
                     Positioned(
                       top: 8,
                       left: 8,
-                      child: _FavoriteButton(
-                        isFavorite: isFavorite,
-                        onTap: () async {
-                          HapticFeedback.selectionClick();
-                          if (isGuest || !ref.read(isAuthenticatedProvider)) {
-                            await showGuestBottomSheet(context);
-                            return;
-                          }
-                          await ref
-                              .read(toggleFavoriteProvider.notifier)
-                              .toggle(listing.id);
-                        },
-                      ),
+                      child: ListingFavoriteToggleButton(listing: listing),
                     ),
                     if (shouldShowSellerRatingBadge(
                       avgRating: listing.sellerAvgRating,
@@ -132,6 +117,24 @@ class ListingCard extends ConsumerWidget {
                           label: '#${listing.referenceNo}',
                         ),
                       ),
+                    if (listing.isPremiumListing)
+                      const Positioned(
+                        top: 8,
+                        right: 8,
+                        child: PackageBadge(
+                          package: ListingPackage.premium,
+                          size: PackageBadgeSize.compact,
+                        ),
+                      )
+                    else if (listing.isProListing)
+                      const Positioned(
+                        top: 8,
+                        right: 8,
+                        child: PackageBadge(
+                          package: ListingPackage.pro,
+                          size: PackageBadgeSize.compact,
+                        ),
+                      ),
                     if (isSold)
                       Container(
                         color: Colors.black45,
@@ -147,7 +150,7 @@ class ListingCard extends ConsumerWidget {
                           ),
                           child: Text(
                             'مباع',
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.cairo(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
@@ -177,7 +180,7 @@ class ListingCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textDark,
@@ -189,7 +192,7 @@ class ListingCard extends ConsumerWidget {
                         listing.formattedPrice,
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
-                        style: GoogleFonts.inter(
+                        style: AppFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
@@ -216,7 +219,7 @@ class ListingCard extends ConsumerWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.right,
-                                    style: GoogleFonts.cairo(
+                                    style: AppFonts.cairo(
                                       fontSize: 10,
                                       color: AppColors.textMuted,
                                     ),
@@ -227,7 +230,7 @@ class ListingCard extends ConsumerWidget {
                           ),
                           Text(
                             daysLabel,
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.cairo(
                               fontSize: 10,
                               color: AppColors.textMuted,
                             ),
@@ -241,6 +244,7 @@ class ListingCard extends ConsumerWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -261,7 +265,7 @@ class _DarkImagePill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: 9,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -286,41 +290,10 @@ class _GreenCategoryPill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: AppColors.primary,
-        ),
-      ),
-    );
-  }
-}
-
-class _FavoriteButton extends StatelessWidget {
-  const _FavoriteButton({
-    required this.isFavorite,
-    required this.onTap,
-  });
-
-  final bool isFavorite;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: Icon(
-          isFavorite ? Icons.favorite : Icons.favorite_border,
-          size: 16,
-          color: isFavorite ? AppColors.heartAccent : AppColors.textDark,
         ),
       ),
     );
@@ -341,8 +314,11 @@ class _ListingImage extends StatelessWidget {
       );
     }
 
-    return CachedNetworkImage(
+    return cachedListingImage(
+      context: context,
       imageUrl: url!,
+      width: 200,
+      height: _imageHeight,
       fit: BoxFit.cover,
       placeholder: (_, _) => Shimmer.fromColors(
         baseColor: AppColors.borderLight,

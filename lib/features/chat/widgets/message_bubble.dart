@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/chat_date_utils.dart';
@@ -156,7 +156,7 @@ class _SentBubble extends StatelessWidget {
                       : EdgeInsets.only(top: _hasImage ? 8 : 0),
                   child: Text(
                     message.content,
-                    style: GoogleFonts.tajawal(
+                    style: AppFonts.tajawal(
                       fontSize: 14.5,
                       color: AppColors.surface,
                       height: 1.5,
@@ -175,7 +175,7 @@ class _SentBubble extends StatelessWidget {
                     children: [
                       Text(
                         timeString,
-                        style: GoogleFonts.inter(
+                        style: AppFonts.inter(
                           fontSize: 10,
                           color: AppColors.surface.withValues(alpha: 0.65),
                         ),
@@ -274,7 +274,7 @@ class _ReceivedBubble extends StatelessWidget {
                       padding: EdgeInsets.only(top: _hasImage ? 8 : 0),
                       child: Text(
                         message.content,
-                        style: GoogleFonts.tajawal(
+                        style: AppFonts.tajawal(
                           fontSize: 14.5,
                           color: AppColors.chatTextDark,
                           height: 1.5,
@@ -286,7 +286,7 @@ class _ReceivedBubble extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       timeString,
-                      style: GoogleFonts.inter(
+                      style: AppFonts.inter(
                         fontSize: 10,
                         color: AppColors.textLight,
                       ),
@@ -339,12 +339,12 @@ class ChatDateSeparator extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 12),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.07),
+          color: Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           formatChatDateSeparator(date),
-          style: GoogleFonts.tajawal(
+          style: AppFonts.tajawal(
             fontSize: 11,
             color: AppColors.textMuted,
           ),

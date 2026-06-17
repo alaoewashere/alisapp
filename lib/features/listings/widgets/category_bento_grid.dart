@@ -1,14 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_decorations.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/category_tree.dart';
 import '../../../shared/models/category_model.dart';
-import '../../home/widgets/category_grid.dart';
-import 'vehicle_brand_logo.dart';
+import '../../../shared/widgets/category_icon.dart';
 
 /// 2-column bento card for category pickers — souqly-redesign-studio categories mockup.
 class CategoryBentoCard extends StatelessWidget {
@@ -40,17 +38,19 @@ class CategoryBentoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
         child: Ink(
           decoration: BoxDecoration(
-            color: selected ? AppColors.primary.withValues(alpha: 0.06) : Colors.white,
+            color: selected
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : AppColors.fieldCarbon,
             borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
             border: Border.all(
               color: selected
-                  ? AppColors.primary.withValues(alpha: 0.35)
-                  : AppColors.borderLight,
+                  ? AppColors.primary.withValues(alpha: 0.55)
+                  : AppColors.glassBorder,
               width: selected ? 1.5 : 1,
             ),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x08000000),
+                color: Color(0x40000000),
                 blurRadius: 12,
                 offset: Offset(0, 4),
               ),
@@ -71,7 +71,7 @@ class CategoryBentoCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
@@ -85,7 +85,7 @@ class CategoryBentoCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 11,
                       color: AppColors.textMuted,
                       height: 1.35,
@@ -96,7 +96,7 @@ class CategoryBentoCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     arabicNumber(listingCount!),
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: AppColors.accent,
@@ -123,59 +123,9 @@ class _CategoryBentoIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (showBrandStyle && isVehicleBrand(category)) {
-      return VehicleBrandLogo(category: category, size: 48);
-    }
-
-    if (category.icon == 'brand' || category.icon == 'model') {
-      return VehicleBrandLogo(category: category, size: 48);
-    }
-
-    final accent = parseCategoryColor(category.colorHex);
-
-    if (category.logoUrl != null && category.logoUrl!.isNotEmpty) {
-      return Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: accent.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: CachedNetworkImage(
-          imageUrl: category.logoUrl!,
-          fit: BoxFit.cover,
-          errorWidget: (_, _, _) => _EmojiIconBox(category: category, accent: accent),
-        ),
-      );
-    }
-
-    return _EmojiIconBox(category: category, accent: accent);
-  }
-}
-
-class _EmojiIconBox extends StatelessWidget {
-  const _EmojiIconBox({
-    required this.category,
-    required this.accent,
-  });
-
-  final CategoryModel category;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) {
-    final emoji = CategoryGrid.emojiFor(category.icon);
-
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      alignment: Alignment.center,
-      child: Text(emoji, style: const TextStyle(fontSize: 24)),
+    return CategoryIcon(
+      category: category,
+      showBrandStyle: showBrandStyle,
     );
   }
 }
@@ -207,7 +157,7 @@ class CategoryBentoGrid extends StatelessWidget {
       return Center(
         child: Text(
           'لا توجد فئات',
-          style: GoogleFonts.cairo(color: AppColors.textMuted),
+          style: AppFonts.cairo(color: AppColors.textMuted),
         ),
       );
     }
@@ -244,7 +194,7 @@ class CategoryBentoGrid extends StatelessWidget {
         if (loading)
           const Positioned.fill(
             child: ColoredBox(
-              color: Color(0x44FFFFFF),
+              color: Color(0x99131315),
               child: Center(child: CircularProgressIndicator()),
             ),
           ),
@@ -270,9 +220,9 @@ class CategoryBentoGridShimmer extends StatelessWidget {
       itemCount: 6,
       itemBuilder: (_, _) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.fieldCarbon,
           borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.glassBorder),
         ),
       ),
     );

@@ -19,107 +19,108 @@ class CategoryDrillScreen extends ConsumerStatefulWidget {
 }
 
 class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
-  final List<List<CategoryModel>> _levelStack = [];
   bool _loadingLevel = false;
-
-  bool get _isRoot => _levelStack.isEmpty;
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(postListingProvider, (previous, next) {
-      if (next.categoryPath.isEmpty &&
-          (previous?.categoryPath.isNotEmpty ?? false) &&
-          _levelStack.isNotEmpty) {
-        setState(_levelStack.clear);
-      }
-    });
-
     final state = ref.watch(postListingProvider);
+    final notifier = ref.read(postListingProvider.notifier);
     final allAsync = ref.watch(allCategoriesProvider);
     final theme = Theme.of(context);
+    final isRoot = !state.canPopCategoryDrill;
+    final drillStack = state.categoryDrillStack;
 
-    return ColoredBox(
-      color: AppColors.background,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (!_isRoot)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: _loadingLevel ? null : _onBack,
-                icon: const Icon(Icons.arrow_back),
-                label: const Text('رجوع'),
+    return PopScope(
+      canPop: isRoot,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop || _loadingLevel) return;
+        notifier.popCategoryDrillLevel();
+      },
+      child: ColoredBox(
+        color: AppColors.background,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!isRoot)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: _loadingLevel ? null : notifier.popCategoryDrillLevel,
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('رجوع'),
+                ),
               ),
-            ),
-          if (state.categoryPath.isNotEmpty)
-            CategoryPathBreadcrumb(
-              path: state.categoryPath,
-              onSegmentTap: _loadingLevel ? null : _onBreadcrumbTap,
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Text(
-              'اختر الفئة',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textDark,
+            if (state.categoryPath.isNotEmpty)
+              CategoryPathBreadcrumb(
+                path: state.categoryPath,
+                onSegmentTap: _loadingLevel
+                    ? null
+                    : (index) => notifier.jumpCategoryDrillToDepth(index + 1),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, animation) {
-                final offsetAnimation = Tween<Offset>(
-                  begin: const Offset(0.15, 0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeOutCubic,
-                ));
-                return SlideTransition(
-                  position: offsetAnimation,
-                  child: FadeTransition(opacity: animation, child: child),
-                );
-              },
-              child: KeyedSubtree(
-                key: ValueKey(_levelStack.length),
-                child: _isRoot
-                    ? _RootCategoryGrid(
-                        onCategoryTap: _onCategoryTap,
-                        loading: _loadingLevel,
-                        allAsync: allAsync,
-                        selectedRootId: state.categoryPath.isNotEmpty
-                            ? state.categoryPath.first.id
-                            : null,
-                      )
-                    : allAsync.when(
-                        loading: () => const CategoryBentoGridShimmer(),
-                        error: (e, _) => AppErrorWidget(
-                          message: '$e',
-                          onRetry: () => ref.invalidate(allCategoriesProvider),
-                        ),
-                        data: (all) => CategoryBentoGrid(
-                          categories: _levelStack.last,
-                          all: all,
-                          loading: _loadingLevel,
-                          onTap: (c) => _onCategoryTap(c),
-                        ),
-                      ),
-              ),
-            ),
-          ),
-          if (state.error != null)
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                state.error!,
-                style: TextStyle(color: theme.colorScheme.error),
+                'اختر الفئة',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark,
+                ),
               ),
             ),
-        ],
+            const SizedBox(height: 8),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: const Offset(0.15, 0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ));
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: KeyedSubtree(
+                  key: ValueKey(drillStack.length),
+                  child: isRoot
+                      ? _RootCategoryGrid(
+                          onCategoryTap: _onCategoryTap,
+                          loading: _loadingLevel,
+                          allAsync: allAsync,
+                          selectedRootId: state.categoryPath.isNotEmpty
+                              ? state.categoryPath.first.id
+                              : null,
+                        )
+                      : allAsync.when(
+                          loading: () => const CategoryBentoGridShimmer(),
+                          error: (e, _) => AppErrorWidget(
+                            message: '$e',
+                            onRetry: () => ref.invalidate(allCategoriesProvider),
+                          ),
+                          data: (all) => CategoryBentoGrid(
+                            categories: drillStack.last,
+                            all: all,
+                            loading: _loadingLevel,
+                            onTap: (c) => _onCategoryTap(c),
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            if (state.error != null)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  state.error!,
+                  style: TextStyle(color: theme.colorScheme.error),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -129,21 +130,20 @@ class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
 
     final repo = ref.read(categoriesRepositoryProvider);
     final notifier = ref.read(postListingProvider.notifier);
-    final drillDepth = _levelStack.length;
+    final drillDepth = ref.read(postListingProvider).categoryDrillStack.length;
 
     notifier.selectCategoryAtDrillDepth(drillDepth, category);
 
     setState(() => _loadingLevel = true);
 
     try {
-      final children = await repo.getChildCategories(category.id);
+      final all = await ref.read(allCategoriesProvider.future);
+      final children = await repo.getDrillDownChildren(category, all);
       if (!mounted) return;
 
       if (children.isNotEmpty) {
-        setState(() {
-          _levelStack.add(children);
-          _loadingLevel = false;
-        });
+        notifier.pushCategoryDrillLevel(children);
+        setState(() => _loadingLevel = false);
         return;
       }
 
@@ -156,36 +156,6 @@ class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
       setState(() => _loadingLevel = false);
       notifier.setValidationError('تعذّر تحميل الفئات');
     }
-  }
-
-  void _onBack() {
-    if (_levelStack.isEmpty) return;
-
-    final notifier = ref.read(postListingProvider.notifier);
-    final pathLength = ref.read(postListingProvider).categoryPath.length;
-    final newPathLength = pathLength > 0 ? pathLength - 1 : 0;
-
-    setState(() {
-      if (_levelStack.isNotEmpty) {
-        _levelStack.removeLast();
-      }
-    });
-
-    notifier.trimCategoryPath(newPathLength);
-  }
-
-  void _onBreadcrumbTap(int index) {
-    if (_loadingLevel) return;
-    final notifier = ref.read(postListingProvider.notifier);
-    final targetDepth = index + 1;
-
-    setState(() {
-      if (targetDepth < _levelStack.length) {
-        _levelStack.removeRange(targetDepth, _levelStack.length);
-      }
-    });
-
-    notifier.trimCategoryPath(targetDepth);
   }
 }
 

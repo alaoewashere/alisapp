@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/package_badge.dart';
 import '../../../../shared/models/listing_model.dart';
 import '../../constants/listing_package_config.dart';
 import '../../providers/post_listing_provider.dart';
 
-class StepListingPackage extends ConsumerWidget {
+class StepListingPackage extends ConsumerStatefulWidget {
   const StepListingPackage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StepListingPackage> createState() => _StepListingPackageState();
+}
+
+class _StepListingPackageState extends ConsumerState<StepListingPackage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(postListingProvider.notifier).refreshFreePostQuota();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
     final theme = Theme.of(context);
-    final selectedOption = ListingPackageConfig.optionFor(state.listingPackage);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,12 +49,20 @@ class StepListingPackage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _PackageTabBar(
-                    selected: state.listingPackage,
-                    onSelected: notifier.setListingPackage,
-                  ),
-                  const SizedBox(height: 20),
-                  _PackageDetails(option: selectedOption),
+                  ...ListingPackageConfig.options.map((option) {
+                    final isLast =
+                        option.package == ListingPackage.premium;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+                      child: _PackageTierCard(
+                        option: option,
+                        isSelected: state.listingPackage == option.package,
+                        freePostsRemaining: state.freePostsRemaining,
+                        quotaLoaded: state.freePostQuotaLoaded,
+                        onTap: () => notifier.setListingPackage(option.package),
+                      ),
+                    );
+                  }),
                   if (state.error != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -85,142 +107,181 @@ class StepListingPackage extends ConsumerWidget {
   }
 }
 
-class _PackageTabBar extends StatelessWidget {
-  const _PackageTabBar({
-    required this.selected,
-    required this.onSelected,
+class _PackageTierCard extends StatelessWidget {
+  const _PackageTierCard({
+    required this.option,
+    required this.isSelected,
+    required this.freePostsRemaining,
+    required this.quotaLoaded,
+    required this.onTap,
   });
 
-  final ListingPackage selected;
-  final ValueChanged<ListingPackage> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(28),
-      ),
-      child: Row(
-        children: ListingPackageConfig.options.map((option) {
-          final isSelected = option.package == selected;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onSelected(option.package),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected ? theme.colorScheme.surface : Colors.transparent,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.06),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Text(
-                  option.labelAr,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected
-                        ? theme.colorScheme.onSurface
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
-class _PackageDetails extends StatelessWidget {
-  const _PackageDetails({required this.option});
-
   final ListingPackageOption option;
+  final bool isSelected;
+  final int freePostsRemaining;
+  final bool quotaLoaded;
+  final VoidCallback onTap;
+
+  String _priceLabel() {
+    if (option.package == ListingPackage.standard &&
+        quotaLoaded &&
+        freePostsRemaining > 0) {
+      return '0 د.ع (متبقي $freePostsRemaining من 2 إعلان مجاني)';
+    }
+    return formatPackagePriceIqd(option.priceIqd);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final showQuotaWarning = option.package == ListingPackage.standard &&
+        quotaLoaded &&
+        freePostsRemaining <= 0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              option.isFree ? 'مجاني' : formatIqd(option.priceIqd),
-              style: theme.textTheme.headlineSmall?.copyWith(
-                color: AppColors.approved,
-                fontWeight: FontWeight.bold,
-              ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.fieldCarbon
+                : AppColors.fieldCarbon,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isSelected ? AppColors.volt : AppColors.borderLight,
+              width: isSelected ? 2 : 1,
             ),
-            if (option.originalPriceIqd != null) ...[
-              const SizedBox(width: 10),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.volt.withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          transform: Matrix4.identity()..scale(isSelected ? 1.02 : 1.0),
+          transformAlignment: Alignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PackageBadge(
+                          package: option.package,
+                          size: PackageBadgeSize.compact,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          option.labelAr,
+                          style: AppFonts.sans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.pureWhite,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isSelected)
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.volt,
+                      size: 22,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
               Text(
-                formatIqd(option.originalPriceIqd!),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.outline,
-                  decoration: TextDecoration.lineThrough,
+                _priceLabel(),
+                style: AppFonts.inter(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.volt,
+                  height: 1.2,
                 ),
               ),
-            ],
-            if (option.discountPercent != null) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '%${option.discountPercent} خصم',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: Colors.amber.shade900,
-                    fontWeight: FontWeight.w700,
-                  ),
+              const SizedBox(height: 6),
+              Text(
+                option.durationLabelAr,
+                style: AppFonts.sans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.pureWhite.withValues(alpha: 0.65),
                 ),
               ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 20),
-        ...option.features.map(
-          (feature) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+              if (showQuotaWarning) ...[
+                const SizedBox(height: 8),
                 Text(
-                  feature.title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  feature.description,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  'تم استخدام إعلانيك المجانيين. سيتم تحصيل رسوم الإعلان العادي.',
+                  style: AppFonts.sans(
+                    fontSize: 12,
+                    color: AppColors.pending,
+                    height: 1.35,
                   ),
                 ),
               ],
-            ),
+              const SizedBox(height: 14),
+              ...option.features.map(
+                (feature) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.volt,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              feature.title,
+                              style: AppFonts.sans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.pureWhite,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              feature.description,
+                              style: AppFonts.sans(
+                                fontSize: 12,
+                                color: AppColors.pureWhite.withValues(alpha: 0.55),
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/result.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import '../../shared/widgets/app_back_button.dart';
 import 'widgets/otp_four_box_input.dart';
 
 class EmailVerifyScreen extends ConsumerStatefulWidget {
@@ -66,7 +67,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
           SnackBar(
             content: Text(
               'تم إرسال رمز جديد',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+              style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
         );
@@ -100,7 +101,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
           SnackBar(
             content: Text(
               'رمز غير صحيح',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+              style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
         );
@@ -115,23 +116,18 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
           centerTitle: true,
-          leading: IconButton(
+          leading: AppBackButton(
             onPressed: _verifying ? null : () => context.pop(),
-            icon: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Color(0xFF111111),
-              size: 20,
-            ),
           ),
           title: Text(
             'التحقق من البريد',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF111111),
@@ -145,7 +141,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
               const SizedBox(height: 32),
               Text(
                 'أدخل الرمز الذي أرسلناه إلى',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 14,
                   color: const Color(0xFF888888),
                 ),
@@ -153,7 +149,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
               const SizedBox(height: 8),
               Text(
                 widget.email,
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF111111),
@@ -168,7 +164,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
               if (_secondsLeft > 0)
                 Text(
                   '00:${_secondsLeft.toString().padLeft(2, '0')}',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFF5A623),
@@ -179,7 +175,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
                   onPressed: _verifying ? null : _resend,
                   child: Text(
                     'إعادة الإرسال',
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
@@ -210,7 +206,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
                         )
                       : Text(
                           'التحقق',
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

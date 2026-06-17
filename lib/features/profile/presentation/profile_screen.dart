@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_governorates.dart';
@@ -14,6 +14,7 @@ import '../../../services/share_service.dart';
 import '../../../shared/models/profile_model.dart';
 import '../../../shared/models/profile_stats_model.dart';
 import '../../../widgets/profile_share_card.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
@@ -23,6 +24,7 @@ import '../providers/profile_provider.dart';
 import '../widgets/profile_menu_tile.dart';
 import '../../verification/widgets/verification_status_banner.dart';
 import '../../../shared/widgets/verified_badge.dart';
+import '../../../shared/widgets/app_bottom_nav.dart';
 import '../../../widgets/star_display.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -107,9 +109,9 @@ class ProfileScreen extends ConsumerWidget {
                 surfaceTintColor: Colors.transparent,
                 title: Text(
                   profile.fullName,
-                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                  style: AppFonts.cairo(fontWeight: FontWeight.bold),
                 ),
-                leading: BackButton(onPressed: () => context.pop()),
+                leading: AppBackButton(onPressed: () => context.pop()),
               ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -129,7 +131,7 @@ class ProfileScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           strings.listingsOf(profile.fullName),
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textDark,
@@ -139,7 +141,7 @@ class ProfileScreen extends ConsumerWidget {
                       listingsAsync.when(
                         data: (items) => Text(
                           arabicNumber(items.length),
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             color: AppColors.textMuted,
                             fontSize: 13,
                           ),
@@ -266,13 +268,10 @@ class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
               elevation: 0,
               scrolledUnderElevation: 0,
               surfaceTintColor: Colors.transparent,
+              automaticallyImplyLeading: false,
               title: Text(
                 strings.myAccount,
-                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
-              ),
-              leading: IconButton(
-                icon: const Icon(Icons.favorite_border),
-                onPressed: () => context.push(AppRoutes.favorites),
+                style: AppFonts.cairo(fontWeight: FontWeight.bold),
               ),
               actions: [
                 if (_canShareProfile)
@@ -310,7 +309,7 @@ class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
                 onSmartAlerts: () => context.push(AppRoutes.smartAlerts),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            AppBottomNavSliverSpacer(),
           ],
         ),
         if (_sharing)
@@ -366,9 +365,9 @@ class _ProfileHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.glassBorder),
         boxShadow: const [
           BoxShadow(
             color: AppColors.microShadow,
@@ -406,7 +405,7 @@ class _ProfileHeaderCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppColors.fieldCarbon, width: 2),
                       boxShadow: const [
                         BoxShadow(
                           color: AppColors.microShadow,
@@ -418,7 +417,7 @@ class _ProfileHeaderCard extends StatelessWidget {
                     child: const Icon(
                       Icons.settings,
                       size: 14,
-                      color: Colors.white,
+                      color: AppColors.canvas,
                     ),
                   ),
               ],
@@ -432,7 +431,7 @@ class _ProfileHeaderCard extends StatelessWidget {
                 child: Text(
                   profile.fullName,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
@@ -459,7 +458,7 @@ class _ProfileHeaderCard extends StatelessWidget {
             Text(
               _locationLine,
               textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 12,
                 color: AppColors.textMuted,
               ),
@@ -532,7 +531,7 @@ class _StatColumn extends StatelessWidget {
       children: [
         Text(
           value,
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: AppColors.textDark,
@@ -541,7 +540,7 @@ class _StatColumn extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 11,
             color: AppColors.textMuted,
           ),
@@ -621,7 +620,7 @@ class _EmptyListings extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             isOwnProfile ? emptyOwnMessage : emptyOtherMessage,
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,

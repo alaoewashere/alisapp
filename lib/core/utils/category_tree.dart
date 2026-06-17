@@ -122,6 +122,13 @@ bool isVehicleBrand(CategoryModel category) => category.icon == 'brand';
 
 bool isVehicleModel(CategoryModel category) => category.icon == 'model';
 
+/// Vehicle brand/model tiles use [VehicleBrandLogo]; tutoring subjects also use
+/// `model` icon but should resolve to the default category PNG instead.
+bool shouldUseVehicleBrandLogo(CategoryModel category) {
+  if (category.slug.startsWith('tutor_')) return false;
+  return isVehicleBrand(category) || isVehicleModel(category);
+}
+
 /// Sorts categories by [displayOrder] then [id].
 List<CategoryModel> sortCategories(List<CategoryModel> items) {
   return [...items]..sort((a, b) {

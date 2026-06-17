@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/l10n/l10n_provider.dart';
@@ -13,6 +13,7 @@ import '../../../core/utils/result.dart';
 import '../../../shared/widgets/loading_widget.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_form_styles.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../widgets/auth_hero_header.dart';
 import '../widgets/otp_input.dart';
 
@@ -86,25 +87,22 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final canVerify = _otpCode.length == OtpInputState.length && !verifying;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.canvas,
       body: Stack(
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AuthHeroHeader(
+              AuthDarkHeader(
                 title: strings.verifyOtp,
                 subtitle: 'أرسلنا رمزاً إلى\n${widget.phone}',
-                leading: IconButton(
+                leading: AppBackButton(
                   onPressed: verifying ? null : _goBack,
-                  icon: const Icon(Icons.arrow_forward_ios_rounded),
-                  color: Colors.white,
-                  iconSize: 20,
                 ),
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -122,7 +120,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         Text(
                           auth.errorMessage!,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             color: Theme.of(context).colorScheme.error,
                             fontSize: 14,
                           ),
@@ -140,7 +138,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                             ? 'إعادة الإرسال خلال $countdown ث'
                             : 'يمكنك إعادة إرسال الرمز',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.sans(
                           fontSize: 14,
                           color: AppColors.textMuted,
                         ),
@@ -152,10 +150,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           onPressed: countdown > 0 || verifying ? null : _resend,
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
-                            foregroundColor: AppColors.primary,
-                            side: BorderSide(
-                              color: AppColors.borderLight.withValues(alpha: 0.9),
-                            ),
+                            foregroundColor: AppColors.volt,
+                            side: const BorderSide(color: AppColors.glassBorder),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 AuthFormStyles.pillRadius,
@@ -164,7 +160,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           ),
                           child: Text(
                             strings.resendOtp,
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.sans(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -231,15 +227,16 @@ class _OtpHelpCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AuthFormStyles.fieldFill,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.glassBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'لم يصلك الرمز؟',
-            style: GoogleFonts.cairo(
+            style: AppFonts.sans(
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
@@ -253,7 +250,7 @@ class _OtpHelpCard extends StatelessWidget {
             '• يجب تفعيل مزود SMS (Twilio أو MessageBird) في Supabase\n'
             '• للتطوير: أضف رقمك كـ Test OTP في لوحة Supabase\n'
             '• راجع supabase/README.md — قسم Phone OTP',
-            style: GoogleFonts.cairo(
+            style: AppFonts.sans(
               fontSize: 12,
               color: AppColors.textMuted,
               height: 1.5,

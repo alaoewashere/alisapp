@@ -45,6 +45,7 @@ dependencies:
   connectivity_plus: ^7.1.1
   uuid: ^4.5.3
   intl: ^0.20.2
+  sentry_flutter: ^9.0.0
   flutter_dotenv: ^6.0.1
   app_links: ^6.4.0
   google_maps_flutter: ^2.12.3
@@ -70,7 +71,6 @@ dependencies:
   package_info_plus: ^8.3.0
   webview_flutter: ^4.13.0
   flutter_staggered_animations: ^1.1.1
-  google_fonts: ^6.2.1
   http: ^1.4.0
   freezed_annotation: ^3.1.0
   flutter_colorpicker: ^1.1.0
@@ -90,6 +90,24 @@ dev_dependencies:
   mocktail: ^1.0.5
   freezed: ^3.2.5
   build_runner: ^2.15.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/app_icon.png
+  remove_alpha_ios: true
+  background_color_ios: "#1A1A1A"
+  adaptive_icon_background: "#1A1A1A"
+  adaptive_icon_foreground: assets/app_icon.png
+  macos:
+    generate: true
+  web:
+    generate: true
+    background_color: "#1A1A1A"
+    theme_color: "#1A1A1A"
+  windows:
+    generate: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -104,7 +122,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - .env
     - assets/app_logo.png
     - assets/images/
     - assets/images/forgot_password.jpg
@@ -114,6 +131,15 @@ flutter:
     - assets/icons/apple.svg
     - assets/icons/facebook.svg
     - assets/icons/marketplace_hero.svg
+    - assets/car-icons/
+    - assets/real-estate-icons/
+    - assets/electronics-icons/
+    - assets/usedandnewmarketicons/
+    - assets/special-lesson/
+    - assets/jobs-icons/
+    - assets/animals-icons/
+    - assets/assistant/
+    - assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -126,22 +152,40 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: ThmanyahSans
+      fonts:
+        - asset: assets/fonts/thmanyahsans/thmanyahsans-Light.otf
+          weight: 300
+        - asset: assets/fonts/thmanyahsans/thmanyahsans-Regular.otf
+          weight: 400
+        - asset: assets/fonts/thmanyahsans/thmanyahsans-Medium.otf
+          weight: 500
+        - asset: assets/fonts/thmanyahsans/thmanyahsans-Bold.otf
+          weight: 700
+        - asset: assets/fonts/thmanyahsans/thmanyahsans-Black.otf
+          weight: 900
+    - family: ThmanyahSerifDisplay
+      fonts:
+        - asset: assets/fonts/thmanyahserifdisplay/thmanyahserifdisplay-Light.otf
+          weight: 300
+        - asset: assets/fonts/thmanyahserifdisplay/thmanyahserifdisplay-Regular.otf
+          weight: 400
+        - asset: assets/fonts/thmanyahserifdisplay/thmanyahserifdisplay-Medium.otf
+          weight: 500
+        - asset: assets/fonts/thmanyahserifdisplay/thmanyahserifdisplay-Bold.otf
+          weight: 700
+        - asset: assets/fonts/thmanyahserifdisplay/thmanyahserifdisplay-Black.otf
+          weight: 900
+    - family: ThmanyahSerifText
+      fonts:
+        - asset: assets/fonts/thmanyahseriftext/thmanyahseriftext-Light.otf
+          weight: 300
+        - asset: assets/fonts/thmanyahseriftext/thmanyahseriftext-Regular.otf
+          weight: 400
+        - asset: assets/fonts/thmanyahseriftext/thmanyahseriftext-Medium.otf
+          weight: 500
+        - asset: assets/fonts/thmanyahseriftext/thmanyahseriftext-Bold.otf
+          weight: 700
+        - asset: assets/fonts/thmanyahseriftext/thmanyahseriftext-Black.otf
+          weight: 900

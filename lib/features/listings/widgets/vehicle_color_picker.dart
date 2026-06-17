@@ -3,6 +3,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../constants/vehicle_listing_options.dart';
+import 'vehicle_form_field_card.dart';
 
 /// Card-style vehicle color picker with preset swatches and custom spectrum sheet.
 class VehicleColorPicker extends StatelessWidget {
@@ -165,74 +166,67 @@ class VehicleColorPicker extends StatelessWidget {
 
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'اللون',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
-                    ),
+      child: VehicleFormFieldCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const Text(
+                  'اللون',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
                   ),
-                  const Spacer(),
-                  Text(
-                    displayLabel ?? 'اختر اللون',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: displayLabel != null
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      color: displayLabel != null
-                          ? AppColors.primary
-                          : AppColors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: _circleSize + 4,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: VehicleCarColors.options.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final option = VehicleCarColors.options[index];
-                    return _ColorSwatch(
-                      option: option,
-                      selected: _isSelected(option),
-                      customPreviewColor: option.isOther
-                          ? _parseCustomHex()
-                          : null,
-                      onTap: () => _onTapSwatch(context, option),
-                    );
-                  },
                 ),
-              ),
-              if (displayLabel != null) ...[
-                const SizedBox(height: 14),
+                const Spacer(),
                 Text(
-                  displayLabel,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  displayLabel ?? 'اختر اللون',
+                  style: TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    fontWeight: displayLabel != null
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: displayLabel != null
+                        ? AppColors.volt
+                        : AppColors.textMuted,
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: _circleSize + 4,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: VehicleCarColors.options.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final option = VehicleCarColors.options[index];
+                  return _ColorSwatch(
+                    option: option,
+                    selected: _isSelected(option),
+                    customPreviewColor: option.isOther
+                        ? _parseCustomHex()
+                        : null,
+                    onTap: () => _onTapSwatch(context, option),
+                  );
+                },
+              ),
+            ),
+            if (displayLabel != null) ...[
+              const SizedBox(height: 14),
+              Text(
+                displayLabel,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.volt,
+                ),
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );

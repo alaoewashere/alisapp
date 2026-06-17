@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_governorates.dart';
 import '../../../core/constants/dicebear_avatars.dart';
 import '../../../core/router/app_router.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/result.dart';
 import '../../../shared/models/profile_model.dart';
@@ -38,7 +39,7 @@ class ProfileSetupScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
+      appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textDark,
         elevation: 0,
@@ -86,7 +87,7 @@ class ProfileSetupScreen extends ConsumerWidget {
           Text(
             'اضغط لاختيار صورتك الرمزية',
             textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 12,
               color: AppColors.textMuted,
             ),

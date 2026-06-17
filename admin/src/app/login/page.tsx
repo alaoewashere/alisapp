@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-sm">
+    <main className="flex min-h-screen items-center justify-center bg-canvas p-4">
+      <div className="w-full max-w-sm rounded-[16px] border border-border bg-card p-8">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
           <div className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
             <ShieldCheck className="size-7" />

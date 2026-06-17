@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/models/category_model.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../../../shared/widgets/loading_widget.dart';
 import '../providers/edit_listing_form_mode.dart';
 import '../providers/edit_listing_provider.dart';
@@ -64,7 +66,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         SnackBar(
           content: Text(
             'تم حفظ التعديلات ✓',
-            style: GoogleFonts.cairo(),
+            style: AppFonts.cairo(),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -76,7 +78,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         SnackBar(
           content: Text(
             validationError ?? 'حدث خطأ، حاول مرة أخرى',
-            style: GoogleFonts.cairo(),
+            style: AppFonts.cairo(),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -95,7 +97,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
     if (edit.error != null && !edit.loaded) {
       return Scaffold(
-        appBar: AppBar(title: const Text('تعديل الإعلان')),
+        appBar: SelloAppBar(title: const Text('تعديل الإعلان')),
         body: AppErrorWidget(
           message: edit.error!,
           onRetry: () => ref.invalidate(editListingProvider(widget.listingId)),
@@ -111,10 +113,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         elevation: 0,
         title: Text(
           'تعديل الإعلان',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+        leading: AppBackButton(
           onPressed: edit.loading
               ? null
               : () {
@@ -184,7 +185,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                       )
                     : Text(
                         'حفظ التعديلات',
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -220,7 +221,7 @@ class _ReadOnlyCategoryBanner extends StatelessWidget {
         children: [
           Text(
             'الفئة',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 12,
               color: AppColors.textMuted,
             ),
@@ -228,7 +229,7 @@ class _ReadOnlyCategoryBanner extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             labels,
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,

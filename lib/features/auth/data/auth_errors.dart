@@ -1,21 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/utils/secure_log.dart';
+
 /// Logs raw auth errors in development for debugging Supabase responses.
 void logAuthError(Object error, [StackTrace? stackTrace]) {
   if (!kDebugMode) return;
 
   if (error is AuthException) {
-    debugPrint(
-      'AuthException: statusCode=${error.statusCode} '
-      'code=${error.code} message=${error.message}',
+    SecureLog.error(
+      'AuthException: statusCode=${error.statusCode} code=${error.code}',
+      error: error.message,
+      stackTrace: stackTrace,
     );
   } else {
-    debugPrint('Auth error (${error.runtimeType}): $error');
-  }
-
-  if (stackTrace != null) {
-    debugPrint('$stackTrace');
+    SecureLog.error(
+      'Auth error (${error.runtimeType})',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -97,7 +100,6 @@ String authErrorMessage(Object error) {
   return 'تعذّر إكمال العملية. حاول مرة أخرى.';
 }
 
-/// User-facing hint aligned with Supabase signup password policy.
 const weakPasswordMessage =
     'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، '
     'حرفاً كبيراً وصغيراً، رقماً، ورمزاً خاصاً';

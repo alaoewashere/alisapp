@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../models/rating.dart';
@@ -123,7 +123,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                 const SizedBox(height: 20),
                 Text(
                   'كيف كانت تجربتك؟',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
@@ -137,7 +137,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                 const SizedBox(height: 8),
                 Text(
                   widget.reviewedName,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textDark,
@@ -146,7 +146,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                 const SizedBox(height: 4),
                 Text(
                   widget.subtitle,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     color: AppColors.textMuted,
                   ),
@@ -191,7 +191,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     '$charCount/200',
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 11,
                       color: AppColors.textMuted,
                     ),
@@ -223,7 +223,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                           )
                         : Text(
                             'إرسال التقييم',
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.cairo(
                               fontWeight: FontWeight.w700,
                               fontSize: 15,
                             ),
@@ -234,7 +234,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                 Text(
                   'تقييماتك تساعد المجتمع على الثقة بالبائعين',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 12,
                     color: AppColors.textMuted,
                   ),

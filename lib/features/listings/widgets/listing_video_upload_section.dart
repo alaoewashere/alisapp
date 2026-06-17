@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -26,9 +26,9 @@ class ListingVideoUploadSection extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8F8F8),
+            color: AppColors.fieldCarbon,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFEEEEEE)),
+            border: Border.all(color: AppColors.borderLight),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,16 +37,16 @@ class ListingVideoUploadSection extends ConsumerWidget {
                 children: [
                   Icon(
                     canUpload ? Icons.videocam_outlined : Icons.lock_outline,
-                    color: canUpload ? AppColors.primary : AppColors.textMuted,
+                    color: canUpload ? AppColors.volt : AppColors.premiumGold,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'أضف فيديو توضيحي (حتى 60 ثانية)',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.sans(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF222222),
+                        color: AppColors.pureWhite,
                       ),
                     ),
                   ),
@@ -56,10 +56,12 @@ class ListingVideoUploadSection extends ConsumerWidget {
               Text(
                 canUpload
                     ? 'متاح لمشتركي Pro و Premium فقط'
-                    : 'ترقّ إلى Pro لإضافة فيديو',
-                style: GoogleFonts.cairo(
+                    : 'ترقّ إلى Pro 🔒',
+                style: AppFonts.sans(
                   fontSize: 12,
-                  color: AppColors.textMuted,
+                  color: canUpload
+                      ? AppColors.textMuted
+                      : AppColors.premiumGold.withValues(alpha: 0.85),
                 ),
               ),
               const SizedBox(height: 14),
@@ -67,7 +69,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
                 LinearProgressIndicator(
                   value: state.videoProcessingProgress,
                   backgroundColor: AppColors.borderLight,
-                  color: AppColors.primary,
+                  color: AppColors.volt,
                   minHeight: 6,
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -75,7 +77,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
                 Text(
                   'جاري معالجة الفيديو... ${(state.videoProcessingProgress * 100).round()}%',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     color: AppColors.textMuted,
                   ),
@@ -95,17 +97,17 @@ class ListingVideoUploadSection extends ConsumerWidget {
                       ? () => _pickVideo(context, ref, ImageSource.gallery)
                       : () => notifier.goToStep(state.packageStep),
                   icon: Icon(canUpload ? Icons.video_library_outlined : Icons.lock),
-                  label: Text(canUpload ? 'اختر فيديو' : 'ترقّ إلى Pro'),
+                  label: Text(canUpload ? 'اختر فيديو' : 'ترقّ إلى Pro 🔒'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: canUpload ? AppColors.volt : AppColors.premiumGold,
                     side: BorderSide(
                       color: canUpload
-                          ? AppColors.primary.withValues(alpha: 0.5)
+                          ? AppColors.volt.withValues(alpha: 0.45)
                           : AppColors.borderLight,
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                 ),
@@ -174,7 +176,7 @@ class _VideoPreview extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             child: Image.file(thumbnail, fit: BoxFit.cover),
           ),
           Center(
@@ -182,12 +184,12 @@ class _VideoPreview extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.85),
+                color: AppColors.volt.withValues(alpha: 0.9),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.play_arrow_rounded,
-                color: Colors.white,
+                color: AppColors.canvas,
                 size: 32,
               ),
             ),
@@ -203,7 +205,7 @@ class _VideoPreview extends StatelessWidget {
               ),
               child: Text(
                 durationLabel,
-                style: GoogleFonts.inter(
+                style: AppFonts.inter(
                   color: Colors.white,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/l10n/l10n_provider.dart';
 import '../../core/providers/locale_provider.dart';
+import '../../shared/widgets/app_back_button.dart';
 import '../../core/router/app_router.dart';
 
 class LanguageScreen extends ConsumerStatefulWidget {
@@ -19,7 +20,7 @@ class LanguageScreen extends ConsumerStatefulWidget {
 }
 
 class _LanguageScreenState extends ConsumerState<LanguageScreen> {
-  static const _pageBg = Color(0xFFF5F5F5);
+  static const _pageBg = AppColors.background;
   static const _titleColor = Color(0xFF111111);
   static const _subtitleColor = Color(0xFF555555);
   static const _hintColor = Color(0xFF888888);
@@ -74,21 +75,14 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
         appBar: widget.isOnboarding
             ? null
             : AppBar(
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.transparent,
                 elevation: 0,
                 scrolledUnderElevation: 0,
                 centerTitle: true,
-                leading: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: _titleColor,
-                    size: 20,
-                  ),
-                  onPressed: () => context.pop(),
-                ),
+                leading: AppBackButton(onPressed: () => context.pop()),
                 title: Text(
                   'اللغة',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: _titleColor,
@@ -107,7 +101,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                       Text(
                         'مرحباً بك في سيلو',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: _titleColor,
@@ -117,7 +111,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                       Text(
                         'اختر لغتك',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 18,
                           color: _subtitleColor,
                         ),
@@ -141,7 +135,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                 child: Text(
                   'يمكنك تغيير اللغة في أي وقت من الإعدادات',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 13,
                     color: _hintColor,
                     height: 1.4,
@@ -164,7 +158,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                     ),
                     child: Text(
                       _continueLabel,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -229,7 +223,7 @@ class _LanguageOptionTile extends StatelessWidget {
                   child: Text(
                     label,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 16,
                       fontWeight: selected ? FontWeight.bold : FontWeight.w600,
                       color: selected ? Colors.white : const Color(0xFF111111),

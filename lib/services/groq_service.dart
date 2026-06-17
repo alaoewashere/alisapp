@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../core/config/groq_config.dart';
+import '../core/supabase/supabase_client.dart';
+import '../core/utils/secure_log.dart';
 import '../core/utils/vehicle_listing_utils.dart';
 import '../models/price_estimate.dart';
 import '../shared/models/category_model.dart';
@@ -102,16 +101,13 @@ class GroqServiceException implements Exception {
   String toString() => message;
 }
 
-/// Calls Groq chat completions for Iraqi car price estimation.
+/// Calls the authenticated groq-proxy edge function for Iraqi car price estimation.
 class GroqService {
-  GroqService({http.Client? client, String? apiKey})
-      : _client = client ?? http.Client(),
-        _apiKeyOverride = apiKey;
+  GroqService({SupabaseClient? client}) : _client = client ?? supabase;
 
-  static const _endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-  /// Groq decommissioned `llama3-70b-8192`; use the official 70B replacement.
+  final SupabaseClient _client;
   static const _model = 'llama-3.3-70b-versatile';
-  static const _timeout = Duration(seconds: 10);
+  static const _timeout = Duration(seconds: 25);
 
   static const _systemPrompt = '''
 أنت خبير في أسعار السيارات في السوق العراقي. تفهم أسعار الدينار العراقي وظروف السوق المحلية في بغداد والمحافظات العراقية.
@@ -123,16 +119,12 @@ class GroqService {
 - reasoning: جملة أو جملتان بالعربية تشرح التقدير
 ''';
 
-  final http.Client _client;
-  final String? _apiKeyOverride;
-
   Future<PriceEstimate> estimatePrice(CarPriceEstimateInput input) async {
-    final apiKey = (_apiKeyOverride ?? GroqConfig.apiKey).trim();
-    if (apiKey.isEmpty) {
-      throw const GroqServiceException('Groq API key is not configured');
+    if (_client.auth.currentSession == null) {
+      throw const GroqServiceException('يجب تسجيل الدخول لاستخدام المُقدّر');
     }
 
-    final body = jsonEncode({
+    final body = {
       'model': _model,
       'temperature': 0.2,
       'response_format': {'type': 'json_object'},
@@ -140,45 +132,33 @@ class GroqService {
         {'role': 'system', 'content': _systemPrompt},
         {'role': 'user', 'content': input.toUserMessage()},
       ],
-    });
+    };
 
-    if (kDebugMode) {
-      debugPrint('GroqService: requesting price estimate');
-    }
+    SecureLog.debug('GroqService: requesting price estimate via groq-proxy');
 
-    http.Response response;
+    FunctionResponse response;
     try {
-      response = await _client
-          .post(
-            Uri.parse(_endpoint),
-            headers: {
-              'Authorization': 'Bearer $apiKey',
-              'Content-Type': 'application/json',
-            },
-            body: body,
-          )
+      response = await _client.functions
+          .invoke('groq-proxy', body: body)
           .timeout(_timeout);
     } on TimeoutException {
       throw const GroqServiceException('Groq request timed out');
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint('GroqService: request failed: $e');
-      }
+      SecureLog.error('GroqService: request failed', error: e);
       throw GroqServiceException('Groq request failed: $e');
     }
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      if (kDebugMode) {
-        debugPrint(
-          'GroqService: API error ${response.statusCode}: ${response.body}',
-        );
-      }
+    if (response.status < 200 || response.status >= 300) {
+      SecureLog.error(
+        'GroqService: proxy error ${response.status}',
+        error: response.data,
+      );
       throw GroqServiceException(
-        'Groq API error (${response.statusCode})',
+        'Groq API error (${response.status})',
       );
     }
 
-    final decoded = jsonDecode(response.body);
+    final decoded = response.data;
     if (decoded is! Map<String, dynamic>) {
       throw const GroqServiceException('Invalid Groq response shape');
     }

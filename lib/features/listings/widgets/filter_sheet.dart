@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_governorates.dart';
 import '../../../core/utils/arabic_number.dart';
+import '../../../core/utils/digit_input_formatter.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/filter_model.dart';
 import '../../home/providers/home_provider.dart';
@@ -236,7 +237,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         child: TextField(
                           controller: _minController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          inputFormatters: [appDigitsOnly()],
+                          style: theme.textTheme.bodyLarge,
                           decoration: const InputDecoration(
                             labelText: 'من',
                             suffixText: 'د.ع',
@@ -249,7 +251,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         child: TextField(
                           controller: _maxController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          inputFormatters: [appDigitsOnly()],
+                          style: theme.textTheme.bodyLarge,
                           decoration: const InputDecoration(
                             labelText: 'إلى',
                             suffixText: 'د.ع',

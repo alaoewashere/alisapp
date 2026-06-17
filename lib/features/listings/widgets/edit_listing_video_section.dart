@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../providers/post_listing_provider.dart';
@@ -36,7 +36,7 @@ class EditListingVideoSection extends ConsumerWidget {
         children: [
           Text(
             'الفيديو',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
@@ -76,7 +76,7 @@ class EditListingVideoSection extends ConsumerWidget {
             const SizedBox(height: 8),
             Text(
               'الفيديو الحالي — يمكنك استبداله بفيديو جديد أدناه',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 13,
                 color: AppColors.textMuted,
               ),

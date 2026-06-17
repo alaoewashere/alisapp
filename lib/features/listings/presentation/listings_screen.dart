@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/utils/category_tree.dart';
 import '../../home/providers/home_provider.dart';
 import '../../home/widgets/listing_card.dart';
-import '../../listings/data/categories_repository.dart';
+import '../providers/post_listing_provider.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
@@ -38,15 +40,12 @@ class ListingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(onPressed: () => context.pop()),
+        leading: AppBackButton(onPressed: () => context.pop()),
         title: isAll
             ? const Text('جميع الإعلانات')
-            : titleAsync?.when(
-                  data: (name) => Text(name ?? 'الإعلانات'),
-                  loading: () => const Text('الإعلانات'),
-                  error: (_, _) => const Text('الإعلانات'),
-                ) ??
-                const Text('الإعلانات'),
+            : Text(
+                titleAsync ?? 'الإعلانات',
+              ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -105,9 +104,10 @@ class ListingsScreen extends ConsumerWidget {
   }
 }
 
-final _categoryTitleProvider =
-    FutureProvider.family<String?, int>((ref, categoryId) async {
-  final category =
-      await ref.watch(categoriesRepositoryProvider).fetchById(categoryId);
-  return category?.nameAr;
+final _categoryTitleProvider = Provider.family<String?, int>((ref, categoryId) {
+  final allAsync = ref.watch(allCategoriesProvider);
+  return allAsync.maybeWhen(
+    data: (all) => categoryById(categoryId, all)?.nameAr,
+    orElse: () => null,
+  );
 });

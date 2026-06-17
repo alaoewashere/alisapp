@@ -3,12 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/widgets/custom_button.dart';
+import '../constants/post_listing_step_labels.dart';
 import '../presentation/car_paint_condition_screen.dart';
+import '../constants/listing_package_config.dart';
 import '../providers/post_listing_provider.dart';
+import '../../../shared/widgets/app_back_button.dart';
+import '../widgets/listing_publish_success_dialog.dart';
 import '../widgets/steps/step1_category.dart';
 import '../widgets/steps/step2_details.dart';
 import '../widgets/steps/step3_location.dart';
@@ -26,17 +31,17 @@ class PostListingScreen extends ConsumerWidget {
     final notifier = ref.read(postListingProvider.notifier);
 
     return Scaffold(
-      backgroundColor:
-          state.currentStep == state.photosStep ? Colors.white : null,
+      backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        title: const Text('نشر إعلان'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+        title: Text(postListingStepAppBarTitle(state.currentStep)),
+        leading: AppBackButton(
           onPressed: state.isLoading
               ? null
               : () {
                   if (state.currentStep > 1) {
                     notifier.previousStep();
+                  } else if (state.canPopCategoryDrill) {
+                    notifier.popCategoryDrillLevel();
                   } else if (context.canPop()) {
                     context.pop();
                   } else {
@@ -139,10 +144,38 @@ class PostListingScreen extends ConsumerWidget {
       return;
     }
 
+    final state = ref.read(postListingProvider);
+    if (state.standardRequiresPaidPublish) {
+      final price = ListingPackageConfig.paidStandardPriceIqd;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('تأكيد رسوم الإعلان'),
+          content: Text(
+            'لقد استخدمت إعلانيك المجانيين هذا الشهر. سيتم تحصيل رسوم الإعلان العادي '
+            '(${formatIqd(price)}) لهذا الإعلان.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('إلغاء'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text('تأكيد ودفع ${formatIqd(price)}'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+
     final id = await ref.read(postListingProvider.notifier).publishListing();
     if (!context.mounted) return;
 
     if (id != null) {
+      await showListingPublishSuccessDialog(context);
+      if (!context.mounted) return;
       ref.read(postListingProvider.notifier).reset();
       context.go('/listing/$id');
     }
@@ -300,12 +333,12 @@ class _BottomActions extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: canProceed && !state.isLoading
                         ? AppColors.primary
-                        : const Color(0xFFCCCCCC),
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: const Color(0xFFCCCCCC),
-                    disabledForegroundColor: Colors.white,
+                        : AppColors.surfaceMuted,
+                    foregroundColor: AppColors.canvas,
+                    disabledBackgroundColor: AppColors.surfaceMuted,
+                    disabledForegroundColor: AppColors.textMuted,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(28),
                     ),
                   ),
                   child: state.isLoading
@@ -314,7 +347,7 @@ class _BottomActions extends StatelessWidget {
                           height: 22,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.canvas,
                           ),
                         )
                       : Text(

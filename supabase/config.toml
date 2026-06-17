@@ -391,6 +391,12 @@ verify_jwt = false
 [functions.verify-whatsapp-otp]
 verify_jwt = false
 
+[functions.groq-proxy]
+verify_jwt = true
+
+[functions.verify-purchase]
+verify_jwt = true
+
 [analytics]
 enabled = true
 port = 54327

@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/models/listing_model.dart';
 import '../../../../shared/models/vehicle_listing_metadata.dart';
 import '../../constants/vehicle_listing_options.dart';
+import '../../constants/listing_form_options.dart';
 import '../../providers/post_listing_provider.dart';
 import '../category_path_breadcrumb.dart';
 import '../vehicle_color_picker.dart';
+import '../vehicle_form_field_card.dart';
 import '../vehicle_specs_checklist.dart';
 import '../vehicle_price_estimator_section.dart';
 import 'step2_form_common.dart';
 import 'step2_title_description_fields.dart';
-
-const _vehicleFormCardFill = Color(0xFFF8F8F8);
-const _vehicleFormDivider = Color(0xFFE5E5EA);
 
 class Step2VehicleDetails extends ConsumerStatefulWidget {
   const Step2VehicleDetails({super.key});
@@ -108,72 +108,58 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
               ),
             ),
             const SizedBox(height: 12),
-            _VehicleSettingsCard(
-              children: [
-                _VehicleTextRow(
-                  label: 'الفئة',
-                  controller: _trimController,
-                  hint: 'مثال: SE',
-                  textDirection: TextDirection.rtl,
-                  onChanged: (v) => _updateVehicle((d) => d.copyWith(trim: v)),
-                ),
-                _VehicleTextRow(
-                  label: 'المسافة',
-                  controller: _mileageController,
-                  hint: '0',
-                  textDirection: TextDirection.ltr,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  unitLabel: vehicle.mileageUnit.labelAr,
-                  onUnitTap: () {
-                    final next = vehicle.mileageUnit == MileageUnit.km
-                        ? MileageUnit.mile
-                        : MileageUnit.km;
-                    _updateVehicle((d) => d.copyWith(mileageUnit: next));
-                  },
-                  onChanged: (v) {
-                    final parsed = int.tryParse(v);
-                    _updateVehicle(
-                      (d) => parsed == null
-                          ? d.copyWith(clearMileage: true)
-                          : d.copyWith(mileage: parsed),
-                    );
-                  },
-                  showDivider: true,
-                ),
-              ],
+            _VehicleTextFieldCard(
+              label: 'الفئة',
+              controller: _trimController,
+              hint: 'مثال: SE',
+              textDirection: TextDirection.rtl,
+              onChanged: (v) => _updateVehicle((d) => d.copyWith(trim: v)),
             ),
-            const SizedBox(height: 20),
-            _VehicleSettingsCard(
-              children: [
-                _VehicleTextRow(
-                  label: 'المحرك',
-                  controller: _engineController,
-                  hint: '2.0T',
-                  textDirection: TextDirection.ltr,
-                  onChanged: (v) => _updateVehicle((d) => d.copyWith(engine: v)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: _vehicleFormDivider,
-                      ),
-                      Step2LabeledDropdown(
-                        label: 'الأسطوانات',
-                        value: vehicle.cylinders,
-                        items: VehicleListingOptions.cylinderOptions,
-                        onChanged: (v) =>
-                            _updateVehicle((d) => d.copyWith(cylinders: v)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            const SizedBox(height: 12),
+            _VehicleTextFieldCard(
+              label: 'المسافة',
+              controller: _mileageController,
+              hint: '0',
+              textDirection: TextDirection.ltr,
+              keyboardType: TextInputType.number,
+              inputFormatters: [appDigitsOnly()],
+              unitLabel: vehicle.mileageUnit.labelAr,
+              onUnitTap: () {
+                final next = vehicle.mileageUnit == MileageUnit.km
+                    ? MileageUnit.mile
+                    : MileageUnit.km;
+                _updateVehicle((d) => d.copyWith(mileageUnit: next));
+              },
+              onChanged: (v) {
+                final parsed = int.tryParse(v);
+                _updateVehicle(
+                  (d) => parsed == null
+                      ? d.copyWith(clearMileage: true)
+                      : d.copyWith(mileage: parsed),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            _VehicleYearPickerField(
+              year: vehicle.year,
+              onChanged: (year) =>
+                  _updateVehicle((d) => d.copyWith(year: year)),
+            ),
+            const SizedBox(height: 12),
+            _VehicleTextFieldCard(
+              label: 'المحرك',
+              controller: _engineController,
+              hint: '2.0T',
+              textDirection: TextDirection.ltr,
+              onChanged: (v) => _updateVehicle((d) => d.copyWith(engine: v)),
+            ),
+            const SizedBox(height: 12),
+            _VehiclePickerField(
+              label: 'الأسطوانات',
+              value: vehicle.cylinders,
+              items: VehicleListingOptions.cylinderOptions,
+              onChanged: (v) =>
+                  _updateVehicle((d) => d.copyWith(cylinders: v)),
             ),
             const SizedBox(height: 24),
             Text('التفاصيل', style: theme.textTheme.titleSmall),
@@ -269,7 +255,7 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [appDigitsOnly()],
               textDirection: TextDirection.ltr,
               decoration: const InputDecoration(
                 labelText: 'السعر *',
@@ -301,31 +287,33 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
   }
 }
 
-class _VehicleSettingsCard extends StatelessWidget {
-  const _VehicleSettingsCard({required this.children});
+class _VehicleFieldCard extends StatelessWidget {
+  const _VehicleFieldCard({required this.child});
 
-  final List<Widget> children;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => VehicleFormFieldCard(child: child);
+}
+
+class _VehicleFieldLabel extends StatelessWidget {
+  const _VehicleFieldLabel({required this.label});
+
+  final String label;
+
+  static const _style = TextStyle(
+    fontSize: 12,
+    color: AppColors.textMuted,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: _vehicleFormCardFill,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: children,
-        ),
-      ),
-    );
+    return Text(label, style: _style);
   }
 }
 
-class _VehicleTextRow extends StatelessWidget {
-  const _VehicleTextRow({
+class _VehicleTextFieldCard extends StatelessWidget {
+  const _VehicleTextFieldCard({
     required this.label,
     required this.controller,
     required this.hint,
@@ -335,7 +323,6 @@ class _VehicleTextRow extends StatelessWidget {
     this.inputFormatters,
     this.unitLabel,
     this.onUnitTap,
-    this.showDivider = false,
   });
 
   final String label;
@@ -347,17 +334,10 @@ class _VehicleTextRow extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? unitLabel;
   final VoidCallback? onUnitTap;
-  final bool showDivider;
 
-  static const _labelStyle = TextStyle(
+  static const _valueStyle = TextStyle(
     fontSize: 15,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textDark,
-  );
-
-  static const _fieldStyle = TextStyle(
-    fontSize: 15,
-    color: AppColors.textDark,
+    color: AppColors.pureWhite,
   );
 
   static const _hintStyle = TextStyle(
@@ -367,44 +347,255 @@ class _VehicleTextRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (showDivider)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Divider(height: 1, thickness: 1, color: _vehicleFormDivider),
-          ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(label, style: _labelStyle),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                textDirection: textDirection,
-                keyboardType: keyboardType,
-                inputFormatters: inputFormatters,
-                style: _fieldStyle,
-                textAlign: TextAlign.left,
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: _hintStyle,
-                  isDense: true,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
+    return _VehicleFieldCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _VehicleFieldLabel(label: label),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  textDirection: textDirection,
+                  keyboardType: keyboardType,
+                  inputFormatters: inputFormatters,
+                  style: _valueStyle,
+                  cursorColor: AppColors.volt,
+                  textAlign: TextAlign.left,
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: _hintStyle,
+                    filled: true,
+                    fillColor: AppColors.fieldCarbon,
+                    isDense: true,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 0,
+                      vertical: 4,
+                    ),
+                  ),
+                  onChanged: onChanged,
                 ),
-                onChanged: onChanged,
+              ),
+              if (unitLabel != null && onUnitTap != null) ...[
+                const SizedBox(width: 8),
+                _VehicleUnitPill(label: unitLabel!, onTap: onUnitTap!),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VehicleYearPickerField extends StatelessWidget {
+  const _VehicleYearPickerField({
+    required this.year,
+    required this.onChanged,
+  });
+
+  final int? year;
+  final ValueChanged<int?> onChanged;
+
+  static List<int> _yearOptions() {
+    final currentYear = DateTime.now().year;
+    return List.generate(
+      currentYear - 1970 + 1,
+      (index) => currentYear - index,
+    );
+  }
+
+  Future<void> _openPicker(BuildContext context) async {
+    final options = _yearOptions();
+    final labels = options.map((y) => y.toString()).toList();
+    final picked = await showStep2PickerSheet(
+      context: context,
+      title: step2PickerSheetTitle('السنة'),
+      options: labels,
+      selected: year?.toString(),
+    );
+    if (picked == null) return;
+    onChanged(int.tryParse(picked));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final displayValue = year != null ? year.toString() : 'اختر';
+
+    return _VehicleFieldCard(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _openPicker(context),
+          child: Row(
+            children: [
+              const _VehicleFieldLabel(label: 'السنة'),
+              const Spacer(),
+              Text(
+                displayValue,
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: AppColors.pureWhite,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.chevron_left_rounded,
+                size: 22,
+                color: AppColors.textMuted,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VehiclePickerField extends StatefulWidget {
+  const _VehiclePickerField({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String? value;
+  final List<String> items;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  State<_VehiclePickerField> createState() => _VehiclePickerFieldState();
+}
+
+class _VehiclePickerFieldState extends State<_VehiclePickerField> {
+  late final TextEditingController _otherController;
+  bool _otherExpanded = false;
+
+  List<String> get _allItems => ListingFormOptions.withOther(widget.items);
+
+  bool get _showOtherField =>
+      _otherExpanded ||
+      ListingFormOptions.isCustomValue(widget.value, widget.items);
+
+  String get _displayValue {
+    if (_showOtherField) {
+      return widget.value?.trim().isNotEmpty == true
+          ? widget.value!.trim()
+          : 'اختر';
+    }
+    if (widget.value != null && widget.value!.isNotEmpty) {
+      return widget.value!;
+    }
+    return 'اختر';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _otherExpanded = ListingFormOptions.isCustomValue(
+      widget.value,
+      widget.items,
+    );
+    _otherController = TextEditingController(
+      text: ListingFormOptions.isCustomValue(widget.value, widget.items)
+          ? widget.value!.trim()
+          : '',
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _VehiclePickerField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.value != oldWidget.value) {
+      final isCustom = ListingFormOptions.isCustomValue(
+        widget.value,
+        widget.items,
+      );
+      if (isCustom) _otherExpanded = true;
+      final text = isCustom ? widget.value!.trim() : '';
+      if (_otherController.text != text) {
+        _otherController.text = text;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _otherController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _openPicker() async {
+    final picked = await showStep2PickerSheet(
+      context: context,
+      title: step2PickerSheetTitle(widget.label),
+      options: _allItems,
+      selected: _showOtherField ? ListingFormOptions.other : widget.value,
+    );
+    if (!mounted || picked == null) return;
+
+    if (picked == ListingFormOptions.other) {
+      setState(() => _otherExpanded = true);
+      _otherController.clear();
+      widget.onChanged(null);
+      return;
+    }
+
+    setState(() => _otherExpanded = false);
+    widget.onChanged(picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _VehicleFieldCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _openPicker,
+              child: Row(
+                children: [
+                  _VehicleFieldLabel(label: widget.label),
+                  const Spacer(),
+                  Text(
+                    _displayValue,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: AppColors.pureWhite,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.chevron_left_rounded,
+                    size: 22,
+                    color: AppColors.textMuted,
+                  ),
+                ],
               ),
             ),
-            if (unitLabel != null && onUnitTap != null) ...[
-              const SizedBox(width: 8),
-              _VehicleUnitPill(label: unitLabel!, onTap: onUnitTap!),
-            ],
+          ),
+          if (_showOtherField) ...[
+            const SizedBox(height: 12),
+            Step2OtherTextField(
+              controller: _otherController,
+              label: 'حدد القيمة',
+              onChanged: (value) {
+                final trimmed = value.trim();
+                widget.onChanged(trimmed.isEmpty ? null : trimmed);
+              },
+            ),
           ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -418,7 +609,7 @@ class _VehicleUnitPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.surfaceMuted,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -427,14 +618,14 @@ class _VehicleUnitPill extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: _vehicleFormDivider),
+            border: Border.all(color: AppColors.glassBorder),
           ),
           child: Text(
             label,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textDark,
+              color: AppColors.pureWhite,
             ),
           ),
         ),

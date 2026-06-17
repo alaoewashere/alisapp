@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/digit_input_formatter.dart';
 
 class OtpFourBoxInput extends StatefulWidget {
   const OtpFourBoxInput({super.key, required this.controller});
@@ -91,7 +92,7 @@ class OtpFourBoxInputState extends State<OtpFourBoxInput>
                 keyboardType: TextInputType.number,
                 maxLength: length,
                 autofocus: true,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                inputFormatters: [appDigitsOnly(maxLength: length)],
                 decoration: const InputDecoration(counterText: ''),
               ),
             ),
@@ -111,16 +112,16 @@ class OtpFourBoxInputState extends State<OtpFourBoxInput>
                     height: 68,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.fieldCarbon,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: filled ? AppColors.primary : const Color(0xFFE0E0E0),
+                        color: filled ? AppColors.volt : AppColors.glassBorder,
                         width: 1.5,
                       ),
                       boxShadow: filled
                           ? [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.18),
+                                color: AppColors.volt.withValues(alpha: 0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -129,10 +130,10 @@ class OtpFourBoxInputState extends State<OtpFourBoxInput>
                     ),
                     child: Text(
                       char,
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF111111),
+                        color: AppColors.pureWhite,
                       ),
                     ),
                   ),

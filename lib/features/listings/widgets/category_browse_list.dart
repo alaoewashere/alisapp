@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
+import '../../../core/constants/category_asset_icons.dart';
 import '../../../core/theme/app_decorations.dart';
+import '../../../shared/widgets/app_bottom_nav.dart';
+import '../../../shared/widgets/category_asset_image.dart';
 import '../../../shared/models/category_model.dart';
 
 class CategoryBrowseList extends StatelessWidget {
@@ -21,7 +24,12 @@ class CategoryBrowseList extends StatelessWidget {
     final items = buildBrowseCategoryItems(categories);
 
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        8,
+        16,
+        AppBottomNavLayout.scrollBottomPadding(context),
+      ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 14,
@@ -52,6 +60,7 @@ class _BrowseCategoryBentoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = item.style;
+    final assetPath = CategoryAssetIcons.displayAssetForSlug(style.slug);
 
     return Material(
       color: Colors.transparent,
@@ -60,12 +69,12 @@ class _BrowseCategoryBentoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.fieldCarbon,
             borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.glassBorder),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x08000000),
+                color: Color(0x40000000),
                 blurRadius: 12,
                 offset: Offset(0, 4),
               ),
@@ -80,11 +89,24 @@ class _BrowseCategoryBentoCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: style.color.withValues(alpha: 0.12),
+                    color: assetPath == null
+                        ? style.color.withValues(alpha: 0.12)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(style.icon, size: 26, color: style.color),
+                  child: assetPath != null
+                      ? CategoryAssetImage(
+                          assetPath: assetPath,
+                          size: 44,
+                          showPlate: false,
+                          fallback: Icon(
+                            style.icon,
+                            size: 26,
+                            color: style.color,
+                          ),
+                        )
+                      : Icon(style.icon, size: 26, color: style.color),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -92,7 +114,7 @@ class _BrowseCategoryBentoCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
@@ -106,7 +128,7 @@ class _BrowseCategoryBentoCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 11,
                       color: AppColors.textMuted,
                       height: 1.35,
@@ -128,7 +150,12 @@ class CategoryBrowseListShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        8,
+        16,
+        AppBottomNavLayout.scrollBottomPadding(context),
+      ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 14,
@@ -138,9 +165,9 @@ class CategoryBrowseListShimmer extends StatelessWidget {
       itemCount: 8,
       itemBuilder: (_, _) => Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.fieldCarbon,
           borderRadius: BorderRadius.circular(AppDecorations.cardRadius),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.glassBorder),
         ),
       ),
     );

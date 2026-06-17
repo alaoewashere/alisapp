@@ -1,6 +1,0 @@
-{
-  "name": "Sello Redesign Studio",
-  "description": "An interactive layout planner, custom prompt generator, and design system blueprint to overhaul your Flutter marketplace app into a premium aesthetic.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

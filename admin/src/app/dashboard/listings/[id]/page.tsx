@@ -7,14 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActionDialog } from "@/components/ui/action-dialog";
 import { Thumbnail } from "@/components/ui/thumbnail";
+import { ReportStatusBadge } from "@/components/ui/status-badge";
 import {
-  AvailabilityBadge,
-  ListingStatusBadge,
-  ReportStatusBadge,
-} from "@/components/ui/status-badge";
-import {
-  FlagSwitch,
+  ListingStatusChips,
+  PackageTierControl,
   StatusControl,
+  type ListingPackageTier,
 } from "@/app/dashboard/listings/[id]/listing-controls";
 import { ResolveReportButton } from "@/app/dashboard/reports/report-actions";
 import { deleteListing, setListingStatus, warnSeller } from "@/app/actions/listings";
@@ -60,6 +58,7 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
   });
   const sellerName =
     listing.seller?.full_name || listing.seller?.display_name || "بائع غير معروف";
+  const listingPackage = packageTierFromListing(listing);
 
   return (
     <div className="space-y-4">
@@ -135,23 +134,25 @@ export default async function ListingDetailPage({ params }: { params: { id: stri
 
         {/* Right: controls */}
         <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>التحكم</CardTitle>
+          <Card className="border-white/10 bg-[#18181A] text-white shadow-none">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-white">التحكم</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">حالة المراجعة</span>
+            <CardContent className="space-y-5 text-white">
+              <div className="space-y-2">
+                <span className="text-sm font-bold text-white">حالة المراجعة</span>
                 <StatusControl id={listing.id} status={listing.status} />
               </div>
-              <div className="flex flex-wrap gap-2">
-                <ListingStatusBadge status={listing.status} />
-                <AvailabilityBadge availability={listing.availability} />
-                {listing.is_featured && <Badge>مميز</Badge>}
+              <ListingStatusChips
+                status={listing.status}
+                availability={listing.availability}
+                isFeatured={listing.is_featured}
+              />
+              <hr className="border-white/10" />
+              <div className="space-y-3">
+                <span className="text-sm font-bold text-white">باقة الإعلان</span>
+                <PackageTierControl id={listing.id} initialPackage={listingPackage} />
               </div>
-              <hr className="border-border" />
-              <FlagSwitch id={listing.id} flag="is_featured" initial={listing.is_featured} label="إعلان مميز" />
-              <FlagSwitch id={listing.id} flag="is_boosted" initial={listing.is_boosted} label="إعلان مُروَّج" />
             </CardContent>
           </Card>
 
@@ -273,4 +274,12 @@ function Detail({ label, value }: { label: string; value: string }) {
       <p className="font-medium text-foreground">{value}</p>
     </div>
   );
+}
+
+function packageTierFromListing(listing: ListingDetail): ListingPackageTier {
+  const meta = listing.metadata as Record<string, unknown> | null;
+  const pkg = meta?.listing_package;
+  if (listing.is_featured || pkg === "premium") return "premium";
+  if (listing.is_boosted || pkg === "pro") return "pro";
+  return "standard";
 }

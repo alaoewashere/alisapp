@@ -1,6 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:video_player/video_player.dart';
 
 import '../core/constants/app_colors.dart';
@@ -119,7 +119,7 @@ class _ListingVideoPlayerState extends State<ListingVideoPlayer> {
           children: [
             Text(
               'تعذّر تحميل الفيديو',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 color: AppColors.textMuted,
                 fontSize: 14,
               ),
@@ -189,7 +189,7 @@ class _ListingVideoPlayerState extends State<ListingVideoPlayer> {
             ),
             child: Text(
               widget.duration,
-              style: GoogleFonts.inter(
+              style: AppFonts.inter(
                 color: Colors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,

@@ -81,4 +81,19 @@ void main() {
       expect(_listing().isStandard, isTrue);
     });
   });
+
+  group('ListingModel moderation', () {
+    test('pending listings disable owner actions', () {
+      final pending = _listing().copyWith(
+        moderationStatus: ListingModerationStatus.pending,
+      );
+      final approved = pending.copyWith(
+        moderationStatus: ListingModerationStatus.approved,
+      );
+
+      expect(pending.isPendingModeration, isTrue);
+      expect(pending.isOwnerActionsEnabled, isFalse);
+      expect(approved.isOwnerActionsEnabled, isTrue);
+    });
+  });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/supabase/public_profiles_query.dart';
 import '../core/supabase/supabase_client.dart';
 import '../models/rating.dart';
 
@@ -21,7 +22,6 @@ class RatingService {
     stars,
     review_text,
     created_at,
-    reviewer:profiles!ratings_reviewer_id_fkey(full_name, display_name, avatar_seed),
     listing:listings(title_ar)
   ''';
 
@@ -106,26 +106,39 @@ class RatingService {
         .order('created_at', ascending: false)
         .range(offset, offset + limit - 1);
 
-    return (data as List)
-        .map((row) => Rating.fromJson(Map<String, dynamic>.from(row as Map)))
+    final rows = (data as List)
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList();
+
+    final reviewerIds =
+        rows.map((r) => r['reviewer_id'] as String).toSet().toList();
+    if (reviewerIds.isNotEmpty) {
+      final reviewers = await fetchPublicProfiles(_client, reviewerIds);
+      final byId = <String, Map<String, dynamic>>{
+        for (final map in reviewers) map['id'] as String: map,
+      };
+      for (final row in rows) {
+        row['reviewer'] = byId[row['reviewer_id'] as String];
+      }
+    }
+
+    return rows
+        .map((row) => Rating.fromJson(row))
         .toList();
   }
 
   Future<RatingBreakdown> getProfileRatingBreakdown(String profileId) async {
-    final profile = await _client
-        .from('profiles')
-        .select('avg_rating, rating_count')
-        .eq('id', profileId)
-        .maybeSingle();
+    final rows = await fetchPublicProfiles(_client, [profileId]);
+    final profile = rows.isEmpty ? null : rows.first;
 
     final counts = <int, int>{for (var i = 1; i <= 5; i++) i: 0};
-    final rows = await _client
+    final ratingRows = await _client
         .from('ratings')
         .select('stars')
         .eq('reviewed_id', profileId)
         .eq('hidden', false);
 
-    for (final row in rows as List) {
+    for (final row in ratingRows as List) {
       final stars = (row['stars'] as num).toInt();
       counts[stars] = (counts[stars] ?? 0) + 1;
     }

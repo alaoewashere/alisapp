@@ -110,6 +110,15 @@ class EditListingNotifier extends Notifier<EditListingState> {
         return;
       }
 
+      final currentUserId = ref.read(currentUserIdProvider);
+      if (currentUserId == null || listing.userId != currentUserId) {
+        state = state.copyWith(
+          loading: false,
+          error: 'لا يمكنك تعديل هذا الإعلان',
+        );
+        return;
+      }
+
       final all = await ref.read(allCategoriesProvider.future);
       CategoryModel? leaf;
       for (final c in all) {

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/preset_avatars.dart';
@@ -48,7 +48,7 @@ class ProfileAvatarPicker extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           'اختر صورتك',
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 13,
             color: AppColors.textMuted,
           ),
@@ -95,7 +95,7 @@ class _SectionDivider extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             label,
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: AppColors.textMuted,

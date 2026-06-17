@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/vehicle_listing_utils.dart';
 import '../../../models/price_estimate.dart';
@@ -13,7 +14,9 @@ import '../../../shared/models/category_model.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/models/vehicle_listing_metadata.dart';
 
-final groqServiceProvider = Provider<GroqService>((ref) => GroqService());
+final groqServiceProvider = Provider<GroqService>((ref) {
+  return GroqService(client: ref.watch(supabaseClientProvider));
+});
 
 /// Optional AI price helper shown on the automobile car details step.
 class VehiclePriceEstimatorSection extends ConsumerStatefulWidget {
@@ -69,7 +72,7 @@ class _VehiclePriceEstimatorSectionState
         SnackBar(
           content: Text(
             'تعذّر تقدير السعر، حاول مرة أخرى',
-            style: GoogleFonts.cairo(),
+            style: AppFonts.cairo(),
             textAlign: TextAlign.right,
           ),
           behavior: SnackBarBehavior.floating,
@@ -108,28 +111,22 @@ class _EstimatorPromptButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.primary.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(12),
+      color: AppColors.volt,
+      borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.25),
-            ),
-          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 '✨ احسب السعر المقترح',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: AppColors.canvas,
                 ),
               ),
             ],
@@ -199,7 +196,7 @@ class _EstimatorResultCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'تقدير الذكاء الاصطناعي',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
@@ -214,7 +211,7 @@ class _EstimatorResultCard extends StatelessWidget {
                 ),
                 child: Text(
                   _confidenceLabel,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: _confidenceColor,
@@ -227,7 +224,7 @@ class _EstimatorResultCard extends StatelessWidget {
           Text(
             '${arabicNumber(estimate.minPrice)} — ${arabicNumber(estimate.maxPrice)} د.ع',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: AppFonts.inter(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: AppColors.primary,
@@ -238,7 +235,7 @@ class _EstimatorResultCard extends StatelessWidget {
             estimate.reasoning,
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 12,
               height: 1.45,
               color: AppColors.textMuted,
@@ -248,7 +245,7 @@ class _EstimatorResultCard extends StatelessWidget {
           Text(
             'هذا تقدير تقريبي وليس سعراً نهائياً',
             textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 10,
               color: AppColors.textMuted.withValues(alpha: 0.9),
             ),

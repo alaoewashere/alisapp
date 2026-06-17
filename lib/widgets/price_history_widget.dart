@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/utils/arabic_number.dart';
@@ -17,20 +17,15 @@ class PriceHistoryWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final historyFuture =
-        ref.read(priceHistoryServiceProvider).getHistory(listingId);
+    final historyAsync = ref.watch(priceHistoryProvider(listingId));
 
-    return FutureBuilder<PriceHistoryData>(
-      future: historyFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+    return historyAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (data) {
+        if (!data.hasChanges || data.timeline.isEmpty) {
           return const SizedBox.shrink();
         }
-        final data = snapshot.data;
-        if (data == null || !data.hasChanges || data.timeline.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
         return _PriceHistoryCard(data: data);
       },
     );
@@ -50,9 +45,9 @@ class _PriceHistoryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.glassBorder),
         boxShadow: const [
           BoxShadow(
             color: AppColors.microShadow,
@@ -70,7 +65,7 @@ class _PriceHistoryCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'تاريخ السعر',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textDark,
@@ -139,7 +134,7 @@ class _SummaryBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textDark,
@@ -156,7 +151,7 @@ class _SummaryBanner extends StatelessWidget {
             ),
             child: Text(
               pctLabel,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: fg,
@@ -296,7 +291,7 @@ class _TimelineRow extends StatelessWidget {
                   if (point.isOriginal)
                     Text(
                       'السعر الأصلي',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 11,
                         color: AppColors.textMuted,
                       ),
@@ -304,7 +299,7 @@ class _TimelineRow extends StatelessWidget {
                   if (point.isCurrent)
                     Text(
                       'السعر الحالي',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
@@ -314,7 +309,7 @@ class _TimelineRow extends StatelessWidget {
                     children: [
                       Text(
                         formatIqd(point.price),
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textDark,
@@ -331,7 +326,7 @@ class _TimelineRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     formatListingPublicationDateAr(point.at),
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 12,
                       color: AppColors.textMuted,
                     ),
@@ -366,7 +361,7 @@ class _ChangePill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: color,

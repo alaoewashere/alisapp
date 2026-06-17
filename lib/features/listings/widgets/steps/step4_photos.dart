@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -18,7 +18,7 @@ class Step4Photos extends ConsumerWidget {
     final hasPhotos = state.images.isNotEmpty;
 
     return ColoredBox(
-      color: Colors.white,
+      color: AppColors.canvas,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -30,37 +30,37 @@ class Step4Photos extends ConsumerWidget {
                 children: [
                   Text(
                     'الصور',
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.sans(
                       fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF111111),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     'أضف حتى ${AppConstants.maxListingPhotos} صور — اسحب لإعادة الترتيب',
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.sans(
                       fontSize: 13,
-                      color: const Color(0xFF888888),
+                      color: AppColors.pureWhite.withValues(alpha: 0.6),
                       height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20),
+                      color: AppColors.volt,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       'الصورة الأولى هي الغلاف',
-                      style: GoogleFonts.cairo(
+                      style: AppFonts.sans(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.canvas,
                       ),
                     ),
                   ),
@@ -80,7 +80,7 @@ class Step4Photos extends ConsumerWidget {
                   SnackBar(
                     content: Text(
                       'الحد الأقصى ${AppConstants.maxListingPhotos} صور',
-                      style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+                      style: AppFonts.sans(fontWeight: FontWeight.w600),
                     ),
                   ),
                 );
@@ -91,24 +91,24 @@ class Step4Photos extends ConsumerWidget {
               Icon(
                 Icons.photo_library_outlined,
                 size: 64,
-                color: Colors.grey.shade300,
+                color: AppColors.textMuted.withValues(alpha: 0.45),
               ),
               const SizedBox(height: 12),
               Text(
                 'لم تضف أي صور بعد',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.cairo(
+                style: AppFonts.sans(
                   fontSize: 15,
-                  color: const Color(0xFFBBBBBB),
+                  color: AppColors.textMuted,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 'الصور تزيد من فرصة بيع إعلانك',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.cairo(
+                style: AppFonts.sans(
                   fontSize: 12,
-                  color: const Color(0xFFCCCCCC),
+                  color: AppColors.textMuted.withValues(alpha: 0.75),
                 ),
               ),
             ],
@@ -126,8 +126,8 @@ class Step4Photos extends ConsumerWidget {
                 child: Text(
                   state.error!,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
-                    color: Theme.of(context).colorScheme.error,
+                  style: AppFonts.sans(
+                    color: AppColors.rejected,
                     fontSize: 13,
                   ),
                 ),
@@ -149,16 +149,9 @@ class _PhotoTipsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: const Row(
         children: [
@@ -183,8 +176,8 @@ class _TipDivider extends StatelessWidget {
     return Container(
       width: 1,
       height: 36,
-      margin: EdgeInsets.symmetric(horizontal: 4),
-      color: const Color(0xFFEEEEEE),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      color: AppColors.borderLight,
     );
   }
 }
@@ -200,14 +193,14 @@ class _PhotoTip extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.textMuted),
         const SizedBox(height: 6),
         Text(
           label,
           textAlign: TextAlign.center,
-          style: GoogleFonts.cairo(
+          style: AppFonts.sans(
             fontSize: 11,
-            color: const Color(0xFF555555),
+            color: AppColors.textMuted,
             height: 1.2,
           ),
         ),

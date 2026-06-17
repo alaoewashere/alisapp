@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'sello_app_bar.dart';
+
 class WebViewScreen extends StatefulWidget {
   const WebViewScreen({
     super.key,
@@ -37,7 +39,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: SelloAppBar(
         title: Text(widget.title),
         bottom: _progress < 1
             ? PreferredSize(

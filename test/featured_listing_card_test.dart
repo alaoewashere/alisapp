@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:my_app/shared/models/listing_model.dart';
@@ -22,18 +23,24 @@ void main() {
     );
   }
 
-  group('FeaturedListingCard', () {
-    testWidgets('shows title, price, and مميز badge', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
+  Future<void> pumpCard(WidgetTester tester, ListingModel listing) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
           home: Scaffold(
             body: SizedBox(
               width: 160,
-              child: FeaturedListingCard(listing: sampleListing()),
+              child: FeaturedListingCard(listing: listing),
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
+
+  group('FeaturedListingCard', () {
+    testWidgets('shows title, price, and مميز badge', (tester) async {
+      await pumpCard(tester, sampleListing());
 
       expect(find.text('سيارة تويوتا كامري'), findsOneWidget);
       expect(find.textContaining('25,000,000'), findsOneWidget);
@@ -41,18 +48,30 @@ void main() {
     });
 
     testWidgets('shows placeholder when no image', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 160,
-              child: FeaturedListingCard(listing: sampleListing()),
-            ),
-          ),
-        ),
-      );
+      await pumpCard(tester, sampleListing());
 
       expect(find.byIcon(Icons.image_outlined), findsOneWidget);
+    });
+
+    testWidgets('shows favorite button on image', (tester) async {
+      await pumpCard(tester, sampleListing());
+
+      expect(find.byIcon(Icons.favorite_border), findsOneWidget);
+    });
+
+    testWidgets('long title uses two lines before ellipsis', (tester) async {
+      final listing = sampleListing().copyWith(
+        titleAr: 'sportage model 2025 prestige full option pack',
+      );
+
+      await pumpCard(tester, listing);
+
+      final titleText = tester.widget<Text>(
+        find.textContaining('sportage model 2025'),
+      );
+      expect(titleText.maxLines, 2);
+      expect(titleText.overflow, TextOverflow.ellipsis);
+      expect(titleText.textDirection, TextDirection.rtl);
     });
   });
 }

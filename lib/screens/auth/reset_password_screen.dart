@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
@@ -9,6 +9,8 @@ import '../../core/utils/result.dart';
 import '../../core/utils/validators.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/widgets/auth_form_styles.dart';
+import '../../shared/widgets/app_back_button.dart';
+import '../../features/auth/widgets/auth_hero_header.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -54,12 +56,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     switch (result) {
       case Success():
-        context.go(AppRoutes.phone);
+        context.go(AppRoutes.login);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'تم تغيير كلمة المرور',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
+              style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
         );
@@ -75,76 +77,79 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: true,
-          leading: IconButton(
-            onPressed: _submitting ? null : () => context.pop(),
-            icon: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Color(0xFF111111),
-              size: 20,
+        backgroundColor: AppColors.canvas,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AuthDarkHeader(
+              title: 'كلمة المرور الجديدة',
+              subtitle: 'أدخل كلمة مرور جديدة لحسابك',
+              leading: AppBackButton(
+                onPressed: _submitting ? null : () => context.pop(),
+              ),
+              titleStyle: AppFonts.sans(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppColors.pureWhite,
+                height: 1.2,
+              ),
             ),
-          ),
-          title: Text(
-            'كلمة المرور الجديدة',
-            style: GoogleFonts.cairo(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF111111),
-            ),
-          ),
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AuthPillField(
-                label: 'كلمة المرور الجديدة',
-                controller: _passwordController,
-                hintText: '••••••••',
-                obscureText: _obscurePassword,
-                suffixIcon: IconButton(
-                  onPressed: () =>
-                      setState(() => _obscurePassword = !_obscurePassword),
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: AppColors.textMuted,
-                  ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AuthPillField(
+                      label: 'كلمة المرور الجديدة',
+                      controller: _passwordController,
+                      hintText: '••••••••',
+                      obscureText: _obscurePassword,
+                      grouped: false,
+                      loginStyle: true,
+                      suffixIcon: IconButton(
+                        onPressed: () =>
+                            setState(() => _obscurePassword = !_obscurePassword),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: AppColors.pureWhite.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    AuthPillField(
+                      label: 'تأكيد كلمة المرور',
+                      controller: _confirmController,
+                      hintText: '••••••••',
+                      obscureText: _obscureConfirm,
+                      textInputAction: TextInputAction.done,
+                      grouped: false,
+                      loginStyle: true,
+                      suffixIcon: IconButton(
+                        onPressed: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
+                        icon: Icon(
+                          _obscureConfirm
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: AppColors.pureWhite.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    AuthPrimaryButton(
+                      label: 'تأكيد',
+                      loading: _submitting,
+                      loginStyle: true,
+                      onPressed: _submitting ? null : _submit,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              AuthPillField(
-                label: 'تأكيد كلمة المرور',
-                controller: _confirmController,
-                hintText: '••••••••',
-                obscureText: _obscureConfirm,
-                textInputAction: TextInputAction.done,
-                suffixIcon: IconButton(
-                  onPressed: () =>
-                      setState(() => _obscureConfirm = !_obscureConfirm),
-                  icon: Icon(
-                    _obscureConfirm
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: AppColors.textMuted,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              AuthPrimaryButton(
-                label: 'تأكيد',
-                loading: _submitting,
-                onPressed: _submitting ? null : _submit,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

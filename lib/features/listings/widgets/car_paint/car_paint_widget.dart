@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/car_paint_panels.dart';
 import 'car_paint_calibrator.dart';
 import 'car_paint_panel_overlay.dart';
@@ -106,6 +107,7 @@ class CarPaintWidget extends StatelessWidget {
   void _showPicker(BuildContext context, CarPaintPanelLayout panel) {
     showModalBottomSheet<void>(
       context: context,
+      backgroundColor: AppColors.fieldCarbon,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -120,6 +122,7 @@ class CarPaintWidget extends StatelessWidget {
                   panel.nameAr,
                   style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: AppColors.pureWhite,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -142,7 +145,7 @@ class CarPaintWidget extends StatelessWidget {
                 sheetContext,
                 panel,
                 CarPaintCondition.painted,
-                'مبوية',
+                'مصبوغة',
                 CarPaintColors.painted,
               ),
               _conditionTile(
@@ -178,12 +181,21 @@ class CarPaintWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: CarPaintColors.panelStroke),
+          border: Border.all(
+            color: isSelected ? AppColors.volt : const Color(0x20FFFFFF),
+            width: isSelected ? 2 : 1,
+          ),
         ),
       ),
-      title: Text(label),
+      title: Text(
+        label,
+        style: const TextStyle(
+          color: AppColors.pureWhite,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
       trailing: isSelected
-          ? const Icon(Icons.check_circle, color: Color(0xFF1EC878))
+          ? const Icon(Icons.check_circle, color: AppColors.volt)
           : null,
       onTap: () {
         onPanelConditionChanged?.call(panel.id, value);

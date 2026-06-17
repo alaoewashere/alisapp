@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
@@ -9,13 +9,12 @@ import '../../../widgets/rate_dialog.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/listing_display_title.dart';
-import '../../../core/utils/phone_links.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../chat/providers/chat_provider.dart';
 import '../widgets/listing_owner_package_panel.dart';
 import '../providers/listing_detail_provider.dart';
 
-const _whatsappGreen = Color(0xFF25D366);
+const _voltGlow = Color(0xFFD4FF3A);
 
 class ListingDetailBottomBar extends ConsumerWidget {
   const ListingDetailBottomBar({
@@ -33,6 +32,8 @@ class ListingDetailBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final pending = listing.isPendingModeration;
+
     return Material(
       elevation: 8,
       color: Theme.of(context).colorScheme.surface,
@@ -46,11 +47,14 @@ class ListingDetailBottomBar extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ListingOwnerPackagePanel(listing: listing),
-                    _OwnerActions(
-                      listing: listing,
-                      onShareWhatsApp: onShareWhatsApp,
-                      shareEnabled: shareEnabled,
-                    ),
+                    if (pending)
+                      const _PendingOwnerNotice()
+                    else
+                      _OwnerActions(
+                        listing: listing,
+                        onShareWhatsApp: onShareWhatsApp,
+                        shareEnabled: shareEnabled,
+                      ),
                   ],
                 )
               : _BuyerActions(
@@ -59,6 +63,44 @@ class ListingDetailBottomBar extends ConsumerWidget {
                   shareEnabled: shareEnabled,
                 ),
         ),
+      ),
+    );
+  }
+}
+
+class _PendingOwnerNotice extends StatelessWidget {
+  const _PendingOwnerNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.lock_clock_rounded, color: scheme.primary, size: 28),
+          const SizedBox(height: 10),
+          Text(
+            'بانتظار موافقة الإدارة',
+            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'تعديل، حذف، تم البيع، وواتساب ستظهر بعد الموافقة',
+            textAlign: TextAlign.center,
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -75,96 +117,56 @@ class _BuyerActions extends ConsumerWidget {
   final VoidCallback? onShareWhatsApp;
   final bool shareEnabled;
 
-  bool get _hasPhone =>
-      listing.sellerPhone != null && listing.sellerPhone!.trim().isNotEmpty;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
-      children: [
-        if (_hasPhone) ...[
-          Expanded(
-            child: _ActionButton(
-              label: 'مراسلة',
-              icon: Icons.chat,
-              backgroundColor: _whatsappGreen.withValues(alpha: 0.12),
-              foregroundColor: _whatsappGreen,
-              borderColor: _whatsappGreen.withValues(alpha: 0.4),
-              onPressed: () => _openWhatsApp(context),
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _startChatWithSeller(context, ref),
+          borderRadius: BorderRadius.circular(14),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: _voltGlow,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: _voltGlow.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: _voltGlow.withValues(alpha: 0.25),
+                  blurRadius: 32,
+                  spreadRadius: 4,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _ActionButton(
-              label: 'اتصال',
-              icon: Icons.phone_outlined,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              foregroundColor: Theme.of(context).colorScheme.onSurface,
-              borderColor: Theme.of(context).colorScheme.outline,
-              onPressed: () => _openPhone(context),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-        if (onShareWhatsApp != null) ...[
-          Expanded(
-            child: _ActionButton(
-              label: 'واتساب',
-              icon: Icons.share_rounded,
-              backgroundColor: _whatsappGreen,
-              foregroundColor: Colors.white,
-              onPressed: shareEnabled ? onShareWhatsApp : null,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _startChatWithSeller(context, ref),
-            icon: const Icon(Icons.chat_bubble_outline, size: 18),
-            label: Text(
-              'راسل البائع',
-              style: GoogleFonts.cairo(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              minimumSize: const Size(0, 56),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.chat_bubble_outline,
+                  size: 18,
+                  color: AppColors.canvas,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'راسل البائع',
+                  style: AppFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.canvas,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
-  }
-
-  Future<void> _openWhatsApp(BuildContext context) async {
-    final phone = listing.sellerPhone;
-    if (phone == null || phone.isEmpty) return;
-
-    final launched = await launchWhatsApp(
-      phone,
-      message: 'مرحباً، أنا مهتم بإعلانك: ${listingDisplayTitle(listing)}',
-    );
-    if (!launched && context.mounted) {
-      _showSnack(context, 'واتساب غير مثبت');
-    }
-  }
-
-  Future<void> _openPhone(BuildContext context) async {
-    final phone = listing.sellerPhone;
-    if (phone == null || phone.isEmpty) return;
-
-    final launched = await launchPhoneCall(phone);
-    if (!launched && context.mounted) {
-      _showSnack(context, 'تعذّر فتح تطبيق الاتصال');
-    }
   }
 
   Future<void> _startChatWithSeller(BuildContext context, WidgetRef ref) async {
@@ -213,18 +215,6 @@ class _OwnerActions extends ConsumerWidget {
 
     return Row(
       children: [
-        if (onShareWhatsApp != null) ...[
-          Expanded(
-            child: _ActionButton(
-              label: 'واتساب',
-              icon: Icons.share_rounded,
-              backgroundColor: _whatsappGreen,
-              foregroundColor: Colors.white,
-              onPressed: shareEnabled ? onShareWhatsApp : null,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
         Expanded(
           child: _ActionButton(
             label: 'تعديل',

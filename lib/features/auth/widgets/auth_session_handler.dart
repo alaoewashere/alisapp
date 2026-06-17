@@ -87,14 +87,30 @@ class _AuthSessionHandlerState extends ConsumerState<AuthSessionHandler> {
     if (!_isAuthCallback(uri)) return;
     if (!_hasOAuthPayload(uri)) return;
 
+    final isRecovery = uri.fragment.contains('type=recovery') ||
+        uri.queryParameters['type'] == 'recovery';
+
     // Already signed in — ignore duplicate/stale callback (common after hot restart).
-    if (supabase.auth.currentSession != null) {
+    if (!isRecovery && supabase.auth.currentSession != null) {
       ref.read(authNotifierProvider.notifier).clearOAuthLoading();
       return;
     }
 
     try {
       await supabase.auth.getSessionFromUrl(uri);
+      if (isRecovery) {
+        ref.read(authNotifierProvider.notifier).clearOAuthLoading();
+        void navigate() {
+          if (!mounted) return;
+          ref.read(routerProvider).go(AppRoutes.resetPassword);
+        }
+        if (fromColdStart) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => navigate());
+        } else {
+          navigate();
+        }
+        return;
+      }
       ref.read(authNotifierProvider.notifier).onOAuthSessionEstablished();
       ref.invalidate(currentProfileProvider);
     } on AuthException catch (e) {

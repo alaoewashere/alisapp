@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/utils/secure_log.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/models/message_model.dart';
@@ -51,15 +51,6 @@ class ChatNearBottomNotifier extends Notifier<bool> {
 
   void setNearBottom(bool value) => state = value;
 }
-
-final chatInputControllerProvider =
-    Provider.autoDispose.family<TextEditingController, String>(
-  (ref, conversationId) {
-    final controller = TextEditingController();
-    ref.onDispose(controller.dispose);
-    return controller;
-  },
-);
 
 final pendingMessagesProvider = NotifierProvider.autoDispose
     .family<PendingMessagesNotifier, List<MessageModel>, String>(
@@ -111,7 +102,7 @@ class ChatNotifier extends Notifier<AsyncValue<void>> {
             content: intro,
           );
       await ref.read(listingsRepositoryProvider).incrementContacts(listingId);
-      debugPrint(
+      SecureLog.debug(
         'chat: sent listing intro for conversation ${result.conversation.id}',
       );
     }

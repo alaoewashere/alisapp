@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/supabase/supabase_client.dart';
-import '../../home/providers/home_provider.dart';
 import '../data/favorites_repository.dart';
 
 export '../data/favorites_repository.dart';
@@ -15,8 +14,20 @@ final favoritesIdsProvider = FutureProvider<Set<String>>((ref) async {
 class FavoriteToggleNotifier extends Notifier<Set<String>> {
   @override
   Set<String> build() {
+    ref.watch(currentUserIdProvider);
+
+    ref.listen(favoritesIdsProvider, (previous, next) {
+      next.whenData((ids) => state = Set<String>.from(ids));
+    }, fireImmediately: true);
+
     final asyncIds = ref.watch(favoritesIdsProvider);
-    return asyncIds.maybeWhen(data: (ids) => ids, orElse: () => {});
+    return asyncIds.when(
+      data: (ids) => Set<String>.from(ids),
+      loading: () =>
+          asyncIds.hasValue ? Set<String>.from(asyncIds.requireValue) : {},
+      error: (_, __) =>
+          asyncIds.hasValue ? Set<String>.from(asyncIds.requireValue) : {},
+    );
   }
 
   Future<void> toggle(String listingId) async {
@@ -24,9 +35,6 @@ class FavoriteToggleNotifier extends Notifier<Set<String>> {
     if (userId == null) return;
 
     final wasFavorite = state.contains(listingId);
-    state = wasFavorite
-        ? (Set<String>.from(state)..remove(listingId))
-        : {...state, listingId};
 
     try {
       if (wasFavorite) {
@@ -34,20 +42,17 @@ class FavoriteToggleNotifier extends Notifier<Set<String>> {
               userId,
               listingId,
             );
+        state = Set<String>.from(state)..remove(listingId);
       } else {
         await ref.read(favoritesRepositoryProvider).addFavorite(
               userId,
               listingId,
             );
+        state = {...state, listingId};
       }
       ref.invalidate(favoritesProvider);
-      ref.invalidate(favoritesIdsProvider);
-      ref.invalidate(recentListingsProvider);
-      ref.invalidate(featuredListingsProvider);
     } catch (_) {
-      state = wasFavorite
-          ? {...state, listingId}
-          : (Set<String>.from(state)..remove(listingId));
+      // Keep prior state on failure — do not optimistically flip UI.
     }
   }
 

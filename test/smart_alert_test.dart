@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:my_app/models/smart_alert.dart';
+import 'package:my_app/models/smart_alert_category.dart';
+import 'package:my_app/shared/models/category_model.dart';
 import 'package:my_app/shared/models/filter_model.dart';
 
 void main() {
@@ -102,6 +104,45 @@ void main() {
       expect(alert.make, 'BMW');
       expect(alert.triggerCount, 4);
       expect(alert.isActive, isTrue);
+    });
+  });
+
+  group('categoryFieldsFromPath', () {
+    test('maps vehicle drill-down to alert columns', () {
+      const root = CategoryModel(
+        id: 1,
+        slug: 'cars',
+        nameAr: 'المركبات',
+        icon: 'directions_car',
+      );
+      const sub = CategoryModel(
+        id: 2,
+        slug: 'veh_automobile',
+        nameAr: 'سيارات',
+        icon: 'category',
+        parentId: 1,
+      );
+      const brand = CategoryModel(
+        id: 3,
+        slug: 'bmw',
+        nameAr: 'BMW',
+        icon: 'brand',
+        parentId: 2,
+      );
+      const model = CategoryModel(
+        id: 4,
+        slug: 'bmw_320',
+        nameAr: '320i',
+        icon: 'model',
+        parentId: 3,
+      );
+
+      final fields = categoryFieldsFromPath([root, sub, brand, model]);
+
+      expect(fields.category, 'المركبات');
+      expect(fields.subcategory, 'سيارات');
+      expect(fields.make, 'BMW');
+      expect(fields.model, '320i');
     });
   });
 }

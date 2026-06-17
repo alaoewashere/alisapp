@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_governorates.dart';
@@ -107,7 +107,7 @@ class ListingShareCard extends StatelessWidget {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.right,
-                                  style: GoogleFonts.cairo(
+                                  style: AppFonts.cairo(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -118,7 +118,7 @@ class ListingShareCard extends StatelessWidget {
                                 Text(
                                   '${listing.formattedPrice} د.ع',
                                   textAlign: TextAlign.right,
-                                  style: GoogleFonts.inter(
+                                  style: AppFonts.inter(
                                     fontSize: 32,
                                     fontWeight: FontWeight.w800,
                                     color: AppColors.primary,
@@ -144,7 +144,7 @@ class ListingShareCard extends StatelessWidget {
                               children: [
                                 Text(
                                   'sello.iq',
-                                  style: GoogleFonts.inter(
+                                  style: AppFonts.inter(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.textMuted,
@@ -167,7 +167,7 @@ class ListingShareCard extends StatelessWidget {
                                     _locationLabel,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.cairo(
+                                    style: AppFonts.cairo(
                                       fontSize: 16,
                                       color: AppColors.textMuted,
                                     ),
@@ -185,7 +185,7 @@ class ListingShareCard extends StatelessWidget {
                             Text(
                               _referenceLabel,
                               textAlign: TextAlign.right,
-                              style: GoogleFonts.cairo(
+                              style: AppFonts.cairo(
                                 fontSize: 13,
                                 color: AppColors.textMuted.withValues(alpha: 0.85),
                               ),
@@ -207,7 +207,7 @@ class ListingShareCard extends StatelessWidget {
                                   ),
                                   child: Text(
                                     _deepLinkLabel!,
-                                    style: GoogleFonts.robotoMono(
+                                    style: AppFonts.robotoMono(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.primary,
@@ -229,7 +229,7 @@ class ListingShareCard extends StatelessWidget {
                                 ),
                                 child: Text(
                                   'تواصل معنا على سيلو',
-                                  style: GoogleFonts.cairo(
+                                  style: AppFonts.cairo(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,

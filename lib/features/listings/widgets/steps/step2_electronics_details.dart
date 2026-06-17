@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../core/utils/electronics_listing_utils.dart';
 import '../../../../shared/models/electronics_listing_metadata.dart';
 import '../../constants/electronics_listing_options.dart';
@@ -97,7 +98,7 @@ class _Step2ElectronicsDetailsState
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [appDigitsOnly()],
               textDirection: TextDirection.ltr,
               decoration: const InputDecoration(
                 labelText: 'السعر *',
@@ -188,7 +189,7 @@ class _Step2ElectronicsDetailsState
       TextField(
         controller: _batteryController,
         keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        inputFormatters: [appDigitsOnly()],
         textDirection: TextDirection.ltr,
         decoration: const InputDecoration(
           labelText: 'صحة البطارية',

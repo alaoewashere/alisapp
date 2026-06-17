@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../theme/app_form_fields.dart';
 import '../../../theme/app_text_styles.dart';
@@ -22,7 +24,8 @@ abstract final class AuthFormStyles {
       hintText: hintText,
       suffix: suffixIcon,
     ).copyWith(
-      contentPadding: contentPadding ??
+      contentPadding:
+          contentPadding ??
           const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
@@ -30,13 +33,57 @@ abstract final class AuthFormStyles {
   static ButtonStyle primaryButtonStyle() {
     return FilledButton.styleFrom(
       backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
-      disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.45),
-      disabledForegroundColor: Colors.white.withValues(alpha: 0.85),
+      foregroundColor: AppColors.canvas,
+      disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.35),
+      disabledForegroundColor: AppColors.canvas.withValues(alpha: 0.55),
       minimumSize: const Size.fromHeight(52),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      textStyle: AppTextStyles.button,
+    );
+  }
+
+  static const _loginFieldRadius = 14.0;
+
+  static OutlineInputBorder _loginBorder(Color color, double width) =>
+      OutlineInputBorder(
+        borderRadius: BorderRadius.circular(_loginFieldRadius),
+        borderSide: BorderSide(color: color, width: width),
+      );
+
+  static const _loginFieldBorder = Color(0x15FFFFFF);
+
+  /// Login / auth flat fields — Field Carbon, 15% white border, 1.5px Volt focus.
+  static InputDecoration loginFieldDecoration({
+    required String hintText,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: AppFonts.sans(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: AppColors.pureWhite.withValues(alpha: 0.5),
       ),
+      filled: true,
+      fillColor: AppColors.fieldCarbon,
+      border: _loginBorder(_loginFieldBorder, 1),
+      enabledBorder: _loginBorder(_loginFieldBorder, 1),
+      focusedBorder: _loginBorder(AppColors.volt, 1.5),
+      errorBorder: _loginBorder(AppColors.rejected, 1.5),
+      focusedErrorBorder: _loginBorder(AppColors.rejected, 1.5),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      suffixIcon: suffixIcon,
+    );
+  }
+
+  static ButtonStyle loginPrimaryButtonStyle() {
+    return FilledButton.styleFrom(
+      backgroundColor: AppColors.volt,
+      foregroundColor: AppColors.canvas,
+      disabledBackgroundColor: AppColors.volt.withValues(alpha: 0.35),
+      disabledForegroundColor: AppColors.canvas.withValues(alpha: 0.55),
+      minimumSize: const Size.fromHeight(52),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       textStyle: AppTextStyles.button,
     );
   }
@@ -58,6 +105,12 @@ class AuthPillField extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.autofillHints,
     this.validator,
+    this.maxLength,
+    this.inputFormatters,
+    this.prefixText,
+    this.prefixStyle,
+    this.grouped = true,
+    this.loginStyle = false,
   });
 
   final String label;
@@ -73,34 +126,60 @@ class AuthPillField extends StatelessWidget {
   final TextCapitalization textCapitalization;
   final Iterable<String>? autofillHints;
   final FormFieldValidator<String>? validator;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? prefixText;
+  final TextStyle? prefixStyle;
+  final bool grouped;
+  final bool loginStyle;
 
   @override
   Widget build(BuildContext context) {
+    final field = TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
+      textDirection: textDirection,
+      textAlign: textAlign,
+      textCapitalization: textCapitalization,
+      autofillHints: autofillHints,
+      maxLength: maxLength,
+      inputFormatters: inputFormatters,
+      cursorColor: loginStyle ? AppColors.volt : null,
+      style: loginStyle
+          ? AppFonts.sans(
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              color: AppColors.pureWhite,
+            )
+          : AppTextStyles.input,
+      validator: validator,
+      decoration: (loginStyle
+              ? AuthFormStyles.loginFieldDecoration(
+                  hintText: hintText ?? '',
+                  suffixIcon: suffixIcon,
+                )
+              : AuthFormStyles.fieldDecoration(
+                  hintText: hintText ?? '',
+                  suffixIcon: suffixIcon,
+                ))
+          .copyWith(
+        counterText: maxLength != null ? '' : null,
+        prefixText: prefixText,
+        prefixStyle: prefixStyle ?? AppTextStyles.caption,
+      ),
+      onChanged: onChanged,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AppFieldGroupLabel(label: label, required: true),
-        AppFormFieldGroup(
-          children: [
-            TextFormField(
-              controller: controller,
-              keyboardType: keyboardType,
-              textInputAction: textInputAction,
-              obscureText: obscureText,
-              textDirection: textDirection,
-              textAlign: textAlign,
-              textCapitalization: textCapitalization,
-              autofillHints: autofillHints,
-              style: AppTextStyles.input,
-              validator: validator,
-              decoration: AuthFormStyles.fieldDecoration(
-                hintText: hintText ?? '',
-                suffixIcon: suffixIcon,
-              ),
-              onChanged: onChanged,
-            ),
-          ],
-        ),
+        if (grouped)
+          AppFormFieldGroup(children: [field])
+        else
+          field,
       ],
     );
   }
@@ -112,11 +191,13 @@ class AuthPrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.loading = false,
+    this.loginStyle = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool loading;
+  final bool loginStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -124,14 +205,16 @@ class AuthPrimaryButton extends StatelessWidget {
       width: double.infinity,
       child: FilledButton(
         onPressed: loading ? null : onPressed,
-        style: AuthFormStyles.primaryButtonStyle(),
+        style: loginStyle
+            ? AuthFormStyles.loginPrimaryButtonStyle()
+            : AuthFormStyles.primaryButtonStyle(),
         child: loading
             ? const SizedBox(
                 width: 22,
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: AppColors.canvas,
                 ),
               )
             : Text(label),
@@ -147,11 +230,13 @@ class AuthOrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lineColor = AppColors.pureWhite.withValues(alpha: 0.15);
+
     return Row(
       children: [
         Expanded(
           child: Divider(
-            color: AppColors.borderLight.withValues(alpha: 0.9),
+            color: lineColor,
             thickness: 1,
           ),
         ),
@@ -161,7 +246,7 @@ class AuthOrDivider extends StatelessWidget {
         ),
         Expanded(
           child: Divider(
-            color: AppColors.borderLight.withValues(alpha: 0.9),
+            color: lineColor,
             thickness: 1,
           ),
         ),

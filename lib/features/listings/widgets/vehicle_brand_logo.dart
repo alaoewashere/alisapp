@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/utils/svg_sanitizer.dart';
@@ -39,7 +39,7 @@ class VehicleBrandLogo extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           initial,
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: size * 0.4,
             fontWeight: FontWeight.w800,
             color: accent,

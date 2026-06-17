@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_governorates.dart';
+import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../theme/app_form_fields.dart';
 import '../../../../theme/app_text_styles.dart';
 import '../../constants/listing_form_options.dart';
@@ -147,7 +148,7 @@ class _Step2PickerSheetState extends State<_Step2PickerSheet> {
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Material(
-          color: Colors.white,
+          color: AppColors.fieldCarbon,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           clipBehavior: Clip.antiAlias,
           child: ConstrainedBox(
@@ -181,11 +182,13 @@ class _Step2PickerSheetState extends State<_Step2PickerSheet> {
                     child: TextField(
                       controller: _searchController,
                       textDirection: TextDirection.rtl,
+                      style: AppTextStyles.input,
                       decoration: InputDecoration(
                         hintText: 'بحث...',
+                        hintStyle: AppTextStyles.hint,
                         prefixIcon: const Icon(Icons.search, size: 20),
                         filled: true,
-                        fillColor: const Color(0xFFF2F2F7),
+                        fillColor: AppColors.surfaceMuted,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -281,7 +284,7 @@ class Step2PickerTriggerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.fieldCarbon,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -347,10 +350,7 @@ class Step2FormShell extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (!isEdit)
-            Text(
-              title,
-              style: AppTextStyles.headline.copyWith(fontSize: 20),
-            ),
+            Text(title, style: AppTextStyles.headline.copyWith(fontSize: 20)),
           if (state.categoryPath.isNotEmpty && !isEdit) ...[
             if (!isEdit) const SizedBox(height: 12),
             CategoryPathBreadcrumb(
@@ -439,16 +439,16 @@ class Step2PillChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
+          color: selected ? AppColors.volt : AppColors.fieldCarbon,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
+            color: selected ? AppColors.volt : AppColors.glassBorder,
             width: 1.5,
           ),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.2),
+                    color: AppColors.volt.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -459,7 +459,7 @@ class Step2PillChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (selected) ...[
-              const Icon(Icons.check, color: Colors.white, size: 13),
+              const Icon(Icons.check, color: AppColors.canvas, size: 13),
               const SizedBox(width: 4),
             ],
             Text(
@@ -467,7 +467,7 @@ class Step2PillChip extends StatelessWidget {
               style: AppTextStyles.subheading.copyWith(
                 fontSize: 13,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: selected ? Colors.white : const Color(0xFF444444),
+                color: selected ? AppColors.canvas : AppColors.pureWhite,
               ),
             ),
           ],
@@ -742,9 +742,10 @@ class _Step2LabeledDropdownState extends State<Step2LabeledDropdown> {
           ListingFormOptions.isCustomValue(widget.value, widget.items));
 
   String get _displayValue {
-    if (_showOtherField) return widget.value?.trim().isNotEmpty == true
-        ? widget.value!.trim()
-        : 'اختر';
+    if (_showOtherField)
+      return widget.value?.trim().isNotEmpty == true
+          ? widget.value!.trim()
+          : 'اختر';
     if (widget.value != null && widget.value!.isNotEmpty) {
       return widget.value!;
     }
@@ -1022,7 +1023,7 @@ class Step2IqdField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      inputFormatters: [appDigitsOnly()],
       textDirection: TextDirection.ltr,
       style: AppTextStyles.price.copyWith(fontSize: 15),
       decoration: AppFormDecorations.underline(
@@ -1113,8 +1114,7 @@ class _Step2GridWithOtherState extends State<Step2GridWithOther> {
   late final TextEditingController _otherController;
   bool _otherExpanded = false;
 
-  List<String> get _allOptions =>
-      ListingFormOptions.withOther(widget.options);
+  List<String> get _allOptions => ListingFormOptions.withOther(widget.options);
 
   bool get _isCustom =>
       ListingFormOptions.isCustomValue(widget.value, widget.options);
@@ -1172,9 +1172,7 @@ class _Step2GridWithOtherState extends State<Step2GridWithOther> {
             final selected = _selectedTile == type;
             final icon = widget.icons[type] ?? Icons.more_horiz;
             return Material(
-              color: selected
-                  ? theme.colorScheme.primaryContainer
-                  : theme.colorScheme.surfaceContainerHighest,
+              color: selected ? AppColors.volt : AppColors.fieldCarbon,
               borderRadius: BorderRadius.circular(12),
               child: InkWell(
                 onTap: () {
@@ -1188,13 +1186,33 @@ class _Step2GridWithOtherState extends State<Step2GridWithOther> {
                   widget.onChanged(type);
                 },
                 borderRadius: BorderRadius.circular(12),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, color: theme.colorScheme.primary),
-                    const SizedBox(height: 4),
-                    Text(type, style: theme.textTheme.labelSmall),
-                  ],
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: selected ? AppColors.volt : AppColors.glassBorder,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        icon,
+                        color: selected
+                            ? AppColors.canvas
+                            : AppColors.pureWhite,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        type,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: selected
+                              ? AppColors.canvas
+                              : AppColors.pureWhite,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

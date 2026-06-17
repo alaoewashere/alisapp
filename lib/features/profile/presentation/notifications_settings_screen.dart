@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/l10n/l10n_provider.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 
 const _pushKey = 'notifications_push_enabled';
 const _emailKey = 'notifications_email_enabled';
@@ -65,7 +66,7 @@ class NotificationsSettingsScreen extends ConsumerWidget {
     final email = ref.watch(emailNotificationsEnabledProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(strings.notifications)),
+      appBar: SelloAppBar(title: Text(strings.notifications)),
       body: ListView(
         children: [
           SwitchListTile(

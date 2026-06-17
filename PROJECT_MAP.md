@@ -54,6 +54,46 @@ Living architecture document for the Iraq Classifieds Marketplace.
 flutter run
 ```
 
+### Tooling: Sello design skill
+
+| Item | Value |
+|---|---|
+| **Location** | `.cursor/skills/ui-ux-pro-max/` (CLI path unchanged) |
+| **Brand name** | Sello - Design Intelligence |
+| **Generator** | `scripts/design_system.py` — BM25 search + reasoning |
+| **Typography** | Always emits local Thmanyah fonts (`ThmanyahSans`, `ThmanyahSerifDisplay`, `ThmanyahSerifText`) with `@font-face` rules to `assets/fonts/` |
+| **Run** | `python3 .cursor/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system -p "Sello" -f markdown` |
+| **Tests** | `python3 .cursor/skills/ui-ux-pro-max/scripts/test_design_system.py` |
+
+### Security posture (P0/P1 hardening — Jun 2026)
+
+| Control | Implementation |
+|---|---|
+| **RLS column guards** | `20260720000000_security_rls_guards.sql` — triggers on `listings`, `profiles`, `messages`; `public_profiles` view |
+| **Public listings** | `20260724000000_listings_public_approved_rls.sql` — public SELECT `status = approved`; `Admins read all listings`; app feeds use `.eq('status', 'approved')` in `ListingsRepository` + favorites inner join |
+| **Storage** | `20260720000001_security_storage.sql` — owner-scoped writes for listing media; admin-only `brand-logos` |
+| **OTP** | Rate limiting via `otp_throttle`; CORS allowlist in edge functions; `get_auth_user_id_by_phone` RPC |
+| **RPC hardening** | `20260720000002_security_rpc.sql` — view/contact increments only on public listings; rating notification auth |
+| **Purchases** | `verify-purchase` edge function + `pending_purchases`; client INSERT revoked on `listing_purchases`/`boosts` — **deployed** to remote (Jun 2026) |
+| **Secrets** | No `.env` in release bundle; `groq-proxy` edge function; `env.json.example` for `--dart-define-from-file` |
+| **Monitoring** | Optional `SENTRY_DSN` dart-define; `SecureLog` scrubs PII in logs |
+| **Verification** | `supabase/tests/security_policies.sql`; `test/security_hardening_test.dart` |
+| **Remote DB** | Security migrations `20260720000000`–`000003` + `phone_verification` (`phone_verifications`, `profiles.phone_verified`) applied to project `riaazqhgknsnymjzzjou` (Jun 2026) |
+| **Remote Edge** | `send-whatsapp-otp` + `verify-whatsapp-otp` deployed to remote (Jun 2026); requires Twilio secrets (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` for profile OTP) |
+| **Client fallback** | `lib/core/supabase/public_profiles_query.dart` — `fetchPublicProfiles()` falls back to `profiles` if view missing |
+
+### Performance optimizations (Jun 2026)
+
+| Area | Change |
+|---|---|
+| **Favorites** | `toggleFavoriteProvider.select()` per card; no home feed refetch on heart tap |
+| **Images** | `cachedListingImage()` with `memCacheWidth`/`memCacheHeight` on grid, carousel, gallery, bento |
+| **Home** | Isolated sliver sections — category/featured/recent rebuild independently; recent listings horizontal scroll row; local PNG icons for all 8 root browse categories (المركبات، العقارات، الإلكترونيات، سوق المستعمل، دروس خصوصية، فرص العمل، الحيوانات، مساعدة منزلية) |
+| **Detail** | View count once in `initState`; price history via `priceHistoryProvider`; favorite scoped to gallery `Consumer` |
+| **Chat** | Removed build-time scroll callback; offline banner isolated; message `ValueKey`s; input `TextEditingController` owned locally in `_ChatInputBar` (not autoDispose provider); bounded `TextField` (`maxLines: 5`) fixes overflow |
+| **Categories** | Removed drill-down `initState` invalidation; listings title from cached `allCategoriesProvider` |
+| **Dead code** | Removed `category_browse_row`, `CategoryGridSection`, `favoriteOverridesProvider`, `legacyMyListingsProvider`, `descriptionExpandedProvider`, `isOwnerProvider` |
+
 ---
 
 ## ARCHITECTURE (COMPLETE)
@@ -69,9 +109,9 @@ lib/
 │   │   ├── app_governorates.dart      # 18 Iraqi governorates
 │   │   └── app_constants.dart         # bundle ID, redirect URI, limits
 │   ├── theme/
-│   │   ├── app_theme.dart             # Cupertino Glass light theme (souqly-redesign-studio)
-│   │   ├── app_decorations.dart       # Radii, shadows, glass card decoration
-│   │   └── text_styles.dart           # Cairo headings + Readex Pro body (google_fonts)
+│   │   ├── app_theme.dart             # Dark "fintech" theme (Deep Canvas / Field Carbon / Volt Green)
+│   │   ├── app_decorations.dart       # Radii, shadows (dark), carbon card decoration
+│   │   └── text_styles.dart           # Thmanyah Sans / Serif Text / Serif Display
 │   ├── router/
 │   │   └── app_router.dart            # GoRouter + AppRoutes
 │   ├── utils/
@@ -92,6 +132,7 @@ lib/
 │   │   ├── presentation/home_screen.dart
 │   │   ├── widgets/category_grid.dart
 │   │   ├── widgets/listing_card.dart
+│   │   ├── widgets/recent_listings_row.dart
 │   │   └── providers/home_provider.dart
 │   ├── listings/
 │   │   ├── data/listings_repository.dart
@@ -191,7 +232,7 @@ BottomNav "+" → `PostListingScreen` (6 steps; 7 for vehicles incl. paint) → 
 
 Steps: category (recursive drill-down to leaf) → details → location (+ optional map pin) → photos (reorder, max 10) → contact preferences (profile name/phone + `contact_preference`) → review & publish / save draft
 
-**Category pick (Step 1):** `CategoryDrillScreen` — internal `_levelStack` (no GoRouter); all levels use 2-column `CategoryBentoGrid` (white rounded cards, icon + bold title + grey subtitle); leaf → `categoryPath` + Step 2. Breadcrumb + back trim stack in place.
+**Category pick (Step 1):** `CategoryDrillScreen` — `categoryDrillStack` in `PostListingState` (no GoRouter); `getDrillDownChildren` aliases سيارات للإيجار → سيارات brand tree (`effectiveBrowseParentId`, same as browse). AppBar/system back and breadcrumb pop one drill level; at root grid back exits the flow.
 
 **Vehicle Step 2:** When `categoryPath` root is `cars` (المركبات), Step 2 shows `Step2VehicleDetails` — iOS-style grouped basic-info cards (trim, mileage, engine, cylinders); always `sale` (no rent toggle); specs chips in `metadata` JSONB; title/description auto-generated on advance.
 
@@ -271,6 +312,8 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `features/listings/widgets/steps/step1_category.dart` — embeds `CategoryDrillScreen` (root grid)
   - `features/listings/widgets/category_drill_screen.dart` — recursive post-listing category picker (2-col bento grid)
   - `features/listings/widgets/category_bento_grid.dart` — `CategoryBentoCard` / `CategoryBentoGrid` — 2-column white cards, Cairo title + muted subtitle, brand logos for vehicle browse
+  - `shared/widgets/category_icon.dart` — category tile icon resolution; generic `category` placeholder (📦) → `assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png` inside accent box; `tutor_*` subjects (`icon: model`) skip vehicle letter logo and use same fallback PNG; dedicated emojis/PNGs unchanged
+  - `shared/widgets/package_badge.dart` — luxury metallic pill badges for listing tiers (مجاني / برو / مميز); used on cards, detail, package picker, owner panel
   - `features/listings/widgets/category_path_breadcrumb.dart` — horizontal tappable path chips
   - `features/listings/widgets/steps/step2_details.dart` — routes generic vs vehicle / real estate / electronics form
   - `features/listings/widgets/steps/step2_vehicle_details.dart` — vehicle listing fields (metadata); optional Groq AI price estimator for `veh_automobile` only
@@ -287,12 +330,15 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `core/utils/general_listing_utils.dart` — buy_sell detection, title/description, condition mapping
   - `shared/models/electronics_listing_metadata.dart` — `listing_kind: phone|laptop|tv` JSONB schema
   - `core/utils/electronics_listing_utils.dart` — branch detection, title/description, condition mapping
-  - `theme/app_text_styles.dart` — Cairo/Tajawal/Inter typography system (headline, subheading, body, input, button, price, hint, counter)
-  - `theme/app_form_fields.dart` — underline input decoration, white field groups, labels, char counters, section dividers
+  - `theme/app_text_styles.dart` — Thmanyah typography system on dark (white/grey text, dark text on Volt buttons; headline, subheading, body, input, button, price, hint, counter)
+  - `theme/app_form_fields.dart` — rounded (14px) carbon input decoration, carbon field groups, labels, char counters, section dividers
+  - Dark "fintech" tokens live in `core/constants/app_colors.dart`: Deep Canvas `#131315` (scaffold), Field Carbon `#18181A` (cards/inputs/sheets/received bubble), Volt Green `#D4FF3A` (primary/active/focus/links/sent bubble), Pure White text. Premium gold badge stays `#F5A623`; verified badge = Volt Green. Bottom nav = floating carbon pill with circular Volt active highlight (dark icon).
   - `features/listings/widgets/steps/step2_title_description_fields.dart` — premium underline title/description group (no suggestion chips)
   - `features/listings/widgets/steps/step2_generic_details.dart` — price, condition
   - `features/listings/widgets/steps/step3_location.dart` — governorate, city, map picker
-  - `features/listings/widgets/steps/step4_photos.dart` — photo grid step
+  - `features/listings/widgets/steps/step4_photos.dart` — photo grid step (dark canvas + Volt Green restyle)
+  - `features/listings/widgets/image_picker_grid.dart` — Field Carbon thumbnails, RTL-aware remove badge
+  - `features/listings/widgets/listing_video_upload_section.dart` — dark video upload card + muted Pro upsell
   - `features/listings/widgets/steps/step5_review.dart` — preview card, edit jumps, publish overlay
   - `features/listings/widgets/map_picker_sheet.dart` — GoogleMap + geolocator (Iraq bounds)
   - `features/listings/widgets/image_picker_grid.dart` — reorderable grid, compression on add
@@ -340,7 +386,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `features/listings/presentation/category_browse_screen.dart` — nested category browser (`CategoryBentoGrid`, `categoryBrowseChildrenProvider`)
   - `features/listings/widgets/category_browse_list.dart` — search tab top-level categories (`CategoryBrowseList` 2-col bento grid)
   - `features/listings/widgets/category_tree_row.dart` — ORPHANED (replaced by `CategoryBentoGrid`; may be removed)
-  - `features/listings/widgets/category_browse_row.dart` — search tab top-level browse row (48px colored icon circle + text + chevron)
+  - `features/listings/widgets/category_browse_row.dart` — ORPHANED (removed Jun 2026; unused)
   - `core/utils/category_tree.dart` — `categoryBrowseRootSlugs`, `electronicsBrandListParentSlugs`, childrenOf, subtitleForCategory, parseCategoryColor
   - `core/utils/category_navigation.dart` — routes all 8 browse-root slugs (`real_estate`, `cars`, `electronics`, `buy_sell`, `tutoring`, `jobs`, `pets`, `home_help`) to browse screen
   - `core/constants/browse_categories.dart` — static styles for top-level browse rows
@@ -407,15 +453,17 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
 - **Auth feature (Phone OTP + Google + Guest)** — COMPLETE
   - `core/supabase/supabase_client.dart` — init, `supabase`, `currentUser`, stream providers
   - `core/utils/result.dart` — `Result` / `Success` / `Failure`
-  - `features/splash/presentation/splash_screen.dart` — 2.8s white intro (`/splash` → `/home`), elastic logo + Sello wordmark
   - `features/auth/data/auth_repository.dart`
   - `features/auth/domain/auth_result.dart`
   - `features/auth/providers/auth_provider.dart`
-  - `features/auth/presentation/login_screen.dart` — email/password login, Google + Apple OAuth, forgot-password link
+  - `features/auth/presentation/login_screen.dart` — dark canvas login (`AuthDarkHeader`), email/password fields, Google + Apple OAuth, forgot-password link
+  - `features/auth/presentation/otp_screen.dart` — dark canvas WhatsApp OTP verify (`AuthDarkHeader`)
   - `features/auth/presentation/phone_screen.dart` — legacy export alias → `LoginScreen` (`/phone` redirects to `/login`)
-  - `features/auth/presentation/sign_up_screen.dart` — email/password signup + profiles row insert → `/username-setup`
+  - `features/auth/presentation/sign_up_screen.dart` — dark canvas sign-up (`AuthDarkHeader`), flat login-style fields, @username debounced availability → profile upsert → post-auth route
   - `screens/auth/forgot_password_screen.dart` — recovery method picker + email reset flow
-  - `screens/auth/phone_verify_screen.dart` — 4-digit WhatsApp OTP verify (Twilio via Edge Functions)
+  - `supabase/functions/send-whatsapp-otp` — auth: Twilio Verify; profile (`purpose=profile`): 6-digit OTP → `phone_verifications` + WhatsApp message
+  - `supabase/functions/verify-whatsapp-otp` — auth: Twilio Verify + session; profile: validates OTP → `profiles.phone` + `phone_verified`
+  - `screens/auth/phone_verify_screen.dart` — 4-digit WhatsApp OTP verify for login (Twilio Verify)
   - `screens/auth/email_verify_screen.dart` — email OTP verify → reset password
   - `screens/auth/reset_password_screen.dart` — new password after email OTP
   - `screens/auth/widgets/phone_login_bottom_sheet.dart` — country picker + WhatsApp OTP send
@@ -441,7 +489,9 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `features/profile/presentation/profile_screen.dart` — centered header card (stats: إعلان/مشاهدة/متابع), vertical menu tiles for own profile; seller listings for others
   - `features/profile/widgets/profile_menu_tile.dart` — rounded RTL menu row with icon, badge, chevron
   - `widgets/user_avatar.dart` + `widgets/avatar_picker_sheet.dart` — DiceBear illustrated avatars (`profiles.avatar_seed`)
-  - `screens/settings/edit_profile_screen.dart` — RTL profile editor (DiceBear picker, name, @username, phone)
+  - `screens/settings/edit_profile_screen.dart` — RTL profile editor (DiceBear, name, locked @username, verified phone via WhatsApp OTP)
+  - `screens/settings/profile_phone_otp_screen.dart` — 6-digit profile phone OTP (10:00 timer)
+  - `screens/settings/widgets/edit_profile_phone_sheet.dart` — phone entry bottom sheet for profile verification
   - `features/profile/presentation/my_listings_screen.dart` — 4-tab lazy-loaded listings manager
   - `screens/settings/settings_screen.dart` — RTL settings hub (profile card, account, about, delete)
   - `screens/settings/language_screen.dart` — full-screen language picker (ar/en/ku)
@@ -487,7 +537,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
 
 ### FLAGGED (post-MVP)
 - Full Kurdish/English UI translations (locale switch works; strings remain Arabic)
-- Dark mode theme
+- Light/dark theme toggle (app now ships a single dark "fintech" theme; no runtime switch)
 - Paid/promoted listings UI (boost sheet)
 - Seller phone reveal
 
@@ -497,6 +547,19 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
 
 Separate Next.js 14 app in `admin/` (App Router, TypeScript, Tailwind, Supabase,
 TanStack Table, Recharts). Connects to the **same Supabase project**.
+
+- **Theme (Jun 2026):** Dark Sello DNA — `admin/src/lib/theme/tokens.ts` mirrors Flutter
+  `AppColors` (Deep Canvas, Field Carbon, Volt Green); ThmanyahSans + Inter; pill tabs,
+  status badges, Volt primary CTAs, destructive outline buttons.
+- **Listings UI (Jun 2026):** Status badges + filter pills use explicit contrast colors
+  (Volt/dark, sold grey, pending Field Carbon + white border); sidebar active state via
+  `isNavItemActive()` (overview exact-only); header logo `admin/public/app_logo.png`;
+  listing detail التحكم panel — dark select, status chips, package tier radio group.
+- **Free posts quota (Jun 2026):** 2 free standard-tier listings per calendar month per user;
+  `profiles.free_posts_this_month` + RPCs; 3rd+ standard post charged via `standard` purchase.
+- **Listing approval fix (Jun 2026):** `20260722000000_admin_service_role_listing_guard.sql`
+  — `is_privileged_backend_caller()` allows service_role through column guards; server
+  actions verify persisted `status` after update and surface Supabase errors in UI.
 
 - **URL:** `admin.souqiq.com` (Vercel). Local: `http://localhost:3000`.
 - **Auth:** Supabase email/password, restricted to rows in `admin_users`

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/dicebear_avatars.dart';
@@ -27,7 +27,7 @@ class AvatarSelectionGrid extends StatelessWidget {
       children: [
         Text(
           'اختر صورة افتراضية',
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textDark,
@@ -36,7 +36,7 @@ class AvatarSelectionGrid extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'أو ارفع صورتك من الكاميرا / المعرض أعلاه',
-          style: GoogleFonts.cairo(
+          style: AppFonts.cairo(
             fontSize: 12,
             color: AppColors.textMuted,
           ),

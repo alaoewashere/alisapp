@@ -49,6 +49,8 @@ export type ListingRow = {
   views_count: number;
   is_featured: boolean;
   is_boosted: boolean;
+  is_verified_seller?: boolean;
+  metadata?: Record<string, unknown> | null;
   latitude: number | null;
   longitude: number | null;
   expires_at: string | null;

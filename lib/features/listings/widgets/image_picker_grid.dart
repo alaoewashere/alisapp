@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -95,7 +95,7 @@ class ImagePickerGrid extends StatelessWidget {
               return Material(
                 elevation: 8,
                 shadowColor: AppColors.primary.withValues(alpha: 0.35),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 child: Transform.scale(scale: 1.05, child: child),
               );
             },
@@ -143,8 +143,9 @@ class _AddPhotoCell extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF0FAF4),
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.fieldCarbon,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderLight),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -153,18 +154,22 @@ class _AddPhotoCell extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: const BoxDecoration(
-                    color: AppColors.primary,
+                    color: AppColors.volt,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.add,
+                    color: AppColors.canvas,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'إضافة صورة',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.sans(
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.volt,
                   ),
                 ),
               ],
@@ -199,19 +204,25 @@ class _PhotoCell extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.file(file, fit: BoxFit.cover),
+            borderRadius: BorderRadius.circular(16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.borderLight),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Image.file(file, fit: BoxFit.cover),
+            ),
           ),
           Positioned(
             top: 6,
-            right: 6,
+            left: 6,
             child: GestureDetector(
               onTap: onRemove,
               child: Container(
-                width: 22,
-                height: 22,
+                width: 24,
+                height: 24,
                 decoration: const BoxDecoration(
-                  color: Colors.red,
+                  color: AppColors.rejected,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.close, color: Colors.white, size: 14),
@@ -224,18 +235,20 @@ class _PhotoCell extends StatelessWidget {
               right: 0,
               bottom: 0,
               child: Container(
-                height: 22,
+                height: 24,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: Color(0x80000000),
-                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.62),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(16),
+                  ),
                 ),
                 child: Text(
                   'الغلاف',
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.sans(
                     fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.pureWhite,
                   ),
                 ),
               ),

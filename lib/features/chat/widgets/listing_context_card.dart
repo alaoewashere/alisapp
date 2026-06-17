@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -27,12 +27,12 @@ class ListingContextCard extends StatelessWidget {
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.borderLight),
+          color: AppColors.fieldCarbon,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.glassBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withValues(alpha: 0.25),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -49,7 +49,7 @@ class ListingContextCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.cairo(
+                    style: AppFonts.cairo(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
@@ -62,7 +62,7 @@ class ListingContextCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       formatIQD(price),
-                      style: GoogleFonts.inter(
+                      style: AppFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
@@ -81,7 +81,7 @@ class ListingContextCard extends StatelessWidget {
               ),
               child: Text(
                 'إعلان',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 10,
                   color: AppColors.primary,
                   fontWeight: FontWeight.w600,

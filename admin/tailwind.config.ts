@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+import { appColors } from "./src/lib/theme/tokens";
+
 const config: Config = {
   darkMode: ["class"],
   content: ["./src/**/*.{ts,tsx}"],
@@ -11,7 +13,7 @@ const config: Config = {
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
+        border: "hsl(var(--border) / var(--border-opacity))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
@@ -40,14 +42,20 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        canvas: appColors.canvas,
+        field: appColors.fieldCarbon,
+        volt: appColors.volt,
+        sold: appColors.soldMuted,
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        pill: "12px",
       },
       fontFamily: {
-        sans: ["var(--font-cairo)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        numeric: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
     },
   },

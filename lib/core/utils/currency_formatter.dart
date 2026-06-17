@@ -11,6 +11,12 @@ String formatIQD(double amount) {
 /// Formats IQD from integer amount (backward compatible).
 String formatIqd(int amount) => formatIQD(amount.toDouble());
 
+/// Package tier price label: د.ع prefix with Western numerals.
+String formatPackagePriceIqd(int amount) {
+  final formatter = NumberFormat('#,###', 'en_US');
+  return 'د.ع ${formatter.format(amount)}';
+}
+
 String formatRelativeTimeAr(DateTime dateTime) {
   final now = DateTime.now();
   final diff = now.difference(dateTime);

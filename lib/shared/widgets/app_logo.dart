@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
@@ -53,7 +53,7 @@ class AppBrandHeader extends StatelessWidget {
           children: [
             Text(
               brandNameAr,
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textDark,
@@ -63,7 +63,7 @@ class AppBrandHeader extends StatelessWidget {
             if (showSubtitle)
               Text(
                 subtitle ?? 'العراق',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 10,
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w500,

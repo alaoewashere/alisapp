@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/supabase/public_profiles_query.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/result.dart';
 import '../../../core/utils/username_utils.dart';
+import '../../../core/utils/validators.dart';
 import '../../../shared/models/profile_model.dart';
 import '../../../shared/models/profile_stats_model.dart';
 import '../../auth/data/auth_repository.dart';
@@ -44,15 +47,22 @@ class ProfileRepository {
   final ListingsRepository _listingsRepo;
 
   Future<ProfileModel?> getProfile(String userId) async {
-    final data = await _client
-        .from('profiles')
-        .select()
-        .eq('id', userId)
-        .maybeSingle();
-    if (data == null) return null;
-    final profile = ProfileModel.fromJson(data);
-    if (profile.isDeleted) return null;
-    return profile;
+    final currentId = _client.auth.currentUser?.id;
+    if (currentId == userId) {
+      final data = await _client
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
+      if (data == null) return null;
+      final profile = ProfileModel.fromJson(data);
+      if (profile.isDeleted) return null;
+      return profile;
+    }
+
+    final publicRows = await fetchPublicProfiles(_client, [userId]);
+    if (publicRows.isEmpty) return null;
+    return ProfileModel.fromJson(publicRows.first);
   }
 
   Future<ProfileModel> updateProfile(ProfileModel profile) async {
@@ -136,19 +146,16 @@ class ProfileRepository {
     String? excludeUserId,
   }) async {
     final normalized = normalizeUsername(username);
-    if (!isValidUsernameLength(normalized)) return false;
+    if (!isValidUsernameFormat(normalized)) return false;
 
-    var query = _client
-        .from('profiles')
-        .select('id')
-        .eq('username', normalized);
-
-    if (excludeUserId != null) {
-      query = query.neq('id', excludeUserId);
-    }
-
-    final row = await query.maybeSingle();
-    return row == null;
+    final available = await _client.rpc(
+      'check_username_available',
+      params: {
+        'p_username': normalized,
+        if (excludeUserId != null) 'p_exclude_user_id': excludeUserId,
+      },
+    );
+    return available == true;
   }
 
   Future<ProfileModel> updateUsername(String userId, String username) async {
@@ -163,5 +170,81 @@ class ProfileRepository {
         .select()
         .single();
     return ProfileModel.fromJson(data);
+  }
+
+  Future<Result<bool>> sendProfilePhoneOtp(String phoneE164) async {
+    try {
+      final phone = Validators.normalizeE164(phoneE164);
+      final response = await _client.functions.invoke(
+        'send-whatsapp-otp',
+        body: {'phone': phone, 'purpose': 'profile'},
+      );
+      if (kDebugMode) {
+        debugPrint(
+          'sendProfilePhoneOtp ← ${response.status} ${response.data}',
+        );
+      }
+      if (response.status == 200) {
+        return const Success(true);
+      }
+      return Failure(_profileOtpSendErrorMessage(response.data));
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('sendProfilePhoneOtp error: $e');
+      }
+      return Failure('فشل إرسال الرمز، حاول مجدداً', cause: e);
+    }
+  }
+
+  String _profileOtpSendErrorMessage(Object? data) {
+    if (data is Map) {
+      final code = data['error']?.toString() ?? '';
+      switch (code) {
+        case 'invalid_phone':
+          return 'رقم الهاتف غير صحيح';
+        case 'unauthorized':
+          return 'يجب تسجيل الدخول أولاً';
+        case 'rate_limited':
+        case 'rate_limited_phone':
+        case 'rate_limited_ip':
+          return 'تجاوزت الحد المسموح، حاول لاحقاً';
+        case 'send_failed':
+        case 'twilio_not_configured':
+          return 'تعذّر إرسال الرمز عبر واتساب';
+        case 'store_failed':
+          return 'تعذّر حفظ الرمز، حاول مجدداً';
+      }
+    }
+    return 'فشل إرسال الرمز، حاول مجدداً';
+  }
+
+  Future<Result<bool>> verifyProfilePhoneOtp({
+    required String phoneE164,
+    required String otp,
+  }) async {
+    try {
+      final phone = Validators.normalizeE164(phoneE164);
+      final response = await _client.functions.invoke(
+        'verify-whatsapp-otp',
+        body: {
+          'phone': phone,
+          'code': otp.trim(),
+          'purpose': 'profile',
+        },
+      );
+      final data = response.data;
+      if (response.status == 200 &&
+          data is Map &&
+          data['status'] == 'approved') {
+        return const Success(true);
+      }
+      if (data is Map &&
+          (data['status'] == 'expired' || data['error'] == 'expired')) {
+        return const Failure('انتهت صلاحية الرمز، أعد الإرسال');
+      }
+      return const Failure('الرمز غير صحيح');
+    } catch (e) {
+      return const Failure('الرمز غير صحيح');
+    }
   }
 }

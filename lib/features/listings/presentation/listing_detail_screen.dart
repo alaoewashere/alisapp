@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../core/constants/display_locale.dart';
@@ -26,8 +26,9 @@ import '../../../widgets/rate_dialog.dart';
 import '../../../widgets/star_display.dart';
 import '../../../shared/widgets/verified_badge.dart';
 import '../../../shared/widgets/error_widget.dart';
+import '../../../shared/widgets/sello_app_bar.dart';
 import '../../../shared/widgets/loading_widget.dart';
-import '../../favorites/data/favorites_repository.dart';
+import '../../favorites/providers/favorites_provider.dart';
 import '../../home/widgets/listing_card.dart';
 import '../providers/listing_detail_provider.dart';
 import '../providers/listings_provider.dart';
@@ -62,18 +63,12 @@ class ListingDetailScreen extends ConsumerWidget {
         ? ref.watch(listingDetailByReferenceProvider(referenceNo!))
         : ref.watch(listingDetailProvider(listingId!));
 
-    final resolvedId = listingId ?? listingAsync.value?.id ?? '';
-    final favoriteLoadingId = ref.watch(listingFavoriteLoadingProvider);
-    final isOwner = resolvedId.isNotEmpty
-        ? ref.watch(isOwnerProvider(resolvedId))
-        : false;
-
     return listingAsync.when(
       loading: () => const Scaffold(
         body: LoadingWidget(message: 'جاري التحميل...'),
       ),
       error: (e, _) => Scaffold(
-        appBar: AppBar(),
+        appBar: SelloAppBar(),
         body: AppErrorWidget(
           message: '$e',
           onRetry: () {
@@ -88,7 +83,7 @@ class ListingDetailScreen extends ConsumerWidget {
       data: (listing) {
         if (listing == null) {
           return Scaffold(
-            appBar: AppBar(),
+            appBar: SelloAppBar(),
             body: AppErrorWidget(
               message: 'الإعلان غير موجود',
               onRetry: () {
@@ -102,11 +97,13 @@ class ListingDetailScreen extends ConsumerWidget {
           );
         }
 
+        final userId = ref.watch(currentUserIdProvider);
+        final isOwner = userId != null && listing.userId == userId;
+
         return _ListingDetailLoadedView(
           listing: listing,
           isOwner: isOwner,
           listingId: listing.id,
-          favoriteLoadingId: favoriteLoadingId,
           onToggleFavorite: () => _toggleFavorite(context, ref, listing),
         );
       },
@@ -129,13 +126,7 @@ class ListingDetailScreen extends ConsumerWidget {
     }
     ref.read(listingFavoriteLoadingProvider.notifier).setListingId(listing.id);
     try {
-      await ref.read(favoritesRepositoryProvider).toggle(userId, listing.id);
-      if (referenceNo != null) {
-        ref.invalidate(listingDetailByReferenceProvider(referenceNo!));
-      } else {
-        ref.invalidate(listingDetailProvider(listingId!));
-      }
-      ref.invalidate(favoritesProvider);
+      await ref.read(toggleFavoriteProvider.notifier).toggle(listing.id);
     } finally {
       ref.read(listingFavoriteLoadingProvider.notifier).setListingId(null);
     }
@@ -147,14 +138,12 @@ class _ListingDetailLoadedView extends ConsumerStatefulWidget {
     required this.listing,
     required this.isOwner,
     required this.listingId,
-    required this.favoriteLoadingId,
     required this.onToggleFavorite,
   });
 
   final ListingModel listing;
   final bool isOwner;
   final String listingId;
-  final String? favoriteLoadingId;
   final VoidCallback onToggleFavorite;
 
   @override
@@ -165,15 +154,60 @@ class _ListingDetailLoadedView extends ConsumerStatefulWidget {
 class _ListingDetailLoadedViewState
     extends ConsumerState<_ListingDetailLoadedView> {
   final GlobalKey _shareRepaintKey = GlobalKey();
+  final ScrollController _scrollController = ScrollController();
   bool _shareImageReady = false;
   bool _sharing = false;
+  bool _bottomBarVisible = true;
+  double _lastScrollOffset = 0;
+
+  static const _scrollHideThreshold = 48.0;
+  static const _scrollDeltaThreshold = 6.0;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref
+            .read(listingsRepositoryProvider)
+            .incrementViews(widget.listingId);
+      }
+    });
     _precacheShareImage();
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybePromptBuyerRating());
   }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final offset = _scrollController.offset;
+    final delta = offset - _lastScrollOffset;
+
+    bool? nextVisible;
+    if (offset <= _scrollHideThreshold) {
+      nextVisible = true;
+    } else if (delta > _scrollDeltaThreshold) {
+      nextVisible = false;
+    } else if (delta < -_scrollDeltaThreshold) {
+      nextVisible = true;
+    }
+
+    if (nextVisible != null && nextVisible != _bottomBarVisible) {
+      setState(() => _bottomBarVisible = nextVisible!);
+    }
+
+    _lastScrollOffset = offset;
+  }
+
+  double get _scrollBottomInset => widget.isOwner ? 210 : 92;
 
   Future<void> _maybePromptBuyerRating() async {
     final listing = widget.listing;
@@ -245,50 +279,61 @@ class _ListingDetailLoadedViewState
     return Stack(
       children: [
         Scaffold(
+          extendBody: true,
           body: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverAppBar(
                 expandedHeight: 300,
                 pinned: true,
                 automaticallyImplyLeading: false,
-                title: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final settings = context
-                        .dependOnInheritedWidgetOfExactType<
-                            FlexibleSpaceBarSettings>();
-                    final collapsed = settings == null ||
-                        settings.currentExtent <= settings.minExtent + 10;
-                    return collapsed
-                        ? Text(
-                            listingDisplayTitle(listing),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        : const SizedBox.shrink();
-                  },
-                ),
                 flexibleSpace: FlexibleSpaceBar(
-                  background: ListingDetailGallery(
-                    listing: listing,
-                    favoriteLoading:
-                        widget.favoriteLoadingId == widget.listingId,
-                    onBack: () => context.canPop()
-                        ? context.pop()
-                        : context.go(AppRoutes.home),
-                    onShare: () => shareListingUrl(listing),
-                    onFavorite: widget.onToggleFavorite,
+                  background: Consumer(
+                    builder: (context, ref, _) {
+                      final isFavorite = ref.watch(
+                            toggleFavoriteProvider
+                                .select((ids) => ids.contains(listing.id)),
+                          ) ||
+                          listing.isFavorite;
+                      final favoriteLoading = ref.watch(
+                        listingFavoriteLoadingProvider
+                            .select((id) => id == listing.id),
+                      );
+                      return ListingDetailGallery(
+                        listing: listing,
+                        isFavorite: isFavorite,
+                        favoriteLoading: favoriteLoading,
+                        onBack: () => context.canPop()
+                            ? context.pop()
+                            : context.go(AppRoutes.home),
+                        onShare: () => shareListingUrl(listing),
+                        onFavorite: widget.onToggleFavorite,
+                      );
+                    },
                   ),
                 ),
               ),
               SliverToBoxAdapter(
-                child: _ListingDetailBody(
-                  listing: listing,
-                  isOwner: widget.isOwner,
+                child: Column(
+                  children: [
+                    _ListingDetailBody(
+                      listing: listing,
+                      isOwner: widget.isOwner,
+                    ),
+                    SizedBox(height: _scrollBottomInset),
+                  ],
                 ),
               ),
             ],
           ),
-          bottomNavigationBar: ListingDetailBottomBar(
+        ),
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+          left: 0,
+          right: 0,
+          bottom: _bottomBarVisible ? 0 : -320,
+          child: ListingDetailBottomBar(
             listing: listing,
             isOwner: widget.isOwner,
             onShareWhatsApp: _shareListingToWhatsApp,
@@ -467,6 +512,29 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
   }
 }
 
+class _NegotiablePill extends StatelessWidget {
+  const _NegotiablePill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0x20FFFFFF)),
+      ),
+      child: const Text(
+        'قابل للتفاوض',
+        style: TextStyle(
+          fontSize: 11,
+          color: AppColors.pureWhite,
+        ),
+      ),
+    );
+  }
+}
+
 class _BadgeChip extends StatelessWidget {
   const _BadgeChip({required this.label, this.color});
 
@@ -528,7 +596,7 @@ class _ListingInfoTab extends StatelessWidget {
         if (listing.hasListingVideo) ...[
           Text(
             '🎥 جولة بالفيديو',
-            style: GoogleFonts.cairo(
+            style: AppFonts.cairo(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.primary,
@@ -553,6 +621,7 @@ class _ListingInfoTab extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               listing.formattedPrice,
@@ -563,10 +632,7 @@ class _ListingInfoTab extends StatelessWidget {
             ),
             if (listing.isNegotiable) ...[
               const SizedBox(width: 8),
-              Chip(
-                label: const Text('قابل للتفاوض'),
-                visualDensity: VisualDensity.compact,
-              ),
+              const _NegotiablePill(),
             ],
           ],
         ),
@@ -829,11 +895,8 @@ class _ListingLocationTabState extends State<_ListingLocationTab> {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0x40000000),
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 10),
-                ],
               ),
               child: Row(
                 textDirection: TextDirection.rtl,
@@ -841,12 +904,12 @@ class _ListingLocationTabState extends State<_ListingLocationTab> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F5EE),
+                      color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.location_on,
-                      color: AppColors.primary,
+                      color: AppColors.volt,
                       size: 20,
                     ),
                   ),
@@ -862,7 +925,7 @@ class _ListingLocationTabState extends State<_ListingLocationTab> {
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF111111),
+                            color: AppColors.pureWhite,
                           ),
                           textAlign: TextAlign.right,
                           maxLines: 2,
@@ -873,7 +936,7 @@ class _ListingLocationTabState extends State<_ListingLocationTab> {
                             governorateLabel,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: AppColors.pureWhite.withValues(alpha: 0.85),
                             ),
                             textAlign: TextAlign.right,
                           ),

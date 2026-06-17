@@ -60,6 +60,7 @@ function FeatureToggleItem({ listing }: { listing: ListingCard }) {
 export function ListingsTable({ data }: { data: ListingCard[] }) {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const [bulkPending, startBulk] = React.useTransition();
+  const [bulkError, setBulkError] = React.useState<string | null>(null);
 
   const columns = React.useMemo<ColumnDef<ListingCard>[]>(
     () => [
@@ -193,11 +194,16 @@ export function ListingsTable({ data }: { data: ListingCard[] }) {
   const selectedIds = Object.keys(rowSelection);
 
   function runBulk(op: string) {
+    setBulkError(null);
     startBulk(async () => {
       const fd = new FormData();
       fd.set("ids", selectedIds.join(","));
       fd.set("op", op);
-      await bulkListingAction(fd);
+      const result = await bulkListingAction(fd);
+      if (result.ok === false) {
+        setBulkError(result.error);
+        return;
+      }
       setRowSelection({});
     });
   }
@@ -222,6 +228,11 @@ export function ListingsTable({ data }: { data: ListingCard[] }) {
 
   return (
     <div className="space-y-3">
+      {bulkError && (
+        <p className="rounded-[14px] border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+          {bulkError}
+        </p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {selectedIds.length > 0 ? (
@@ -229,8 +240,8 @@ export function ListingsTable({ data }: { data: ListingCard[] }) {
               <span className="text-sm text-muted-foreground">
                 {selectedIds.length} محدد
               </span>
-              <Button size="sm" variant="outline" disabled={bulkPending} onClick={() => runBulk("approve")}>
-                قبول
+              <Button size="sm" disabled={bulkPending} onClick={() => runBulk("approve")}>
+                موافقة
               </Button>
               <Button size="sm" variant="outline" disabled={bulkPending} onClick={() => runBulk("feature")}>
                 تمييز
@@ -252,7 +263,7 @@ export function ListingsTable({ data }: { data: ListingCard[] }) {
         </Button>
       </div>
 
-      <div className="rounded-lg border border-border bg-card">
+      <div className="rounded-[16px] border border-border bg-card">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (

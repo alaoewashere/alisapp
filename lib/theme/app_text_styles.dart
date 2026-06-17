@@ -1,74 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import '../core/theme/app_fonts.dart';
 import '../core/constants/app_colors.dart';
 
-/// Semantic Arabic typography for Sello (Cairo + Tajawal + Inter).
+/// Semantic Arabic typography for Sello (Thmanyah Sans / Serif Text / Serif Display).
 abstract final class AppTextStyles {
   /// Screen titles, section headers.
-  static TextStyle get headline => GoogleFonts.cairo(
+  static TextStyle get headline => AppFonts.sans(
         fontSize: 22,
         fontWeight: FontWeight.w700,
-        color: const Color(0xFF111111),
+        color: AppColors.pureWhite,
         height: 1.4,
       );
 
   /// Card titles, field labels above inputs.
-  static TextStyle get subheading => GoogleFonts.cairo(
+  static TextStyle get subheading => AppFonts.sans(
         fontSize: 15,
-        fontWeight: FontWeight.w600,
-        color: const Color(0xFF222222),
+        fontWeight: FontWeight.w700,
+        color: AppColors.pureWhite,
       );
 
   /// Descriptions, listing details, general content.
-  static TextStyle get body => GoogleFonts.tajawal(
+  static TextStyle get body => AppFonts.serifText(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: const Color(0xFF333333),
+        color: const Color(0xE6FFFFFF), // ~90% white
         height: 1.75,
       );
 
   /// Placeholder-adjacent helper text, section captions.
-  static TextStyle get caption => GoogleFonts.tajawal(
+  static TextStyle get caption => AppFonts.serifText(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: const Color(0xFFAAAAAA),
+        color: AppColors.textMuted,
       );
 
-  /// Primary action buttons.
-  static TextStyle get button => GoogleFonts.cairo(
+  /// Primary action buttons (dark text on Volt Green).
+  static TextStyle get button => AppFonts.sans(
         fontSize: 16,
         fontWeight: FontWeight.w700,
-        color: Colors.white,
+        color: AppColors.canvas,
         letterSpacing: 0.3,
       );
 
   /// Text the user types in form fields.
-  static TextStyle get input => GoogleFonts.tajawal(
+  static TextStyle get input => AppFonts.serifText(
         fontSize: 15,
         fontWeight: FontWeight.w400,
-        color: const Color(0xFF1A1A1A),
+        color: AppColors.pureWhite,
       );
 
-  /// Prices and numeric emphasis (Latin numerals).
-  static TextStyle get price => GoogleFonts.inter(
-        fontSize: 18,
+  /// Prices and numeric emphasis — large balance-style figures.
+  static TextStyle get price => AppFonts.sans(
+        fontSize: 19,
         fontWeight: FontWeight.w700,
-        color: const Color(0xFF111111),
+        color: AppColors.pureWhite,
       );
 
   /// Input hint / placeholder.
-  static TextStyle get hint => GoogleFonts.tajawal(
+  static TextStyle get hint => AppFonts.serifText(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: const Color(0xFFBBBBBB),
+        color: const Color(0x66FFFFFF), // ~40% white
       );
 
-  /// Character counters (Inter numerals).
-  static TextStyle get counter => GoogleFonts.inter(
+  /// Character counters.
+  static TextStyle get counter => AppFonts.serifDisplay(
         fontSize: 11,
         fontWeight: FontWeight.w400,
-        color: const Color(0xFFCCCCCC),
+        color: const Color(0x59FFFFFF), // ~35% white
       );
 
   /// Builds Material [TextTheme] aligned with this system.

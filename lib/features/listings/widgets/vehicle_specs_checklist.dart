@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../constants/vehicle_listing_options.dart';
+import 'vehicle_form_field_card.dart';
 
-const _dividerColor = Color(0xFFE5E5EA);
+const _dividerColor = AppColors.glassBorder;
 
 /// Sahibinden-style accordion checklist for vehicle specs (one group open at a time).
 class VehicleSpecsChecklist extends StatefulWidget {
@@ -92,17 +93,14 @@ class _SpecAccordionGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      clipBehavior: Clip.antiAlias,
+    return VehicleFormFieldCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InkWell(
             onTap: onHeaderTap,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 children: [
                   Text(
@@ -110,7 +108,7 @@ class _SpecAccordionGroup extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                   if (selectedCount > 0) ...[
@@ -185,7 +183,7 @@ class _SelectedCountBadge extends StatelessWidget {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: AppColors.canvas,
         ),
       ),
     );
@@ -217,7 +215,7 @@ class _SpecCheckRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? AppColors.primary : AppColors.textDark,
+                  color: isSelected ? AppColors.volt : AppColors.pureWhite,
                 ),
               ),
             ),
@@ -244,12 +242,12 @@ class _CircleCheckbox extends StatelessWidget {
         shape: BoxShape.circle,
         color: selected ? AppColors.primary : Colors.transparent,
         border: Border.all(
-          color: selected ? AppColors.primary : const Color(0xFFC7C7CC),
+          color: selected ? AppColors.volt : AppColors.glassBorder,
           width: 1.5,
         ),
       ),
       child: selected
-          ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+          ? const Icon(Icons.check_rounded, size: 16, color: AppColors.canvas)
           : null,
     );
   }

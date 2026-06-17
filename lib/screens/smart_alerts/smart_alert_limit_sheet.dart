@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 
@@ -7,7 +7,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
-    backgroundColor: Colors.white,
+    backgroundColor: AppColors.fieldCarbon,
     builder: (context) {
       return SafeArea(
         child: Padding(
@@ -25,7 +25,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
               Text(
                 'وصلت للحد الأقصى للمستخدمين المجانيين (3 تنبيهات)',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textDark,
@@ -35,7 +35,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
               Text(
                 'ترقّ إلى Pro للحصول على تنبيهات غير محدودة',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 14,
                   color: AppColors.textMuted,
                   height: 1.5,
@@ -44,7 +44,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('حسناً', style: GoogleFonts.cairo()),
+                child: Text('حسناً', style: AppFonts.cairo()),
               ),
             ],
           ),

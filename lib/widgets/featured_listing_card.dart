@@ -1,14 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/utils/cached_network_image_utils.dart';
 import '../core/utils/listing_display_title.dart';
 import '../shared/models/listing_model.dart';
+import '../shared/widgets/listing_card_favorite_button.dart';
+import '../shared/widgets/package_badge.dart';
 
 /// Compact gold-accent card for the home premium listings carousel.
-class FeaturedListingCard extends StatelessWidget {
+class FeaturedListingCard extends ConsumerWidget {
   const FeaturedListingCard({super.key, required this.listing});
 
   final ListingModel listing;
@@ -24,7 +27,7 @@ class FeaturedListingCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () => context.push('/listing/${listing.id}'),
       child: Container(
@@ -45,6 +48,7 @@ class FeaturedListingCard extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Stack(
@@ -52,8 +56,11 @@ class FeaturedListingCard extends StatelessWidget {
                 AspectRatio(
                   aspectRatio: 4 / 3,
                   child: _imageUrl != null
-                      ? CachedNetworkImage(
+                      ? cachedListingImage(
+                          context: context,
                           imageUrl: _imageUrl!,
+                          width: 280,
+                          height: 210,
                           fit: BoxFit.cover,
                           errorWidget: (_, _, _) => _imagePlaceholder(),
                         )
@@ -61,60 +68,45 @@ class FeaturedListingCard extends StatelessWidget {
                 ),
                 Positioned(
                   top: 8,
+                  left: 8,
+                  child: ListingFavoriteToggleButton(listing: listing),
+                ),
+                Positioned(
+                  top: 8,
                   right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.listingPremiumGoldGradient,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          color: Colors.white,
-                          size: 10,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          'مميز',
-                          style: GoogleFonts.cairo(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: PackageBadge(
+                    package: ListingPackage.premium,
+                    size: PackageBadgeSize.compact,
                   ),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    listingDisplayTitle(listing),
-                    style: GoogleFonts.cairo(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textDark,
+                  SizedBox(
+                    height: 30,
+                    child: Text(
+                      listingDisplayTitle(listing),
+                      style: AppFonts.cairo(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                      softWrap: true,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     listing.formattedPrice,
-                    style: GoogleFonts.inter(
+                    style: AppFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,

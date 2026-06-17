@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/supabase/public_profiles_query.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/listing_package_utils.dart';
 import '../../../shared/models/filter_model.dart';
@@ -25,14 +26,12 @@ class ListingsRepository {
   static const _listingSelect = '''
     *,
     categories(name_ar),
-    profiles!listings_user_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone, is_verified, verification_status, avg_rating, rating_count),
     listing_images(id, listing_id, storage_path, sort_order, is_primary, url)
   ''';
 
   static const _listingDetailSelect = '''
     *,
     categories(name_ar, parent_id, parent:categories!categories_parent_id_fkey(name_ar)),
-    profiles!listings_user_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone, is_verified, verification_status, created_at, avg_rating, rating_count),
     listing_images(id, listing_id, storage_path, sort_order, is_primary, url)
   ''';
 
@@ -41,7 +40,10 @@ class ListingsRepository {
     return _client.storage.from(AppConstants.storageBucket).getPublicUrl(path);
   }
 
-  Future<List<ListingModel>> getFeaturedListings({int limit = 10}) async {
+  Future<List<ListingModel>> getFeaturedListings({
+    int limit = 10,
+    String? userIdForFavorites,
+  }) async {
     final data = await _client
         .from('listings')
         .select(_listingSelect)
@@ -56,7 +58,7 @@ class ListingsRepository {
         .order('created_at', ascending: false)
         .limit(limit);
 
-    final listings = await _mapListings(data, null);
+    final listings = await _mapListings(data, userIdForFavorites);
     return listings.where((listing) => listing.isPremiumListing).toList();
   }
 
@@ -817,15 +819,24 @@ class ListingsRepository {
     String? userPhone,
     String? userEmail,
   }) async {
-    await _client.from('listing_purchases').insert({
-      'user_id': userId,
-      'listing_id': listingId,
-      'package_type': packageType,
-      'price': price,
-      'user_name': userName,
-      'user_phone': userPhone,
-      'user_email': userEmail,
-    });
+    final response = await _client.functions.invoke(
+      'verify-purchase',
+      body: {
+        'listing_id': listingId,
+        'package_type': packageType,
+        'price': price,
+        'user_name': userName,
+        'user_phone': userPhone,
+        'user_email': userEmail,
+      },
+    );
+
+    if (response.status != 200 && response.status != 202) {
+      final error = response.data;
+      throw Exception(
+        'verify-purchase failed (${response.status}): $error',
+      );
+    }
   }
 
   Map<String, dynamic> _listingInsertRow({
@@ -1085,6 +1096,11 @@ class ListingsRepository {
     List<dynamic> data,
     String? userId,
   ) async {
+    final maps = data
+        .map((row) => Map<String, dynamic>.from(row as Map))
+        .toList();
+    await _attachSellerProfiles(maps);
+
     Set<String> favoriteIds = {};
     if (userId != null && data.isNotEmpty) {
       final ids = data.map((e) => (e as Map)['id'] as String).toList();
@@ -1096,8 +1112,7 @@ class ListingsRepository {
       favoriteIds = (favs as List).map((e) => e['listing_id'] as String).toSet();
     }
 
-    return data.map((row) {
-      final map = Map<String, dynamic>.from(row as Map);
+    return maps.map((map) {
       final images = (map['listing_images'] as List?) ?? [];
       if (images.isNotEmpty) {
         images.sort((a, b) {
@@ -1125,5 +1140,44 @@ class ListingsRepository {
     }).toList();
   }
 
+  Future<List<Map<String, dynamic>>> enrichListingMaps(
+    List<Map<String, dynamic>> maps,
+  ) async {
+    final copies = maps.map(Map<String, dynamic>.from).toList();
+    await _attachSellerProfiles(copies);
+    return copies;
+  }
+
+  Future<void> _attachSellerProfiles(List<Map<String, dynamic>> maps) async {
+    if (maps.isEmpty) return;
+    final userIds = maps.map((m) => m['user_id'] as String).toSet().toList();
+    final sellers = await fetchPublicProfiles(_client, userIds);
+    final byId = <String, Map<String, dynamic>>{
+      for (final map in sellers) map['id'] as String: map,
+    };
+    for (final map in maps) {
+      final seller = byId[map['user_id'] as String];
+      if (seller != null) {
+        map['profiles'] = seller;
+      }
+    }
+  }
+
   String publicUrlForPath(String path) => _publicUrl(path);
+
+  Future<int> fetchMonthlyFreePostCount(String userId) async {
+    final result = await _client.rpc(
+      'get_or_reset_monthly_free_count',
+      params: {'p_user_id': userId},
+    );
+    return (result as num?)?.toInt() ?? 0;
+  }
+
+  Future<int> incrementMonthlyFreePostCount(String userId) async {
+    final result = await _client.rpc(
+      'increment_monthly_free_count',
+      params: {'p_user_id': userId},
+    );
+    return (result as num?)?.toInt() ?? 0;
+  }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/dicebear_avatars.dart';
@@ -75,7 +75,7 @@ class _AvatarPickerSheetState extends State<AvatarPickerSheet> {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
               'اختر صورتك الرمزية',
-              style: GoogleFonts.cairo(
+              style: AppFonts.cairo(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,

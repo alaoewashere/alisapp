@@ -13,35 +13,20 @@ final listingDetailProvider =
     FutureProvider.family<ListingModel?, String>((ref, listingId) async {
   final userId = ref.watch(currentUserIdProvider);
   final repo = ref.watch(listingsRepositoryProvider);
-  final listing = await repo.getListingById(
+  return repo.getListingById(
     listingId,
     userIdForFavorites: userId,
   );
-  if (listing != null) {
-    repo.incrementViews(listingId);
-  }
-  return listing;
 });
 
 final listingDetailByReferenceProvider =
     FutureProvider.family<ListingModel?, int>((ref, referenceNo) async {
   final userId = ref.watch(currentUserIdProvider);
   final repo = ref.watch(listingsRepositoryProvider);
-  final listing = await repo.getListingByReferenceNo(
+  return repo.getListingByReferenceNo(
     referenceNo,
     userIdForFavorites: userId,
   );
-  if (listing != null) {
-    repo.incrementViews(listing.id);
-  }
-  return listing;
-});
-
-final isOwnerProvider = Provider.family<bool, String>((ref, listingId) {
-  final listing = ref.watch(listingDetailProvider(listingId)).value;
-  final userId = ref.watch(currentUserIdProvider);
-  if (listing == null || userId == null) return false;
-  return listing.userId == userId;
 });
 
 final sellerOtherListingsProvider =
@@ -61,23 +46,6 @@ final sellerListingsCountProvider =
       .watch(listingsRepositoryProvider)
       .countSellerActiveListings(sellerId);
 });
-
-/// Local UI toggle for description expand on detail screen.
-final descriptionExpandedProvider =
-    NotifierProvider.family<DescriptionExpandedNotifier, bool, String>(
-  DescriptionExpandedNotifier.new,
-);
-
-class DescriptionExpandedNotifier extends Notifier<bool> {
-  DescriptionExpandedNotifier(this.listingId);
-
-  final String listingId;
-
-  @override
-  bool build() => false;
-
-  void toggle() => state = !state;
-}
 
 final listingDetailActionsProvider =
     NotifierProvider<ListingDetailActionsNotifier, AsyncValue<void>>(

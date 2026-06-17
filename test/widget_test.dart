@@ -30,6 +30,25 @@ void main() {
   test('Validators.normalizeLocalDigits strips Iraqi leading zero', () {
     expect(Validators.normalizeLocalDigits('07901234567', 'IQ'), '7901234567');
     expect(Validators.normalizeLocalDigits('9647901234567', 'IQ'), '7901234567');
+    expect(
+      Validators.normalizeLocalDigits(
+        '905342660876',
+        'TR',
+        phoneCode: '90',
+      ),
+      '5342660876',
+    );
+    expect(
+      Validators.formatE164(
+        '+90',
+        Validators.normalizeLocalDigits(
+          '905342660876',
+          'TR',
+          phoneCode: '90',
+        ),
+      ),
+      '+905342660876',
+    );
   });
 
   test('Validators.toE164 adds country code', () {

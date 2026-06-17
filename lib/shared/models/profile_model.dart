@@ -6,6 +6,7 @@ class ProfileModel {
     required this.fullName,
     this.email,
     this.phone,
+    this.phoneVerified = false,
     this.username,
     this.avatarSeed,
     this.avatarUrl,
@@ -27,6 +28,7 @@ class ProfileModel {
   final String fullName;
   final String? email;
   final String? phone;
+  final bool phoneVerified;
   final String? username;
   final String? avatarSeed;
   final String? avatarUrl;
@@ -72,6 +74,7 @@ class ProfileModel {
     String? fullName,
     String? email,
     String? phone,
+    bool? phoneVerified,
     String? username,
     bool clearUsername = false,
     String? avatarSeed,
@@ -98,6 +101,7 @@ class ProfileModel {
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      phoneVerified: phoneVerified ?? this.phoneVerified,
       username: clearUsername ? null : (username ?? this.username),
       avatarSeed: avatarSeed ?? this.avatarSeed,
       avatarUrl: clearAvatarUrl ? null : (avatarUrl ?? this.avatarUrl),
@@ -133,6 +137,7 @@ class ProfileModel {
           '',
       email: json['email'] as String?,
       phone: json['phone'] as String?,
+      phoneVerified: json['phone_verified'] as bool? ?? false,
       username: json['username'] as String?,
       avatarSeed: json['avatar_seed'] as String?,
       avatarUrl: json['avatar_url'] as String?,
@@ -199,8 +204,6 @@ class ProfileModel {
       'full_name': fullName,
       'display_name': fullName,
       'email': email,
-      'phone': phone,
-      'username': username,
       'avatar_seed': avatarSeed,
       'avatar_url': avatarUrl,
       'avatar_index': avatarIndex,

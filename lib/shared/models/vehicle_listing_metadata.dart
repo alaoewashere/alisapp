@@ -4,6 +4,7 @@ class VehicleListingMetadata {
     this.trim = '',
     this.mileage,
     this.mileageUnit = MileageUnit.km,
+    this.year,
     this.engine = '',
     this.cylinders,
     this.paintParts,
@@ -22,6 +23,7 @@ class VehicleListingMetadata {
   final String trim;
   final int? mileage;
   final MileageUnit mileageUnit;
+  final int? year;
   final String engine;
   final String? cylinders;
   final String? paintParts;
@@ -46,6 +48,8 @@ class VehicleListingMetadata {
     int? mileage,
     bool clearMileage = false,
     MileageUnit? mileageUnit,
+    int? year,
+    bool clearYear = false,
     String? engine,
     String? cylinders,
     bool clearCylinders = false,
@@ -74,6 +78,7 @@ class VehicleListingMetadata {
       trim: trim ?? this.trim,
       mileage: clearMileage ? null : (mileage ?? this.mileage),
       mileageUnit: mileageUnit ?? this.mileageUnit,
+      year: clearYear ? null : (year ?? this.year),
       engine: engine ?? this.engine,
       cylinders: clearCylinders ? null : (cylinders ?? this.cylinders),
       paintParts: clearPaintParts ? null : (paintParts ?? this.paintParts),
@@ -101,6 +106,7 @@ class VehicleListingMetadata {
       'trim': trim,
       if (mileage != null) 'mileage': mileage,
       'mileage_unit': mileageUnit.value,
+      if (year != null) 'year': year,
       'engine': engine,
       if (cylinders != null) 'cylinders': cylinders,
       if (paintParts != null) 'paint_parts': paintParts,
@@ -127,6 +133,7 @@ class VehicleListingMetadata {
       trim: json['trim'] as String? ?? '',
       mileage: (json['mileage'] as num?)?.toInt(),
       mileageUnit: MileageUnit.fromValue(json['mileage_unit'] as String?),
+      year: (json['year'] as num?)?.toInt(),
       engine: json['engine'] as String? ?? '',
       cylinders: json['cylinders'] as String?,
       paintParts: json['paint_parts'] as String?,

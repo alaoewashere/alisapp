@@ -9,6 +9,7 @@ import '../../core/constants/verification_constants.dart';
 import '../../core/providers/locale_provider.dart';
 import '../../core/l10n/l10n_provider.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../shared/widgets/sello_app_bar.dart';
 import '../../features/auth/presentation/otp_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/profile_setup_screen.dart';
@@ -17,6 +18,7 @@ import '../../screens/auth/email_verify_screen.dart';
 import '../../screens/auth/forgot_password_screen.dart';
 import '../../screens/auth/phone_verify_screen.dart';
 import '../../screens/auth/username_setup_screen.dart';
+import '../../screens/auth/password_reset_email_sent_screen.dart';
 import '../../screens/auth/reset_password_screen.dart';
 import '../../screens/ratings_screen.dart';
 import '../../screens/verification/verification_document_type_screen.dart';
@@ -38,13 +40,13 @@ import '../../features/listings/presentation/search_results_screen.dart';
 import '../../features/listings/presentation/search_screen.dart';
 import '../../features/profile/data/profile_repository.dart';
 import '../../screens/settings/edit_profile_screen.dart';
+import '../../screens/settings/profile_phone_otp_screen.dart';
 import '../../features/profile/presentation/my_listings_screen.dart';
 import '../../features/profile/presentation/notifications_settings_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../screens/settings/language_screen.dart';
 import '../../screens/settings/settings_screen.dart';
 import '../../features/profile/presentation/seller_profile_screen.dart';
-import '../../features/splash/presentation/splash_screen.dart';
 import '../../shared/widgets/app_bottom_nav.dart';
 import '../../screens/smart_alerts/create_alert_screen.dart';
 import '../../screens/smart_alerts/my_alerts_screen.dart';
@@ -52,7 +54,6 @@ import '../../models/smart_alert.dart';
 import '../../shared/models/listing_model.dart';
 
 abstract final class AppRoutes {
-  static const splash = '/splash';
   static const home = '/';
   static const homeNav = '/home';
   static const login = '/login';
@@ -60,7 +61,9 @@ abstract final class AppRoutes {
   static const signUp = '/sign-up';
   static const forgotPassword = '/forgot-password';
   static const phoneVerify = '/phone-verify';
+  static const profilePhoneVerify = '/profile-phone-verify';
   static const emailVerify = '/email-verify';
+  static const passwordResetEmailSent = '/password-reset-email-sent';
   static const resetPassword = '/reset-password';
   static const otp = '/otp';
   static const profileSetup = '/profile-setup';
@@ -116,7 +119,6 @@ abstract final class AppRoutes {
 }
 
 bool isGuestAllowedPath(String path) {
-  if (path == AppRoutes.splash) return true;
   if (path == AppRoutes.language) return true;
   if (path == AppRoutes.home ||
       path == AppRoutes.homeNav ||
@@ -146,7 +148,7 @@ bool isGuestBlockedPath(String path) {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
-    initialLocation: AppRoutes.splash,
+    initialLocation: AppRoutes.home,
     redirect: (context, state) async {
       try {
         return await _resolveRedirect(ref, state);
@@ -158,10 +160,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
     },
     routes: [
-      GoRoute(
-        path: AppRoutes.splash,
-        builder: (_, _) => const SplashScreen(),
-      ),
       ShellRoute(
         builder: (context, state, child) => AppBottomNav(child: child),
         routes: [
@@ -229,11 +227,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.phoneVerify,
         builder: (_, state) => PhoneVerifyScreen(
           phone: state.uri.queryParameters['phone'] ?? '',
+          purpose: state.uri.queryParameters['purpose'],
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.profilePhoneVerify,
+        builder: (_, state) => ProfilePhoneOtpScreen(
+          phone: state.uri.queryParameters['phone'] ?? '',
         ),
       ),
       GoRoute(
         path: AppRoutes.emailVerify,
         builder: (_, state) => EmailVerifyScreen(
+          email: state.uri.queryParameters['email'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.passwordResetEmailSent,
+        builder: (_, state) => PasswordResetEmailSentScreen(
           email: state.uri.queryParameters['email'] ?? '',
         ),
       ),
@@ -366,7 +377,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     errorBuilder: (_, state) {
       final strings = ref.read(appLocalizationsProvider);
       return Scaffold(
-        appBar: AppBar(title: Text(strings.appName)),
+        appBar: SelloAppBar(title: Text(strings.appName)),
         body: Center(child: Text('${strings.pageNotFound}: ${state.uri}')),
       );
     },
@@ -391,18 +402,6 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
   final isLanguageOnboarding =
       state.uri.queryParameters['onboarding'] != 'false';
 
-  if (path == AppRoutes.splash) return null;
-
-  final prefs = await SharedPreferences.getInstance();
-  final languageOnboardingDone =
-      prefs.getBool(languageOnboardingCompleteKey) ?? false;
-
-  // First launch — unsigned user must pick a language before anything else.
-  if (!languageOnboardingDone && session == null) {
-    if (path == AppRoutes.language && isLanguageOnboarding) return null;
-    return '${AppRoutes.language}?onboarding=true';
-  }
-
   // Signed-in users skip onboarding language picker.
   if (session != null && path == AppRoutes.language && isLanguageOnboarding) {
     return AppRoutes.home;
@@ -416,6 +415,7 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
       path == AppRoutes.forgotPassword ||
       path == AppRoutes.phoneVerify ||
       path == AppRoutes.emailVerify ||
+      path == AppRoutes.passwordResetEmailSent ||
       path == AppRoutes.resetPassword ||
       path == AppRoutes.otp ||
       path == AppRoutes.profileSetup ||
@@ -455,6 +455,7 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
     orElse: () => false,
   );
 
+  final prefs = await SharedPreferences.getInstance();
   final usernameSkipped = prefs.getBool(usernameSetupSkippedKey) ?? false;
   final needsUsernameSetup = !hasUsername && !usernameSkipped;
 
@@ -472,6 +473,10 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
   }
 
   if (!profileComplete && path != AppRoutes.profileSetup) {
+    if (path == AppRoutes.editProfile ||
+        path == AppRoutes.profilePhoneVerify) {
+      return null;
+    }
     return AppRoutes.profileSetup;
   }
 

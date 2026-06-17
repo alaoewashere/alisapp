@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/supabase/public_profiles_query.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/conversation_model.dart';
@@ -31,9 +32,7 @@ class ChatRepository {
     listings(
       title, title_ar, price_iqd, price,
       listing_images(storage_path, url, sort_order, is_primary)
-    ),
-    buyer:profiles!conversations_buyer_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone),
-    seller:profiles!conversations_seller_id_fkey(full_name, display_name, avatar_url, avatar_seed, phone)
+    )
   ''';
 
   String _publicUrl(String path) {
@@ -63,6 +62,7 @@ class ChatRepository {
     Map<String, dynamic> row,
     String currentUserId,
   ) async {
+    await _attachParticipantProfiles(row);
     final unread = await _unreadCountForConversation(
       row['id'] as String,
       currentUserId,
@@ -75,6 +75,20 @@ class ChatRepository {
         row['listings'] as Map<String, dynamic>?,
       ),
     );
+  }
+
+  Future<void> _attachParticipantProfiles(Map<String, dynamic> row) async {
+    final buyerId = row['buyer_id'] as String?;
+    final sellerId = row['seller_id'] as String?;
+    final ids = [buyerId, sellerId].whereType<String>().toList();
+    if (ids.isEmpty) return;
+
+    final profiles = await fetchPublicProfiles(_client, ids);
+    for (final map in profiles) {
+      final id = map['id'] as String;
+      if (id == buyerId) row['buyer'] = map;
+      if (id == sellerId) row['seller'] = map;
+    }
   }
 
   Future<int> _unreadCountForConversation(

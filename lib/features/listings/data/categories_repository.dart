@@ -73,6 +73,20 @@ class CategoriesRepository {
     return _mapRows(data);
   }
 
+  /// Drill-down children for post-listing step 1 (handles سيارات للإيجار → سيارات brands).
+  Future<List<CategoryModel>> getDrillDownChildren(
+    CategoryModel category,
+    List<CategoryModel> all,
+  ) async {
+    final direct = await getChildCategories(category.id);
+    if (direct.isNotEmpty) return direct;
+
+    final aliasParentId = effectiveBrowseParentId(category.id, all);
+    if (aliasParentId == category.id) return direct;
+
+    return getChildCategories(aliasParentId);
+  }
+
   Future<List<CategoryModel>> fetchParentCategories() async {
     final data = await _client
         .from('categories')

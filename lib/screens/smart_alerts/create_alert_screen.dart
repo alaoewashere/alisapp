@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_governorates.dart';
-import '../../core/constants/notification_constants.dart';
+import '../../core/utils/digit_input_formatter.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../features/listings/providers/post_listing_provider.dart';
 import '../../features/listings/widgets/steps/step2_form_common.dart';
 import '../../models/smart_alert.dart';
+import '../../models/smart_alert_category.dart';
 import '../../services/smart_alert_service.dart';
+import '../../shared/models/category_model.dart';
 import '../../theme/app_form_fields.dart';
+import '../../theme/app_text_styles.dart';
 import 'smart_alert_limit_sheet.dart';
+import '../../shared/widgets/app_back_button.dart';
+import 'widgets/smart_alert_category_pickers.dart';
 
 class CreateAlertScreen extends ConsumerStatefulWidget {
   const CreateAlertScreen({super.key, this.prefill});
@@ -26,24 +31,21 @@ class CreateAlertScreen extends ConsumerStatefulWidget {
 class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _titleController;
-  late final TextEditingController _makeController;
-  late final TextEditingController _modelController;
   late final TextEditingController _yearMinController;
   late final TextEditingController _yearMaxController;
   late final TextEditingController _priceMinController;
   late final TextEditingController _priceMaxController;
 
-  String? _category;
+  List<CategoryModel> _categoryPath = [];
   String? _location;
   bool _saving = false;
+  bool _prefillPathLoaded = false;
 
   @override
   void initState() {
     super.initState();
     final prefill = widget.prefill;
     _titleController = TextEditingController(text: prefill?.title ?? '');
-    _makeController = TextEditingController(text: prefill?.make ?? '');
-    _modelController = TextEditingController(text: prefill?.model ?? '');
     _yearMinController = TextEditingController(
       text: prefill?.yearMin?.toString() ?? '',
     );
@@ -56,41 +58,41 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
     _priceMaxController = TextEditingController(
       text: prefill?.priceMax?.toString() ?? '',
     );
-    _category = prefill?.category;
     _location = prefill?.location;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefill = widget.prefill;
+      if (prefill == null || _prefillPathLoaded) return;
+      try {
+        final all = await ref.read(allCategoriesProvider.future);
+        if (!mounted) return;
+        final rebuilt = rebuildCategoryPathFromFields(
+          all: all,
+          category: prefill.category,
+          subcategory: prefill.subcategory,
+          make: prefill.make,
+          model: prefill.model,
+        );
+        if (rebuilt != null && rebuilt.isNotEmpty) {
+          setState(() {
+            _categoryPath = rebuilt;
+            _prefillPathLoaded = true;
+          });
+        }
+      } catch (_) {
+        // Categories optional for prefill.
+      }
+    });
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _makeController.dispose();
-    _modelController.dispose();
     _yearMinController.dispose();
     _yearMaxController.dispose();
     _priceMinController.dispose();
     _priceMaxController.dispose();
     super.dispose();
-  }
-
-  bool get _isVehicle =>
-      _category != null && _category!.trim() == kSmartAlertVehicleCategory;
-
-  Future<void> _pickCategory() async {
-    final picked = await showStep2PickerSheet(
-      context: context,
-      title: 'الفئة',
-      options: kSmartAlertCategoryOptions,
-      selected: _category,
-    );
-    if (picked != null && mounted) {
-      setState(() {
-        _category = picked;
-        if (!_isVehicle) {
-          _makeController.clear();
-          _modelController.clear();
-        }
-      });
-    }
   }
 
   Future<void> _pickLocation() async {
@@ -131,25 +133,30 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
 
     setState(() => _saving = true);
     try {
+      final categoryFields = categoryFieldsFromPath(_categoryPath);
+      final yearFromPath = categoryFields.year;
+      final yearMin = _parseInt(_yearMinController.text) ?? yearFromPath;
+      final yearMax = _parseInt(_yearMaxController.text) ?? yearFromPath;
+
       final alert = SmartAlert(
         id: '',
         userId: userId,
         title: _titleController.text.trim(),
-        category: _category,
-        make: _isVehicle ? _makeController.text.trim() : null,
-        model: _isVehicle ? _modelController.text.trim() : null,
-        yearMin: _parseInt(_yearMinController.text),
-        yearMax: _parseInt(_yearMaxController.text),
+        category: categoryFields.category,
+        subcategory: categoryFields.subcategory,
+        make: categoryFields.make,
+        model: categoryFields.model,
+        yearMin: yearMin,
+        yearMax: yearMax,
         priceMin: _parseInt(_priceMinController.text),
         priceMax: _parseInt(_priceMaxController.text),
         location: _location,
         createdAt: DateTime.now(),
       );
 
-      await ref.read(smartAlertServiceProvider).createAlert(
-            userId: userId,
-            alert: alert,
-          );
+      await ref
+          .read(smartAlertServiceProvider)
+          .createAlert(userId: userId, alert: alert);
 
       ref.invalidate(userSmartAlertsProvider);
 
@@ -158,7 +165,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
         SnackBar(
           content: Text(
             'تم حفظ التنبيه ✓ سنخبرك فور نشر إعلان مطابق',
-            style: GoogleFonts.cairo(),
+            style: AppFonts.cairo(),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -169,14 +176,14 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
         if (mounted) await showSmartAlertLimitSheet(context);
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message, style: GoogleFonts.cairo())),
+          SnackBar(content: Text(e.message, style: AppFonts.cairo())),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تعذّر حفظ التنبيه: $e', style: GoogleFonts.cairo()),
+            content: Text('تعذّر حفظ التنبيه: $e', style: AppFonts.cairo()),
           ),
         );
       }
@@ -195,12 +202,9 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
         elevation: 0,
         title: Text(
           'تنبيه ذكي جديد',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_forward),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBackButton(onPressed: () => context.pop()),
       ),
       body: Form(
         key: _formKey,
@@ -227,29 +231,10 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                         },
                       ),
                       const SizedBox(height: 8),
-                      Step2PickerTriggerRow(
-                        label: 'الفئة',
-                        displayValue: _category ?? 'الكل',
-                        onTap: _pickCategory,
+                      SmartAlertCategoryPickers(
+                        path: _categoryPath,
+                        onPathChanged: (path) => setState(() => _categoryPath = path),
                       ),
-                      if (_isVehicle) ...[
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _makeController,
-                          textDirection: TextDirection.rtl,
-                          decoration: AppFormDecorations.underline(
-                            hintText: 'الصانع',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _modelController,
-                          textDirection: TextDirection.rtl,
-                          decoration: AppFormDecorations.underline(
-                            hintText: 'الموديل',
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -257,7 +242,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                     children: [
                       Text(
                         'سنة الصنع',
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
@@ -269,10 +254,9 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                             child: TextFormField(
                               controller: _yearMinController,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
+                              inputFormatters: [appDigitsOnly()],
                               textAlign: TextAlign.center,
+                              style: AppTextStyles.input,
                               decoration: AppFormDecorations.underline(
                                 hintText: 'من',
                               ),
@@ -283,10 +267,9 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                             child: TextFormField(
                               controller: _yearMaxController,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
+                              inputFormatters: [appDigitsOnly()],
                               textAlign: TextAlign.center,
+                              style: AppTextStyles.input,
                               decoration: AppFormDecorations.underline(
                                 hintText: 'إلى',
                               ),
@@ -301,7 +284,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                     children: [
                       Text(
                         'السعر',
-                        style: GoogleFonts.cairo(
+                        style: AppFonts.cairo(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
                         ),
@@ -358,12 +341,12 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                           height: 22,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.canvas,
                           ),
                         )
                       : Text(
                           'حفظ التنبيه',
-                          style: GoogleFonts.cairo(
+                          style: AppFonts.cairo(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -388,9 +371,9 @@ class _FormCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.glassBorder),
         boxShadow: const [
           BoxShadow(
             color: AppColors.microShadow,

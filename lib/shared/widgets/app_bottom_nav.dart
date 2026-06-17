@@ -13,6 +13,56 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../features/chat/providers/chat_provider.dart';
 
+/// Layout metrics for the floating shell bottom nav (positioning only).
+abstract final class AppBottomNavLayout {
+  static const barHeight = 72.0;
+  static const sideMargin = 20.0;
+  /// Small gap above the home indicator, on top of [MediaQuery.padding.bottom].
+  static const safeBottomGap = 8.0;
+  /// Center "+" button [Transform.translate] — visual only; within [barHeight].
+  static const fabOverhang = 10.0;
+
+  static double _bottomInset(BuildContext context) =>
+      MediaQuery.paddingOf(context).bottom;
+
+  /// Padding around the floating nav pill (horizontal + above home indicator).
+  static EdgeInsets barOuterPadding(BuildContext context) {
+    final inset = _bottomInset(context);
+    return EdgeInsets.fromLTRB(
+      sideMargin,
+      0,
+      sideMargin,
+      inset + safeBottomGap,
+    );
+  }
+
+  /// Scroll-end clearance only — tight fit above the nav bar (not a static gap).
+  static double scrollBottomPadding(BuildContext context) {
+    final inset = _bottomInset(context);
+    return barHeight + inset + safeBottomGap;
+  }
+}
+
+/// Invisible until the user scrolls to the end — clears the floating nav bar.
+class AppBottomNavScrollSpacer extends StatelessWidget {
+  const AppBottomNavScrollSpacer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(height: AppBottomNavLayout.scrollBottomPadding(context));
+  }
+}
+
+/// Sliver variant for [CustomScrollView] tab screens.
+class AppBottomNavSliverSpacer extends StatelessWidget {
+  const AppBottomNavSliverSpacer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(child: AppBottomNavScrollSpacer());
+  }
+}
+
 /// Floating glass nav — souqly-redesign-studio FloatingGlassNavBar pattern.
 class AppBottomNav extends ConsumerWidget {
   const AppBottomNav({super.key, required this.child});
@@ -34,14 +84,13 @@ class AppBottomNav extends ConsumerWidget {
     final unreadAsync = ref.watch(unreadCountProvider);
     final unread = unreadAsync.value ?? 0;
     final strings = ref.watch(appLocalizationsProvider);
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.transparent,
       body: child,
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.fromLTRB(20, 0, 20, bottomInset + 20),
+        padding: AppBottomNavLayout.barOuterPadding(context),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppDecorations.navRadius),
           child: BackdropFilter(
@@ -54,7 +103,7 @@ class AppBottomNav extends ConsumerWidget {
                 boxShadow: AppDecorations.navShadow,
               ),
               child: SizedBox(
-                height: 72,
+                height: AppBottomNavLayout.barHeight,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -140,8 +189,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.primary : AppColors.textMuted;
-    final size = selected ? 26.0 : 22.0;
+    final iconColor = selected ? AppColors.canvas : AppColors.textMuted;
+    final labelColor = selected ? AppColors.volt : AppColors.textMuted;
 
     return GestureDetector(
       onTap: onTap,
@@ -152,19 +201,30 @@ class _NavItem extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(icon, color: color, size: size),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.volt : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(icon, color: iconColor, size: 22),
+              ),
               if (badgeCount > 0)
                 Positioned(
-                  top: -4,
-                  right: -8,
+                  top: -2,
+                  right: -2,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 5,
                       vertical: 1,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.accent,
+                      color: AppColors.heartAccent,
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.fieldCarbon, width: 1.5),
                     ),
                     constraints: const BoxConstraints(minWidth: 16),
                     child: Text(
@@ -180,13 +240,13 @@ class _NavItem extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
           Text(
             label,
             style: TextStyle(
               fontSize: 10,
               fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              color: color,
+              color: labelColor,
             ),
           ),
         ],
@@ -214,13 +274,13 @@ class _CenterAddButton extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Color(0x60005F54),
-                blurRadius: 10,
+                color: Color(0x66D4FF3A),
+                blurRadius: 14,
                 offset: Offset(0, 4),
               ),
             ],
           ),
-          child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
+          child: const Icon(Icons.add_rounded, color: AppColors.canvas, size: 30),
         ),
       ),
     );

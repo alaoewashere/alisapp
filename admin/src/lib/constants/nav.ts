@@ -37,6 +37,14 @@ export const navItems: NavItem[] = [
 export function titleForPath(pathname: string): string {
   const match = [...navItems]
     .sort((a, b) => b.href.length - a.href.length)
-    .find((item) => pathname === item.href || pathname.startsWith(item.href + "/"));
+    .find((item) => isNavItemActive(pathname, item.href));
   return match?.label ?? "لوحة التحكم";
+}
+
+/** True when [pathname] is under [href]. Overview (/dashboard) is exact-only. */
+export function isNavItemActive(pathname: string, href: string): boolean {
+  if (href === "/dashboard") {
+    return pathname === "/dashboard";
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
 }

@@ -21,6 +21,46 @@ void main() {
     expect(find.byType(AppLogo), findsOneWidget);
   });
 
+  testWidgets('AuthDarkHeader uses dark canvas without wave clipper', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: AuthDarkHeader(
+            title: 'مرحباً بك',
+            subtitle: 'سجّل دخولك للمتابعة',
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('مرحباً بك'), findsOneWidget);
+    expect(find.text('سجّل دخولك للمتابعة'), findsOneWidget);
+    expect(find.byType(AppLogo), findsOneWidget);
+    expect(find.byType(ClipPath), findsNothing);
+    expect(find.byType(AuthDarkHeader), findsOneWidget);
+  });
+
+  testWidgets('AuthDarkHeader supports overline and leading without logo', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AuthDarkHeader(
+            overline: 'أنشئ حسابك',
+            title: 'إنشاء حساب',
+            showLogo: false,
+            leading: TextButton(onPressed: () {}, child: const Text('تخطي')),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('أنشئ حسابك'), findsOneWidget);
+    expect(find.text('إنشاء حساب'), findsOneWidget);
+    expect(find.text('تخطي'), findsOneWidget);
+    expect(find.byType(AppLogo), findsNothing);
+    expect(find.byType(ClipPath), findsNothing);
+  });
+
   testWidgets('AuthHeroHeader animates when animations are provided', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

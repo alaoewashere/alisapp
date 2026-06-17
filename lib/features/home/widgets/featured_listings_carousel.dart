@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/models/listing_model.dart';
@@ -26,7 +26,7 @@ class FeaturedListingsCarousel extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'إعلانات مميزة',
-                style: GoogleFonts.cairo(
+                style: AppFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,

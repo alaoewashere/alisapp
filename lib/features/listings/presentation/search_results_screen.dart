@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_governorates.dart';
 import '../../../core/router/app_router.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../shared/models/filter_model.dart';
 import '../../../shared/widgets/error_widget.dart';
@@ -29,10 +30,7 @@ class SearchResultsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBackButton(onPressed: () => context.pop()),
         title: GestureDetector(
           onTap: () => context.push(AppRoutes.search),
           child: Text(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/widgets/app_logo.dart';
@@ -88,7 +88,7 @@ class AuthHeroHeader extends StatelessWidget {
       final overlineWidget = Text(
         overline!,
         textAlign: TextAlign.center,
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: 15,
           fontWeight: FontWeight.w500,
           color: Colors.white.withValues(alpha: 0.82),
@@ -120,7 +120,7 @@ class AuthHeroHeader extends StatelessWidget {
       final titleWidget = Text(
         title,
         textAlign: TextAlign.center,
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: 26,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -193,7 +193,7 @@ class AuthHeroHeader extends StatelessWidget {
                               Text(
                                 subtitle,
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.cairo(
+                                style: AppFonts.cairo(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white.withValues(alpha: 0.82),
@@ -250,4 +250,111 @@ class _AuthHeroWaveClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Clean dark header for auth screens — Deep Canvas, no colored shapes.
+class AuthDarkHeader extends StatelessWidget {
+  const AuthDarkHeader({
+    super.key,
+    required this.title,
+    this.subtitle = '',
+    this.overline,
+    this.leading,
+    this.logoSize = 72,
+    this.showLogo = true,
+    this.titleStyle,
+  });
+
+  final String title;
+  final String subtitle;
+  final String? overline;
+  final Widget? leading;
+  final double logoSize;
+  final bool showLogo;
+  final TextStyle? titleStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: AppColors.canvas,
+      child: SafeArea(
+        bottom: false,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            if (leading != null)
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 8),
+                  child: leading,
+                ),
+              ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                24,
+                leading != null ? 12 : 32,
+                24,
+                20,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (showLogo) ...[
+                      ColorFiltered(
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.pureWhite,
+                          BlendMode.srcIn,
+                        ),
+                        child: AppLogo(size: logoSize),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (overline != null && overline!.isNotEmpty) ...[
+                      Text(
+                        overline!,
+                        textAlign: TextAlign.center,
+                        style: AppFonts.sans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.pureWhite.withValues(alpha: 0.6),
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: titleStyle ??
+                          AppFonts.serifDisplay(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.pureWhite,
+                            height: 1.2,
+                          ),
+                    ),
+                    if (subtitle.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        subtitle,
+                        textAlign: TextAlign.center,
+                        style: AppFonts.sans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.pureWhite.withValues(alpha: 0.6),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

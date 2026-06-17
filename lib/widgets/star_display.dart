@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/utils/arabic_number.dart';
@@ -50,7 +50,7 @@ class StarDisplay extends StatelessWidget {
     if (count <= 0) return const SizedBox.shrink();
 
     final labelStyle = textStyle ??
-        GoogleFonts.cairo(
+        AppFonts.cairo(
           fontSize: starSize * 0.95,
           fontWeight: FontWeight.w600,
           color: AppColors.textDark,
@@ -148,7 +148,7 @@ class SellerRatingBadge extends StatelessWidget {
           const SizedBox(width: 2),
           Text(
             avgRating.toStringAsFixed(1),
-            style: GoogleFonts.inter(
+            style: AppFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: Colors.white,

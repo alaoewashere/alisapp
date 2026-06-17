@@ -2,7 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/chat_date_utils.dart';
@@ -10,6 +10,7 @@ import '../../../core/utils/phone_links.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/models/message_model.dart';
+import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
 import '../../../widgets/user_avatar.dart';
@@ -39,12 +40,6 @@ final _chatScrollControllerProvider =
   return controller;
 });
 
-final _markedReadProvider = Provider.autoDispose.family<void, String>((ref, id) {
-  Future.microtask(
-    () => ref.read(chatNotifierProvider.notifier).markAsRead(id),
-  );
-});
-
 class ChatScreen extends ConsumerWidget {
   const ChatScreen({super.key, required this.conversationId});
 
@@ -52,14 +47,10 @@ class ChatScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(_markedReadProvider(conversationId));
-
     final userId = ref.watch(currentUserIdProvider);
     final conversationAsync = ref.watch(conversationProvider(conversationId));
     final messagesAsync = ref.watch(messagesStreamProvider(conversationId));
     final pending = ref.watch(pendingMessagesProvider(conversationId));
-    final networkAsync = ref.watch(_networkStatusProvider);
-    final offline = networkAsync.value?.contains(ConnectivityResult.none) ?? false;
 
     ref.listen(messagesStreamProvider(conversationId), (prev, next) {
       final prevLen = prev?.value?.length ?? 0;
@@ -87,16 +78,7 @@ class ChatScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          if (offline)
-            MaterialBanner(
-              content: const Text('جاري إعادة الاتصال...'),
-              leading: const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-              actions: const [SizedBox.shrink()],
-            ),
+          _ChatOfflineBanner(),
           conversationAsync.maybeWhen(
             data: (conversation) {
               if (conversation == null) return const SizedBox.shrink();
@@ -118,7 +100,7 @@ class ChatScreen extends ConsumerWidget {
                   return Center(
                     child: Text(
                       'ابدأ المحادثة',
-                      style: GoogleFonts.tajawal(
+                      style: AppFonts.tajawal(
                         fontSize: 14,
                         color: AppColors.textMuted,
                       ),
@@ -143,11 +125,10 @@ class ChatScreen extends ConsumerWidget {
 
   PreferredSizeWidget _buildLoadingAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       elevation: 0.5,
       leadingWidth: 40,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, size: 18, color: AppColors.textDark),
+      leading: AppBackButton(
         onPressed: () {
           if (context.canPop()) {
             context.pop();
@@ -156,7 +137,7 @@ class ChatScreen extends ConsumerWidget {
       ),
       title: Text(
         'محادثة',
-        style: GoogleFonts.cairo(
+        style: AppFonts.cairo(
           fontSize: 15,
           fontWeight: FontWeight.w700,
           color: AppColors.textDark,
@@ -252,13 +233,12 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     final name = c.otherUserName ?? 'مستخدم';
 
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.canvas,
       elevation: 0.5,
       scrolledUnderElevation: 0.5,
       surfaceTintColor: Colors.transparent,
       leadingWidth: 40,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, size: 18, color: AppColors.textDark),
+      leading: AppBackButton(
         onPressed: () {
           if (context.canPop()) {
             context.pop();
@@ -296,7 +276,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.cairo(
+                  style: AppFonts.cairo(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
@@ -305,7 +285,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 if (_isOnline)
                   Text(
                     'متصل الآن',
-                    style: GoogleFonts.tajawal(
+                    style: AppFonts.tajawal(
                       fontSize: 11,
                       color: AppColors.approved,
                     ),
@@ -352,12 +332,6 @@ class _MessagesList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(_chatScrollControllerProvider(conversationId));
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ref.read(chatNearBottomProvider) && controller.hasClients) {
-        controller.jumpTo(controller.position.maxScrollExtent);
-      }
-    });
-
     return ListView.builder(
       controller: controller,
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
@@ -377,53 +351,76 @@ class _MessagesList extends ConsumerWidget {
             next.senderId != message.senderId ||
             !isSameChatDay(next.createdAt, message.createdAt);
 
-        return Column(
-          children: [
-            if (showDate) ChatDateSeparator(date: message.createdAt),
-            if (userId != null)
-              MessageBubble(
-                message: message,
-                currentUserId: userId!,
-                isFirstInGroup: isFirstInGroup,
-                isLastInGroup: isLastInGroup,
-                otherUserAvatarSeed: otherUserAvatarSeed,
-              ),
-          ],
+        return KeyedSubtree(
+          key: ValueKey(message.id),
+          child: Column(
+            children: [
+              if (showDate) ChatDateSeparator(date: message.createdAt),
+              if (userId != null)
+                MessageBubble(
+                  message: message,
+                  currentUserId: userId!,
+                  isFirstInGroup: isFirstInGroup,
+                  isLastInGroup: isLastInGroup,
+                  otherUserAvatarSeed: otherUserAvatarSeed,
+                ),
+            ],
+          ),
         );
       },
     );
   }
 }
 
-class _ChatInputBar extends ConsumerWidget {
+class _ChatInputBar extends ConsumerStatefulWidget {
   const _ChatInputBar({required this.conversationId});
 
   final String conversationId;
 
-  Future<void> _send(WidgetRef ref) async {
-    final controller = ref.read(chatInputControllerProvider(conversationId));
-    final text = controller.text;
-    controller.clear();
+  @override
+  ConsumerState<_ChatInputBar> createState() => _ChatInputBarState();
+}
+
+class _ChatInputBarState extends ConsumerState<_ChatInputBar> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    if (!mounted) return;
+    final text = _controller.text;
+    if (text.trim().isEmpty) return;
+    _controller.clear();
     await ref.read(chatNotifierProvider.notifier).sendMessage(
-          conversationId: conversationId,
+          conversationId: widget.conversationId,
           content: text,
         );
+    if (!mounted) return;
     ref.read(chatNearBottomProvider.notifier).setNearBottom(true);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.watch(chatInputControllerProvider(conversationId));
+  Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)
           .add(EdgeInsets.only(bottom: bottomInset > 0 ? 0 : 8)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.fieldCarbon,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: 0.35),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -432,7 +429,7 @@ class _ChatInputBar extends ConsumerWidget {
       child: SafeArea(
         top: false,
         child: ValueListenableBuilder<TextEditingValue>(
-          valueListenable: controller,
+          valueListenable: _controller,
           builder: (context, value, _) {
             final hasText = value.text.trim().isNotEmpty;
             return Row(
@@ -440,7 +437,7 @@ class _ChatInputBar extends ConsumerWidget {
               children: [
                 if (hasText)
                   GestureDetector(
-                    onTap: () => _send(ref),
+                    onTap: _send,
                     child: Container(
                       width: 40,
                       height: 40,
@@ -450,38 +447,46 @@ class _ChatInputBar extends ConsumerWidget {
                       ),
                       child: const Icon(
                         Icons.send_rounded,
-                        color: Colors.white,
+                        color: AppColors.canvas,
                         size: 18,
                       ),
                     ),
                   ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: TextField(
-                      controller: controller,
-                      style: GoogleFonts.tajawal(
-                        fontSize: 14,
-                        color: AppColors.textDark,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 120),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'اكتب رسالة...',
-                        hintStyle: GoogleFonts.tajawal(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceMuted,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: AppColors.glassBorder),
+                      ),
+                      child: TextField(
+                        controller: _controller,
+                        style: AppFonts.tajawal(
                           fontSize: 14,
-                          color: AppColors.textMuted,
+                          color: AppColors.pureWhite,
                         ),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
+                        decoration: InputDecoration(
+                          hintText: 'اكتب رسالة...',
+                          hintStyle: AppFonts.tajawal(
+                            fontSize: 14,
+                            color: AppColors.textMuted,
+                          ),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        minLines: 1,
+                        maxLines: 5,
+                        textDirection: TextDirection.rtl,
+                        onSubmitted: hasText ? (_) => _send() : null,
                       ),
-                      maxLines: null,
-                      textDirection: TextDirection.rtl,
-                      onSubmitted: hasText ? (_) => _send(ref) : null,
                     ),
                   ),
                 ),
@@ -526,6 +531,44 @@ class _MessagesShimmer extends StatelessWidget {
         SizedBox(height: 8),
         ShimmerBox(height: 48, width: 240),
       ],
+    );
+  }
+}
+
+class _ChatOfflineBanner extends ConsumerWidget {
+  const _ChatOfflineBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final networkAsync = ref.watch(_networkStatusProvider);
+    final offline =
+        networkAsync.value?.contains(ConnectivityResult.none) ?? false;
+    if (!offline) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: AppColors.surfaceMuted,
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            'جاري إعادة الاتصال...',
+            style: AppFonts.cairo(
+              fontSize: 13,
+              color: AppColors.textMuted,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

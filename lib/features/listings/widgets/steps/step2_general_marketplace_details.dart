@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../shared/models/general_listing_metadata.dart';
 import '../../constants/general_listing_options.dart';
 import '../../providers/post_listing_provider.dart';
@@ -139,7 +140,7 @@ class _Step2GeneralMarketplaceDetailsState
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [appDigitsOnly()],
               textDirection: TextDirection.ltr,
               decoration: const InputDecoration(
                 labelText: 'السعر *',

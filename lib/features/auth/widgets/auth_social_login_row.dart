@@ -59,26 +59,12 @@ class _PhoneIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      elevation: 2,
-      shadowColor: Colors.black.withValues(alpha: 0.08),
-      shape: CircleBorder(
-        side: const BorderSide(color: Color(0xFFE8E8E8)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: AuthSocialLoginRow._iconSize,
-          height: AuthSocialLoginRow._iconSize,
-          child: const Icon(
-            Icons.phone_outlined,
-            color: AppColors.primary,
-            size: 24,
-          ),
-        ),
+    return _SocialCircleButton(
+      onPressed: onPressed,
+      child: const Icon(
+        Icons.phone_outlined,
+        color: AppColors.primary,
+        size: 24,
       ),
     );
   }
@@ -97,31 +83,50 @@ class _SocialIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _SocialCircleButton(
+      onPressed: loading ? null : onPressed,
+      child: loading
+          ? const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.pureWhite,
+              ),
+            )
+          : SvgPicture.asset(
+              assetPath,
+              width: 24,
+              height: 24,
+            ),
+    );
+  }
+}
+
+class _SocialCircleButton extends StatelessWidget {
+  const _SocialCircleButton({
+    required this.onPressed,
+    required this.child,
+  });
+
+  final VoidCallback? onPressed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.fieldCarbon,
       shape: CircleBorder(
-        side: BorderSide(color: AppColors.borderLight.withValues(alpha: 0.9)),
+        side: BorderSide(color: AppColors.glassBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: loading ? null : onPressed,
+        onTap: onPressed,
         customBorder: const CircleBorder(),
         child: SizedBox(
           width: AuthSocialLoginRow._iconSize,
           height: AuthSocialLoginRow._iconSize,
-          child: Center(
-            child: loading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : SvgPicture.asset(
-                    assetPath,
-                    width: 24,
-                    height: 24,
-                  ),
-          ),
+          child: Center(child: child),
         ),
       ),
     );

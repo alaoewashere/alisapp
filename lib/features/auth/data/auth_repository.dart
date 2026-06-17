@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -6,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/result.dart';
+import '../../../core/utils/username_utils.dart';
 import '../../../core/utils/validators.dart';
 import '../../../shared/models/profile_model.dart';
 import '../domain/auth_result.dart';
@@ -25,43 +28,130 @@ class AuthRepository {
 
   Session? getSession() => _client.auth.currentSession;
 
-  Future<Result<bool>> sendWhatsAppOtp(String phoneE164) async {
+  Future<Result<bool>> sendWhatsAppOtp(
+    String phoneE164, {
+    String? purpose,
+  }) async {
     try {
       final phone = Validators.normalizeE164(phoneE164);
       if (kDebugMode) {
-        debugPrint('sendWhatsAppOtp → $phone');
+        debugPrint('sendWhatsAppOtp → $phone purpose=$purpose');
       }
       final response = await _client.functions.invoke(
         'send-whatsapp-otp',
-        body: {'phone': phone},
+        body: {
+          'phone': phone,
+          if (purpose != null) 'purpose': purpose,
+        },
       );
+      if (kDebugMode) {
+        debugPrint(
+          'sendWhatsAppOtp ← status=${response.status} data=${response.data}',
+        );
+      }
       if (response.status == 200) {
         if (kDebugMode) {
           debugPrint('sendWhatsAppOtp ← WhatsApp OTP dispatched');
         }
         return const Success(true);
       }
-      return const Failure('فشل إرسال الرمز، حاول مجدداً');
+      return Failure(_whatsappOtpSendErrorMessage(response));
+    } on FunctionException catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+          'sendWhatsAppOtp FunctionException: status=${e.status} details=${e.details}',
+        );
+      }
+      return Failure(
+        _whatsappOtpSendErrorMessage(
+          FunctionResponse(data: e.details, status: e.status),
+        ),
+        cause: e,
+      );
     } catch (e) {
+      if (kDebugMode) {
+        debugPrint('sendWhatsAppOtp error: $e');
+      }
       return Failure('فشل إرسال الرمز، حاول مجدداً', cause: e);
     }
   }
 
-  Future<Result<bool>> resendWhatsAppOtp(String phoneE164) =>
-      sendWhatsAppOtp(phoneE164);
+  String _whatsappOtpSendErrorMessage(FunctionResponse response) {
+    final data = _coerceResponseMap(response.data);
+    if (data != null) {
+      final error = data['error'] as String?;
+      if (error == 'rate_limited' ||
+          error == 'rate_limited_phone' ||
+          error == 'rate_limited_ip' ||
+          error == 'throttle_check_failed' ||
+          error == 'throttle_record_failed') {
+        return 'تم إرسال عدة رموز. انتظر قليلاً ثم حاول مجدداً';
+      }
+      if (error == 'invalid_phone') {
+        return 'رقم الهاتف غير صالح';
+      }
+      if (error == 'twilio_not_configured' || error == 'server_misconfigured') {
+        return 'خدمة واتساب غير مهيأة حالياً';
+      }
+      if (error == 'send_failed') {
+        return 'فشل إرسال الرمز عبر واتساب، حاول مجدداً';
+      }
+
+      final twilioCode = data['code'];
+      final codeNum = twilioCode is int
+          ? twilioCode
+          : int.tryParse(twilioCode?.toString() ?? '');
+      if (codeNum == 60203 || codeNum == 20429) {
+        return 'تم إرسال عدة رموز. انتظر قليلاً ثم حاول مجدداً';
+      }
+      if (codeNum == 21211 || codeNum == 60200 || codeNum == 63016) {
+        return 'رقم الهاتف غير صالح لإرسال واتساب';
+      }
+    }
+    if (response.status == 429) {
+      return 'تم إرسال عدة رموز. انتظر قليلاً ثم حاول مجدداً';
+    }
+    return 'فشل إرسال الرمز، حاول مجدداً';
+  }
+
+  Map<String, dynamic>? _coerceResponseMap(dynamic data) {
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    if (data is String) {
+      try {
+        final decoded = jsonDecode(data);
+        if (decoded is Map) {
+          return Map<String, dynamic>.from(decoded);
+        }
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  Future<Result<bool>> resendWhatsAppOtp(
+    String phoneE164, {
+    String? purpose,
+  }) =>
+      sendWhatsAppOtp(phoneE164, purpose: purpose);
 
   Future<Result<AuthResult>> verifyWhatsAppOtp({
     required String phone,
     required String otp,
+    String? purpose,
   }) async {
     try {
       final e164 = Validators.normalizeE164(phone);
       if (kDebugMode) {
-        debugPrint('verifyWhatsAppOtp → $e164');
+        debugPrint('verifyWhatsAppOtp → $e164 purpose=$purpose');
       }
       final response = await _client.functions.invoke(
         'verify-whatsapp-otp',
-        body: {'phone': e164, 'code': otp.trim()},
+        body: {
+          'phone': e164,
+          'code': otp.trim(),
+          if (purpose != null) 'purpose': purpose,
+        },
       );
 
       final data = response.data;
@@ -212,13 +302,15 @@ class AuthRepository {
     required String password,
     required String firstName,
     required String lastName,
+    String? username,
   }) async {
     try {
       final fullName = '$firstName $lastName'.trim();
       if (kDebugMode) {
         debugPrint(
           'signUpWithPassword → email=$email '
-          'firstName=$firstName lastName=$lastName fullName=$fullName',
+          'firstName=$firstName lastName=$lastName fullName=$fullName '
+          'username=$username',
         );
       }
       final response = await _client.auth.signUp(
@@ -240,6 +332,7 @@ class AuthRepository {
         userId: userId,
         email: email.trim(),
         fullName: fullName,
+        username: username,
       );
       if (profileResult case Failure(:final message)) {
         return Failure(message);
@@ -260,12 +353,40 @@ class AuthRepository {
 
   Future<Result<bool>> resetPasswordForEmail(String email) async {
     try {
-      await _client.auth.resetPasswordForEmail(email.trim());
+      await _client.auth.resetPasswordForEmail(
+        email.trim(),
+        redirectTo: AppConstants.authRedirectUri,
+      );
       return const Success(true);
     } on AuthException catch (e) {
       return Failure(authErrorMessage(e), cause: e);
     } catch (e) {
-      return Failure('تعذّر إرسال رمز التحقق.', cause: e);
+      return Failure('تعذّر إرسال رابط إعادة التعيين.', cause: e);
+    }
+  }
+
+  Future<Result<bool>> isEmailRegistered(String email) async {
+    try {
+      final registered = await _client.rpc(
+        'check_registered_email',
+        params: {'p_email': email.trim()},
+      );
+      return Success(registered == true);
+    } catch (e) {
+      return Failure('تعذّر التحقق من البريد.', cause: e);
+    }
+  }
+
+  Future<Result<bool>> isPhoneRegistered(String phoneE164) async {
+    try {
+      final phone = Validators.normalizeE164(phoneE164);
+      final registered = await _client.rpc(
+        'check_registered_phone',
+        params: {'p_phone': phone},
+      );
+      return Success(registered == true);
+    } catch (e) {
+      return Failure('تعذّر التحقق من رقم الهاتف.', cause: e);
     }
   }
 
@@ -474,6 +595,7 @@ class AuthRepository {
     required String userId,
     required String email,
     required String fullName,
+    String? username,
   }) async {
     try {
       final createdAt = DateTime.now().toUtc().toIso8601String();
@@ -482,6 +604,8 @@ class AuthRepository {
         'email': email,
         'full_name': fullName,
         'display_name': fullName,
+        if (username != null && username.isNotEmpty)
+          'username': normalizeUsername(username),
         'created_at': createdAt,
       });
       if (kDebugMode) {

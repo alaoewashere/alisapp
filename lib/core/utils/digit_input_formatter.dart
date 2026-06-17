@@ -48,3 +48,8 @@ class WesternDigitsInputFormatter extends TextInputFormatter {
     );
   }
 }
+
+/// Standard numeric formatter for Iraqi RTL inputs — accepts Western (0-9),
+/// Eastern Arabic (٠-٩), and Persian (۰-۹) digits.
+WesternDigitsInputFormatter appDigitsOnly({int? maxLength}) =>
+    WesternDigitsInputFormatter(maxLength: maxLength);

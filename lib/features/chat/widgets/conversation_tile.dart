@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/chat_date_utils.dart';
@@ -35,9 +35,9 @@ class ConversationTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.fieldCarbon,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.glassBorder),
             boxShadow: const [
               BoxShadow(
                 color: AppColors.microShadow,
@@ -67,7 +67,7 @@ class ConversationTile extends StatelessWidget {
                               conversation.otherUserName ?? 'مستخدم',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.cairo(
+                              style: AppFonts.cairo(
                                 fontSize: 14,
                                 fontWeight: hasUnread
                                     ? FontWeight.bold
@@ -79,7 +79,7 @@ class ConversationTile extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             formatConversationTimeAr(time),
-                            style: GoogleFonts.cairo(
+                            style: AppFonts.cairo(
                               fontSize: 10,
                               color: AppColors.textMuted,
                             ),
@@ -94,7 +94,7 @@ class ConversationTile extends StatelessWidget {
                               conversation.lastMessage ?? 'ابدأ المحادثة',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.tajawal(
+                              style: AppFonts.tajawal(
                                 fontSize: 13,
                                 fontWeight:
                                     hasUnread ? FontWeight.w600 : FontWeight.normal,
@@ -145,7 +145,7 @@ class _UnreadBadge extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         label,
-        style: GoogleFonts.inter(
+        style: AppFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w700,
           color: Colors.white,

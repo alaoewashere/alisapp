@@ -15,81 +15,79 @@ class ListingPackageOption {
     required this.package,
     required this.labelAr,
     required this.priceIqd,
+    required this.durationLabelAr,
+    required this.features,
     this.originalPriceIqd,
     this.discountPercent,
-    required this.features,
   });
 
   final ListingPackage package;
   final String labelAr;
   final int priceIqd;
+  final String durationLabelAr;
+  final List<ListingPackageFeature> features;
   final int? originalPriceIqd;
   final int? discountPercent;
-  final List<ListingPackageFeature> features;
-
-  bool get isFree => priceIqd <= 0;
 }
 
 abstract final class ListingPackageConfig {
+  /// Fee when posting standard tier after monthly free quota is used.
+  static const paidStandardPriceIqd = 10000;
+
   static const options = [
     ListingPackageOption(
       package: ListingPackage.standard,
       labelAr: 'إعلان عادي',
-      priceIqd: 0,
+      priceIqd: paidStandardPriceIqd,
+      durationLabelAr: '30 يوم',
       features: [
         ListingPackageFeature(
-          title: '30 يوم',
-          description: 'يُنشر إعلانك لمدة 30 يوماً',
-        ),
-        ListingPackageFeature(
-          title: 'ظهور عادي',
-          description: 'يظهر في نتائج البحث ضمن الإعلانات العادية',
+          title: 'إعلان أساسي',
+          description: 'ينشر في نتائج البحث ضمن الإعلانات العادية',
         ),
         ListingPackageFeature(
           title: 'رسائل واتصال',
-          description: 'يتواصل معك المشترون حسب تفضيلاتك',
+          description: 'يتواصل المشترون حسب تفضيلاتك',
         ),
       ],
     ),
     ListingPackageOption(
       package: ListingPackage.pro,
       labelAr: 'إعلان برو',
-      priceIqd: 99,
-      originalPriceIqd: 114,
-      discountPercent: 13,
+      priceIqd: 16000,
+      durationLabelAr: '60 يوم',
       features: [
         ListingPackageFeature(
-          title: '45 يوم',
-          description: 'يُنشر إعلانك لمدة 45 يوماً',
+          title: 'شارة بروفايل موثق',
+          description: 'تعزيز ثقة البائع على بطاقة الإعلان',
         ),
         ListingPackageFeature(
-          title: 'تعزيز في البحث',
-          description: 'يظهر أعلى من الإعلانات العادية في نفس الفئة',
+          title: 'ظهور أعلى',
+          description: 'يظهر قبل الإعلانات العادية في نفس الفئة',
         ),
         ListingPackageFeature(
-          title: 'شارة برو',
-          description: 'شارة مميزة على بطاقة الإعلان',
+          title: 'إحصائيات',
+          description: 'مشاهدات وتواصل مع الإعلان',
         ),
       ],
     ),
     ListingPackageOption(
       package: ListingPackage.premium,
       labelAr: 'إعلان مميز',
-      priceIqd: 199,
-      originalPriceIqd: 229,
-      discountPercent: 13,
+      priceIqd: 20000,
+      durationLabelAr: '90 يوم',
       features: [
         ListingPackageFeature(
-          title: '60 يوم',
-          description: 'يُنشر إعلانك لمدة 60 يوماً',
-        ),
-        ListingPackageFeature(
-          title: 'ظهور في المميز',
+          title: 'كروسيل المميز',
           description: 'يُعرض في قسم الإعلانات المميزة بالصفحة الرئيسية',
         ),
         ListingPackageFeature(
-          title: 'أولوية قصوى',
-          description: 'أعلى ظهور في نتائج البحث والفئة',
+          title: 'أعلى ترتيب',
+          description: 'أولوية قصوى في نتائج البحث والفئة',
+        ),
+        ListingPackageFeature(
+          title: 'تعزيز دفع',
+          description: 'ظهور مميز لزيادة المشاهدات',
         ),
       ],
     ),
@@ -97,5 +95,15 @@ abstract final class ListingPackageConfig {
 
   static ListingPackageOption optionFor(ListingPackage package) {
     return options.firstWhere((option) => option.package == package);
+  }
+
+  static int purchasePriceIqd(
+    ListingPackage package, {
+    bool standardOverQuota = false,
+  }) {
+    if (package == ListingPackage.standard) {
+      return standardOverQuota ? paidStandardPriceIqd : 0;
+    }
+    return optionFor(package).priceIqd;
   }
 }
