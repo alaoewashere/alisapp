@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/constants/category_asset_icons.dart';
+import 'package:Sello/core/constants/category_asset_icons.dart';
 
 void main() {
   group('CategoryAssetIcons', () {

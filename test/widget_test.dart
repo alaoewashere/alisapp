@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/app_constants.dart';
-import 'package:my_app/core/utils/currency_formatter.dart';
-import 'package:my_app/core/utils/digit_input_formatter.dart';
-import 'package:my_app/core/utils/validators.dart';
+import 'package:Sello/core/constants/app_constants.dart';
+import 'package:Sello/core/utils/currency_formatter.dart';
+import 'package:Sello/core/utils/digit_input_formatter.dart';
+import 'package:Sello/core/utils/validators.dart';
 
 void main() {
   test('formatIqd formats without decimals', () {

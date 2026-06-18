@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/app_colors.dart';
-import 'package:my_app/features/listings/widgets/vehicle_stats_row.dart';
-import 'package:my_app/shared/models/vehicle_listing_metadata.dart';
+import 'package:Sello/core/constants/app_colors.dart';
+import 'package:Sello/features/listings/widgets/vehicle_stats_row.dart';
+import 'package:Sello/shared/models/vehicle_listing_metadata.dart';
 
 void main() {
   testWidgets('VehicleStatsRow uses dark styling and clean stat values', (tester) async {

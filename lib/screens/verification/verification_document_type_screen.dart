@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/verification_constants.dart';
@@ -8,17 +8,26 @@ import '../../core/router/app_router.dart';
 import '../../shared/widgets/sello_app_bar.dart';
 
 /// Screen 2 — pick document type.
-class VerificationDocumentTypeScreen extends StatefulWidget {
+class VerificationDocumentTypeScreen extends StatelessWidget {
   const VerificationDocumentTypeScreen({super.key});
 
-  @override
-  State<VerificationDocumentTypeScreen> createState() =>
-      _VerificationDocumentTypeScreenState();
-}
-
-class _VerificationDocumentTypeScreenState
-    extends State<VerificationDocumentTypeScreen> {
-  String? _selected;
+  static const _documentTypes = [
+    (
+      type: VerificationDocumentType.nationalId,
+      label: 'الهوية الوطنية',
+      icon: Icons.badge_outlined,
+    ),
+    (
+      type: VerificationDocumentType.driversLicense,
+      label: 'رخصة القيادة',
+      icon: Icons.directions_car_outlined,
+    ),
+    (
+      type: VerificationDocumentType.passport,
+      label: 'جواز السفر',
+      icon: Icons.menu_book_outlined,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -36,60 +45,42 @@ class _VerificationDocumentTypeScreenState
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _DocumentTypeTile(
-              type: VerificationDocumentType.nationalId,
-              label: 'الهوية الوطنية',
-              icon: Icons.badge_outlined,
-              selected: _selected == VerificationDocumentType.nationalId,
-              onTap: () => _goUpload(VerificationDocumentType.nationalId),
-            ),
-            const SizedBox(height: 12),
-            _DocumentTypeTile(
-              type: VerificationDocumentType.driversLicense,
-              label: 'رخصة القيادة',
-              icon: Icons.directions_car_outlined,
-              selected: _selected == VerificationDocumentType.driversLicense,
-              onTap: () => _goUpload(VerificationDocumentType.driversLicense),
-            ),
-            const SizedBox(height: 12),
-            _DocumentTypeTile(
-              type: VerificationDocumentType.passport,
-              label: 'جواز السفر',
-              icon: Icons.menu_book_outlined,
-              selected: _selected == VerificationDocumentType.passport,
-              onTap: () => _goUpload(VerificationDocumentType.passport),
-            ),
+            for (var i = 0; i < _documentTypes.length; i++) ...[
+              if (i > 0) const SizedBox(height: 12),
+              _DocumentTypeTile(
+                key: ValueKey(_documentTypes[i].type),
+                label: _documentTypes[i].label,
+                icon: _documentTypes[i].icon,
+                onTap: () => context.push(
+                  '${AppRoutes.verificationUpload}?type=${_documentTypes[i].type}',
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
-
-  void _goUpload(String type) {
-    setState(() => _selected = type);
-    context.push('${AppRoutes.verificationUpload}?type=$type');
-  }
 }
 
 class _DocumentTypeTile extends StatelessWidget {
+  static const _cardBorder = Color(0x15FFFFFF);
+
   const _DocumentTypeTile({
-    required this.type,
+    super.key,
     required this.label,
     required this.icon,
-    required this.selected,
     required this.onTap,
   });
 
-  final String type;
   final String label;
   final IconData icon;
-  final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.fieldCarbon,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -98,10 +89,7 @@ class _DocumentTypeTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: selected ? AppColors.primary : AppColors.borderLight,
-              width: selected ? 1.5 : 1,
-            ),
+            border: Border.all(color: _cardBorder, width: 1),
           ),
           child: Row(
             children: [
@@ -112,11 +100,11 @@ class _DocumentTypeTile extends StatelessWidget {
                 style: AppFonts.cairo(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textDark,
+                  color: AppColors.pureWhite,
                 ),
               ),
               const SizedBox(width: 12),
-              Icon(icon, color: AppColors.primary, size: 26),
+              Icon(icon, color: AppColors.volt, size: 26),
               const SizedBox(width: 12),
               Container(
                 width: 22,
@@ -124,16 +112,10 @@ class _DocumentTypeTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: selected ? AppColors.primary : AppColors.borderLight,
+                    color: _cardBorder,
                     width: 2,
                   ),
-                  color: selected
-                      ? AppColors.primary
-                      : Colors.transparent,
                 ),
-                child: selected
-                    ? const Icon(Icons.check, size: 14, color: Colors.white)
-                    : null,
               ),
             ],
           ),

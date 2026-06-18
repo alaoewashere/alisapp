@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/category_fallback_icon.dart';
-import 'package:my_app/features/home/widgets/category_grid.dart';
-import 'package:my_app/shared/models/category_model.dart';
-import 'package:my_app/shared/widgets/category_icon.dart';
+import 'package:Sello/core/constants/category_fallback_icon.dart';
+import 'package:Sello/features/home/widgets/category_grid.dart';
+import 'package:Sello/shared/models/category_model.dart';
+import 'package:Sello/shared/widgets/category_icon.dart';
 
 void main() {
   group('CategoryGrid placeholder helpers', () {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';

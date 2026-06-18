@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/shared/models/listing_model.dart';
-import 'package:my_app/shared/widgets/package_badge.dart';
+import 'package:Sello/shared/models/listing_model.dart';
+import 'package:Sello/shared/widgets/package_badge.dart';
 
 void main() {
   group('ListingPackage.badgeLabelAr', () {

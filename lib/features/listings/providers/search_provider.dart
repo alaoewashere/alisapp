@@ -61,6 +61,7 @@ class FilterNotifier extends Notifier<FilterModel> {
       'subcategoryId' => state.copyWith(subcategoryId: value as int?),
       'governorate' => state.copyWith(governorate: value as String?),
       'city' => state.copyWith(city: value as String?),
+      'areaName' => state.copyWith(areaName: value as String?),
       'minPrice' => state.copyWith(minPrice: value as double?),
       'maxPrice' => state.copyWith(maxPrice: value as double?),
       'condition' => state.copyWith(condition: value as FilterCondition),
@@ -83,6 +84,7 @@ class FilterNotifier extends Notifier<FilterModel> {
       'subcategoryId' => state.copyWith(clearSubcategory: true),
       'governorate' => state.copyWith(clearGovernorate: true),
       'city' => state.copyWith(clearCity: true),
+      'areaName' => state.copyWith(clearAreaName: true),
       'minPrice' => state.copyWith(clearMinPrice: true),
       'maxPrice' => state.copyWith(clearMaxPrice: true),
       'condition' => state.copyWith(condition: FilterCondition.all),
@@ -233,7 +235,7 @@ class SearchResultsNotifier extends Notifier<SearchResultsState> {
 
   Future<void> search(FilterModel filter, {bool log = true}) async {
     _filter = filter;
-    state = state.copyWith(isLoading: true, clearError: true, page: 0);
+    state = const SearchResultsState(isLoading: true);
 
     try {
       final userId = ref.read(currentUserIdProvider);

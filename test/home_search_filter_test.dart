@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/home/utils/home_listing_search.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/features/home/utils/home_listing_search.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 ListingModel _listing(String titleAr) {
   return ListingModel(

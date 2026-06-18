@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/screens/settings/settings_screen.dart';
+import 'package:Sello/screens/settings/settings_screen.dart';
 
 void main() {
   testWidgets('SettingsScreen shows title and section label', (tester) async {

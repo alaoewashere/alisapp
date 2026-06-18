@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/utils/listing_publication_date.dart';
+import 'package:Sello/core/utils/listing_publication_date.dart';
 
 void main() {
   group('formatListingPublicationDateAr', () {

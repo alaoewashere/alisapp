@@ -81,6 +81,7 @@ class ListingDetailActionsNotifier extends Notifier<AsyncValue<void>> {
 
       ref.invalidate(listingDetailProvider(listingId));
       ref.invalidate(recentListingsProvider);
+      ref.invalidate(latestHomeListingsProvider);
       invalidateMyListingsProviders(ref);
     });
     return state.hasError ? null : lastBuyerId;
@@ -91,6 +92,7 @@ class ListingDetailActionsNotifier extends Notifier<AsyncValue<void>> {
     state = await AsyncValue.guard(() async {
       await ref.read(listingsRepositoryProvider).softDeleteListing(listingId);
       ref.invalidate(recentListingsProvider);
+      ref.invalidate(latestHomeListingsProvider);
       invalidateMyListingsProviders(ref);
       ref.invalidate(featuredListingsProvider);
     });

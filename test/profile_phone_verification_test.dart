@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/shared/models/profile_model.dart';
+import 'package:Sello/shared/models/profile_model.dart';
 
 void main() {
   group('ProfileModel phoneVerified', () {

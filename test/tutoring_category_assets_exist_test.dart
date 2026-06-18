@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/constants/tutoring_category_icons.dart';
+import 'package:Sello/core/constants/tutoring_category_icons.dart';
 
 void main() {
   test('every mapped tutoring icon file exists on disk', () {

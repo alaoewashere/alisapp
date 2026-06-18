@@ -11,7 +11,12 @@ void main() {
 
   final publicMethods = <String>[
     'getFeaturedListings',
+    'getFeaturedListingsPage',
+    '_featuredListingsBaseQuery',
     'getRecentListings',
+    'getLatestHomeListings',
+    'getLatestHomeListingsPage',
+    '_latestListingsBaseQuery',
     '_filteredListingsQuery',
     'getSearchSuggestions',
     'getSellerListings',
@@ -22,16 +27,56 @@ void main() {
     test('$method filters approved listings', () {
       final needle = method == '_filteredListingsQuery'
           ? 'dynamic _filteredListingsQuery'
-          : method;
+          : method == '_featuredListingsBaseQuery'
+              ? 'dynamic _featuredListingsBaseQuery'
+              : method == '_latestListingsBaseQuery'
+                  ? 'dynamic _latestListingsBaseQuery'
+                  : method;
       final start = repoSource.indexOf(needle);
       expect(start, greaterThan(-1), reason: 'method $method not found');
 
       final nextMethod = repoSource.indexOf(
-        method == '_filteredListingsQuery' ? 'dynamic _applyFilters' : 'Future<',
+        method == '_filteredListingsQuery'
+            ? 'dynamic _applyFilters'
+            : method == '_featuredListingsBaseQuery'
+                ? 'dynamic _latestListingsBaseQuery'
+                : method == '_latestListingsBaseQuery'
+                    ? 'dynamic _applyLatestListingsOrder'
+                    : 'Future<',
         start + needle.length,
       );
       final blockEnd = nextMethod == -1 ? repoSource.length : nextMethod;
       final block = repoSource.substring(start, blockEnd);
+
+      if (method == 'getFeaturedListings' ||
+          method == 'getFeaturedListingsPage') {
+        expect(
+          block,
+          contains('_featuredListingsBaseQuery'),
+          reason: '$method must use shared featured query',
+        );
+        return;
+      }
+
+      if (method == 'getLatestHomeListings') {
+        expect(block, contains('_sortByPackagePriority'));
+        expect(block, contains('_latestListingsBaseQuery'));
+        return;
+      }
+
+      if (method == 'getLatestHomeListingsPage') {
+        expect(block, contains('_latestListingsBaseQuery'));
+        return;
+      }
+
+      if (method == '_latestListingsBaseQuery') {
+        expect(
+          block,
+          contains(".eq('status', 'approved')"),
+          reason: '$method must eq status approved',
+        );
+        return;
+      }
 
       expect(
         block,

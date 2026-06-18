@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/listings/widgets/category_bento_grid.dart';
-import 'package:my_app/shared/models/category_model.dart';
+import 'package:Sello/features/listings/widgets/category_bento_grid.dart';
+import 'package:Sello/shared/models/category_model.dart';
 
 void main() {
   group('CategoryBentoGrid', () {

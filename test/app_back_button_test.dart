@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/app_colors.dart';
-import 'package:my_app/shared/widgets/app_back_button.dart';
+import 'package:Sello/core/constants/app_colors.dart';
+import 'package:Sello/shared/widgets/app_back_button.dart';
 
 void main() {
   testWidgets('AppBackButton uses Field Carbon circle styling', (tester) async {

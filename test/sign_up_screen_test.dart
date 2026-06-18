@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/utils/validators.dart';
-import 'package:my_app/features/auth/presentation/sign_up_screen.dart';
+import 'package:Sello/core/utils/validators.dart';
+import 'package:Sello/features/auth/presentation/sign_up_screen.dart';
 
 void main() {
   group('Validators signup', () {

@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_governorates.dart';

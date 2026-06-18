@@ -28,6 +28,15 @@ final recentListingsProvider = FutureProvider<List<ListingModel>>((ref) async {
       );
 });
 
+/// Home «أحدث النشرات والمعروضات» — برو + مجاني, package priority then newest.
+final latestHomeListingsProvider = FutureProvider<List<ListingModel>>((ref) async {
+  final userId = ref.watch(currentUserIdProvider);
+  return ref.watch(listingsRepositoryProvider).getLatestHomeListings(
+        limit: 20,
+        userIdForFavorites: userId,
+      );
+});
+
 class HomeSearchQueryNotifier extends Notifier<String> {
   @override
   String build() => '';
@@ -43,7 +52,7 @@ final homeSearchQueryProvider =
 
 final filteredHomeListingsProvider = Provider<List<ListingModel>>((ref) {
   final query = ref.watch(homeSearchQueryProvider);
-  final listings = ref.watch(recentListingsProvider).value;
+  final listings = ref.watch(latestHomeListingsProvider).value;
   if (listings == null) return const [];
   return filterHomeListingsByTitle(listings, query);
 });
@@ -86,6 +95,7 @@ String categoryListingsQueryKey(String categoryId, {String? listingType}) {
 Future<void> refreshHomeProviders(WidgetRef ref) async {
   ref.invalidate(categoriesProvider);
   ref.invalidate(featuredListingsProvider);
+  ref.invalidate(latestHomeListingsProvider);
   ref.invalidate(recentListingsProvider);
   ref.invalidate(favoritesIdsProvider);
 }

@@ -157,6 +157,9 @@ class AppLocalizationsKu extends AppLocalizations {
   String get languageEnglish => '🇬🇧 ئینگلیزی';
 
   @override
+  String get languageTurkish => '🇹🇷 تورکی';
+
+  @override
   String get accountSection => 'هەژمار';
 
   @override

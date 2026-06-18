@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/screens/auth/username_setup_screen.dart';
+import 'package:Sello/screens/auth/username_setup_screen.dart';
 
 void main() {
   testWidgets('UsernameSetupScreen shows title and continue button',

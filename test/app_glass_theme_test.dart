@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/constants/app_colors.dart';
-import 'package:my_app/core/theme/app_decorations.dart';
+import 'package:Sello/core/constants/app_colors.dart';
+import 'package:Sello/core/theme/app_decorations.dart';
 
 void main() {
   group('Dark fintech design tokens', () {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/auth/presentation/profile_setup_screen.dart';
+import 'package:Sello/features/auth/presentation/profile_setup_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

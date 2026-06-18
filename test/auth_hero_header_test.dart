@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/auth/widgets/auth_hero_header.dart';
-import 'package:my_app/shared/widgets/app_logo.dart';
+import 'package:Sello/features/auth/widgets/auth_hero_header.dart';
+import 'package:Sello/shared/widgets/app_logo.dart';
 
 void main() {
   testWidgets('AuthHeroHeader shows welcome copy and logo', (tester) async {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/router/app_router.dart';
+import 'package:Sello/core/router/app_router.dart';
 
 void main() {
   group('auth route constants', () {

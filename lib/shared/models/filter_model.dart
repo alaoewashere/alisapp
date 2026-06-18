@@ -38,6 +38,7 @@ class FilterModel {
     this.subcategoryId,
     this.governorate,
     this.city,
+    this.areaName,
     this.minPrice,
     this.maxPrice,
     this.condition = FilterCondition.all,
@@ -51,6 +52,7 @@ class FilterModel {
   final int? subcategoryId;
   final String? governorate;
   final String? city;
+  final String? areaName;
   final double? minPrice;
   final double? maxPrice;
   final FilterCondition condition;
@@ -64,6 +66,7 @@ class FilterModel {
       subcategoryId == null &&
       governorate == null &&
       (city == null || city!.trim().isEmpty) &&
+      (areaName == null || areaName!.trim().isEmpty) &&
       minPrice == null &&
       maxPrice == null &&
       condition == FilterCondition.all &&
@@ -77,6 +80,7 @@ class FilterModel {
     if (subcategoryId != null) count++;
     if (governorate != null) count++;
     if (city != null && city!.trim().isNotEmpty) count++;
+    if (areaName != null && areaName!.trim().isNotEmpty) count++;
     if (minPrice != null) count++;
     if (maxPrice != null) count++;
     if (condition != FilterCondition.all) count++;
@@ -95,6 +99,7 @@ class FilterModel {
     int? subcategoryId,
     String? governorate,
     String? city,
+    String? areaName,
     double? minPrice,
     double? maxPrice,
     FilterCondition? condition,
@@ -106,6 +111,7 @@ class FilterModel {
     bool clearSubcategory = false,
     bool clearGovernorate = false,
     bool clearCity = false,
+    bool clearAreaName = false,
     bool clearMinPrice = false,
     bool clearMaxPrice = false,
   }) {
@@ -116,6 +122,7 @@ class FilterModel {
           clearSubcategory ? null : (subcategoryId ?? this.subcategoryId),
       governorate: clearGovernorate ? null : (governorate ?? this.governorate),
       city: clearCity ? null : (city ?? this.city),
+      areaName: clearAreaName ? null : (areaName ?? this.areaName),
       minPrice: clearMinPrice ? null : (minPrice ?? this.minPrice),
       maxPrice: clearMaxPrice ? null : (maxPrice ?? this.maxPrice),
       condition: condition ?? this.condition,
@@ -132,6 +139,8 @@ class FilterModel {
       if (subcategoryId != null) 'subcategory_id': subcategoryId,
       if (governorate != null) 'governorate': governorate,
       if (city != null && city!.trim().isNotEmpty) 'city': city!.trim(),
+      if (areaName != null && areaName!.trim().isNotEmpty)
+        'area_name': areaName!.trim(),
       if (minPrice != null) 'min_price': minPrice,
       if (maxPrice != null) 'max_price': maxPrice,
       if (condition != FilterCondition.all) 'condition': condition.dbValue,
@@ -148,6 +157,7 @@ class FilterModel {
       subcategoryId: json['subcategory_id'] as int?,
       governorate: json['governorate'] as String?,
       city: json['city'] as String?,
+      areaName: json['area_name'] as String?,
       minPrice: (json['min_price'] as num?)?.toDouble(),
       maxPrice: (json['max_price'] as num?)?.toDouble(),
       condition: FilterConditionX.fromDb(json['condition'] as String?),

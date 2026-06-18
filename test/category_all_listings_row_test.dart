@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/app_colors.dart';
-import 'package:my_app/features/listings/widgets/category_tree_row.dart';
+import 'package:Sello/core/constants/app_colors.dart';
+import 'package:Sello/features/listings/widgets/category_tree_row.dart';
 
 void main() {
   testWidgets('CategoryAllListingsRow shows volt label and count', (tester) async {

@@ -30,12 +30,15 @@ import '../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../features/chat/presentation/chat_screen.dart';
 import '../../features/chat/presentation/conversations_screen.dart';
 import '../../features/favorites/presentation/favorites_screen.dart';
+import '../../features/home/presentation/home_feed_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/home/models/home_listings_feed_type.dart';
 import '../../features/listings/presentation/category_browse_screen.dart';
 import '../../features/listings/presentation/edit_listing_screen.dart';
 import '../../features/listings/presentation/listing_detail_screen.dart';
 import '../../features/listings/presentation/listings_screen.dart';
 import '../../features/listings/presentation/post_listing_screen.dart';
+import '../../features/listings/presentation/listing_heatmap_screen.dart';
 import '../../features/listings/presentation/search_results_screen.dart';
 import '../../features/listings/presentation/search_screen.dart';
 import '../../features/profile/data/profile_repository.dart';
@@ -70,6 +73,8 @@ abstract final class AppRoutes {
   static const usernameSetup = '/username-setup';
   static const search = '/search';
   static const searchResults = '/search/results';
+  static const heatmap = '/heatmap';
+  static const homeFeed = 'feed/:feedType';
   static const listing = '/listing/:id';
   static const editListing = '/listing/edit/:listingId';
   static const listings = '/listings/:categoryId';
@@ -116,6 +121,8 @@ abstract final class AppRoutes {
       uri.queryParameters[listingTypeQueryKey];
 
   static String editListingPath(String listingId) => '/listing/edit/$listingId';
+
+  static String homeFeedPath(HomeListingsFeedType type) => '/feed/${type.slug}';
 }
 
 bool isGuestAllowedPath(String path) {
@@ -123,10 +130,12 @@ bool isGuestAllowedPath(String path) {
   if (path == AppRoutes.home ||
       path == AppRoutes.homeNav ||
       path == AppRoutes.search ||
-      path == AppRoutes.searchResults) {
+      path == AppRoutes.searchResults ||
+      path == AppRoutes.heatmap) {
     return true;
   }
   if (path.startsWith('/listings/')) return true;
+  if (path.startsWith('/feed/')) return true;
   if (path.startsWith('/categories/')) return true;
   if (RegExp(r'^/listing/[^/]+$').hasMatch(path)) return true;
   if (path.startsWith('/seller/')) return true;
@@ -166,6 +175,24 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.home,
             builder: (_, _) => const HomeScreen(),
+            routes: [
+              GoRoute(
+                path: 'heatmap',
+                builder: (_, _) => const ListingHeatmapScreen(),
+              ),
+              GoRoute(
+                path: AppRoutes.homeFeed,
+                builder: (_, state) {
+                  final feedType = HomeListingsFeedType.fromSlug(
+                    state.pathParameters['feedType'] ?? '',
+                  );
+                  if (feedType == null) {
+                    return const HomeScreen();
+                  }
+                  return HomeFeedScreen(feedType: feedType);
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: AppRoutes.homeNav,

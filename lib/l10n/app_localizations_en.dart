@@ -158,6 +158,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageEnglish => '🇬🇧 English';
 
   @override
+  String get languageTurkish => '🇹🇷 Türkçe';
+
+  @override
   String get accountSection => 'Account';
 
   @override

@@ -1,4 +1,4 @@
-name: my_app
+name: Sello
 description: "Sello — Iraq Classifieds Marketplace"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -77,6 +77,9 @@ dependencies:
   sign_in_with_apple: ^8.1.0
   crypto: ^3.0.7
   video_thumbnail: ^0.5.6
+  flutter_map: ^8.3.0
+  latlong2: ^0.9.1
+  flutter_map_marker_cluster: ^8.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

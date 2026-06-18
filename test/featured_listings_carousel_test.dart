@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/home/widgets/featured_listings_carousel.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/features/home/widgets/featured_listings_carousel.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   ListingModel sampleListing() {

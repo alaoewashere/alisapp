@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../core/constants/app_governorates.dart';
 import '../../../core/utils/listing_display_title.dart';
+import '../../../core/utils/listing_location_label.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/premium_listing_badge.dart';
 import '../../../shared/widgets/pro_listing_badge.dart';
@@ -102,7 +102,7 @@ class ListingListTile extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${governorateNameAr(listing.governorate)} · ${listing.city}',
+                      listingLocationLabel(listing),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall,

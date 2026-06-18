@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/screens/auth/widgets/phone_login_bottom_sheet.dart';
+import 'package:Sello/core/constants/app_colors.dart';
+import 'package:Sello/screens/auth/widgets/phone_login_bottom_sheet.dart';
 
 class _SheetOpener extends ConsumerWidget {
   const _SheetOpener();
@@ -37,5 +38,37 @@ void main() {
     expect(find.text('+966'), findsOneWidget);
     expect(find.text('🇸🇦'), findsOneWidget);
     expect(find.text('إرسال الرمز'), findsOneWidget);
+
+    final title = tester.widget<Text>(find.text('متابعة برقم الهاتف'));
+    expect(title.style?.color, AppColors.pureWhite);
+
+    final subtitle = tester.widget<Text>(
+      find.text('سنرسل لك رمز تحقق عبر واتساب'),
+    );
+    expect(subtitle.style?.color, AppColors.textMuted);
+
+    final phoneField = tester.widget<TextField>(find.byType(TextField));
+    expect(phoneField.cursorColor, AppColors.volt);
+    expect(
+      phoneField.style?.color,
+      AppColors.pureWhite,
+    );
+
+    final button = tester.widget<FilledButton>(
+      find.ancestor(
+        of: find.text('إرسال الرمز'),
+        matching: find.byType(FilledButton),
+      ),
+    );
+    expect(button.style?.backgroundColor?.resolve({}), AppColors.volt);
+    expect(button.style?.foregroundColor?.resolve({}), AppColors.canvas);
+    expect(
+      (button.style?.shape?.resolve({}) as RoundedRectangleBorder?)
+          ?.borderRadius
+          .resolve(TextDirection.rtl)
+          .topLeft
+          .x,
+      14,
+    );
   });
 }

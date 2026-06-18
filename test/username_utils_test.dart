@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/utils/username_utils.dart';
+import 'package:Sello/core/utils/username_utils.dart';
 
 void main() {
   group('username validation', () {

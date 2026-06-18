@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/deep_link_constants.dart';
-import 'package:my_app/core/deep_links/deep_link_service.dart';
+import 'package:Sello/core/constants/deep_link_constants.dart';
+import 'package:Sello/core/deep_links/deep_link_service.dart';
 
 void main() {
   group('DeepLinkService', () {

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/models/smart_alert.dart';
-import 'package:my_app/models/smart_alert_category.dart';
-import 'package:my_app/shared/models/category_model.dart';
-import 'package:my_app/shared/models/filter_model.dart';
+import 'package:Sello/models/smart_alert.dart';
+import 'package:Sello/models/smart_alert_category.dart';
+import 'package:Sello/shared/models/category_model.dart';
+import 'package:Sello/shared/models/filter_model.dart';
 
 void main() {
   group('buildSmartAlertSummary', () {

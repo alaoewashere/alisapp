@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../core/constants/display_locale.dart';

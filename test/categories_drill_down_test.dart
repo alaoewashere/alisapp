@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/listings/data/categories_repository.dart';
-import 'package:my_app/shared/models/category_model.dart';
+import 'package:Sello/features/listings/data/categories_repository.dart';
+import 'package:Sello/shared/models/category_model.dart';
 
 class _FakeCategoriesRepository extends CategoriesRepository {
   _FakeCategoriesRepository(this._childrenByParent) : super(_NoOpClient());

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 void main() {
   test('AppFonts exposes Thmanyah family names', () {

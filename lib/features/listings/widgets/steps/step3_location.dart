@@ -44,9 +44,11 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
       );
 
       if (result != null) {
-        notifier.updateField('latitude', result.latitude);
-        notifier.updateField('longitude', result.longitude);
-        notifier.updateField('locationAddress', result.address);
+        notifier.applyMapPickerResult(
+          latitude: result.latitude,
+          longitude: result.longitude,
+          address: result.address,
+        );
       }
     } catch (_) {
       if (!mounted) return;
@@ -84,7 +86,21 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
             value: state.governorate,
             onChanged: (v) => notifier.updateField('governorate', v),
           ),
-          const SizedBox(height: 24),
+          Step2NeighborhoodPicker(
+            governorateSlug: state.governorate,
+            selectedSlug: notifier.selectedAreaSlug,
+            onChanged: notifier.setAreaNameFromSlug,
+          ),
+          if (state.areaName != null && state.areaName!.trim().isNotEmpty) ...[
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => notifier.setAreaNameFromSlug(null),
+                child: const Text('إزالة المنطقة'),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
           const Divider(),
           const SizedBox(height: 12),
           OutlinedButton.icon(
@@ -106,6 +122,21 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
                 'الإحداثيات: ${state.latitude!.toStringAsFixed(5)}, ${state.longitude!.toStringAsFixed(5)}',
                 style: theme.textTheme.bodySmall,
                 textDirection: TextDirection.ltr,
+              ),
+            if (state.areaName != null && state.areaName!.trim().isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  state.areaNameLocked
+                      ? 'المنطقة المختارة: ${state.areaName}'
+                      : 'المنطقة المقترحة: ${state.areaName}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: state.areaNameLocked
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.primary,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
               ),
             TextButton(
               onPressed: notifier.clearLocation,

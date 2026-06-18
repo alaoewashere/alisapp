@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/constants/dicebear_avatars.dart';
+import 'package:Sello/core/constants/dicebear_avatars.dart';
 
 void main() {
   test('avatarUrl builds DiceBear glyphs URL', () {

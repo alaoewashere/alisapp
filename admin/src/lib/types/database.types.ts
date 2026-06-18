@@ -26,6 +26,13 @@ export type ProfileRow = {
   is_suspended: boolean;
   suspended_reason: string | null;
   suspended_at: string | null;
+  moderation_violation_count?: number;
+  last_moderation_violation_at?: string | null;
+  is_banned?: boolean;
+  banned_until?: string | null;
+  ban_count?: number;
+  ban_reason?: string | null;
+  banned_by?: string | null;
   created_at: string;
   updated_at: string;
 }

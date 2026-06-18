@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/supabase/supabase_client.dart';
-import 'package:my_app/features/favorites/data/favorites_repository.dart';
-import 'package:my_app/features/favorites/providers/favorites_provider.dart';
+import 'package:Sello/core/supabase/supabase_client.dart';
+import 'package:Sello/features/favorites/data/favorites_repository.dart';
+import 'package:Sello/features/favorites/providers/favorites_provider.dart';
 
 class _FakeFavoritesRepository extends FavoritesRepository {
   _FakeFavoritesRepository(Set<String> ids) : super(null) {

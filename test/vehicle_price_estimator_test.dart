@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/listings/widgets/vehicle_price_estimator_section.dart';
-import 'package:my_app/models/price_estimate.dart';
-import 'package:my_app/services/groq_service.dart';
-import 'package:my_app/shared/models/category_model.dart';
-import 'package:my_app/shared/models/listing_model.dart';
-import 'package:my_app/shared/models/vehicle_listing_metadata.dart';
+import 'package:Sello/features/listings/widgets/vehicle_price_estimator_section.dart';
+import 'package:Sello/models/price_estimate.dart';
+import 'package:Sello/services/groq_service.dart';
+import 'package:Sello/shared/models/category_model.dart';
+import 'package:Sello/shared/models/listing_model.dart';
+import 'package:Sello/shared/models/vehicle_listing_metadata.dart';
 
 class _FakeGroqService extends GroqService {
   _FakeGroqService({this.result, this.error});

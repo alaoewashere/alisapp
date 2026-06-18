@@ -12,6 +12,7 @@ import '../../../core/utils/listing_package_utils.dart';
 import '../../../shared/models/filter_model.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/models/report_model.dart';
+import '../models/listing_density.dart';
 
 final listingsRepositoryProvider = Provider<ListingsRepository>((ref) {
   return ListingsRepository(ref.watch(supabaseClientProvider));
@@ -40,23 +41,41 @@ class ListingsRepository {
     return _client.storage.from(AppConstants.storageBucket).getPublicUrl(path);
   }
 
+  /// Active approved listing counts grouped by neighborhood.
+  Future<List<ListingDensity>> getListingDensity({String? categorySlug}) async {
+    final slug = categorySlug?.trim();
+    final data = await _client.rpc(
+      'get_listing_density',
+      params: {
+        if (slug != null && slug.isNotEmpty) 'p_category_slug': slug,
+      },
+    );
+
+    return (data as List)
+        .map((row) => ListingDensity.fromJson(Map<String, dynamic>.from(row)))
+        .toList();
+  }
+
   Future<List<ListingModel>> getFeaturedListings({
     int limit = 10,
     String? userIdForFavorites,
   }) async {
-    final data = await _client
-        .from('listings')
-        .select(_listingSelect)
-        .eq('status', 'approved')
-        .eq('availability', 'active')
-        .or(
-          'is_featured.eq.true,'
-          'metadata->>listing_package.eq.premium,'
-          'metadata->>listing_package.eq.مميز,'
-          'metadata->>listing_package.eq.featured',
-        )
+    final data = await _featuredListingsBaseQuery()
         .order('created_at', ascending: false)
         .limit(limit);
+
+    final listings = await _mapListings(data, userIdForFavorites);
+    return listings.where((listing) => listing.isPremiumListing).toList();
+  }
+
+  Future<List<ListingModel>> getFeaturedListingsPage({
+    int page = 0,
+    int pageSize = AppConstants.listingsPageSize,
+    String? userIdForFavorites,
+  }) async {
+    final data = await _featuredListingsBaseQuery()
+        .order('created_at', ascending: false)
+        .range(page * pageSize, (page + 1) * pageSize - 1);
 
     final listings = await _mapListings(data, userIdForFavorites);
     return listings.where((listing) => listing.isPremiumListing).toList();
@@ -83,6 +102,44 @@ class ListingsRepository {
     final listings = await _mapListings(data, userIdForFavorites);
     return _sortByPackagePriority(
       listings.where((listing) => !listing.isPremiumListing).take(limit).toList(),
+    );
+  }
+
+  /// Home «أحدث النشرات والمعروضات» preview — برو + مجاني only (no مميز).
+  Future<List<ListingModel>> getLatestHomeListings({
+    int limit = 20,
+    String? userIdForFavorites,
+  }) async {
+    final fetchLimit = (limit * 3).clamp(limit, 200);
+    final data = await _applyLatestListingsOrder(
+      _latestListingsBaseQuery(),
+    ).limit(fetchLimit);
+
+    final listings = await _mapListings(data, userIdForFavorites);
+    return sliceLatestHomeFeedPage(
+      listings,
+      page: 0,
+      pageSize: limit,
+    );
+  }
+
+  /// Paginated Home «أحدث النشرات والمعروضات» — same pro→مجاني sort as preview.
+  Future<List<ListingModel>> getLatestHomeListingsPage({
+    int page = 0,
+    int pageSize = AppConstants.listingsPageSize,
+    String? userIdForFavorites,
+  }) async {
+    final endExclusive = (page + 1) * pageSize;
+    final fetchLimit = (endExclusive * 3).clamp(pageSize, 500);
+    final data = await _applyLatestListingsOrder(
+      _latestListingsBaseQuery(),
+    ).limit(fetchLimit);
+
+    final listings = await _mapListings(data, userIdForFavorites);
+    return sliceLatestHomeFeedPage(
+      listings,
+      page: page,
+      pageSize: pageSize,
     );
   }
 
@@ -392,6 +449,7 @@ class ListingsRepository {
     double? latitude,
     double? longitude,
     String? locationAddress,
+    String? areaName,
     required List<Map<String, dynamic>> imageRows,
     required List<String> removedImageIds,
     Map<String, dynamic>? metadata,
@@ -412,6 +470,8 @@ class ListingsRepository {
       'longitude': longitude,
       if (locationAddress != null && locationAddress.trim().isNotEmpty)
         'location_address': locationAddress.trim(),
+      if (areaName != null && areaName.trim().isNotEmpty)
+        'area_name': areaName.trim(),
       if (metadata != null) 'metadata': metadata,
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('id', listingId);
@@ -708,6 +768,7 @@ class ListingsRepository {
     double? latitude,
     double? longitude,
     String? locationAddress,
+    String? areaName,
     required List<String> imageStoragePaths,
     required bool asDraft,
     String listingType = 'sale',
@@ -731,6 +792,7 @@ class ListingsRepository {
       latitude: latitude,
       longitude: longitude,
       locationAddress: locationAddress,
+      areaName: areaName,
       listingType: listingType,
       metadata: metadata,
       contactPreference: contactPreference,
@@ -773,6 +835,7 @@ class ListingsRepository {
             latitude: latitude,
             longitude: longitude,
             locationAddress: locationAddress,
+            areaName: areaName,
             listingType: listingType,
             metadata: metadata,
             contactPreference: contactPreference,
@@ -853,6 +916,7 @@ class ListingsRepository {
     double? latitude,
     double? longitude,
     String? locationAddress,
+    String? areaName,
     required String listingType,
     Map<String, dynamic>? metadata,
     ListingContactPreference? contactPreference,
@@ -895,6 +959,8 @@ class ListingsRepository {
       'longitude': longitude,
       if (locationAddress != null && locationAddress.trim().isNotEmpty)
         'location_address': locationAddress.trim(),
+      if (areaName != null && areaName.trim().isNotEmpty)
+        'area_name': areaName.trim(),
       'listing_type': listingType,
       'status': 'pending',
       'availability': 'active',
@@ -1020,10 +1086,106 @@ class ListingsRepository {
     }).eq('id', listingId);
   }
 
+  /// Applies a paid boost / package upgrade on an owned listing.
+  Future<void> applyListingBoost({
+    required String listingId,
+    required String userId,
+    required Map<String, dynamic> currentMetadata,
+    required ListingPackage targetPackage,
+    required int priceIqd,
+    required bool setFeatured,
+    required bool setBoosted,
+    required bool upgradePackage,
+    required String userName,
+    String? userPhone,
+    String? userEmail,
+  }) async {
+    final metadata = Map<String, dynamic>.from(currentMetadata);
+    if (upgradePackage) {
+      metadata['listing_package'] = targetPackage.value;
+    }
+
+    final updates = <String, dynamic>{
+      'metadata': metadata,
+      'updated_at': DateTime.now().toIso8601String(),
+      'is_featured': setFeatured,
+      'is_boosted': setBoosted,
+    };
+
+    if (upgradePackage) {
+      updates['is_verified_seller'] = targetPackage != ListingPackage.standard;
+      updates['expires_at'] =
+          calculateListingExpiry(targetPackage).toIso8601String();
+    }
+
+    final data = await _client
+        .from('listings')
+        .update(updates)
+        .eq('id', listingId)
+        .eq('user_id', userId)
+        .select('id');
+
+    if ((data as List).isEmpty) {
+      throw StateError('تعذّر تحديث الإعلان');
+    }
+
+    final packageType = targetPackage.purchasePackageType;
+    if (packageType != null && priceIqd > 0) {
+      await recordListingPurchase(
+        userId: userId,
+        listingId: listingId,
+        packageType: packageType,
+        price: priceIqd,
+        userName: userName,
+        userPhone: userPhone,
+        userEmail: userEmail,
+      );
+    }
+  }
+
   List<ListingModel> _sortByPackagePriority(List<ListingModel> listings) {
     final sorted = [...listings];
     sortListingsByPackagePriority(sorted);
     return sorted;
+  }
+
+  /// Featured/premium listings query — same filter as [getFeaturedListings].
+  dynamic _featuredListingsBaseQuery({String select = _listingSelect}) {
+    return _client
+        .from('listings')
+        .select(select)
+        .eq('status', 'approved')
+        .eq('availability', 'active')
+        .or(
+          'is_featured.eq.true,'
+          'metadata->>listing_package.eq.premium,'
+          'metadata->>listing_package.eq.مميز,'
+          'metadata->>listing_package.eq.featured',
+        );
+  }
+
+  /// Approved active listings for Home latest feed — excludes مميز (featured tier).
+  dynamic _latestListingsBaseQuery({String select = _listingSelect}) {
+    return _client
+        .from('listings')
+        .select(select)
+        .eq('status', 'approved')
+        .eq('availability', 'active')
+        .eq('is_featured', false)
+        .or(
+          'metadata->>listing_package.is.null,'
+          'metadata->>listing_package.eq.standard,'
+          'metadata->>listing_package.eq.pro,'
+          'metadata->>listing_package.eq.مجاني,'
+          'metadata->>listing_package.eq.برو',
+        );
+  }
+
+  /// Pro before free, then newest within tier — mirrors [sortListingsByPackagePriority].
+  dynamic _applyLatestListingsOrder(dynamic query) {
+    return query
+        .order('is_boosted', ascending: false)
+        .order('created_at', ascending: false);
   }
 
   /// Builds filter chain only — never call order/limit/range before this returns.
@@ -1064,6 +1226,9 @@ class ListingsRepository {
     }
     if (filters.city != null && filters.city!.isNotEmpty) {
       query = query.ilike('city', '%${filters.city}%');
+    }
+    if (filters.areaName != null && filters.areaName!.isNotEmpty) {
+      query = query.eq('area_name', filters.areaName!);
     }
     if (filters.minPrice != null) {
       query = query.gte('price', filters.minPrice!.round());

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -180,6 +180,7 @@ class _VerificationUploadScreenState
             AuthPrimaryButton(
               label: 'إرسال للمراجعة',
               loading: _submitting,
+              loginStyle: true,
               onPressed: canSubmit ? _submit : null,
             ),
           ],
@@ -190,6 +191,8 @@ class _VerificationUploadScreenState
 }
 
 class _UploadFrame extends StatelessWidget {
+  static const _frameBorder = Color(0x15FFFFFF);
+
   const _UploadFrame({
     required this.label,
     required this.image,
@@ -210,7 +213,7 @@ class _UploadFrame extends StatelessWidget {
           style: AppFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
+            color: AppColors.pureWhite,
           ),
         ),
         const SizedBox(height: 8),
@@ -220,11 +223,11 @@ class _UploadFrame extends StatelessWidget {
             aspectRatio: 1.58,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: AppColors.fieldCarbon,
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.35),
-                  width: 1.5,
+                  color: _frameBorder,
+                  width: 1,
                 ),
               ),
               child: image != null
@@ -232,7 +235,7 @@ class _UploadFrame extends StatelessWidget {
                       fit: StackFit.expand,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.file(image!, fit: BoxFit.cover),
                         ),
                         Positioned(
@@ -256,10 +259,10 @@ class _UploadFrame extends StatelessWidget {
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.photo_camera_outlined,
                           size: 40,
-                          color: AppColors.primary.withValues(alpha: 0.7),
+                          color: AppColors.volt,
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -267,7 +270,7 @@ class _UploadFrame extends StatelessWidget {
                           style: AppFonts.cairo(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                            color: AppColors.pureWhite,
                           ),
                         ),
                       ],

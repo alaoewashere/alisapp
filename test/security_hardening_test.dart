@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/supabase/public_profiles_query.dart';
-import 'package:my_app/core/utils/secure_log.dart';
-import 'package:my_app/shared/models/profile_model.dart';
+import 'package:Sello/core/supabase/public_profiles_query.dart';
+import 'package:Sello/core/utils/secure_log.dart';
+import 'package:Sello/shared/models/profile_model.dart';
 
 void main() {
   group('publicProfileSelect', () {

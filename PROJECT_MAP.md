@@ -44,7 +44,7 @@ Living architecture document for the Iraq Classifieds Marketplace.
 | State | flutter_riverpod + riverpod_annotation | `^3.3.1` / `^4.0.2` |
 | Localization | flutter_localizations + intl | SDK + `^0.20.2` |
 | Images | cached_network_image, image_picker, flutter_svg | latest |
-| Maps / location | google_maps_flutter, geolocator | latest (ready for geo listings) |
+| Maps / location | google_maps_flutter, geolocator, flutter_map, latlong2, flutter_map_marker_cluster | geo listings + clustered heat-map badges |
 | UI polish | shimmer, timeago, url_launcher, country_picker | latest |
 | Config | flutter_dotenv | `.env` (`SUPABASE_*`, `GOOGLE_MAPS_API_KEY`, `GROQ_API_KEY`, optional `ONESIGNAL_APP_ID`) |
 | Testing | flutter_test, mocktail | SDK + `^1.0.5` |
@@ -224,6 +224,10 @@ Home → category filter → listing grid → ListingDetail (gallery, contact, r
 SearchScreen → category browse list (Sahibinden-style) OR text search (≥2 chars) → FilterSheet → results grid  
 **Category drill-down:** tap العقارات or السيارات → `CategoryBrowseScreen` (`/categories/:id`) → nested branches → leaf → `ListingsScreen`. Children loaded via `fetchChildren(parent_id)` (not in-memory tree only); `fetchAll()` paginates past PostgREST 1000-row cap.
 
+### Listing density heat map (guest OK) — COMPLETE
+Home banner → `/heatmap` (`ListingHeatmapScreen`) → CartoDB dark tiles + Volt circle markers sized by `get_listing_density` RPC → tap area → bottom sheet → «عرض الإعلانات» pre-filters `FilterModel.areaName` (+ optional category) → `SearchResultsScreen`.  
+**Area capture:** post/edit Step 3 optional neighborhood picker + GPS nearest-center suggestion; `listings.area_name` backfilled from `listing_area_centers` seed (29 neighborhoods).
+
 ### Auth
 PhoneScreen → OTP (+964) → ProfileSetupScreen (if new) → Home
 
@@ -252,7 +256,7 @@ ListingDetail ♥ → optimistic toggle → FavoritesScreen (grid, swipe-to-remo
 
 ### Profile + My Listings + Settings (auth) — COMPLETE
 BottomNav "حسابي" → ProfileScreen (own/other user) → edit / my listings / settings / logout  
-"إعلاناتي" → MyListingsScreen (4 tabs: active/pending/sold/deleted) → edit/sold/delete/restore/repost  
+"إعلاناتي" → MyListingsScreen (4 tabs: active/pending/sold/deleted) → Field Carbon listing cards; edit/sold/delete/restore/repost; 🚀 boost sheet for برو/مميز posts when user tier is برو/مميز  
 "الإعدادات" → SettingsScreen → language / notifications / about / logout / delete account
 
 ### Chat (auth) — COMPLETE
@@ -262,6 +266,7 @@ Push: OneSignal (optional `ONESIGNAL_APP_ID` in `.env`) saves `onesignal_player_
 
 ### Smart Alerts (تنبيه ذكي) (auth) — COMPLETE
 Search bell / profile «تنبيهاتي الذكية» / search-results banner → `MyAlertsScreen` → create/edit alerts → DB trigger `notify_smart_alerts()` on listing approval → OneSignal push → tap opens listing detail
+  - First-time coachmark on Search screen (`smart_alerts_tutorial_seen` in SharedPreferences); shared `FeatureTutorialOverlay`
 
 Free users: max 3 active alerts; Pro/Premium purchasers (`listing_purchases`): unlimited
 
@@ -294,8 +299,34 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `features/home/widgets/category_grid.dart` — horizontal chips with shimmer
   - `features/home/widgets/listing_card.dart` — card with badges, favorite, optimistic toggle
   - `features/home/widgets/featured_listings_carousel.dart` — «إعلانات مميزة» horizontal premium carousel
+  - `features/home/widgets/home_section_view_all_link.dart` — shared «عرض الكل» Volt link (matches تصفح الفئات)
+  - `features/home/presentation/home_feed_screen.dart` — paginated full feeds from Home «عرض الكل»
+  - `features/home/providers/home_feed_provider.dart` — featured + latest infinite-scroll providers
+  - `latestHomeListingsProvider` — أحدث النشرات: برو + مجاني only (excludes مميز); `sortLatestHomeFeedListings` + `sliceLatestHomeFeedPage` shared by preview + `/feed/latest` pagination
+  - Routes `/feed/featured`, `/feed/latest` (guest-allowed)
+- **Content moderation + posting bans** — COMPLETE
+  - `blocked_words` + `moderation_violations` tables; `profiles.moderation_violation_count`, `last_moderation_violation_at`
+  - **30-day rolling window** for warn vs block (`effective_moderation_violation_count`); stored count does not auto-decrement
+  - **Posting bans** on `profiles`: `is_banned`, `banned_until`, `ban_count` (lifetime), `ban_reason`, `banned_by`
+  - Auto-ban on 2nd violation (block): 2 days if `ban_count == 0`, else 1 month; `record_moderation_block` RPC for client-side blocks
+  - Bans block chat send + listing create/edit only (browse/login OK); expired bans ignored at enforcement time
+  - `ContentModerationService` + Arabic normalizer (client); Postgres triggers + RPCs (server source of truth)
+  - Admin: `/dashboard/blocked-words`, `/dashboard/moderation` (إدارة المخالفات — view/ban/unban)
+  - Integrated: chat send, listing publish/edit title+description, profile name
+  - **Client submits original text** on censored path (server triggers censor + persist); client-only `***` bypasses DB logging
+  - `test/content_moderation_test.dart`, `test/moderation_warning_dialog_test.dart`, `test/posting_ban_utils_test.dart`, `test/moderation_server_write_path_test.dart`
   - `widgets/featured_listing_card.dart` — compact gold-border premium card
   - `features/home/presentation/home_screen.dart` — sliver layout, pull-to-refresh
+  - `features/home/widgets/home_top_bar_icon_button.dart` — circular header icons (favorites + heat map)
+  - `features/home/widgets/home_heatmap_tutorial.dart` — heat map coachmark wrapper (`heatmap_tutorial_seen`)
+  - `shared/widgets/feature_tutorial_overlay.dart` — reusable dim + spotlight tutorial overlay
+  - `features/home/widgets/home_heatmap_banner.dart` — `openHomeHeatmap` navigation helper → `/heatmap`
+  - `features/listings/presentation/listing_heatmap_screen.dart` — dark map, category chips, area drill-down sheet
+  - `features/listings/providers/listing_heatmap_provider.dart` — `listingDensityProvider`, category slug filter
+  - `core/utils/listing_heatmap_utils.dart` — marker sizing, category-aware density copy
+  - `core/constants/iraq_neighborhoods.dart` — 29 seeded area centers (mirrors `listing_area_centers`)
+  - `supabase/migrations/20260726000000_listing_area_density.sql` — `area_name`, `get_listing_density` RPC, backfill
+  - `test/listing_heatmap_utils_test.dart`, `test/home_heatmap_banner_test.dart`
   - `features/listings/presentation/listings_screen.dart` — category-filtered grid
   - `shared/widgets/shimmer_loading.dart` — shimmer placeholders
   - `core/utils/currency_formatter.dart` — formatIQD()
@@ -494,10 +525,13 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `screens/settings/widgets/edit_profile_phone_sheet.dart` — phone entry bottom sheet for profile verification
   - `features/profile/presentation/my_listings_screen.dart` — 4-tab lazy-loaded listings manager
   - `screens/settings/settings_screen.dart` — RTL settings hub (profile card, account, about, delete)
-  - `screens/settings/language_screen.dart` — full-screen language picker (ar/en/ku)
+  - `screens/settings/language_screen.dart` — full-screen language picker (ar/en/ku/tr), dark Sello theme
   - `features/profile/presentation/notifications_settings_screen.dart` — push/email toggles (shared_preferences)
-  - `features/profile/widgets/my_listing_tile.dart` — image, status chip, edit/sold/delete/restore/repost actions
-  - `features/profile/widgets/language_sheet.dart` — Arabic / Kurdish / English locale picker
+  - `features/profile/widgets/my_listing_tile.dart` — Field Carbon card (Volt price, status pill, circular action icons); conditional 🚀 boost
+  - `features/profile/widgets/listing_boost_sheet.dart` — «ترقية إعلانك» bottom sheet; package upgrade + `is_featured`/`is_boosted` via `applyListingBoost`
+  - `features/profile/utils/listing_boost_utils.dart` — eligibility + upgrade options by user/post tier
+  - `features/profile/providers/user_subscription_tier_provider.dart` — infers tier from `listing_purchases`
+  - `features/profile/widgets/language_sheet.dart` — dark bottom sheet locale picker (ar/en/ku/tr)
   - `features/profile/widgets/settings_tile.dart` — reusable settings row
   - `core/providers/locale_provider.dart` — persisted locale, instant RTL/LTR switch
   - `core/providers/session_reset.dart` — invalidate all user providers on logout/delete
@@ -538,7 +572,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
 ### FLAGGED (post-MVP)
 - Full Kurdish/English UI translations (locale switch works; strings remain Arabic)
 - Light/dark theme toggle (app now ships a single dark "fintech" theme; no runtime switch)
-- Paid/promoted listings UI (boost sheet)
+- ~~Paid/promoted listings UI (boost sheet)~~ — **COMPLETE** (Jun 2026): My Listings 🚀 boost sheet
 - Seller phone reveal
 
 ---

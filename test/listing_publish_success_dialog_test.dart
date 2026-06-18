@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/listings/widgets/listing_publish_success_dialog.dart';
+import 'package:Sello/features/listings/widgets/listing_publish_success_dialog.dart';
 
 void main() {
   testWidgets('ListingPublishSuccessDialog shows done and review message', (

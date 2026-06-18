@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/utils/free_posts_quota.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/core/utils/free_posts_quota.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   group('free_posts_quota', () {

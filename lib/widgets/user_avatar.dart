@@ -18,15 +18,21 @@ class UserAvatar extends StatelessWidget {
     super.key,
     this.avatarSeed,
     this.size = 48,
+    this.darkStyle = false,
   });
 
   final String? avatarSeed;
   final double size;
+  final bool darkStyle;
 
   @override
   Widget build(BuildContext context) {
     if (_isFlutterTest()) {
-      return _SeedPlaceholder(seed: DiceBearAvatars.resolveSeed(avatarSeed), size: size);
+      return _SeedPlaceholder(
+        seed: DiceBearAvatars.resolveSeed(avatarSeed),
+        size: size,
+        darkStyle: darkStyle,
+      );
     }
 
     final seed = DiceBearAvatars.resolveSeed(avatarSeed);
@@ -38,64 +44,84 @@ class UserAvatar extends StatelessWidget {
         width: size,
         height: size,
         fit: BoxFit.cover,
-        placeholderBuilder: (_) => _Fallback(size: size, loading: true),
-        errorBuilder: (_, _, _) => _Fallback(size: size),
+        placeholderBuilder: (_) =>
+            _Fallback(size: size, loading: true, darkStyle: darkStyle),
+        errorBuilder: (_, _, _) => _Fallback(size: size, darkStyle: darkStyle),
       ),
     );
   }
 }
 
 class _SeedPlaceholder extends StatelessWidget {
-  const _SeedPlaceholder({required this.seed, required this.size});
+  const _SeedPlaceholder({
+    required this.seed,
+    required this.size,
+    this.darkStyle = false,
+  });
 
   final String seed;
   final double size;
+  final bool darkStyle;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: Color(0xFFE8F5EE),
+      decoration: BoxDecoration(
+        color: darkStyle ? AppColors.fieldCarbon : const Color(0xFFE8F5EE),
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
-      child: Text(
-        seed.isNotEmpty ? seed[0].toUpperCase() : '?',
-        style: TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold,
-          fontSize: size * 0.35,
-        ),
-      ),
+      child: darkStyle
+          ? Icon(Icons.person, color: AppColors.pureWhite, size: size * 0.45)
+          : Text(
+              seed.isNotEmpty ? seed[0].toUpperCase() : '?',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: size * 0.35,
+              ),
+            ),
     );
   }
 }
 
 class _Fallback extends StatelessWidget {
-  const _Fallback({required this.size, this.loading = false});
+  const _Fallback({
+    required this.size,
+    this.loading = false,
+    this.darkStyle = false,
+  });
 
   final double size;
   final bool loading;
+  final bool darkStyle;
 
   @override
   Widget build(BuildContext context) {
+    final background =
+        darkStyle ? AppColors.fieldCarbon : (loading ? Colors.grey.shade200 : AppColors.primary);
+
     return Container(
       width: size,
       height: size,
-      color: loading ? Colors.grey.shade200 : AppColors.primary,
+      color: background,
       alignment: Alignment.center,
       child: loading
           ? SizedBox(
               width: size * 0.35,
               height: size * 0.35,
-              child: const CircularProgressIndicator(
+              child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.primary,
+                color: darkStyle ? AppColors.pureWhite : AppColors.primary,
               ),
             )
-          : Icon(Icons.person, color: Colors.white, size: size * 0.5),
+          : Icon(
+              Icons.person,
+              color: AppColors.pureWhite,
+              size: size * 0.5,
+            ),
     );
   }
 }

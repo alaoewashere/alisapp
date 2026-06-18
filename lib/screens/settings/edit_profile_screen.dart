@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/dicebear_avatars.dart';
@@ -12,6 +12,7 @@ import '../../theme/app_text_styles.dart';
 import '../../core/utils/result.dart';
 import '../../core/utils/validators.dart';
 import '../../core/supabase/supabase_client.dart';
+import '../../core/moderation/moderation_provider.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../shared/models/profile_model.dart';
 import '../../widgets/avatar_picker_sheet.dart';
@@ -148,8 +149,42 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     try {
+      final name = _nameController.text.trim();
+
+      if (await checkPostingBanGate(ref, context)) {
+        setState(() => _isSaving = false);
+        return;
+      }
+
+      final moderation = await moderateUserText(ref, text: name);
+      if (!mounted) return;
+
+      if (moderation.shouldBlock) {
+        setState(() => _isSaving = false);
+        PostingBanInfo? banInfo;
+        try {
+          banInfo = await recordClientModerationBlock(
+            ref.read(moderationRepositoryProvider),
+            source: 'profile',
+            fieldName: 'full_name',
+            excerpt: name,
+          );
+          ref.invalidateModerationState();
+        } catch (e) {
+          await handlePostingBanOrBlockError(ref, context, e);
+          return;
+        }
+        if (!mounted) return;
+        await showModerationBlockedWarning(context, banInfo: banInfo);
+        return;
+      }
+
+      if (moderation.hadViolation) {
+        await showModerationCensoredWarning(context);
+      }
+
       final updated = profile.copyWith(
-        fullName: _nameController.text.trim(),
+        fullName: name,
         avatarSeed: _avatarSeed,
       );
 
@@ -172,10 +207,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           );
           context.pop();
-        case Failure():
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('حدث خطأ أثناء الحفظ')),
-          );
+        case Failure(:final message, :final cause):
+          final err = cause ?? message;
+          if (isUserPostingBannedError(err) || isModerationBlockedError(err)) {
+            await handlePostingBanOrBlockError(ref, context, err);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('حدث خطأ أثناء الحفظ')),
+            );
+          }
       }
     } catch (_) {
       if (!mounted) return;

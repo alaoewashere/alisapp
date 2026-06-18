@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/listings/constants/post_listing_step_labels.dart';
+import 'package:Sello/features/listings/constants/post_listing_step_labels.dart';
 
 void main() {
   test('postListingStepAppBarTitle uses Arabic ordinals', () {

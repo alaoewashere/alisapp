@@ -14,6 +14,7 @@ class EditListingSnapshot {
     required this.latitude,
     required this.longitude,
     required this.locationAddress,
+    required this.areaName,
     required this.contactPreference,
     required this.metadata,
     required this.imageIds,
@@ -29,6 +30,7 @@ class EditListingSnapshot {
   final double? latitude;
   final double? longitude;
   final String? locationAddress;
+  final String? areaName;
   final ListingContactPreference? contactPreference;
   final Map<String, dynamic>? metadata;
   final List<String> imageIds;
@@ -48,6 +50,7 @@ class EditListingSnapshot {
       latitude: listing.latitude,
       longitude: listing.longitude,
       locationAddress: listing.locationAddress,
+      areaName: listing.areaName,
       contactPreference: listing.contactPreference,
       metadata: metadataForEditSnapshot(listing.metadata),
       imageIds: listing.images.map((i) => i.id).toList(),
@@ -100,6 +103,7 @@ Map<String, dynamic> buildEditListingFieldUpdates({
   required double? latitude,
   required double? longitude,
   required String? locationAddress,
+  required String? areaName,
   required ListingContactPreference? contactPreference,
   required Map<String, dynamic>? metadata,
 }) {
@@ -142,6 +146,7 @@ Map<String, dynamic> buildEditListingFieldUpdates({
   setIfChanged('latitude', latitude, original.latitude);
   setIfChanged('longitude', longitude, original.longitude);
   setIfChanged('location_address', locationAddress, original.locationAddress);
+  setIfChanged('area_name', areaName, original.areaName);
 
   if (contactPreference != original.contactPreference) {
     if (contactPreference != null) {

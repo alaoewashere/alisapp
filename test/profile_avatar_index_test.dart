@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/preset_avatars.dart';
-import 'package:my_app/shared/models/profile_model.dart';
+import 'package:Sello/core/constants/preset_avatars.dart';
+import 'package:Sello/shared/models/profile_model.dart';
 
 void main() {
   group('ProfileModel avatarIndex', () {

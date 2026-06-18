@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/screens/auth/forgot_password_screen.dart';
+import 'package:Sello/screens/auth/forgot_password_screen.dart';
 
 void main() {
   testWidgets('ForgotPasswordScreen shows recovery options', (tester) async {

@@ -214,6 +214,12 @@ class _ActiveFiltersRow extends ConsumerWidget {
             removeAndSearch(filter.copyWith(clearGovernorate: true)),
       ));
     }
+    if (filter.areaName != null && filter.areaName!.trim().isNotEmpty) {
+      chips.add(_FilterChip(
+        label: filter.areaName!,
+        onRemove: () => removeAndSearch(filter.copyWith(clearAreaName: true)),
+      ));
+    }
     if (filter.minPrice != null || filter.maxPrice != null) {
       chips.add(_FilterChip(
         label: 'السعر',

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/moderation/moderation_provider.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
@@ -170,14 +171,29 @@ class PostListingScreen extends ConsumerWidget {
       if (confirmed != true) return;
     }
 
-    final id = await ref.read(postListingProvider.notifier).publishListing();
+    final outcome =
+        await ref.read(postListingProvider.notifier).publishListing();
     if (!context.mounted) return;
 
-    if (id != null) {
+    if (outcome.moderationDialog != null) {
+      await showModerationWarningDialog(
+        context,
+        variant: outcome.moderationDialog!,
+        banInfo: outcome.banInfo,
+        postingBanMessage: outcome.postingBanMessage,
+      );
+      ref.invalidateModerationState();
+      if (outcome.moderationDialog == ModerationDialogVariant.blocked ||
+          outcome.moderationDialog == ModerationDialogVariant.postingBan) {
+        return;
+      }
+    }
+
+    if (outcome.listingId != null) {
       await showListingPublishSuccessDialog(context);
       if (!context.mounted) return;
       ref.read(postListingProvider.notifier).reset();
-      context.go('/listing/$id');
+      context.go('/listing/${outcome.listingId}');
     }
   }
 

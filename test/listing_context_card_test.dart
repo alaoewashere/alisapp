@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/chat/widgets/listing_context_card.dart';
-import 'package:my_app/shared/models/conversation_model.dart';
+import 'package:Sello/features/chat/widgets/listing_context_card.dart';
+import 'package:Sello/shared/models/conversation_model.dart';
 
 void main() {
   ConversationModel sampleConversation({

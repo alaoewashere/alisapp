@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
@@ -8,24 +8,29 @@ import '../../shared/widgets/app_back_button.dart';
 import '../../features/auth/widgets/auth_form_styles.dart';
 import '../../features/auth/widgets/auth_hero_header.dart';
 
-/// Screen 1 — verification intro with green hero header.
+/// Screen 1 — verification intro with dark canvas header.
 class VerificationIntroScreen extends StatelessWidget {
   const VerificationIntroScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.canvas,
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: Column(
           children: [
-            AuthHeroHeader(
-              height: 260,
+            AuthDarkHeader(
               showLogo: false,
               title: 'توثيق الحساب',
               subtitle: 'قبل المتابعة، يرجى توثيق هويتك',
               leading: AppBackButton(onPressed: () => context.pop()),
+              titleStyle: AppFonts.cairo(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppColors.pureWhite,
+                height: 1.2,
+              ),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -35,14 +40,14 @@ class VerificationIntroScreen extends StatelessWidget {
                     Container(
                       width: 88,
                       height: 88,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                      decoration: const BoxDecoration(
+                        color: AppColors.fieldCarbon,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.manage_search_rounded,
                         size: 44,
-                        color: AppColors.primary,
+                        color: AppColors.volt,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -51,7 +56,7 @@ class VerificationIntroScreen extends StatelessWidget {
                       style: AppFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
+                        color: AppColors.pureWhite,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -105,7 +110,7 @@ class _Bullet extends StatelessWidget {
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 6),
-            child: Icon(Icons.check_circle, size: 16, color: AppColors.primary),
+            child: Icon(Icons.check_circle, size: 16, color: AppColors.volt),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -113,7 +118,7 @@ class _Bullet extends StatelessWidget {
               text,
               style: AppFonts.cairo(
                 fontSize: 13,
-                color: AppColors.textDark,
+                color: AppColors.pureWhite,
                 height: 1.45,
               ),
             ),

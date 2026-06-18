@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/utils/arabic_number.dart';
+import 'package:Sello/core/utils/arabic_number.dart';
 
 void main() {
   group('formatCompactArabic', () {

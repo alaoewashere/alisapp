@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/moderation/moderation_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/animal_listing_utils.dart';
 import '../../../core/utils/category_tree.dart';
@@ -145,6 +146,8 @@ class EditListingNotifier extends Notifier<EditListingState> {
               latitude: listing.latitude,
               longitude: listing.longitude,
               locationAddress: listing.locationAddress,
+              areaName: listing.areaName,
+              areaNameLocked: listing.areaName?.trim().isNotEmpty == true,
               categoryPath: categoryPath,
               selectedCategory:
                   categoryPath.isNotEmpty ? categoryPath.last : null,
@@ -221,12 +224,21 @@ class EditListingNotifier extends Notifier<EditListingState> {
     );
   }
 
-  Future<bool> save() async {
+  Future<EditListingSaveOutcome> save() async {
     final userId = ref.read(currentUserIdProvider);
-    if (userId == null) return false;
+    if (userId == null) return const EditListingSaveOutcome(success: false);
+
+    final profile = ref.read(currentProfileProvider).value;
+    if (profile != null && isUserPostingBanned(profile)) {
+      return EditListingSaveOutcome(
+        success: false,
+        moderationDialog: ModerationDialogVariant.postingBan,
+        postingBanMessage: postingBanMessageAr(profile),
+      );
+    }
 
     final snapshot = state.snapshot;
-    if (snapshot == null) return false;
+    if (snapshot == null) return const EditListingSaveOutcome(success: false);
 
     final postNotifier = ref.read(postListingProvider.notifier);
     final postState = ref.read(postListingProvider);
@@ -235,12 +247,12 @@ class EditListingNotifier extends Notifier<EditListingState> {
 
     if (post.title.trim().isEmpty) {
       postNotifier.setValidationError('أدخل عنوان الإعلان');
-      return false;
+      return const EditListingSaveOutcome(success: false);
     }
 
     if (state.existingImages.isEmpty && post.images.isEmpty) {
       postNotifier.setValidationError('أضف صورة واحدة على الأقل');
-      return false;
+      return const EditListingSaveOutcome(success: false);
     }
 
     state = state.copyWith(loading: true, clearError: true);
@@ -257,10 +269,41 @@ class EditListingNotifier extends Notifier<EditListingState> {
         categoryMetadata: categoryMetadata,
       );
 
+      final moderation = await moderateFieldsForUser(
+        ref,
+        fields: {
+          'title': post.title.trim(),
+          'description': post.description.trim(),
+        },
+      );
+      if (moderation.shouldBlock) {
+        PostingBanInfo? banInfo;
+        try {
+          banInfo = await recordClientModerationBlock(
+            ref.read(moderationRepositoryProvider),
+            source: 'listing',
+            fieldName: 'title/description',
+            excerpt: post.title.trim(),
+          );
+        } catch (_) {
+          banInfo = null;
+        }
+        ref.invalidateModerationState();
+        state = state.copyWith(loading: false);
+        return EditListingSaveOutcome(
+          success: false,
+          moderationDialog: ModerationDialogVariant.blocked,
+          banInfo: banInfo,
+        );
+      }
+
+      final moderatedTitle = post.title.trim();
+      final moderatedDescription = post.description.trim();
+
       final fieldUpdates = buildEditListingFieldUpdates(
         original: snapshot,
-        title: post.title,
-        description: post.description,
+        title: moderatedTitle,
+        description: moderatedDescription,
         price: post.price ?? 0,
         isNegotiable: post.isNegotiable,
         condition: post.condition,
@@ -269,6 +312,7 @@ class EditListingNotifier extends Notifier<EditListingState> {
         latitude: post.latitude,
         longitude: post.longitude,
         locationAddress: post.locationAddress,
+        areaName: post.areaName,
         contactPreference: post.contactPreference,
         metadata: metadata,
       );
@@ -320,7 +364,12 @@ class EditListingNotifier extends Notifier<EditListingState> {
 
       if (fieldUpdates.isEmpty && !imagesDirty && post.pendingVideoFile == null) {
         state = state.copyWith(loading: false);
-        return true;
+        return EditListingSaveOutcome(
+          success: true,
+          moderationDialog: moderation.hadViolation
+              ? ModerationDialogVariant.censored
+              : null,
+        );
       }
 
       if (fieldUpdates.isNotEmpty || imagesDirty) {
@@ -351,15 +400,38 @@ class EditListingNotifier extends Notifier<EditListingState> {
 
       ref.invalidate(listingDetailProvider(listingId));
       ref.invalidate(recentListingsProvider);
+      ref.invalidate(latestHomeListingsProvider);
       invalidateMyListingsProviders(ref);
       ref.read(postListingProvider.notifier).reset();
       state = state.copyWith(loading: false);
-      return true;
+      return EditListingSaveOutcome(
+        success: true,
+        moderationDialog: moderation.hadViolation
+            ? ModerationDialogVariant.censored
+            : null,
+      );
     } catch (e, stackTrace) {
       debugPrint('Edit listing error: $e');
       debugPrint('Stack trace: $stackTrace');
+      if (isUserPostingBannedError(e)) {
+        ref.invalidate(currentProfileProvider);
+        state = state.copyWith(loading: false, clearError: true);
+        return EditListingSaveOutcome(
+          success: false,
+          moderationDialog: ModerationDialogVariant.postingBan,
+          postingBanMessage: extractPostingBanMessage(e),
+        );
+      }
+      if (isModerationBlockedError(e)) {
+        ref.invalidate(currentProfileProvider);
+        state = state.copyWith(loading: false, clearError: true);
+        return const EditListingSaveOutcome(
+          success: false,
+          moderationDialog: ModerationDialogVariant.blocked,
+        );
+      }
       state = state.copyWith(loading: false, error: 'تعذّر حفظ التعديلات');
-      return false;
+      return const EditListingSaveOutcome(success: false);
     }
   }
 

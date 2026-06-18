@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/default_avatars.dart';
-import 'package:my_app/core/utils/chat_date_utils.dart';
-import 'package:my_app/features/chat/widgets/active_users_strip.dart';
-import 'package:my_app/shared/models/conversation_model.dart';
+import 'package:Sello/core/constants/default_avatars.dart';
+import 'package:Sello/core/utils/chat_date_utils.dart';
+import 'package:Sello/features/chat/widgets/active_users_strip.dart';
+import 'package:Sello/shared/models/conversation_model.dart';
 
 void main() {
   group('formatConversationTimeAr', () {

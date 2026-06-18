@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,31 +18,110 @@ import '../../../shared/widgets/souqly_search_bar.dart';
 import '../providers/home_provider.dart';
 import '../widgets/category_grid.dart';
 import '../widgets/featured_listings_carousel.dart';
+import '../widgets/home_heatmap_banner.dart';
+import '../widgets/home_heatmap_prefs.dart';
+import '../widgets/home_heatmap_tutorial.dart';
 import '../widgets/home_hero_section.dart';
+import '../widgets/home_section_view_all_link.dart';
+import '../models/home_listings_feed_type.dart';
+import '../widgets/home_top_bar_icon_button.dart';
 import '../widgets/listing_card.dart';
 import '../widgets/recent_listings_row.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  Timer? _iconFadeInTimer;
+  bool _heatmapIconVisible = true;
+  bool _showHeatmapTutorial = false;
+  final _heatmapButtonKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHeatmapTutorialState();
+  }
+
+  @override
+  void dispose() {
+    _iconFadeInTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadHeatmapTutorialState() async {
+    final seen = await hasSeenHeatmapTutorial();
+    if (!mounted || seen) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _showHeatmapTutorial = true);
+    });
+  }
+
+  Future<void> _dismissHeatmapTutorial() async {
+    if (!_showHeatmapTutorial) return;
+    await markHeatmapTutorialSeen();
+    if (!mounted) return;
+    setState(() => _showHeatmapTutorial = false);
+  }
+
+  void _onHeatmapTap(BuildContext context) {
+    if (_showHeatmapTutorial) {
+      unawaited(_dismissHeatmapTutorial());
+    }
+    openHomeHeatmap(context);
+  }
+
+  bool _handleScrollNotification(ScrollNotification notification) {
+    if (ref.read(isHomeSearchActiveProvider)) return false;
+
+    if (notification is ScrollUpdateNotification) {
+      _iconFadeInTimer?.cancel();
+      final delta = notification.scrollDelta ?? 0;
+      if (delta != 0 && _heatmapIconVisible) {
+        setState(() => _heatmapIconVisible = false);
+      }
+    } else if (notification is ScrollEndNotification) {
+      if (notification.metrics.pixels <= 0) {
+        _iconFadeInTimer?.cancel();
+        if (!_heatmapIconVisible) {
+          setState(() => _heatmapIconVisible = true);
+        }
+      } else {
+        _scheduleHeatmapIconFadeIn();
+      }
+    }
+    return false;
+  }
+
+  void _scheduleHeatmapIconFadeIn() {
+    _iconFadeInTimer?.cancel();
+    _iconFadeInTimer = Timer(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
+      if (!_heatmapIconVisible) {
+        setState(() => _heatmapIconVisible = true);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isSearchActive = ref.watch(isHomeSearchActiveProvider);
+    final heatmapIconOpaque = isSearchActive || _heatmapIconVisible;
 
     return DecoratedBox(
       decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: RefreshIndicator(
-          color: AppColors.primary,
-          onRefresh: () => refreshHomeProviders(ref),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Directionality(
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                Directionality(
                   textDirection: TextDirection.ltr,
                   child: AppBar(
                     backgroundColor: Colors.transparent,
@@ -50,7 +131,7 @@ class HomeScreen extends ConsumerWidget {
                     automaticallyImplyLeading: false,
                     leading: Padding(
                       padding: const EdgeInsets.only(left: 8),
-                      child: _HomeTopBarIconButton(
+                      child: HomeTopBarIconButton(
                         icon: Icons.favorite_border_rounded,
                         tooltip: 'المفضلة',
                         onTap: () => context.push(AppRoutes.favorites),
@@ -59,67 +140,67 @@ class HomeScreen extends ConsumerWidget {
                     leadingWidth: 56,
                     title: const AppLogo(size: 46),
                     centerTitle: true,
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 200),
+                          opacity: heatmapIconOpaque ? 1 : 0.28,
+                          child: HomeTopBarIconButton(
+                            key: _heatmapButtonKey,
+                            icon: Icons.map_outlined,
+                            tooltip: 'كثافة الإعلانات',
+                            onTap: () => _onHeatmapTap(context),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(child: HomeHeroSection()),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: _HomeSearchBar(),
+                Expanded(
+                  child: RefreshIndicator(
+                    color: AppColors.primary,
+                    onRefresh: () => refreshHomeProviders(ref),
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: _handleScrollNotification,
+                      child: CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        slivers: [
+                          SliverToBoxAdapter(child: HomeHeroSection()),
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                              child: _HomeSearchBar(),
+                            ),
+                          ),
+                          if (!isSearchActive) ...[
+                            SliverToBoxAdapter(child: _HomeCategoriesHeader()),
+                            SliverToBoxAdapter(child: _HomeCategoriesSection()),
+                            SliverToBoxAdapter(child: _HomeFeaturedSection()),
+                            SliverToBoxAdapter(
+                              child: _HomeRecentListingsHeader(),
+                            ),
+                            _HomeRecentListingsSection(),
+                          ] else ...[
+                            _HomeSearchResultsSection(),
+                          ],
+                          AppBottomNavSliverSpacer(),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              if (!isSearchActive) ...[
-                SliverToBoxAdapter(child: _HomeCategoriesHeader()),
-                SliverToBoxAdapter(child: _HomeCategoriesSection()),
-                SliverToBoxAdapter(child: _HomeFeaturedSection()),
-                SliverToBoxAdapter(child: _HomeRecentListingsHeader()),
-                _HomeRecentListingsSection(),
-              ] else ...[
-                _HomeSearchResultsSection(),
               ],
-              AppBottomNavSliverSpacer(),
-            ],
-          ),
+            ),
+            if (_showHeatmapTutorial && !isSearchActive)
+              HomeHeatmapTutorialOverlay(
+                targetKey: _heatmapButtonKey,
+                onDismiss: _dismissHeatmapTutorial,
+              ),
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class _HomeTopBarIconButton extends StatelessWidget {
-  const _HomeTopBarIconButton({
-    required this.icon,
-    required this.onTap,
-    this.tooltip,
-  });
-
-  final IconData icon;
-  final VoidCallback onTap;
-  final String? tooltip;
-
-  static const _size = 40.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final button = SizedBox(
-      width: _size,
-      height: _size,
-      child: Icon(icon, size: 22, color: AppColors.textDark),
-    );
-
-    return Material(
-      color: AppColors.fieldCarbon,
-      shape: const CircleBorder(
-        side: BorderSide(color: AppColors.glassBorder, width: 1),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: tooltip != null
-            ? Tooltip(message: tooltip!, child: button)
-            : button,
       ),
     );
   }
@@ -233,7 +314,17 @@ class _HomeFeaturedSection extends ConsumerWidget {
     final featuredAsync = ref.watch(featuredListingsProvider);
 
     return featuredAsync.when(
-      data: (listings) => FeaturedListingsCarousel(listings: listings),
+      data: (listings) {
+        if (listings.isEmpty) return const SizedBox.shrink();
+        return FeaturedListingsCarousel(
+          listings: listings,
+          viewAllLink: HomeSectionViewAllLink(
+            onPressed: () => context.push(
+              AppRoutes.homeFeedPath(HomeListingsFeedType.featured),
+            ),
+          ),
+        );
+      },
       loading: () => const FeaturedListingsCarouselShimmer(),
       error: (_, _) => const SizedBox.shrink(),
     );
@@ -247,12 +338,22 @@ class _HomeRecentListingsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-      child: Text(
-        'أحدث النشرات والمعروضات',
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+      child: Row(
+        children: [
+          Text(
+            'أحدث النشرات والمعروضات',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark,
+                ),
+          ),
+          const Spacer(),
+          HomeSectionViewAllLink(
+            onPressed: () => context.push(
+              AppRoutes.homeFeedPath(HomeListingsFeedType.latest),
             ),
+          ),
+        ],
       ),
     );
   }
@@ -263,7 +364,7 @@ class _HomeRecentListingsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recentAsync = ref.watch(recentListingsProvider);
+    final recentAsync = ref.watch(latestHomeListingsProvider);
     final strings = ref.watch(appLocalizationsProvider);
 
     return recentAsync.when(
@@ -272,7 +373,7 @@ class _HomeRecentListingsSection extends ConsumerWidget {
         hasScrollBody: false,
         child: AppErrorWidget(
           message: 'فشل تحميل الإعلانات',
-          onRetry: () => ref.invalidate(recentListingsProvider),
+          onRetry: () => ref.invalidate(latestHomeListingsProvider),
         ),
       ),
       data: (listings) {
@@ -305,7 +406,7 @@ class _HomeSearchResultsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recentAsync = ref.watch(recentListingsProvider);
+    final recentAsync = ref.watch(latestHomeListingsProvider);
     final filtered = ref.watch(filteredHomeListingsProvider);
 
     return recentAsync.when(
@@ -323,7 +424,7 @@ class _HomeSearchResultsSection extends ConsumerWidget {
         hasScrollBody: false,
         child: AppErrorWidget(
           message: 'فشل تحميل الإعلانات',
-          onRetry: () => ref.invalidate(recentListingsProvider),
+          onRetry: () => ref.invalidate(latestHomeListingsProvider),
         ),
       ),
       data: (_) {

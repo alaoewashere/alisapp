@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import 'package:my_app/features/chat/widgets/message_bubble.dart';
-import 'package:my_app/shared/models/message_model.dart';
+import 'package:Sello/features/chat/widgets/message_bubble.dart';
+import 'package:Sello/shared/models/message_model.dart';
 
 void main() {
   setUpAll(() async {

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/router/app_router.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/core/router/app_router.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   test('categoryBrowsePath builds resolved path without route pattern', () {

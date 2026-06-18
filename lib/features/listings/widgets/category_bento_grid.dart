@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_decorations.dart';

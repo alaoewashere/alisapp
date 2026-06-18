@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_governorates.dart';
+import '../../../../core/constants/iraq_neighborhoods.dart';
 import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../theme/app_form_fields.dart';
 import '../../../../theme/app_text_styles.dart';
@@ -999,6 +1000,68 @@ class Step2GovernoratePicker extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Step2PickerTriggerRow(
         label: 'المحافظة *',
+        displayValue: _displayLabel ?? 'اختر',
+        onTap: () => _openPicker(context),
+      ),
+    );
+  }
+}
+
+class Step2NeighborhoodPicker extends StatelessWidget {
+  const Step2NeighborhoodPicker({
+    super.key,
+    required this.governorateSlug,
+    required this.selectedSlug,
+    required this.onChanged,
+  });
+
+  final String? governorateSlug;
+  final String? selectedSlug;
+  final ValueChanged<String?> onChanged;
+
+  List<Step2PickerOption> get _options => neighborhoodsForGovernorate(
+        governorateSlug,
+      )
+          .map(
+            (area) => Step2PickerOption(
+              value: area.slug,
+              label: area.nameAr,
+            ),
+          )
+          .toList();
+
+  String? get _displayLabel {
+    if (selectedSlug == null) return null;
+    return neighborhoodBySlug(selectedSlug!)?.nameAr;
+  }
+
+  Future<void> _openPicker(BuildContext context) async {
+    final options = _options;
+    if (options.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('اختر المحافظة أولاً لعرض المناطق المتاحة'),
+        ),
+      );
+      return;
+    }
+
+    final picked = await showStep2PickerSheetForOptions(
+      context: context,
+      title: step2PickerSheetTitle('المنطقة / الحي'),
+      options: options,
+      selectedValue: selectedSlug,
+      searchable: true,
+    );
+    if (picked != null) onChanged(picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Step2PickerTriggerRow(
+        label: 'المنطقة / الحي (اختياري)',
         displayValue: _displayLabel ?? 'اختر',
         onTap: () => _openPicker(context),
       ),

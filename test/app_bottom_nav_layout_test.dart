@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/shared/widgets/app_bottom_nav.dart';
+import 'package:Sello/shared/widgets/app_bottom_nav.dart';
 
 void main() {
   testWidgets('nav outer padding uses safe area + small gap only', (tester) async {

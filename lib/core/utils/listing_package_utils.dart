@@ -40,3 +40,22 @@ void sortListingsByPackagePriority(List<ListingModel> listings) {
     return b.createdAt.compareTo(a.createdAt);
   });
 }
+
+/// Home «أحدث النشرات والمعروضات»: برو before مجاني, مميز excluded.
+List<ListingModel> sortLatestHomeFeedListings(List<ListingModel> listings) {
+  final filtered = listings.where((l) => !l.isPremiumListing).toList();
+  sortListingsByPackagePriority(filtered);
+  return filtered;
+}
+
+/// Paginated slice after [sortLatestHomeFeedListings].
+List<ListingModel> sliceLatestHomeFeedPage(
+  List<ListingModel> listings, {
+  required int page,
+  required int pageSize,
+}) {
+  return sortLatestHomeFeedListings(listings)
+      .skip(page * pageSize)
+      .take(pageSize)
+      .toList();
+}

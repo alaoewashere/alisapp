@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/shared/models/listing_model.dart';
-import 'package:my_app/widgets/featured_listing_card.dart';
+import 'package:Sello/shared/models/listing_model.dart';
+import 'package:Sello/widgets/featured_listing_card.dart';
 
 void main() {
   ListingModel sampleListing({String? coverImageUrl}) {

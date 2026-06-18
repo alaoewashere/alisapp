@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/theme/app_theme.dart';
-import 'package:my_app/core/utils/digit_input_formatter.dart';
-import 'package:my_app/features/listings/widgets/steps/step2_form_common.dart';
-import 'package:my_app/theme/app_text_styles.dart';
+import 'package:Sello/core/theme/app_theme.dart';
+import 'package:Sello/core/utils/digit_input_formatter.dart';
+import 'package:Sello/features/listings/widgets/steps/step2_form_common.dart';
+import 'package:Sello/theme/app_text_styles.dart';
 
 void main() {
   testWidgets('Step2IqdField accepts western digits', (tester) async {

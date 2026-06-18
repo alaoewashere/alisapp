@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/services/share_service.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/services/share_service.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 ListingModel _listing({
   String? coverImageUrl,

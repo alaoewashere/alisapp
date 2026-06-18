@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/moderation/moderation_provider.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
@@ -56,12 +57,26 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
       if (!confirmed || !mounted) return;
     }
 
-    final ok =
+    final outcome =
         await ref.read(editListingProvider(widget.listingId).notifier).save();
 
     if (!mounted) return;
 
-    if (ok) {
+    if (outcome.moderationDialog != null) {
+      await showModerationWarningDialog(
+        context,
+        variant: outcome.moderationDialog!,
+        banInfo: outcome.banInfo,
+        postingBanMessage: outcome.postingBanMessage,
+      );
+      ref.invalidateModerationState();
+      if (outcome.moderationDialog == ModerationDialogVariant.blocked ||
+          outcome.moderationDialog == ModerationDialogVariant.postingBan) {
+        return;
+      }
+    }
+
+    if (outcome.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

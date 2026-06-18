@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
@@ -17,7 +19,9 @@ import '../providers/post_listing_provider.dart';
 import '../providers/search_provider.dart';
 import '../widgets/category_browse_list.dart';
 import '../widgets/filter_sheet.dart';
+import '../widgets/smart_alerts_tutorial_prefs.dart';
 import '../../../shared/widgets/app_bottom_nav.dart';
+import '../../../shared/widgets/feature_tutorial_overlay.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -29,11 +33,42 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   late final TextEditingController _controller;
   final _focusNode = FocusNode();
+  final _smartAlertsButtonKey = GlobalKey();
+  bool _showSmartAlertsTutorial = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: ref.read(searchQueryProvider));
+    _loadSmartAlertsTutorialState();
+  }
+
+  Future<void> _loadSmartAlertsTutorialState() async {
+    final seen = await hasSeenSmartAlertsTutorial();
+    if (!mounted || seen) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _showSmartAlertsTutorial = true);
+    });
+  }
+
+  Future<void> _dismissSmartAlertsTutorial() async {
+    if (!_showSmartAlertsTutorial) return;
+    await markSmartAlertsTutorialSeen();
+    if (!mounted) return;
+    setState(() => _showSmartAlertsTutorial = false);
+  }
+
+  void _onSmartAlertsTap() {
+    if (_showSmartAlertsTutorial) {
+      unawaited(_dismissSmartAlertsTutorial());
+    }
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) {
+      showGuestBottomSheet(context);
+      return;
+    }
+    context.push(AppRoutes.smartAlerts);
   }
 
   @override
@@ -134,51 +169,59 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _SearchHeader(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  query: query,
-                  canPop: canPop,
-                  filterCount: filter.activeFilterCount,
-                  onQueryChanged: ref.read(searchQueryProvider.notifier).set,
-                  onClear: () {
-                    _controller.clear();
-                    ref.read(searchQueryProvider.notifier).clear();
-                  },
-                  onSubmit: _submit,
-                  onFilterTap: _openFilters,
-                  onAlertsTap: () {
-                    final userId = ref.read(currentUserIdProvider);
-                    if (userId == null) {
-                      showGuestBottomSheet(context);
-                      return;
-                    }
-                    context.push(AppRoutes.smartAlerts);
-                  },
+          body: Stack(
+            children: [
+              SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _SearchHeader(
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      query: query,
+                      canPop: canPop,
+                      filterCount: filter.activeFilterCount,
+                      alertsButtonKey: _smartAlertsButtonKey,
+                      onQueryChanged: ref.read(searchQueryProvider.notifier).set,
+                      onClear: () {
+                        _controller.clear();
+                        ref.read(searchQueryProvider.notifier).clear();
+                      },
+                      onSubmit: _submit,
+                      onFilterTap: _openFilters,
+                      onAlertsTap: _onSmartAlertsTap,
+                    ),
+                    Expanded(
+                      child: showSuggestions
+                          ? _SuggestionsBody(
+                              query: debounced,
+                              suggestionsAsync: suggestionsAsync,
+                              onSubmit: _submit,
+                            )
+                          : categoriesAsync.when(
+                              loading: () => const CategoryBrowseListShimmer(),
+                              error: (e, _) => Center(child: Text('$e')),
+                              data: (categories) => CategoryBrowseList(
+                                categories: categories,
+                                onCategoryTap: (item) =>
+                                    _openCategory(item, categories),
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: showSuggestions
-                      ? _SuggestionsBody(
-                          query: debounced,
-                          suggestionsAsync: suggestionsAsync,
-                          onSubmit: _submit,
-                        )
-                      : categoriesAsync.when(
-                          loading: () => const CategoryBrowseListShimmer(),
-                          error: (e, _) => Center(child: Text('$e')),
-                          data: (categories) => CategoryBrowseList(
-                            categories: categories,
-                            onCategoryTap: (item) =>
-                                _openCategory(item, categories),
-                          ),
-                        ),
+              ),
+              if (_showSmartAlertsTutorial)
+                FeatureTutorialOverlay(
+                  targetKey: _smartAlertsButtonKey,
+                  onDismiss: _dismissSmartAlertsTutorial,
+                  title:
+                      'حدد معايير بحثك مرة واحدة واستلم إشعاراً فورياً عند نشر إعلان جديد يطابقها',
+                  subtitle:
+                      'اضغط على أيقونة الجرس لإدارة تنبيهاتك الذكية',
+                  highlightShape: FeatureTutorialHighlightShape.roundedRect,
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -193,6 +236,7 @@ class _SearchHeader extends StatelessWidget {
     required this.query,
     required this.canPop,
     required this.filterCount,
+    required this.alertsButtonKey,
     required this.onQueryChanged,
     required this.onClear,
     required this.onSubmit,
@@ -205,6 +249,7 @@ class _SearchHeader extends StatelessWidget {
   final String query;
   final bool canPop;
   final int filterCount;
+  final GlobalKey alertsButtonKey;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onClear;
   final void Function([String? query]) onSubmit;
@@ -271,6 +316,7 @@ class _SearchHeader extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           IconButton(
+            key: alertsButtonKey,
             icon: const Icon(Icons.notifications_none_outlined),
             tooltip: 'تنبيهاتي الذكية',
             onPressed: onAlertsTap,

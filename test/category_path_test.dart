@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/utils/category_tree.dart';
-import 'package:my_app/shared/models/category_model.dart';
+import 'package:Sello/core/utils/category_tree.dart';
+import 'package:Sello/shared/models/category_model.dart';
 
 void main() {
   group('buildCategoryPath', () {

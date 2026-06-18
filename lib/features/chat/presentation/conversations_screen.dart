@@ -25,6 +25,7 @@ class ConversationsScreen extends ConsumerWidget {
         backgroundColor: AppColors.background,
         appBar: SelloAppBar(
           backgroundColor: AppColors.background,
+          automaticallyImplyLeading: false,
           title: const Text('رسائلي'),
         ),
         body: Center(
@@ -50,6 +51,7 @@ class ConversationsScreen extends ConsumerWidget {
       appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textDark,
+        automaticallyImplyLeading: false,
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,

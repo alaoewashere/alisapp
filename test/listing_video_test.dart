@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/app_constants.dart';
-import 'package:my_app/core/utils/video_utils.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/core/constants/app_constants.dart';
+import 'package:Sello/core/utils/video_utils.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   group('formatVideoDuration', () {

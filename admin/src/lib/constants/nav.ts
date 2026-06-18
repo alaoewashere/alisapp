@@ -1,10 +1,12 @@
 import {
   BarChart3,
+  Ban,
   FileText,
   Flag,
   FolderTree,
   LayoutDashboard,
   Settings,
+  Shield,
   ShieldCheck,
   ShoppingBag,
   Star,
@@ -29,6 +31,8 @@ export const navItems: NavItem[] = [
   { href: "/dashboard/ratings", label: "التقييمات", icon: Star },
   { href: "/dashboard/reports", label: "البلاغات", icon: Flag, badge: "reports" },
   { href: "/dashboard/categories", label: "الفئات", icon: FolderTree },
+  { href: "/dashboard/blocked-words", label: "كلمات محظورة", icon: Ban },
+  { href: "/dashboard/moderation", label: "إدارة المخالفات", icon: Shield },
   { href: "/dashboard/analytics", label: "التحليلات", icon: BarChart3 },
   { href: "/dashboard/settings", label: "الإعدادات", icon: Settings },
 ];

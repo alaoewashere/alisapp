@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/home/widgets/recent_listings_row.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/features/home/widgets/recent_listings_row.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   ListingModel sampleListing({required String id, required String title}) {

@@ -18,5 +18,6 @@ assert(
 assert(!isNavItemActive("/dashboard/listings", "/dashboard/users"), "users not listings");
 assert(titleForPath("/dashboard/listings") === "الإعلانات", "title listings");
 assert(titleForPath("/dashboard") === "نظرة عامة", "title overview");
+assert(titleForPath("/dashboard/moderation") === "إدارة المخالفات", "title moderation");
 
 console.log("admin nav routes OK");

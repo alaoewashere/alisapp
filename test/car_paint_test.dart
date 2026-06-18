@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/constants/car_paint_panels.dart';
-import 'package:my_app/core/utils/car_paint_utils.dart';
-import 'package:my_app/features/listings/widgets/car_paint/car_paint_panel_layout.dart';
-import 'package:my_app/features/listings/widgets/car_paint/car_paint_panel_overlay.dart';
-import 'package:my_app/shared/models/vehicle_listing_metadata.dart';
+import 'package:Sello/core/constants/car_paint_panels.dart';
+import 'package:Sello/core/utils/car_paint_utils.dart';
+import 'package:Sello/features/listings/widgets/car_paint/car_paint_panel_layout.dart';
+import 'package:Sello/features/listings/widgets/car_paint/car_paint_panel_overlay.dart';
+import 'package:Sello/shared/models/vehicle_listing_metadata.dart';
 
 void main() {
   group('car paint panels', () {

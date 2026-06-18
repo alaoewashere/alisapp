@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/listings/providers/post_listing_provider.dart';
+import 'package:Sello/features/listings/providers/post_listing_provider.dart';
 
 void main() {
   test('location validation requires governorate only', () {

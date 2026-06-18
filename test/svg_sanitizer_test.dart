@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/utils/svg_sanitizer.dart';
+import 'package:Sello/core/utils/svg_sanitizer.dart';
 
 void main() {
   test('sanitizeSvgMarkup removes unsupported flutter_svg elements', () {

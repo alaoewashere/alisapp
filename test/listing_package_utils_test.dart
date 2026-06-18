@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/utils/listing_package_utils.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/core/utils/listing_package_utils.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 ListingModel _listing({
   bool isFeatured = false,

@@ -16,4 +16,5 @@ void invalidateSessionProviders(dynamic ref) {
   ref.invalidate(recentSearchesProvider);
   ref.invalidate(featuredListingsProvider);
   ref.invalidate(recentListingsProvider);
+  ref.invalidate(latestHomeListingsProvider);
 }

@@ -2,7 +2,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
@@ -10,7 +10,6 @@ import '../../../core/utils/result.dart';
 import '../../../core/utils/validators.dart';
 import '../../../features/auth/data/auth_repository.dart';
 import '../../../features/auth/widgets/auth_form_styles.dart';
-
 Future<void> showPhoneLoginBottomSheet(BuildContext context, WidgetRef ref) {
   return showModalBottomSheet<void>(
     context: context,
@@ -28,7 +27,12 @@ class _PhoneLoginSheet extends ConsumerStatefulWidget {
 }
 
 class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
+  static const _fieldRadius = 14.0;
+  static const _fieldBorder = Color(0x15FFFFFF);
+  static const _sheetTopBorder = Color(0x10FFFFFF);
+
   final _phoneController = TextEditingController();
+  final _phoneFocusNode = FocusNode();
   late Country _selectedCountry;
   bool _loading = false;
 
@@ -36,10 +40,15 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
   void initState() {
     super.initState();
     _selectedCountry = Country.parse('SA');
+    _phoneFocusNode.addListener(_onPhoneFocusChanged);
   }
+
+  void _onPhoneFocusChanged() => setState(() {});
 
   @override
   void dispose() {
+    _phoneFocusNode.removeListener(_onPhoneFocusChanged);
+    _phoneFocusNode.dispose();
     _phoneController.dispose();
     super.dispose();
   }
@@ -101,13 +110,15 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final isPhoneFocused = _phoneFocusNode.hasFocus;
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          color: AppColors.canvas,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border(top: BorderSide(color: _sheetTopBorder)),
         ),
         child: SafeArea(
           top: false,
@@ -120,7 +131,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE0E0E0),
+                    color: AppColors.pureWhite.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
@@ -130,7 +141,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                   style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF111111),
+                    color: AppColors.pureWhite,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -138,7 +149,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                   'سنرسل لك رمز تحقق عبر واتساب',
                   style: AppFonts.cairo(
                     fontSize: 13,
-                    color: const Color(0xFF888888),
+                    color: AppColors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -146,18 +157,21 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                   textDirection: TextDirection.rtl,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AuthFormStyles.fieldFill,
-                      borderRadius:
-                          BorderRadius.circular(AuthFormStyles.pillRadius),
+                      color: AppColors.fieldCarbon,
+                      borderRadius: BorderRadius.circular(_fieldRadius),
+                      border: Border.all(
+                        color: isPhoneFocused ? AppColors.volt : _fieldBorder,
+                        width: isPhoneFocused ? 1.5 : 1,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Material(
-                          color: Colors.transparent,
+                          color: AppColors.fieldCarbon,
                           child: InkWell(
                             onTap: _loading ? null : _pickCountry,
-                            borderRadius: BorderRadius.circular(
-                              AuthFormStyles.pillRadius,
+                            borderRadius: const BorderRadius.horizontal(
+                              right: Radius.circular(_fieldRadius),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -176,15 +190,14 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                                     style: AppFonts.cairo(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF111111),
+                                      color: AppColors.pureWhite,
                                     ),
                                   ),
                                   const SizedBox(width: 4),
                                   Icon(
                                     Icons.keyboard_arrow_down_rounded,
                                     size: 20,
-                                    color: AppColors.textMuted
-                                        .withValues(alpha: 0.8),
+                                    color: AppColors.textMuted,
                                   ),
                                 ],
                               ),
@@ -194,24 +207,26 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                         Container(
                           width: 1,
                           height: 28,
-                          color: const Color(0xFFE0E0E0),
+                          color: _fieldBorder,
                         ),
                         Expanded(
                           child: Directionality(
                             textDirection: TextDirection.ltr,
                             child: TextField(
                               controller: _phoneController,
+                              focusNode: _phoneFocusNode,
                               keyboardType: TextInputType.phone,
                               enabled: !_loading,
+                              cursorColor: AppColors.volt,
                               style: AppFonts.cairo(
                                 fontSize: 16,
-                                color: const Color(0xFF111111),
+                                color: AppColors.pureWhite,
                               ),
                               decoration: InputDecoration(
                                 hintText: '5XXXXXXXX',
                                 hintStyle: AppFonts.cairo(
-                                  color: AppColors.textMuted
-                                      .withValues(alpha: 0.75),
+                                  color: AppColors.pureWhite
+                                      .withValues(alpha: 0.5),
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.symmetric(
@@ -227,35 +242,11 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: FilledButton(
-                    onPressed: _loading ? null : _sendCode,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: _loading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'إرسال الرمز',
-                            style: AppFonts.cairo(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
+                AuthPrimaryButton(
+                  label: 'إرسال الرمز',
+                  loading: _loading,
+                  loginStyle: true,
+                  onPressed: _sendCode,
                 ),
               ],
             ),

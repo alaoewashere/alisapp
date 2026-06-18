@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/listings/constants/listing_package_config.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/features/listings/constants/listing_package_config.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   test('package tier prices match business model', () {

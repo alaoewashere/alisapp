@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/constants/dicebear_avatars.dart';
-import 'package:my_app/shared/widgets/avatar_selection_grid.dart';
-import 'package:my_app/shared/widgets/dicebear_avatar_cell.dart';
+import 'package:Sello/core/constants/dicebear_avatars.dart';
+import 'package:Sello/shared/widgets/avatar_selection_grid.dart';
+import 'package:Sello/shared/widgets/dicebear_avatar_cell.dart';
 
 void main() {
   testWidgets('AvatarSelectionGrid renders 30 DiceBear cells', (tester) async {

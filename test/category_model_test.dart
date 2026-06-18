@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/shared/models/category_model.dart';
+import 'package:Sello/shared/models/category_model.dart';
 
 void main() {
   test('fromJson prefers display_order over sort_order', () {

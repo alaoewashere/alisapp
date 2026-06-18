@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/models/price_estimate.dart';
+import 'package:Sello/models/price_estimate.dart';
 
 void main() {
   group('PriceEstimate', () {

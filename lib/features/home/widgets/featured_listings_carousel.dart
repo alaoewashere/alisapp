@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/models/listing_model.dart';
@@ -7,9 +7,14 @@ import '../../../widgets/featured_listing_card.dart';
 
 /// «إعلانات مميزة» horizontal carousel for premium listings.
 class FeaturedListingsCarousel extends StatelessWidget {
-  const FeaturedListingsCarousel({super.key, required this.listings});
+  const FeaturedListingsCarousel({
+    super.key,
+    required this.listings,
+    this.viewAllLink,
+  });
 
   final List<ListingModel> listings;
+  final Widget? viewAllLink;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +37,10 @@ class FeaturedListingsCarousel extends StatelessWidget {
                   color: AppColors.textDark,
                 ),
               ),
+              if (viewAllLink != null) ...[
+                const Spacer(),
+                viewAllLink!,
+              ],
             ],
           ),
         ),

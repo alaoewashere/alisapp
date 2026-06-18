@@ -12,6 +12,7 @@ const supportedAppLocales = [
   Locale('ar'),
   Locale('en'),
   Locale('ku'),
+  Locale('tr'),
 ];
 
 class LocaleNotifier extends Notifier<Locale> {
@@ -33,6 +34,7 @@ class LocaleNotifier extends Notifier<Locale> {
     return switch (code) {
       'en' => const Locale('en'),
       'ku' || 'ckb' => const Locale('ku'),
+      'tr' => const Locale('tr'),
       _ => const Locale('ar'),
     };
   }
@@ -40,6 +42,7 @@ class LocaleNotifier extends Notifier<Locale> {
   String get currentCode => switch (normalizeAppLocale(state).languageCode) {
         'en' => 'en',
         'ku' => 'ku',
+        'tr' => 'tr',
         _ => 'ar',
       };
 
@@ -67,15 +70,17 @@ final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
 );
 
 TextDirection localeTextDirection(Locale locale) {
-  return normalizeAppLocale(locale).languageCode == 'en'
-      ? TextDirection.ltr
-      : TextDirection.rtl;
+  return switch (normalizeAppLocale(locale).languageCode) {
+    'en' || 'tr' => TextDirection.ltr,
+    _ => TextDirection.rtl,
+  };
 }
 
 String localeDisplayName(String code) {
   return switch (code) {
     'en' => 'English',
     'ku' => 'کوردی',
+    'tr' => 'Türkçe',
     _ => 'العربية',
   };
 }

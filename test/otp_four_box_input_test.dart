@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/screens/auth/widgets/otp_four_box_input.dart';
+import 'package:Sello/screens/auth/widgets/otp_four_box_input.dart';
 
 void main() {
   testWidgets('OtpFourBoxInput renders four boxes', (tester) async {

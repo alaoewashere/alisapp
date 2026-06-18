@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_governorates.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/listing_display_title.dart';
+import '../../../core/utils/listing_location_label.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../models/rating.dart';
 import '../../../shared/models/listing_model.dart';
@@ -29,14 +29,6 @@ BoxDecoration listingCardDecoration() => BoxDecoration(
         width: 1,
       ),
     );
-
-String listingLocationLabel(ListingModel listing) {
-  if (listing.locationAddress?.trim().isNotEmpty == true) {
-    return listing.locationAddress!.trim();
-  }
-  if (listing.city.trim().isNotEmpty) return listing.city.trim();
-  return governorateNameAr(listing.governorate);
-}
 
 String listingDaysAgoLabel(DateTime createdAt) {
   final days = DateTime.now().difference(createdAt).inDays;
@@ -163,7 +155,7 @@ class ListingCard extends ConsumerWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 2),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -172,7 +164,7 @@ class ListingCard extends ConsumerWidget {
                           alignment: Alignment.centerRight,
                           child: _GreenCategoryPill(label: category),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                       ],
                       Text(
                         listingDisplayTitle(listing),
@@ -187,9 +179,11 @@ class ListingCard extends ConsumerWidget {
                           height: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         listing.formattedPrice,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
                         style: AppFonts.inter(

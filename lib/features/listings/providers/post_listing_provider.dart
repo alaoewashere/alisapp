@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_governorates.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/car_paint_panels.dart';
+import '../../../core/constants/iraq_neighborhoods.dart';
+import '../../../core/moderation/moderation_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/image_compression.dart';
 import '../../../core/utils/animal_listing_utils.dart';
@@ -55,6 +57,8 @@ class PostListingState {
     this.latitude,
     this.longitude,
     this.locationAddress,
+    this.areaName,
+    this.areaNameLocked = false,
     this.images = const [],
     this.uploadedImagePaths = const [],
     this.uploadIndex = 0,
@@ -103,6 +107,8 @@ class PostListingState {
   final double? latitude;
   final double? longitude;
   final String? locationAddress;
+  final String? areaName;
+  final bool areaNameLocked;
   final List<File> images;
   final List<String> uploadedImagePaths;
 
@@ -194,6 +200,9 @@ class PostListingState {
     double? longitude,
     String? locationAddress,
     bool clearLocationAddress = false,
+    String? areaName,
+    bool clearAreaName = false,
+    bool? areaNameLocked,
     bool clearLocation = false,
     List<File>? images,
     List<String>? uploadedImagePaths,
@@ -259,6 +268,12 @@ class PostListingState {
       locationAddress: clearLocation || clearLocationAddress
           ? null
           : (locationAddress ?? this.locationAddress),
+      areaName: clearLocation || clearAreaName
+          ? null
+          : (areaName ?? this.areaName),
+      areaNameLocked: clearLocation
+          ? false
+          : (areaNameLocked ?? this.areaNameLocked),
       images: images ?? this.images,
       uploadedImagePaths: uploadedImagePaths ?? this.uploadedImagePaths,
       uploadIndex: uploadIndex ?? this.uploadIndex,
@@ -353,13 +368,24 @@ class PostListingNotifier extends Notifier<PostListingState> {
       'condition' =>
         state.copyWith(condition: value as ListingCondition?, clearError: true),
       'governorate' =>
-        state.copyWith(governorate: value as String?, clearError: true),
+        state.copyWith(
+          governorate: value as String?,
+          clearAreaName: true,
+          areaNameLocked: false,
+          clearError: true,
+        ),
       'city' => state.copyWith(city: value as String, clearError: true),
       'latitude' => state.copyWith(latitude: value as double?, clearError: true),
       'longitude' =>
         state.copyWith(longitude: value as double?, clearError: true),
       'locationAddress' => state.copyWith(
         locationAddress: value as String?,
+        clearError: true,
+      ),
+      'areaName' => state.copyWith(
+        areaName: value as String?,
+        areaNameLocked: value != null,
+        clearAreaName: value == null,
         clearError: true,
       ),
       _ => state,
@@ -897,7 +923,49 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   void clearLocation() {
-    state = state.copyWith(clearLocation: true);
+    state = state.copyWith(clearLocation: true, clearAreaName: true);
+  }
+
+  void applyMapPickerResult({
+    required double latitude,
+    required double longitude,
+    String? address,
+  }) {
+    final suggested = nearestNeighborhood(
+      latitude: latitude,
+      longitude: longitude,
+      governorateSlug: state.governorate,
+    );
+
+    state = state.copyWith(
+      latitude: latitude,
+      longitude: longitude,
+      locationAddress: address,
+      areaName: state.areaNameLocked ? state.areaName : suggested?.nameAr,
+      clearAreaName: !state.areaNameLocked && suggested == null,
+      clearError: true,
+    );
+  }
+
+  void setAreaNameFromSlug(String? slug) {
+    if (slug == null || slug.trim().isEmpty) {
+      state = state.copyWith(clearAreaName: true, areaNameLocked: false);
+      return;
+    }
+
+    final area = neighborhoodBySlug(slug);
+    state = state.copyWith(
+      areaName: area?.nameAr,
+      areaNameLocked: area != null,
+      clearAreaName: area == null,
+      clearError: true,
+    );
+  }
+
+  String? get selectedAreaSlug {
+    final name = state.areaName;
+    if (name == null || name.trim().isEmpty) return null;
+    return neighborhoodByNameAr(name)?.slug;
   }
 
   void setContactPreference(ListingContactPreference preference) {
@@ -1250,15 +1318,23 @@ class PostListingNotifier extends Notifier<PostListingState> {
     return paths;
   }
 
-  Future<String?> publishListing() async {
+  Future<PublishListingOutcome> publishListing() async {
     final userId = ref.read(currentUserIdProvider);
-    if (userId == null) return null;
+    if (userId == null) return const PublishListingOutcome();
+
+    final profile = ref.read(currentProfileProvider).value;
+    if (profile != null && isUserPostingBanned(profile)) {
+      return PublishListingOutcome(
+        moderationDialog: ModerationDialogVariant.postingBan,
+        postingBanMessage: postingBanMessageAr(profile),
+      );
+    }
 
     for (var step = 1; step <= state.lastStepBeforeReview; step++) {
       final stepError = validateStep(step);
       if (stepError != null) {
         state = state.copyWith(error: stepError);
-        return null;
+        return const PublishListingOutcome();
       }
     }
 
@@ -1294,7 +1370,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
           isLoading: false,
           error: 'اختر حالة المنتج',
         );
-        return null;
+        return const PublishListingOutcome();
       }
 
       if (kDebugMode) {
@@ -1304,11 +1380,41 @@ class PostListingNotifier extends Notifier<PostListingState> {
         );
       }
 
+      final moderation = await moderateFieldsForUser(
+        ref,
+        fields: {
+          'title': state.title.trim(),
+          'description': state.description.trim(),
+        },
+      );
+      if (moderation.shouldBlock) {
+        PostingBanInfo? banInfo;
+        try {
+          banInfo = await recordClientModerationBlock(
+            ref.read(moderationRepositoryProvider),
+            source: 'listing',
+            fieldName: 'title/description',
+            excerpt: state.title.trim(),
+          );
+        } catch (_) {
+          banInfo = null;
+        }
+        ref.invalidateModerationState();
+        state = state.copyWith(isLoading: false, clearError: true);
+        return PublishListingOutcome(
+          moderationDialog: ModerationDialogVariant.blocked,
+          banInfo: banInfo,
+        );
+      }
+
+      final moderatedTitle = state.title.trim();
+      final moderatedDescription = state.description.trim();
+
       final id = await ref.read(listingsRepositoryProvider).createListingRecord(
             userId: userId,
             categoryId: state.effectiveCategory!.id,
-            title: state.title.trim(),
-            description: state.description.trim(),
+            title: moderatedTitle,
+            description: moderatedDescription,
             price: state.price!,
             isNegotiable: state.isNegotiable,
             condition: condition,
@@ -1317,6 +1423,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
             latitude: state.latitude,
             longitude: state.longitude,
             locationAddress: state.locationAddress,
+            areaName: state.areaName,
             imageStoragePaths: imagePaths,
             asDraft: false,
             listingType: _dbListingType(),
@@ -1400,16 +1507,37 @@ class PostListingNotifier extends Notifier<PostListingState> {
 
       invalidateMyListingsProviders(ref);
       ref.invalidate(recentListingsProvider);
+      ref.invalidate(latestHomeListingsProvider);
       ref.invalidate(featuredListingsProvider);
-      return id;
+      return PublishListingOutcome(
+        listingId: id,
+        moderationDialog: moderation.hadViolation
+            ? ModerationDialogVariant.censored
+            : null,
+      );
     } catch (e, stackTrace) {
       debugPrint('publishListing failed: $e\n$stackTrace');
+      if (isUserPostingBannedError(e)) {
+        state = state.copyWith(isLoading: false, clearError: true);
+        ref.invalidate(currentProfileProvider);
+        return PublishListingOutcome(
+          moderationDialog: ModerationDialogVariant.postingBan,
+          postingBanMessage: extractPostingBanMessage(e),
+        );
+      }
+      if (isModerationBlockedError(e)) {
+        state = state.copyWith(isLoading: false, clearError: true);
+        ref.invalidate(currentProfileProvider);
+        return const PublishListingOutcome(
+          moderationDialog: ModerationDialogVariant.blocked,
+        );
+      }
       state = state.copyWith(
         isLoading: false,
         error: 'تعذّر نشر الإعلان. حاول مرة أخرى.',
         statusMessage: null,
       );
-      return null;
+      return const PublishListingOutcome();
     }
   }
 
@@ -1463,6 +1591,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
             latitude: state.latitude,
             longitude: state.longitude,
             locationAddress: state.locationAddress,
+            areaName: state.areaName,
             imageStoragePaths: imagePaths,
             asDraft: true,
             listingType: _dbListingType(),

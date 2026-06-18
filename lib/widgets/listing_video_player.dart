@@ -1,6 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:video_player/video_player.dart';
 
 import '../core/constants/app_colors.dart';

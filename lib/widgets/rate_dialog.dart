@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
+import '../features/auth/widgets/auth_form_styles.dart';
 import '../models/rating.dart';
 import '../services/rating_service.dart';
 import '../widgets/user_avatar.dart';
 
-const _starGold = Color(0xFFF5A623);
+const _emptyStarColor = Color(0x30FFFFFF);
 
 /// Bottom sheet for rating another user after a completed deal.
 Future<bool?> showRateDialog({
@@ -102,7 +103,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.canvas,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: SafeArea(
@@ -116,7 +117,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.borderLight,
+                    color: AppColors.pureWhite.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(99),
                   ),
                 ),
@@ -126,13 +127,23 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                   style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                    color: AppColors.pureWhite,
                   ),
                 ),
                 const SizedBox(height: 16),
-                UserAvatar(
-                  avatarSeed: widget.reviewedAvatarSeed,
-                  size: 56,
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: const BoxDecoration(
+                    color: AppColors.fieldCarbon,
+                    shape: BoxShape.circle,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: UserAvatar(
+                    avatarSeed: widget.reviewedAvatarSeed,
+                    size: 56,
+                    darkStyle: true,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -140,7 +151,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                   style: AppFonts.cairo(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
+                    color: AppColors.pureWhite,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -170,21 +181,15 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                     controller: _controller,
                     maxLength: 200,
                     maxLines: 3,
-                    onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(
-                      hintText: 'أضف تعليقاً (اختياري)',
-                      counterText: '',
-                      filled: true,
-                      fillColor: AppColors.borderLight.withValues(alpha: 0.45),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
+                    cursorColor: AppColors.volt,
+                    style: AppFonts.cairo(
+                      fontSize: 14,
+                      color: AppColors.pureWhite,
                     ),
+                    onChanged: (_) => setState(() {}),
+                    decoration: AuthFormStyles.loginFieldDecoration(
+                      hintText: 'أضف تعليقاً (اختياري)',
+                    ).copyWith(counterText: ''),
                   ),
                 ),
                 Align(
@@ -198,37 +203,11 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: _selectedStars >= 1 && !_submitting ? _submit : null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      disabledBackgroundColor:
-                          AppColors.primary.withValues(alpha: 0.35),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
-                    child: _submitting
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'إرسال التقييم',
-                            style: AppFonts.cairo(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                            ),
-                          ),
-                  ),
+                AuthPrimaryButton(
+                  label: 'إرسال التقييم',
+                  loading: _submitting,
+                  loginStyle: true,
+                  onPressed: _selectedStars >= 1 ? _submit : null,
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -297,15 +276,13 @@ class _AnimatedStarState extends State<_AnimatedStar>
     return GestureDetector(
       onTap: widget.onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 6),
         child: ScaleTransition(
           scale: _scale,
           child: Icon(
             widget.filled ? Icons.star_rounded : Icons.star_outline_rounded,
-            size: 40,
-            color: widget.filled
-                ? _starGold
-                : AppColors.textMuted.withValues(alpha: 0.45),
+            size: 32,
+            color: widget.filled ? AppColors.volt : _emptyStarColor,
           ),
         ),
       ),

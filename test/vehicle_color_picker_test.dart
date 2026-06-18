@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/features/listings/constants/vehicle_listing_options.dart';
-import 'package:my_app/features/listings/widgets/vehicle_color_picker.dart';
+import 'package:Sello/features/listings/constants/vehicle_listing_options.dart';
+import 'package:Sello/features/listings/widgets/vehicle_color_picker.dart';
 
 void main() {
   testWidgets('VehicleColorPicker selects standard color and shows label', (

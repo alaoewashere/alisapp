@@ -2,7 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/chat_date_utils.dart';
@@ -14,6 +14,7 @@ import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
 import '../../../widgets/user_avatar.dart';
+import '../../../core/moderation/moderation_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/listing_context_card.dart';
 import '../widgets/message_bubble.dart';
@@ -400,12 +401,50 @@ class _ChatInputBarState extends ConsumerState<_ChatInputBar> {
     if (!mounted) return;
     final text = _controller.text;
     if (text.trim().isEmpty) return;
-    _controller.clear();
-    await ref.read(chatNotifierProvider.notifier).sendMessage(
-          conversationId: widget.conversationId,
-          content: text,
-        );
+
+    if (await checkPostingBanGate(ref, context)) return;
+
+    final moderation = await moderateUserText(ref, text: text);
     if (!mounted) return;
+
+    if (moderation.shouldBlock) {
+      PostingBanInfo? banInfo;
+      try {
+        banInfo = await recordClientModerationBlock(
+          ref.read(moderationRepositoryProvider),
+          source: 'chat',
+          fieldName: 'body',
+          excerpt: text,
+        );
+        ref.invalidateModerationState();
+      } catch (e) {
+        if (!mounted) return;
+        await handlePostingBanOrBlockError(ref, context, e);
+        return;
+      }
+      if (!mounted) return;
+      await showModerationBlockedWarning(context, banInfo: banInfo);
+      return;
+    }
+
+    if (moderation.hadViolation) {
+      await showModerationCensoredWarning(context);
+    }
+
+    _controller.clear();
+    try {
+      // Send original text — server trigger detects, logs, and censors on insert.
+      await ref.read(chatNotifierProvider.notifier).sendMessage(
+            conversationId: widget.conversationId,
+            content: text.trim(),
+          );
+    } catch (e) {
+      if (!mounted) return;
+      await handlePostingBanOrBlockError(ref, context, e);
+      return;
+    }
+    if (!mounted) return;
+    ref.invalidateModerationState();
     ref.read(chatNearBottomProvider.notifier).setNearBottom(true);
   }
 

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_app/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/l10n/l10n_provider.dart';
 import '../../core/providers/locale_provider.dart';
-import '../../shared/widgets/app_back_button.dart';
 import '../../core/router/app_router.dart';
+import '../../core/theme/app_fonts.dart';
+import '../../l10n/app_localizations.dart';
+import '../../shared/widgets/app_logo.dart';
+import '../../shared/widgets/sello_app_bar.dart';
 
 class LanguageScreen extends ConsumerStatefulWidget {
   const LanguageScreen({super.key, this.isOnboarding = true});
@@ -20,15 +22,11 @@ class LanguageScreen extends ConsumerStatefulWidget {
 }
 
 class _LanguageScreenState extends ConsumerState<LanguageScreen> {
-  static const _pageBg = AppColors.background;
-  static const _titleColor = Color(0xFF111111);
-  static const _subtitleColor = Color(0xFF555555);
-  static const _hintColor = Color(0xFF888888);
-
   static const _languages = <_LanguageOptionData>[
+    _LanguageOptionData(code: 'ar', flag: '🇮🇶', label: 'العربية'),
     _LanguageOptionData(code: 'en', flag: '🇬🇧', label: 'English'),
-    _LanguageOptionData(code: 'ar', flag: '🇸🇦', label: 'العربية'),
-    _LanguageOptionData(code: 'ku', flag: '🟢', label: 'کوردی'),
+    _LanguageOptionData(code: 'ku', flag: '🇹🇯', label: 'کوردی'),
+    _LanguageOptionData(code: 'tr', flag: '🇹🇷', label: 'Türkçe'),
   ];
 
   late int _selectedIndex;
@@ -42,16 +40,10 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
 
   int _indexForCode(String code) {
     final index = _languages.indexWhere((lang) => lang.code == code);
-    return index >= 0 ? index : 1;
+    return index >= 0 ? index : 0;
   }
 
   String get _selectedCode => _languages[_selectedIndex].code;
-
-  String get _continueLabel => switch (_selectedCode) {
-        'en' => 'CONTINUE',
-        'ku' => 'بەردەوامبە',
-        _ => 'متابعة',
-      };
 
   Future<void> _continue() async {
     await ref.read(localeProvider.notifier).setLocale(Locale(_selectedCode));
@@ -66,26 +58,62 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
     }
   }
 
+  String _continueLabel(AppLocalizations strings) {
+    return switch (_selectedCode) {
+      'en' => strings.continueAction,
+      'tr' => strings.continueAction,
+      'ku' => 'بەردەوامبە',
+      _ => strings.continueAction,
+    };
+  }
+
+  String _welcomeTitle() {
+    return switch (_selectedCode) {
+      'en' => 'Welcome to Sello',
+      'tr' => 'Sello\'ya Hoş Geldiniz',
+      'ku' => 'بەخێربێیت بۆ سێلو',
+      _ => 'مرحباً بك في سيلو',
+    };
+  }
+
+  String _chooseSubtitle() {
+    return switch (_selectedCode) {
+      'en' => 'Choose your language',
+      'tr' => 'Dilinizi seçin',
+      'ku' => 'زمانەکەت هەڵبژێرە',
+      _ => 'اختر لغتك',
+    };
+  }
+
+  String _settingsHint() {
+    return switch (_selectedCode) {
+      'en' => 'You can change the language anytime in Settings',
+      'tr' => 'Dili istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz',
+      'ku' => 'دەتوانیت زمان لە هەر کاتێکدا لە ڕێکخستنەکان بگۆڕیت',
+      _ => 'يمكنك تغيير اللغة في أي وقت من الإعدادات',
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final textDirection = _selectedCode == 'en' || _selectedCode == 'tr'
+        ? TextDirection.ltr
+        : TextDirection.rtl;
+
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: textDirection,
       child: Scaffold(
-        backgroundColor: _pageBg,
+        backgroundColor: AppColors.canvas,
         appBar: widget.isOnboarding
             ? null
-            : AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                centerTitle: true,
-                leading: AppBackButton(onPressed: () => context.pop()),
+            : SelloAppBar(
                 title: Text(
-                  'اللغة',
+                  strings.changeLanguage,
                   style: AppFonts.cairo(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: _titleColor,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.pureWhite,
                   ),
                 ),
               ),
@@ -94,31 +122,40 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      SizedBox(height: widget.isOnboarding ? 80 : 32),
+                      SizedBox(height: widget.isOnboarding ? 48 : 24),
+                      if (widget.isOnboarding) ...[
+                        const AppLogo(size: 56),
+                        const SizedBox(height: 24),
+                      ],
                       Text(
-                        'مرحباً بك في سيلو',
+                        widget.isOnboarding
+                            ? _welcomeTitle()
+                            : strings.chooseLanguage,
                         textAlign: TextAlign.center,
                         style: AppFonts.cairo(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: _titleColor,
+                          fontSize: widget.isOnboarding ? 24 : 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.pureWhite,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'اختر لغتك',
+                        widget.isOnboarding
+                            ? _chooseSubtitle()
+                            : strings.changeLanguage,
                         textAlign: TextAlign.center,
                         style: AppFonts.cairo(
-                          fontSize: 18,
-                          color: _subtitleColor,
+                          fontSize: 14,
+                          height: 1.45,
+                          color: AppColors.textMuted,
                         ),
                       ),
-                      const SizedBox(height: 48),
+                      SizedBox(height: widget.isOnboarding ? 32 : 24),
                       for (var i = 0; i < _languages.length; i++) ...[
-                        if (i > 0) const SizedBox(height: 14),
+                        if (i > 0) const SizedBox(height: 12),
                         _LanguageOptionTile(
                           flag: _languages[i].flag,
                           label: _languages[i].label,
@@ -130,37 +167,33 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(40, 16, 40, 16),
-                child: Text(
-                  'يمكنك تغيير اللغة في أي وقت من الإعدادات',
-                  textAlign: TextAlign.center,
-                  style: AppFonts.cairo(
-                    fontSize: 13,
-                    color: _hintColor,
-                    height: 1.4,
+              if (widget.isOnboarding)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                  child: Text(
+                    _settingsHint(),
+                    textAlign: TextAlign.center,
+                    style: AppFonts.cairo(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                      height: 1.4,
+                    ),
                   ),
                 ),
-              ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(32, 0, 32, 40),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 54,
+                  height: 52,
                   child: FilledButton(
                     onPressed: _continue,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF111111),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
                     child: Text(
-                      _continueLabel,
+                      widget.isOnboarding
+                          ? _continueLabel(strings)
+                          : strings.save,
                       style: AppFonts.cairo(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -202,37 +235,35 @@ class _LanguageOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? AppColors.primary : Colors.white,
+      color: AppColors.fieldCarbon,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-        side: selected
-            ? BorderSide.none
-            : const BorderSide(color: Color(0xFFDDDDDD), width: 1.5),
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(
+          color: selected ? AppColors.volt : AppColors.glassBorder,
+          width: selected ? 1.5 : 1,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: SizedBox(
-          height: 58,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Text(flag, style: const TextStyle(fontSize: 28)),
-                Expanded(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: AppFonts.cairo(
-                      fontSize: 16,
-                      fontWeight: selected ? FontWeight.bold : FontWeight.w600,
-                      color: selected ? Colors.white : const Color(0xFF111111),
-                    ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 26)),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppFonts.cairo(
+                    fontSize: 16,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                    color: AppColors.pureWhite,
                   ),
                 ),
-                _SelectionCheck(selected: selected),
-              ],
-            ),
+              ),
+              _SelectionCheck(selected: selected),
+            ],
           ),
         ),
       ),
@@ -249,30 +280,27 @@ class _SelectionCheck extends StatelessWidget {
   Widget build(BuildContext context) {
     if (selected) {
       return Container(
-        width: 26,
-        height: 26,
+        width: 24,
+        height: 24,
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.volt,
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
         child: const Icon(
-          Icons.check,
+          Icons.check_rounded,
           size: 16,
-          color: AppColors.primary,
+          color: AppColors.canvas,
         ),
       );
     }
 
     return Container(
-      width: 26,
-      height: 26,
+      width: 24,
+      height: 24,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: const Color(0xFFCCCCCC),
-          width: 1.5,
-        ),
+        border: Border.all(color: AppColors.glassBorder, width: 1.5),
       ),
     );
   }

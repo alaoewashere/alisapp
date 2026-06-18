@@ -20,6 +20,8 @@ Locale normalizeAppLocale(Locale locale) {
     case 'ku':
     case 'ckb':
       return const Locale('ku');
+    case 'tr':
+      return const Locale('tr');
     default:
       return const Locale('ar');
   }
@@ -30,6 +32,8 @@ Locale materialDisplayLocale(Locale appLocale) {
   switch (normalizeAppLocale(appLocale).languageCode) {
     case 'en':
       return const Locale('en');
+    case 'tr':
+      return const Locale('tr');
     default:
       return const Locale('ar', 'US');
   }
@@ -40,6 +44,8 @@ String intlDisplayLocale(Locale appLocale) {
   switch (normalizeAppLocale(appLocale).languageCode) {
     case 'en':
       return DisplayLocale.intlEnglish;
+    case 'tr':
+      return 'tr';
     default:
       return DisplayLocale.intlWesternArabic;
   }

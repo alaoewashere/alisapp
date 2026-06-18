@@ -21,6 +21,13 @@ class ProfileModel {
     this.isDeleted = false,
     this.avgRating = 0,
     this.ratingCount = 0,
+    this.moderationViolationCount = 0,
+    this.lastModerationViolationAt,
+    this.isBanned = false,
+    this.bannedUntil,
+    this.banCount = 0,
+    this.banReason,
+    this.bannedBy,
     required this.createdAt,
   });
 
@@ -43,6 +50,13 @@ class ProfileModel {
   final bool isDeleted;
   final double avgRating;
   final int ratingCount;
+  final int moderationViolationCount;
+  final DateTime? lastModerationViolationAt;
+  final bool isBanned;
+  final DateTime? bannedUntil;
+  final int banCount;
+  final String? banReason;
+  final String? bannedBy;
   final DateTime createdAt;
 
   /// True when seller verification is approved.
@@ -94,6 +108,17 @@ class ProfileModel {
     bool? isDeleted,
     double? avgRating,
     int? ratingCount,
+    int? moderationViolationCount,
+    DateTime? lastModerationViolationAt,
+    bool clearLastModerationViolationAt = false,
+    bool? isBanned,
+    DateTime? bannedUntil,
+    bool clearBannedUntil = false,
+    int? banCount,
+    String? banReason,
+    bool clearBanReason = false,
+    String? bannedBy,
+    bool clearBannedBy = false,
     DateTime? createdAt,
   }) {
     return ProfileModel(
@@ -122,6 +147,17 @@ class ProfileModel {
       isDeleted: isDeleted ?? this.isDeleted,
       avgRating: avgRating ?? this.avgRating,
       ratingCount: ratingCount ?? this.ratingCount,
+      moderationViolationCount:
+          moderationViolationCount ?? this.moderationViolationCount,
+      lastModerationViolationAt: clearLastModerationViolationAt
+          ? null
+          : (lastModerationViolationAt ?? this.lastModerationViolationAt),
+      isBanned: isBanned ?? this.isBanned,
+      bannedUntil:
+          clearBannedUntil ? null : (bannedUntil ?? this.bannedUntil),
+      banCount: banCount ?? this.banCount,
+      banReason: clearBanReason ? null : (banReason ?? this.banReason),
+      bannedBy: clearBannedBy ? null : (bannedBy ?? this.bannedBy),
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -159,6 +195,18 @@ class ProfileModel {
       isDeleted: json['is_deleted'] as bool? ?? false,
       avgRating: (json['avg_rating'] as num?)?.toDouble() ?? 0,
       ratingCount: (json['rating_count'] as num?)?.toInt() ?? 0,
+      moderationViolationCount:
+          (json['moderation_violation_count'] as num?)?.toInt() ?? 0,
+      lastModerationViolationAt: json['last_moderation_violation_at'] != null
+          ? DateTime.tryParse(json['last_moderation_violation_at'] as String)
+          : null,
+      isBanned: json['is_banned'] as bool? ?? false,
+      bannedUntil: json['banned_until'] != null
+          ? DateTime.tryParse(json['banned_until'] as String)
+          : null,
+      banCount: (json['ban_count'] as num?)?.toInt() ?? 0,
+      banReason: json['ban_reason'] as String?,
+      bannedBy: json['banned_by'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }

@@ -1,16 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:my_app/core/utils/animal_listing_utils.dart';
-import 'package:my_app/core/utils/home_service_listing_utils.dart';
-import 'package:my_app/core/utils/job_listing_utils.dart';
-import 'package:my_app/core/utils/tutoring_listing_utils.dart';
-import 'package:my_app/features/listings/providers/post_listing_provider.dart';
-import 'package:my_app/shared/models/animal_listing_metadata.dart';
-import 'package:my_app/shared/models/category_model.dart';
-import 'package:my_app/shared/models/home_service_listing_metadata.dart';
-import 'package:my_app/shared/models/job_listing_metadata.dart';
-import 'package:my_app/shared/models/tutoring_listing_metadata.dart';
+import 'package:Sello/core/utils/animal_listing_utils.dart';
+import 'package:Sello/core/utils/home_service_listing_utils.dart';
+import 'package:Sello/core/utils/job_listing_utils.dart';
+import 'package:Sello/core/utils/tutoring_listing_utils.dart';
+import 'package:Sello/features/listings/providers/post_listing_provider.dart';
+import 'package:Sello/shared/models/animal_listing_metadata.dart';
+import 'package:Sello/shared/models/category_model.dart';
+import 'package:Sello/shared/models/home_service_listing_metadata.dart';
+import 'package:Sello/shared/models/job_listing_metadata.dart';
+import 'package:Sello/shared/models/tutoring_listing_metadata.dart';
 
 void main() {
   group('category path detection', () {

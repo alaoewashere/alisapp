@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/features/auth/data/auth_errors.dart';
+import 'package:Sello/features/auth/data/auth_errors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {

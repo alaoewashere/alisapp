@@ -4,10 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:my_app/services/groq_service.dart';
-import 'package:my_app/shared/models/category_model.dart';
-import 'package:my_app/shared/models/listing_model.dart';
-import 'package:my_app/shared/models/vehicle_listing_metadata.dart';
+import 'package:Sello/services/groq_service.dart';
+import 'package:Sello/shared/models/category_model.dart';
+import 'package:Sello/shared/models/listing_model.dart';
+import 'package:Sello/shared/models/vehicle_listing_metadata.dart';
 
 void main() {
   group('GroqService', () {

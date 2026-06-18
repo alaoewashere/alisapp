@@ -234,6 +234,7 @@ class ListingModel {
     this.latitude,
     this.longitude,
     this.locationAddress,
+    this.areaName,
     required this.displayStatus,
     this.moderationStatus = ListingModerationStatus.pending,
     this.viewsCount = 0,
@@ -280,6 +281,7 @@ class ListingModel {
   final double? latitude;
   final double? longitude;
   final String? locationAddress;
+  final String? areaName;
   final ListingDisplayStatus displayStatus;
   final ListingModerationStatus moderationStatus;
   final int viewsCount;
@@ -464,6 +466,7 @@ class ListingModel {
     double? latitude,
     double? longitude,
     String? locationAddress,
+    String? areaName,
     ListingDisplayStatus? displayStatus,
     ListingModerationStatus? moderationStatus,
     int? viewsCount,
@@ -506,6 +509,7 @@ class ListingModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       locationAddress: locationAddress ?? this.locationAddress,
+      areaName: areaName ?? this.areaName,
       displayStatus: displayStatus ?? this.displayStatus,
       moderationStatus: moderationStatus ?? this.moderationStatus,
       viewsCount: viewsCount ?? this.viewsCount,
@@ -573,6 +577,7 @@ class ListingModel {
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       locationAddress: json['location_address'] as String?,
+      areaName: json['area_name'] as String?,
       displayStatus: ListingDisplayStatusX.fromJson(json),
       moderationStatus: ListingModerationStatusX.fromString(
         json['status'] as String? ?? 'pending',

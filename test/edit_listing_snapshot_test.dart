@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/core/constants/app_governorates.dart';
-import 'package:my_app/features/listings/models/edit_listing_snapshot.dart';
-import 'package:my_app/shared/models/listing_model.dart';
+import 'package:Sello/core/constants/app_governorates.dart';
+import 'package:Sello/features/listings/models/edit_listing_snapshot.dart';
+import 'package:Sello/shared/models/listing_model.dart';
 
 void main() {
   group('buildEditListingFieldUpdates', () {
@@ -16,6 +16,7 @@ void main() {
       latitude: 33.3,
       longitude: 44.4,
       locationAddress: 'شارع',
+      areaName: 'الكرادة',
       contactPreference: ListingContactPreference.messagesOnly,
       metadata: const {'make': 'Toyota'},
       imageIds: const ['img-1'],
@@ -34,6 +35,7 @@ void main() {
         latitude: 33.3,
         longitude: 44.4,
         locationAddress: 'شارع',
+        areaName: 'الكرادة',
         contactPreference: ListingContactPreference.messagesOnly,
         metadata: const {'make': 'Toyota'},
       );
@@ -54,6 +56,7 @@ void main() {
         latitude: 33.3,
         longitude: 44.4,
         locationAddress: 'شارع',
+        areaName: 'الكرادة',
         contactPreference: ListingContactPreference.messagesOnly,
         metadata: const {'make': 'Toyota'},
       );
@@ -75,6 +78,7 @@ void main() {
         latitude: 33.3,
         longitude: 44.4,
         locationAddress: 'شارع',
+        areaName: 'الكرادة',
         contactPreference: ListingContactPreference.messagesOnly,
         metadata: const {'make': 'Toyota'},
       );
@@ -138,6 +142,7 @@ void main() {
       latitude: null,
       longitude: null,
       locationAddress: null,
+      areaName: null,
       contactPreference: null,
       metadata: null,
       imageIds: ['a', 'b'],
