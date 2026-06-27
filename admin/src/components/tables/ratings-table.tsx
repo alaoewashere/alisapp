@@ -4,7 +4,6 @@ import { Trash2 } from "lucide-react";
 
 import { hideRating } from "@/app/actions/ratings";
 import { ActionDialog } from "@/components/ui/action-dialog";
-import { SubmitButton } from "@/components/ui/submit-button";
 
 export type AdminRatingRow = {
   id: string;
@@ -67,23 +66,16 @@ export function RatingsTable({ rows }: { rows: AdminRatingRow[] }) {
               </td>
               <td className="px-4 py-3">
                 <ActionDialog
+                  action={hideRating}
                   title="إخفاء التقييم"
                   description="سيتم إخفاء هذا التقييم ولن يُحسب في متوسط التقييم."
-                  trigger={
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-destructive hover:bg-destructive/10"
-                      title="إخفاء"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
-                  }
-                >
-                  <form action={hideRating}>
-                    <input type="hidden" name="id" value={row.id} />
-                    <SubmitButton variant="destructive">إخفاء</SubmitButton>
-                  </form>
-                </ActionDialog>
+                  confirmLabel="إخفاء"
+                  confirmVariant="destructive"
+                  triggerLabel={<Trash2 className="size-4" />}
+                  triggerVariant="ghost"
+                  triggerClassName="inline-flex items-center gap-1 rounded-md px-2 py-1 text-destructive hover:bg-destructive/10"
+                  hidden={{ id: row.id }}
+                />
               </td>
             </tr>
           ))}

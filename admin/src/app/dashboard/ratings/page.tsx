@@ -13,6 +13,25 @@ export const dynamic = "force-dynamic";
 const PAGE_SIZE = 25;
 type SearchParams = { [key: string]: string | string[] | undefined };
 
+type RatingQueryRow = {
+  id: string;
+  stars: number;
+  review_text: string | null;
+  created_at: string;
+  reviewer: {
+    full_name?: string | null;
+    display_name?: string | null;
+  } | null;
+  reviewed: {
+    full_name?: string | null;
+    display_name?: string | null;
+  } | null;
+  listing: {
+    title_ar?: string | null;
+    reference_no?: number | null;
+  } | null;
+};
+
 function param(sp: SearchParams, key: string): string | undefined {
   const v = sp[key];
   return Array.isArray(v) ? v[0] : v;
@@ -56,25 +75,16 @@ export default async function RatingsPage({
 
   const { data, count } = await query.range(offset, offset + PAGE_SIZE - 1);
 
-  const rows: AdminRatingRow[] = (data ?? []).map((row) => {
-    const reviewer = row.reviewer as {
-      full_name?: string | null;
-      display_name?: string | null;
-    } | null;
-    const reviewed = row.reviewed as {
-      full_name?: string | null;
-      display_name?: string | null;
-    } | null;
-    const listing = row.listing as {
-      title_ar?: string | null;
-      reference_no?: number | null;
-    } | null;
+  const rows: AdminRatingRow[] = ((data ?? []) as RatingQueryRow[]).map((row) => {
+    const reviewer = row.reviewer;
+    const reviewed = row.reviewed;
+    const listing = row.listing;
 
     return {
-      id: row.id as string,
-      stars: row.stars as number,
-      reviewText: (row.review_text as string | null) ?? null,
-      createdAtLabel: formatDateTime(row.created_at as string),
+      id: row.id,
+      stars: row.stars,
+      reviewText: row.review_text ?? null,
+      createdAtLabel: formatDateTime(row.created_at),
       reviewerName:
         reviewer?.full_name ?? reviewer?.display_name ?? "—",
       reviewedName:

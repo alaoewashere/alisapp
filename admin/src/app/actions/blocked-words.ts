@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import type { BlockedWordRow } from "@/lib/types/database.types";
 import { requireAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { actionError, actionOk, type ActionResult } from "@/lib/actions/types";
@@ -49,6 +50,12 @@ function normalizeWord(input: string): string {
   return out;
 }
 
+function parseSeverity(raw: FormDataEntryValue | null): BlockedWordRow["severity"] {
+  const value = String(raw ?? "high");
+  if (value === "low" || value === "medium" || value === "high") return value;
+  return "high";
+}
+
 export async function createBlockedWord(formData: FormData): Promise<ActionResult> {
   await requireAdmin();
   const word = String(formData.get("word") ?? "").trim();
@@ -61,7 +68,7 @@ export async function createBlockedWord(formData: FormData): Promise<ActionResul
   const { error } = await supabase.from("blocked_words").insert({
     word,
     normalized_form: normalized,
-    severity: String(formData.get("severity") ?? "high"),
+    severity: parseSeverity(formData.get("severity")),
     active: true,
   });
 

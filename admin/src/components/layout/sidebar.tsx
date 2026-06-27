@@ -23,7 +23,7 @@ export function Sidebar({ email, role, reportsCount }: SidebarProps) {
       <div className="border-b border-border px-5 py-4">
         <Image
           src="/app_logo.png"
-          alt="Sello"
+          alt="Souqak"
           width={120}
           height={36}
           className="h-9 w-auto object-contain object-right"

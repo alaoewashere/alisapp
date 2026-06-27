@@ -7,6 +7,19 @@ import {
 import { signedVerificationDocUrl } from "@/app/actions/verification";
 import { formatDateTime } from "@/lib/utils/format-date";
 
+type VerificationQueryRow = {
+  id: string;
+  user_id: string;
+  document_type: string;
+  front_image_url: string;
+  back_image_url: string | null;
+  submitted_at: string;
+  profiles: {
+    full_name: string | null;
+    display_name: string;
+  } | null;
+};
+
 const DOC_LABELS: Record<string, string> = {
   national_id: "الهوية الوطنية",
   drivers_license: "رخصة القيادة",
@@ -42,29 +55,27 @@ export default async function VerificationPage() {
   }
 
   const rows: VerificationQueueRow[] = await Promise.all(
-    (requests ?? []).map(async (row) => {
-      const profile = row.profiles as
-        | { full_name: string | null; display_name: string }
-        | null;
+    ((requests ?? []) as VerificationQueryRow[]).map(async (row) => {
+      const profile = row.profiles;
       const userName =
         profile?.full_name?.trim() ||
         profile?.display_name?.trim() ||
         "مستخدم";
-      const frontPath = row.front_image_url as string;
-      const backPath = row.back_image_url as string | null;
+      const frontPath = row.front_image_url;
+      const backPath = row.back_image_url;
       const frontThumbUrl = await signedVerificationDocUrl(frontPath);
       const backThumbUrl = backPath
         ? await signedVerificationDocUrl(backPath)
         : null;
 
       return {
-        id: row.id as string,
-        userId: row.user_id as string,
+        id: row.id,
+        userId: row.user_id,
         userName,
-        documentType: row.document_type as string,
+        documentType: row.document_type,
         documentLabel:
-          DOC_LABELS[row.document_type as string] ?? row.document_type,
-        submittedAtLabel: formatDateTime(row.submitted_at as string),
+          DOC_LABELS[row.document_type] ?? row.document_type,
+        submittedAtLabel: formatDateTime(row.submitted_at),
         frontThumbUrl,
         backThumbUrl,
       };

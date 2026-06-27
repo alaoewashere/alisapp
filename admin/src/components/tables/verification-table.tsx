@@ -56,6 +56,10 @@ export function VerificationQueueTable({ rows }: { rows: VerificationQueueRow[] 
     null,
   );
 
+  async function submitApproveVerification(formData: FormData): Promise<void> {
+    await approveVerificationRequest(formData);
+  }
+
   if (rows.length === 0) {
     return (
       <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
@@ -109,7 +113,7 @@ export function VerificationQueueTable({ rows }: { rows: VerificationQueueRow[] 
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-2">
-                    <form action={approveVerificationRequest}>
+                    <form action={submitApproveVerification}>
                       <input type="hidden" name="requestId" value={row.id} />
                       <input type="hidden" name="userId" value={row.userId} />
                       <SubmitButton

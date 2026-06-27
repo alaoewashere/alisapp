@@ -11,7 +11,8 @@ export type NotificationType =
   | "info"
   | "warning"
   | "listing_approved"
-  | "listing_rejected";
+  | "listing_rejected"
+  | "rating_request";
 
 export type ProfileRow = {
   id: string;
@@ -22,6 +23,12 @@ export type ProfileRow = {
   city: string | null;
   governorate: string | null;
   is_verified: boolean;
+  verification_status?: "unverified" | "pending" | "verified" | "rejected";
+  verification_submitted_at?: string | null;
+  verification_reviewed_at?: string | null;
+  rejection_reason?: string | null;
+  avg_rating?: number;
+  rating_count?: number;
   is_deleted: boolean;
   is_suspended: boolean;
   suspended_reason: string | null;
@@ -42,7 +49,10 @@ export type ListingRow = {
   user_id: string;
   category_id: number;
   title: string;
+  title_ar?: string | null;
   description: string;
+  description_ar?: string | null;
+  reference_no?: number;
   price_iqd: number;
   price: number | null;
   currency: string;
@@ -169,6 +179,40 @@ export type GovernorateRow = {
   name_en: string;
 }
 
+export type BlockedWordRow = {
+  id: string;
+  word: string;
+  normalized_form: string;
+  severity: "low" | "medium" | "high";
+  active: boolean;
+  created_at: string;
+  created_by: string | null;
+}
+
+export type RatingRow = {
+  id: string;
+  listing_id: string;
+  reviewer_id: string;
+  reviewed_id: string;
+  stars: number;
+  review_text: string | null;
+  hidden: boolean;
+  created_at: string;
+}
+
+export type VerificationRequestRow = {
+  id: string;
+  user_id: string;
+  document_type: "national_id" | "passport" | "drivers_license";
+  front_image_url: string;
+  back_image_url: string | null;
+  submitted_at: string;
+  status: "pending" | "verified" | "rejected";
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  rejection_reason: string | null;
+}
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
@@ -192,6 +236,9 @@ export type Database = {
       app_settings: Table<AppSettingRow>;
       notifications: Table<NotificationRow>;
       governorates: Table<GovernorateRow>;
+      blocked_words: Table<BlockedWordRow>;
+      ratings: Table<RatingRow>;
+      verification_requests: Table<VerificationRequestRow>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
