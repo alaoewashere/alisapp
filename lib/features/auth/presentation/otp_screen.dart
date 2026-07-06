@@ -7,6 +7,7 @@ import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/l10n/l10n_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/auth_navigation.dart';
 import '../../../core/utils/result.dart';
@@ -95,7 +96,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             children: [
               AuthDarkHeader(
                 title: strings.verifyOtp,
-                subtitle: 'أرسلنا رمزاً إلى\n${widget.phone}',
+                subtitle: strings.otpSentTo(widget.phone),
                 leading: AppBackButton(
                   onPressed: verifying ? null : _goBack,
                 ),
@@ -135,8 +136,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       const SizedBox(height: 24),
                       Text(
                         countdown > 0
-                            ? 'إعادة الإرسال خلال $countdown ث'
-                            : 'يمكنك إعادة إرسال الرمز',
+                            ? strings.otpResendIn('$countdown')
+                            : strings.otpCanResendNow,
                         textAlign: TextAlign.center,
                         style: AppFonts.sans(
                           fontSize: 14,
@@ -168,7 +169,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      _OtpHelpCard(phone: widget.phone),
+                      _OtpHelpCard(
+                        phone: widget.phone,
+                        strings: strings,
+                      ),
                     ],
                   ),
                 ),
@@ -218,9 +222,13 @@ final _otpCountdownProvider =
 );
 
 class _OtpHelpCard extends StatelessWidget {
-  const _OtpHelpCard({required this.phone});
+  const _OtpHelpCard({
+    required this.phone,
+    required this.strings,
+  });
 
   final String phone;
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +243,7 @@ class _OtpHelpCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'لم يصلك الرمز؟',
+            strings.otpNotReceived,
             style: AppFonts.sans(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -244,12 +252,7 @@ class _OtpHelpCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '• تأكد أن الرقم $phone صحيح\n'
-            '• انتظر حتى دقيقة — قد يتأخر SMS\n'
-            '• Twilio: أضف رقمك في Sender Pool لخدمة souqiq-otp\n'
-            '• يجب تفعيل مزود SMS (Twilio أو MessageBird) في Supabase\n'
-            '• للتطوير: أضف رقمك كـ Test OTP في لوحة Supabase\n'
-            '• راجع supabase/README.md — قسم Phone OTP',
+            strings.otpHelpText(phone),
             style: AppFonts.sans(
               fontSize: 12,
               color: AppColors.textMuted,

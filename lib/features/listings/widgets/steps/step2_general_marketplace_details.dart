@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../shared/models/general_listing_metadata.dart';
 import '../../constants/general_listing_options.dart';
@@ -57,6 +57,7 @@ class _Step2GeneralMarketplaceDetailsState
     final notifier = ref.read(postListingProvider.notifier);
     final details = state.generalDetails;
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -66,7 +67,7 @@ class _Step2GeneralMarketplaceDetailsState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'تفاصيل الإعلان',
+              strings.listingDetailsTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -83,7 +84,7 @@ class _Step2GeneralMarketplaceDetailsState
             ],
             const SizedBox(height: 16),
             const Step2TitleDescriptionFields(),
-            Text('الحالة *', style: theme.textTheme.titleSmall),
+            Text(strings.conditionRequiredLabel, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             Step2ChipSelector(
               options: GeneralListingOptions.itemConditions,
@@ -94,8 +95,8 @@ class _Step2GeneralMarketplaceDetailsState
             TextField(
               controller: _brandController,
               textDirection: TextDirection.rtl,
-              decoration: const InputDecoration(
-                labelText: 'الماركة (اختياري)',
+              decoration: InputDecoration(
+                labelText: strings.brandOptionalLabel,
               ),
               onChanged: (v) {
                 if (v.trim().isEmpty) {
@@ -108,13 +109,13 @@ class _Step2GeneralMarketplaceDetailsState
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('قابل للتبادل؟'),
+              title: Text(strings.exchangePossibleQuestion),
               value: details.exchangePossible ?? false,
               onChanged: (v) => _update((d) => d.copyWith(exchangePossible: v)),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('توصيل متاح؟'),
+              title: Text(strings.deliveryAvailableQuestion),
               value: details.deliveryAvailable ?? false,
               onChanged: (v) {
                 _update(
@@ -128,7 +129,7 @@ class _Step2GeneralMarketplaceDetailsState
               },
             ),
             if (details.deliveryAvailable == true) ...[
-              Text('تكلفة التوصيل *', style: theme.textTheme.titleSmall),
+              Text(strings.deliveryCostRequiredLabel, style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
               Step2ChipSelector(
                 options: GeneralListingOptions.deliveryCostOptions,
@@ -140,11 +141,11 @@ class _Step2GeneralMarketplaceDetailsState
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [appDigitsOnly()],
+              inputFormatters: [appThousands()],
               textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(
-                labelText: 'السعر *',
-                suffixText: 'د.ع',
+              decoration: InputDecoration(
+                labelText: strings.priceRequiredLabel,
+                suffixText: strings.currencyIqd,
               ),
               onChanged: (v) {
                 final parsed = double.tryParse(v.replaceAll(',', ''));
@@ -154,7 +155,7 @@ class _Step2GeneralMarketplaceDetailsState
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('قابل للتفاوض'),
+              title: Text(strings.negotiable),
               value: state.isNegotiable,
               onChanged: (v) => notifier.updateField('isNegotiable', v),
             ),

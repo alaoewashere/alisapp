@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../l10n/app_localizations.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/result.dart';
@@ -16,13 +18,17 @@ import 'apple_sign_in.dart';
 import 'auth_errors.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository(ref.watch(supabaseClientProvider));
+  return AuthRepository(
+    ref.watch(supabaseClientProvider),
+    strings: () => ref.read(appLocalizationsProvider),
+  );
 });
 
 class AuthRepository {
-  AuthRepository(this._client);
+  AuthRepository(this._client, {required this._strings});
 
   final SupabaseClient _client;
+  final AppLocalizations Function() _strings;
 
   User? get currentUser => _client.auth.currentUser;
 
@@ -72,7 +78,7 @@ class AuthRepository {
       if (kDebugMode) {
         debugPrint('sendWhatsAppOtp error: $e');
       }
-      return Failure('فشل إرسال الرمز، حاول مجدداً', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -85,10 +91,10 @@ class AuthRepository {
           error == 'rate_limited_ip' ||
           error == 'throttle_check_failed' ||
           error == 'throttle_record_failed') {
-        return 'تم إرسال عدة رموز. انتظر قليلاً ثم حاول مجدداً';
+        return _strings().authRateLimitGeneric;
       }
       if (error == 'invalid_phone') {
-        return 'رقم الهاتف غير صالح';
+        return _strings().validationPhoneInvalid;
       }
       if (error == 'twilio_not_configured' || error == 'server_misconfigured') {
         return 'خدمة واتساب غير مهيأة حالياً';
@@ -102,16 +108,16 @@ class AuthRepository {
           ? twilioCode
           : int.tryParse(twilioCode?.toString() ?? '');
       if (codeNum == 60203 || codeNum == 20429) {
-        return 'تم إرسال عدة رموز. انتظر قليلاً ثم حاول مجدداً';
+        return _strings().authRateLimitGeneric;
       }
       if (codeNum == 21211 || codeNum == 60200 || codeNum == 63016) {
-        return 'رقم الهاتف غير صالح لإرسال واتساب';
+        return _strings().validationPhoneInvalid;
       }
     }
     if (response.status == 429) {
-      return 'تم إرسال عدة رموز. انتظر قليلاً ثم حاول مجدداً';
+      return _strings().authRateLimitGeneric;
     }
-    return 'فشل إرسال الرمز، حاول مجدداً';
+    return _strings().authOperationFailed;
   }
 
   Map<String, dynamic>? _coerceResponseMap(dynamic data) {
@@ -158,12 +164,12 @@ class AuthRepository {
       if (response.status != 200 ||
           data is! Map ||
           data['status'] != 'approved') {
-        return const Failure('رمز غير صحيح');
+        return Failure(_strings().otpInvalidCode);
       }
 
       final tokenHash = data['token_hash'] as String?;
       if (tokenHash == null || tokenHash.isEmpty) {
-        return const Failure('تعذّر إنشاء الجلسة. حاول مرة أخرى.');
+        return Failure(_strings().authSessionFailed);
       }
 
       final verifyResponse = await _client.auth.verifyOTP(
@@ -182,7 +188,7 @@ class AuthRepository {
         if (kDebugMode) {
           debugPrint('verifyWhatsAppOtp: session not established after retries');
         }
-        return const Failure('تعذّر إنشاء الجلسة. حاول مرة أخرى.');
+        return Failure(_strings().authSessionFailed);
       }
 
       final user = session.user;
@@ -197,9 +203,9 @@ class AuthRepository {
         AuthResult(user: user, isNewUser: isNewUser),
       );
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('رمز غير صحيح', cause: e);
+      return Failure(_strings().otpInvalidCode, cause: e);
     }
   }
 
@@ -219,9 +225,9 @@ class AuthRepository {
       }
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     }
   }
 
@@ -248,7 +254,7 @@ class AuthRepository {
         if (kDebugMode) {
           debugPrint('verifyOTP: session not established after retries');
         }
-        return const Failure('تعذّر إنشاء الجلسة. حاول مرة أخرى.');
+        return Failure(_strings().authSessionFailed);
       }
 
       final user = session.user;
@@ -263,9 +269,9 @@ class AuthRepository {
         AuthResult(user: user, isNewUser: isNewUser),
       );
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('رمز التحقق غير صحيح أو منتهي الصلاحية.', cause: e);
+      return Failure(_strings().otpInvalidCode, cause: e);
     }
   }
 
@@ -283,7 +289,7 @@ class AuthRepository {
       );
 
       if (response.session == null) {
-        return const Failure('تعذّر تسجيل الدخول. تحقق من البريد وكلمة المرور.');
+        return Failure(_strings().authInvalidCredentials);
       }
 
       if (kDebugMode) {
@@ -291,9 +297,9 @@ class AuthRepository {
       }
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('تعذّر تسجيل الدخول. حاول مرة أخرى.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -323,8 +329,17 @@ class AuthRepository {
         },
       );
 
+      // No session means Supabase requires email confirmation.
+      // The DB trigger handle_new_user already created the profile row.
+      // Return Success(false) so the caller redirects to email verification.
       if (response.session == null) {
-        return const Failure('تعذّر إنشاء الحساب. حاول مرة أخرى.');
+        if (response.user != null) {
+          if (kDebugMode) {
+            debugPrint('signUpWithPassword ← email confirmation required for ${response.user!.id}');
+          }
+          return const Success(false);
+        }
+        return Failure(_strings().authOperationFailed);
       }
 
       final userId = response.user!.id;
@@ -344,10 +359,10 @@ class AuthRepository {
       return const Success(true);
     } on AuthException catch (e, st) {
       logAuthError(e, st);
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e, st) {
       logAuthError(e, st);
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     }
   }
 
@@ -359,9 +374,9 @@ class AuthRepository {
       );
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('تعذّر إرسال رابط إعادة التعيين.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -373,7 +388,7 @@ class AuthRepository {
       );
       return Success(registered == true);
     } catch (e) {
-      return Failure('تعذّر التحقق من البريد.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -386,7 +401,7 @@ class AuthRepository {
       );
       return Success(registered == true);
     } catch (e) {
-      return Failure('تعذّر التحقق من رقم الهاتف.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -398,9 +413,9 @@ class AuthRepository {
       );
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('تعذّر إعادة إرسال الرمز.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -412,9 +427,9 @@ class AuthRepository {
       );
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('تعذّر إعادة إرسال الرمز.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -431,7 +446,7 @@ class AuthRepository {
 
       Session? session = response.session ?? _client.auth.currentSession;
       if (session == null) {
-        return const Failure('رمز غير صحيح');
+        return Failure(_strings().otpInvalidCode);
       }
 
       final user = session.user;
@@ -440,9 +455,9 @@ class AuthRepository {
 
       return Success(AuthResult(user: user, isNewUser: isNewUser));
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('رمز غير صحيح', cause: e);
+      return Failure(_strings().otpInvalidCode, cause: e);
     }
   }
 
@@ -451,9 +466,9 @@ class AuthRepository {
       await _client.auth.updateUser(UserAttributes(password: password));
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('تعذّر تحديث كلمة المرور.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -469,9 +484,9 @@ class AuthRepository {
       );
       return const Success(true);
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     }
   }
 
@@ -483,7 +498,7 @@ class AuthRepository {
         }
         final response = await signInWithAppleNative(_client.auth);
         if (response.session == null) {
-          return const Failure('تعذّر تسجيل الدخول بـ Apple. حاول مرة أخرى.');
+          return Failure(_strings().authOperationFailed);
         }
         if (kDebugMode) {
           debugPrint(
@@ -511,9 +526,9 @@ class AuthRepository {
         cause: e,
       );
     } on AuthException catch (e) {
-      return Failure(authErrorMessage(e), cause: e);
+      return Failure(authErrorMessage(e, _strings()), cause: e);
     } catch (e) {
-      return Failure('تعذّر تسجيل الدخول بـ Apple. حاول مرة أخرى.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -524,7 +539,7 @@ class AuthRepository {
     } on AuthException catch (e) {
       return Failure(e.message, cause: e);
     } catch (e) {
-      return Failure('تعذّر تسجيل الخروج.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -533,7 +548,7 @@ class AuthRepository {
       final userId = _client.auth.currentSession?.user.id ??
           _client.auth.currentUser?.id;
       if (userId == null) {
-        return const Failure('يجب تسجيل الدخول أولاً');
+        return Failure(_strings().loginRequiredFirst);
       }
 
       final data = await _client
@@ -547,11 +562,11 @@ class AuthRepository {
       return Success(ProfileModel.fromJson(data));
     } on PostgrestException catch (e) {
       if (e.code == '42501' || e.message.toLowerCase().contains('jwt')) {
-        return const Failure('يجب تسجيل الدخول أولاً');
+        return Failure(_strings().loginRequiredFirst);
       }
       return Failure(e.message, cause: e);
     } catch (e) {
-      return Failure('تعذّر حفظ الملف الشخصي.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -577,7 +592,7 @@ class AuthRepository {
     } on StorageException catch (e) {
       return Failure(e.message, cause: e);
     } catch (e) {
-      return Failure('تعذّر رفع الصورة.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 
@@ -616,9 +631,9 @@ class AuthRepository {
       if (kDebugMode) {
         debugPrint('_upsertSignupProfile failed: ${e.message}');
       }
-      return Failure('تعذّر حفظ الملف الشخصي.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     } catch (e) {
-      return Failure('تعذّر حفظ الملف الشخصي.', cause: e);
+      return Failure(_strings().authOperationFailed, cause: e);
     }
   }
 

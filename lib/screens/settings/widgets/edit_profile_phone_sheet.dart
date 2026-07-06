@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/digit_input_formatter.dart';
 import '../../../core/utils/result.dart';
 import '../../../core/utils/validators.dart';
 import '../../../features/auth/widgets/auth_form_styles.dart';
-import '../../../features/profile/data/profile_repository.dart';
+import '../../../features/profile/providers/profile_provider.dart';
 
-/// Returns the E.164 phone number when OTP was sent successfully.
+/// Returns the saved E.164 phone number when the update succeeds.
 Future<String?> showEditProfilePhoneSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -110,10 +111,10 @@ class _EditProfilePhoneSheetState extends ConsumerState<_EditProfilePhoneSheet> 
     );
   }
 
-  Future<void> _sendCode() async {
+  Future<void> _savePhone() async {
     final phoneE164 = _validateAndBuildPhoneE164();
     if (phoneE164 == null) {
-      setState(() => _inlineError = 'أدخل رقم هاتف صحيح');
+      setState(() => _inlineError = ref.read(appLocalizationsProvider).enterValidPhone);
       return;
     }
 
@@ -123,8 +124,8 @@ class _EditProfilePhoneSheetState extends ConsumerState<_EditProfilePhoneSheet> 
     });
 
     final result = await ref
-        .read(profileRepositoryProvider)
-        .sendProfilePhoneOtp(phoneE164);
+        .read(profileNotifierProvider.notifier)
+        .updateProfilePhone(phoneE164);
 
     if (!mounted) return;
     setState(() => _loading = false);
@@ -139,6 +140,7 @@ class _EditProfilePhoneSheetState extends ConsumerState<_EditProfilePhoneSheet> 
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Padding(
@@ -168,21 +170,12 @@ class _EditProfilePhoneSheetState extends ConsumerState<_EditProfilePhoneSheet> 
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'التحقق من رقم الهاتف',
+                  strings.phoneNumber,
                   textAlign: TextAlign.center,
                   style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'سنرسل رمزاً مكوناً من 6 أرقام عبر واتساب',
-                  textAlign: TextAlign.center,
-                  style: AppFonts.cairo(
-                    fontSize: 13,
-                    color: AppColors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -293,7 +286,7 @@ class _EditProfilePhoneSheetState extends ConsumerState<_EditProfilePhoneSheet> 
                   width: double.infinity,
                   height: 52,
                   child: FilledButton(
-                    onPressed: _loading ? null : _sendCode,
+                    onPressed: _loading ? null : _savePhone,
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.canvas,
@@ -311,7 +304,7 @@ class _EditProfilePhoneSheetState extends ConsumerState<_EditProfilePhoneSheet> 
                             ),
                           )
                         : Text(
-                            'إرسال رمز واتساب',
+                            strings.save,
                             style: AppFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

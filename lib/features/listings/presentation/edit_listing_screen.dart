@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/moderation/moderation_provider.dart';
+import '../../../core/l10n/category_locale.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
@@ -47,6 +49,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   }
 
   Future<void> _save() async {
+    final strings = ref.read(appLocalizationsProvider);
     final edit = ref.read(editListingProvider(widget.listingId));
     final post = ref.read(postListingProvider);
     final newPrice = (post.price ?? 0).round();
@@ -80,7 +83,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'تم حفظ التعديلات ✓',
+            strings.editChangesSaved,
             style: AppFonts.cairo(),
           ),
           behavior: SnackBarBehavior.floating,
@@ -92,7 +95,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            validationError ?? 'حدث خطأ، حاول مرة أخرى',
+            validationError ?? strings.genericErrorRetry,
             style: AppFonts.cairo(),
           ),
           behavior: SnackBarBehavior.floating,
@@ -103,16 +106,17 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final edit = ref.watch(editListingProvider(widget.listingId));
     final post = ref.watch(postListingProvider);
 
     if (edit.loading && !edit.loaded) {
-      return const Scaffold(body: LoadingWidget(message: 'جاري التحميل...'));
+      return Scaffold(body: LoadingWidget(message: strings.loading));
     }
 
     if (edit.error != null && !edit.loaded) {
       return Scaffold(
-        appBar: SelloAppBar(title: const Text('تعديل الإعلان')),
+        appBar: SelloAppBar(title: Text(strings.editListingTitle)),
         body: AppErrorWidget(
           message: edit.error!,
           onRetry: () => ref.invalidate(editListingProvider(widget.listingId)),
@@ -127,7 +131,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         foregroundColor: AppColors.textDark,
         elevation: 0,
         title: Text(
-          'تعديل الإعلان',
+          strings.editListingTitle,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
         leading: AppBackButton(
@@ -199,7 +203,7 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         ),
                       )
                     : Text(
-                        'حفظ التعديلات',
+                        strings.saveEdits,
                         style: AppFonts.cairo(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -214,14 +218,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
   }
 }
 
-class _ReadOnlyCategoryBanner extends StatelessWidget {
+class _ReadOnlyCategoryBanner extends ConsumerWidget {
   const _ReadOnlyCategoryBanner({required this.path});
 
   final List<CategoryModel> path;
 
   @override
-  Widget build(BuildContext context) {
-    final labels = path.map((c) => c.nameAr).join(' > ');
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+    final labels = path.joinedPathNames(localeCode);
 
     return Container(
       width: double.infinity,
@@ -235,7 +241,7 @@ class _ReadOnlyCategoryBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'الفئة',
+            strings.categorySection,
             style: AppFonts.cairo(
               fontSize: 12,
               color: AppColors.textMuted,

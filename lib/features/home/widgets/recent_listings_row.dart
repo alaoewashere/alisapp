@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/models/listing_model.dart';
+import '../../../shared/widgets/staggered_entrance.dart';
 import 'listing_card.dart';
 
 /// Horizontal scroll of recent listings on the home screen.
@@ -23,9 +24,13 @@ class RecentListingsRow extends StatelessWidget {
         itemCount: listings.length,
         separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
-          return SizedBox(
-            width: cardWidth,
-            child: ListingCard(listing: listings[index]),
+          return StaggeredEntrance(
+            index: index,
+            offset: 0.0,
+            child: SizedBox(
+              width: cardWidth,
+              child: ListingCard(listing: listings[index]),
+            ),
           );
         },
       ),

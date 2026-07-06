@@ -65,9 +65,12 @@ void main() {
 
       final groups = buildCarPaintSummaryGroups(conditions);
       expect(groups.length, 3);
-      expect(groups[0].labelAr, 'صبغ محلي');
-      expect(groups[1].labelAr, 'مصبوغه');
-      expect(groups[2].labelAr, 'مستبدلة');
+      expect(groups[0].condition, CarPaintCondition.localPaint);
+      expect(groups[0].panelKeys, contains('front_left_door'));
+      expect(groups[1].condition, CarPaintCondition.painted);
+      expect(groups[1].panelKeys, contains('hood'));
+      expect(groups[2].condition, CarPaintCondition.replaced);
+      expect(groups[2].panelKeys, contains('rear_bumper'));
     });
 
     test('all original when map is empty', () {

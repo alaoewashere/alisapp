@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/category_locale.dart';
 import '../../../shared/models/category_model.dart';
 
 /// Horizontal scrollable breadcrumb for category drill-down paths.
-class CategoryPathBreadcrumb extends StatelessWidget {
+class CategoryPathBreadcrumb extends ConsumerWidget {
   const CategoryPathBreadcrumb({
     super.key,
     required this.path,
@@ -18,9 +20,10 @@ class CategoryPathBreadcrumb extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (path.isEmpty) return const SizedBox.shrink();
 
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -39,7 +42,7 @@ class CategoryPathBreadcrumb extends StatelessWidget {
                 ),
               ),
             _BreadcrumbChip(
-              label: path[i].nameAr,
+              label: path[i].localizedName(localeCode),
               isLast: i == path.length - 1,
               onTap: onSegmentTap != null ? () => onSegmentTap!(i) : null,
             ),

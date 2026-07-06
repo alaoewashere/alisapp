@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,8 @@ import '../../core/supabase/supabase_client.dart';
 import '../../core/utils/result.dart';
 import '../../core/providers/session_reset.dart';
 import '../../shared/widgets/app_back_button.dart';
+import '../../features/payment/zaincash_checkout_screen.dart';
+import '../../features/payment/zaincash_service.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../shared/widgets/shimmer_loading.dart';
 import '../../widgets/user_avatar.dart';
@@ -26,9 +29,10 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static const _pageBg = AppColors.background;
-  static const _labelDark = Color(0xFF111111);
-  static const _labelMuted = Color(0xFF888888);
-  static const _chevronColor = Color(0xFFBBBBBB);
+  // Dark-theme tokens (screen was originally authored for a light theme).
+  static const _labelDark = AppColors.textDark;
+  static const _labelMuted = AppColors.textMuted;
+  static const _chevronColor = AppColors.textLight;
 
   bool _loading = true;
   String _name = '';
@@ -49,6 +53,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadUserData() async {
+    final strings = ref.read(appLocalizationsProvider);
     try {
       if (!SupabaseConfig.isConfigured) {
         if (mounted) setState(() => _loading = false);
@@ -75,7 +80,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ? profile['full_name'] as String
             : (user.userMetadata?['full_name'] as String?) ??
                 (user.userMetadata?['display_name'] as String?) ??
-                'مستخدم';
+                strings.defaultUser;
         _email = user.email ?? user.phone ?? '';
         _avatarSeed = DiceBearAvatars.resolveSeed(
           profile['avatar_seed'] as String?,
@@ -89,26 +94,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _confirmLogout() async {
+    final strings = ref.read(appLocalizationsProvider);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          'تسجيل الخروج',
+          strings.logoutConfirmTitle,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+          strings.logoutConfirmBodyExtended,
           style: AppFonts.cairo(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('إلغاء', style: AppFonts.cairo()),
+            child: Text(strings.cancel, style: AppFonts.cairo()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'خروج',
+              strings.logoutAction,
               style: AppFonts.cairo(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -121,35 +127,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     if (confirmed != true || !mounted) return;
 
+    final container = ref.container;
     await supabase.auth.signOut();
-    invalidateSessionProviders(ref);
+    invalidateSessionProviders(container);
     if (mounted) context.go(AppRoutes.phone);
   }
 
   Future<void> _confirmDeleteAccount() async {
+    final strings = ref.read(appLocalizationsProvider);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          'حذف الحساب',
+          strings.deleteAccountTitle,
           style: AppFonts.cairo(
             fontWeight: FontWeight.bold,
             color: Colors.red,
           ),
         ),
         content: Text(
-          'هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.',
+          strings.deleteAccountConfirmBody,
           style: AppFonts.cairo(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('إلغاء', style: AppFonts.cairo()),
+            child: Text(strings.cancel, style: AppFonts.cairo()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'حذف',
+              strings.delete,
               style: AppFonts.cairo(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -184,12 +192,117 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return;
     }
 
+    final container = ref.container;
     await supabase.auth.signOut();
-    invalidateSessionProviders(ref);
+    invalidateSessionProviders(container);
     if (mounted) context.go(AppRoutes.phone);
   }
 
+  /// Shows the list of available payment methods. ZainCash is live; the others
+  /// are placeholders shown as "قريباً" until those merchant accounts exist.
+  void _startPaymentCheckout() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Text(
+                  'اختر طريقة الدفع',
+                  style: AppFonts.cairo(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _labelDark,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _PaymentMethodTile(
+                icon: Icons.account_balance_wallet_outlined,
+                title: 'ZainCash',
+                subtitle: 'محفظة زين كاش',
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _startZainCashCheckout();
+                },
+              ),
+              const SizedBox(height: 10),
+              const _PaymentMethodTile(
+                icon: Icons.credit_card,
+                title: 'بطاقة كي (Qi Card)',
+                subtitle: 'قريباً',
+                enabled: false,
+              ),
+              const SizedBox(height: 10),
+              const _PaymentMethodTile(
+                icon: Icons.payment,
+                title: 'Visa / Mastercard',
+                subtitle: 'قريباً',
+                enabled: false,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _startZainCashCheckout() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    // Fixed test amount; swap for a user-entered amount once wired into a real
+    // purchase flow.
+    const testAmount = 1000; // IQD
+
+    final service = ZainCashService();
+    messenger.showSnackBar(
+      const SnackBar(content: Text('جارٍ تجهيز عملية الدفع...')),
+    );
+
+    final init = await service.startCheckout(amount: testAmount);
+
+    switch (init) {
+      case Success(:final value):
+        final status = await navigator.push<ZainCashOrderStatus>(
+          MaterialPageRoute(
+            builder: (_) => ZainCashCheckoutScreen(
+              checkout: value,
+              service: service,
+            ),
+          ),
+        );
+        if (!mounted) return;
+        if (status == null) {
+          messenger.showSnackBar(
+            const SnackBar(content: Text('تم إلغاء عملية الدفع')),
+          );
+        } else if (status.isPaid) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text('تم الدفع بنجاح ✓  (${status.transactionId ?? ''})'),
+            ),
+          );
+        } else {
+          messenger.showSnackBar(
+            SnackBar(content: Text('لم يكتمل الدفع: ${status.status}')),
+          );
+        }
+      case Failure(:final message):
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
   void _showAboutSheet() {
+    final strings = ref.read(appLocalizationsProvider);
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -201,7 +314,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'عن التطبيق',
+              strings.aboutApp,
               style: AppFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -210,8 +323,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Sello — سوقك المحلي للإعلانات المبوبة في العراق. '
-              'اشترِ وبيع بسهولة عبر تطبيق واحد.',
+              strings.aboutAppDescription,
               textAlign: TextAlign.center,
               style: AppFonts.cairo(
                 fontSize: 14,
@@ -221,7 +333,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'الإصدار $_appVersion',
+              strings.versionLabel(_appVersion),
               style: AppFonts.cairo(
                 fontSize: 13,
                 color: _chevronColor,
@@ -235,154 +347,170 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final currentLanguage = localeDisplayName(
       normalizeAppLocale(ref.watch(localeProvider)).languageCode,
     );
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: _pageBg,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: true,
-          leading: AppBackButton(onPressed: () => context.pop()),
-          title: Text(
-            'الإعدادات',
-            style: AppFonts.cairo(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: _labelDark,
-            ),
+    return Scaffold(
+      backgroundColor: _pageBg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        leading: AppBackButton(onPressed: () => context.pop()),
+        title: Text(
+          strings.settings,
+          style: AppFonts.cairo(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: _labelDark,
           ),
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _loading ? _ProfileCardShimmer() : _ProfileCard(
-                name: _name,
-                email: _email,
-                avatarSeed: _avatarSeed,
-                onTap: () => context.push(AppRoutes.editProfile),
-              ),
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.only(right: 4, bottom: 8),
-                child: Text(
-                  'إعدادات أخرى',
-                  style: AppFonts.cairo(
-                    fontSize: 13,
-                    color: _labelMuted,
-                  ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _loading ? _ProfileCardShimmer() : _ProfileCard(
+              name: _name,
+              email: _email,
+              avatarSeed: _avatarSeed,
+              onTap: () => context.push(AppRoutes.editProfile),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.only(right: 4, bottom: 8),
+              child: Text(
+                strings.otherSettings,
+                style: AppFonts.cairo(
+                  fontSize: 13,
+                  color: _labelMuted,
                 ),
               ),
-              _SettingsGroup(
-                children: [
-                  _SettingsRow(
-                    icon: Icons.person_outline,
-                    label: 'تفاصيل الحساب',
-                    onTap: () => context.push(AppRoutes.editProfile),
-                  ),
-                  const _SettingsDivider(),
-                  _SettingsRow(
-                    icon: Icons.lock_outline,
-                    label: 'كلمة المرور',
-                    onTap: () => context.push(AppRoutes.resetPassword),
-                  ),
-                  const _SettingsDivider(),
-                  _SettingsRow(
-                    icon: Icons.notifications_none,
-                    label: 'الإشعارات',
-                    onTap: () => context.push(AppRoutes.notificationsSettings),
-                  ),
-                  const _SettingsDivider(),
-                  _SettingsRow(
-                    icon: Icons.language,
-                    label: 'اللغة',
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          currentLanguage,
-                          style: AppFonts.cairo(
-                            fontSize: 13,
-                            color: _labelMuted,
-                          ),
+            ),
+            _SettingsGroup(
+              children: [
+                _SettingsRow(
+                  icon: Icons.person_outline,
+                  label: strings.accountDetails,
+                  onTap: () => context.push(AppRoutes.editProfile),
+                ),
+                const _SettingsDivider(),
+                _SettingsRow(
+                  icon: Icons.lock_outline,
+                  label: strings.passwordSettings,
+                  onTap: () => context.push(AppRoutes.resetPassword),
+                ),
+                const _SettingsDivider(),
+                _SettingsRow(
+                  icon: Icons.notifications_none,
+                  label: strings.notifications,
+                  onTap: () => context.push(AppRoutes.notificationsSettings),
+                ),
+                const _SettingsDivider(),
+                _SettingsRow(
+                  icon: Icons.language,
+                  label: strings.chooseLanguage,
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        currentLanguage,
+                        style: AppFonts.cairo(
+                          fontSize: 13,
+                          color: _labelMuted,
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.chevron_left,
-                          color: Color(0xFFBBBBBB),
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                    onTap: () => context.push('${AppRoutes.language}?onboarding=false'),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.chevron_left,
+                        color: Color(0xFFBBBBBB),
+                        size: 18,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                  onTap: () => context.push('${AppRoutes.language}?onboarding=false'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _SettingsGroup(
+              children: [
+                _SettingsRow(
+                  icon: Icons.info_outline,
+                  label: strings.aboutApp,
+                  onTap: _showAboutSheet,
+                ),
+                const _SettingsDivider(),
+                _SettingsRow(
+                  icon: Icons.help_outline,
+                  label: strings.helpFaq,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          strings.comingSoon,
+                          style: AppFonts.cairo(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const _SettingsDivider(),
+                _SettingsRow(
+                  icon: Icons.support_agent_outlined,
+                  label: strings.contactSupport,
+                  onTap: () => context.push(AppRoutes.supportChat),
+                ),
+                const _SettingsDivider(),
+                _SettingsRow(
+                  icon: Icons.delete_outline,
+                  label: strings.deleteAccount,
+                  iconColor: Colors.red,
+                  labelColor: Colors.red,
+                  trailing: const Icon(
+                    Icons.chevron_left,
+                    color: Colors.red,
+                    size: 18,
+                  ),
+                  onTap: _confirmDeleteAccount,
+                ),
+              ],
+            ),
+            if (kDebugMode) ...[
               const SizedBox(height: 16),
               _SettingsGroup(
                 children: [
                   _SettingsRow(
-                    icon: Icons.info_outline,
-                    label: 'عن التطبيق',
-                    onTap: _showAboutSheet,
-                  ),
-                  const _SettingsDivider(),
-                  _SettingsRow(
-                    icon: Icons.help_outline,
-                    label: 'المساعدة / الأسئلة الشائعة',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'قريباً',
-                            style: AppFonts.cairo(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const _SettingsDivider(),
-                  _SettingsRow(
-                    icon: Icons.delete_outline,
-                    label: 'حذف الحساب',
-                    iconColor: Colors.red,
-                    labelColor: Colors.red,
-                    trailing: const Icon(
-                      Icons.chevron_left,
-                      color: Colors.red,
-                      size: 18,
-                    ),
-                    onTap: _confirmDeleteAccount,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _SettingsGroup(
-                children: [
-                  _SettingsRow(
-                    icon: Icons.logout,
-                    label: 'تسجيل الخروج',
-                    iconColor: Colors.red,
-                    labelColor: Colors.red,
-                    iconContainerOpacity: 0.12,
-                    trailing: const Icon(
-                      Icons.chevron_left,
-                      color: Colors.red,
-                      size: 18,
-                    ),
-                    onTap: _confirmLogout,
+                    icon: Icons.account_balance_wallet_outlined,
+                    label: strings.startPayment,
+                    onTap: _startPaymentCheckout,
                   ),
                 ],
               ),
             ],
-          ),
+            const SizedBox(height: 16),
+            _SettingsGroup(
+              children: [
+                _SettingsRow(
+                  icon: Icons.logout,
+                  label: strings.logout,
+                  iconColor: Colors.red,
+                  labelColor: Colors.red,
+                  iconContainerOpacity: 0.12,
+                  trailing: const Icon(
+                    Icons.chevron_left,
+                    color: Colors.red,
+                    size: 18,
+                  ),
+                  onTap: _confirmLogout,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -499,6 +627,83 @@ class _SettingsAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return UserAvatar(avatarSeed: avatarSeed, size: size);
+  }
+}
+
+class _PaymentMethodTile extends StatelessWidget {
+  const _PaymentMethodTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+    this.enabled = true,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = enabled ? AppColors.textDark : AppColors.textMuted;
+    return Material(
+      color: AppColors.fieldCarbon,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: enabled ? onTap : null,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.6,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: AppColors.primary, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppFonts.cairo(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: color,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: AppFonts.cairo(
+                          fontSize: 12,
+                          color: const Color(0xFF888888),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (enabled)
+                  const Icon(Icons.chevron_left, color: Color(0xFFBBBBBB))
+                else
+                  const Icon(Icons.lock_outline,
+                      color: Color(0xFFBBBBBB), size: 18),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

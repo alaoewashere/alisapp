@@ -16,7 +16,7 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 600));
 
-    expect(find.text('اختر اسم المستخدم'), findsOneWidget);
+    expect(find.text('اختر اسم مستخدمك'), findsOneWidget);
     expect(find.text('متابعة'), findsOneWidget);
     expect(find.text('تخطى الآن'), findsOneWidget);
   });

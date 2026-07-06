@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/router/app_router.dart';
 import '../../core/supabase/supabase_client.dart';
-import '../../core/utils/arabic_number.dart';
 import '../../models/smart_alert.dart';
 import '../../shared/widgets/app_back_button.dart';
 import '../../services/smart_alert_service.dart';
@@ -16,6 +17,7 @@ class MyAlertsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final userId = ref.watch(currentUserIdProvider);
     final alertsAsync = ref.watch(userSmartAlertsProvider);
 
@@ -26,14 +28,14 @@ class MyAlertsScreen extends ConsumerWidget {
         foregroundColor: AppColors.textDark,
         elevation: 0,
         title: Text(
-          'تنبيهاتي الذكية',
+          strings.mySmartAlerts,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
         leading: AppBackButton(onPressed: () => context.pop()),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: 'تنبيه جديد',
+            tooltip: strings.newAlert,
             onPressed: () => context.push(AppRoutes.createSmartAlert),
           ),
         ],
@@ -44,12 +46,12 @@ class MyAlertsScreen extends ConsumerWidget {
               onPressed: () => context.push(AppRoutes.createSmartAlert),
               backgroundColor: AppColors.primary,
               icon: const Icon(Icons.notifications_active_outlined),
-              label: Text('تنبيه جديد', style: AppFonts.cairo()),
+              label: Text(strings.newAlert, style: AppFonts.cairo()),
             ),
       body: userId == null
           ? Center(
               child: Text(
-                'سجّل الدخول لإدارة التنبيهات',
+                strings.loginToManageAlerts,
                 style: AppFonts.cairo(color: AppColors.textMuted),
               ),
             )
@@ -59,6 +61,7 @@ class MyAlertsScreen extends ConsumerWidget {
               data: (alerts) {
                 if (alerts.isEmpty) {
                   return _EmptyAlerts(
+                    strings: strings,
                     onCreate: () => context.push(AppRoutes.createSmartAlert),
                   );
                 }
@@ -99,8 +102,9 @@ class MyAlertsScreen extends ConsumerWidget {
 }
 
 class _EmptyAlerts extends StatelessWidget {
-  const _EmptyAlerts({required this.onCreate});
+  const _EmptyAlerts({required this.strings, required this.onCreate});
 
+  final AppLocalizations strings;
   final VoidCallback onCreate;
 
   @override
@@ -118,7 +122,7 @@ class _EmptyAlerts extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'لا توجد تنبيهات بعد',
+              strings.noAlertsYet,
               style: AppFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -139,7 +143,7 @@ class _EmptyAlerts extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'أنشئ تنبيهاً الآن',
+                strings.createAlertNow,
                 style: AppFonts.cairo(fontWeight: FontWeight.bold),
               ),
             ),
@@ -150,7 +154,7 @@ class _EmptyAlerts extends StatelessWidget {
   }
 }
 
-class _AlertCard extends StatelessWidget {
+class _AlertCard extends ConsumerWidget {
   const _AlertCard({
     required this.alert,
     required this.onToggle,
@@ -162,7 +166,8 @@ class _AlertCard extends StatelessWidget {
   final VoidCallback onDelete;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Dismissible(
       key: ValueKey(alert.id),
       direction: DismissDirection.endToStart,
@@ -261,7 +266,9 @@ class _AlertCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '${arabicNumber(alert.triggerCount)} إعلان مطابق',
+                        strings.matchingListingsCount(
+                          '${alert.triggerCount}',
+                        ),
                         style: AppFonts.cairo(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -299,6 +306,7 @@ class SmartAlertSaveBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Material(
       color: AppColors.primary.withValues(alpha: 0.08),
       child: InkWell(
@@ -322,7 +330,7 @@ class SmartAlertSaveBanner extends ConsumerWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'احفظ هذا البحث كتنبيه ذكي 🔔',
+                  strings.saveSearchAsAlert,
                   style: AppFonts.cairo(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

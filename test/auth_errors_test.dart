@@ -1,13 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Sello/features/auth/data/auth_errors.dart';
+import 'package:Sello/l10n/app_localizations_ar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
+  final l10n = AppLocalizationsAr();
+
   group('authErrorMessage', () {
     test('maps invalid credentials to Arabic', () {
       const error = AuthException('Invalid login credentials');
       expect(
-        authErrorMessage(error),
+        authErrorMessage(error, l10n),
         'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
       );
     });
@@ -15,7 +18,7 @@ void main() {
     test('maps duplicate email signup to Arabic', () {
       const error = AuthException('User already registered');
       expect(
-        authErrorMessage(error),
+        authErrorMessage(error, l10n),
         'هذا البريد مسجل مسبقاً',
       );
     });
@@ -28,8 +31,8 @@ void main() {
         code: 'weak_password',
       );
       expect(
-        authErrorMessage(error),
-        weakPasswordMessage,
+        authErrorMessage(error, l10n),
+        l10n.validationWeakPassword,
       );
     });
 
@@ -40,7 +43,7 @@ void main() {
         code: 'over_email_send_rate_limit',
       );
       expect(
-        authErrorMessage(error),
+        authErrorMessage(error, l10n),
         'طلبات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.',
       );
     });
@@ -48,7 +51,7 @@ void main() {
     test('maps network errors to Arabic', () {
       const error = AuthException('Network request failed');
       expect(
-        authErrorMessage(error),
+        authErrorMessage(error, l10n),
         'تحقق من الاتصال بالإنترنت',
       );
     });
@@ -60,7 +63,7 @@ void main() {
         code: 'over_email_send_rate_limit',
       );
       expect(
-        authErrorMessage(error),
+        authErrorMessage(error, l10n),
         'طلبات كثيرة. انتظر 51 ثانية ثم حاول مرة أخرى.',
       );
     });
@@ -72,14 +75,14 @@ void main() {
         code: 'email_address_invalid',
       );
       expect(
-        authErrorMessage(error),
+        authErrorMessage(error, l10n),
         'البريد الإلكتروني غير صالح',
       );
     });
 
     test('returns raw AuthException message when unmapped', () {
       const error = AuthException('Custom provider error');
-      expect(authErrorMessage(error), 'Custom provider error');
+      expect(authErrorMessage(error, l10n), 'Custom provider error');
     });
   });
 }

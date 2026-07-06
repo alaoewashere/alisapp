@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/preset_avatars.dart';
+import '../../core/l10n/l10n_provider.dart';
 
 /// Avatar picker — large preview + horizontal preset row (edit profile).
-class ProfileAvatarPicker extends StatelessWidget {
+class ProfileAvatarPicker extends ConsumerWidget {
   const ProfileAvatarPicker({
     super.key,
     required this.selectedIndex,
@@ -30,7 +32,8 @@ class ProfileAvatarPicker extends StatelessWidget {
   static const _optionSize = 56.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final index = PresetAvatars.clampIndex(selectedIndex);
 
     return Column(
@@ -47,14 +50,14 @@ class ProfileAvatarPicker extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'اختر صورتك',
+          strings.chooseAvatar,
           style: AppFonts.cairo(
             fontSize: 13,
             color: AppColors.textMuted,
           ),
         ),
         const SizedBox(height: 16),
-        _SectionDivider(label: 'الصور الرمزية'),
+        _SectionDivider(label: strings.avatarIconsSection),
         const SizedBox(height: 12),
         SizedBox(
           height: _optionSize + 4,

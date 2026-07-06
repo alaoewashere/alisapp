@@ -172,79 +172,18 @@ class ProfileRepository {
     return ProfileModel.fromJson(data);
   }
 
-  Future<Result<bool>> sendProfilePhoneOtp(String phoneE164) async {
-    try {
-      final phone = Validators.normalizeE164(phoneE164);
-      final response = await _client.functions.invoke(
-        'send-whatsapp-otp',
-        body: {'phone': phone, 'purpose': 'profile'},
-      );
-      if (kDebugMode) {
-        debugPrint(
-          'sendProfilePhoneOtp ← ${response.status} ${response.data}',
-        );
-      }
-      if (response.status == 200) {
-        return const Success(true);
-      }
-      return Failure(_profileOtpSendErrorMessage(response.data));
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('sendProfilePhoneOtp error: $e');
-      }
-      return Failure('فشل إرسال الرمز، حاول مجدداً', cause: e);
-    }
-  }
-
-  String _profileOtpSendErrorMessage(Object? data) {
-    if (data is Map) {
-      final code = data['error']?.toString() ?? '';
-      switch (code) {
-        case 'invalid_phone':
-          return 'رقم الهاتف غير صحيح';
-        case 'unauthorized':
-          return 'يجب تسجيل الدخول أولاً';
-        case 'rate_limited':
-        case 'rate_limited_phone':
-        case 'rate_limited_ip':
-          return 'تجاوزت الحد المسموح، حاول لاحقاً';
-        case 'send_failed':
-        case 'twilio_not_configured':
-          return 'تعذّر إرسال الرمز عبر واتساب';
-        case 'store_failed':
-          return 'تعذّر حفظ الرمز، حاول مجدداً';
-      }
-    }
-    return 'فشل إرسال الرمز، حاول مجدداً';
-  }
-
-  Future<Result<bool>> verifyProfilePhoneOtp({
-    required String phoneE164,
-    required String otp,
-  }) async {
-    try {
-      final phone = Validators.normalizeE164(phoneE164);
-      final response = await _client.functions.invoke(
-        'verify-whatsapp-otp',
-        body: {
+  Future<ProfileModel> updateProfilePhone(String userId, String phoneE164) async {
+    final phone = Validators.normalizeE164(phoneE164);
+    final data = await _client
+        .from('profiles')
+        .update({
           'phone': phone,
-          'code': otp.trim(),
-          'purpose': 'profile',
-        },
-      );
-      final data = response.data;
-      if (response.status == 200 &&
-          data is Map &&
-          data['status'] == 'approved') {
-        return const Success(true);
-      }
-      if (data is Map &&
-          (data['status'] == 'expired' || data['error'] == 'expired')) {
-        return const Failure('انتهت صلاحية الرمز، أعد الإرسال');
-      }
-      return const Failure('الرمز غير صحيح');
-    } catch (e) {
-      return const Failure('الرمز غير صحيح');
-    }
+          'phone_verified': false,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', userId)
+        .select()
+        .single();
+    return ProfileModel.fromJson(data);
   }
 }

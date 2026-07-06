@@ -1,18 +1,9 @@
-/// Arabic publication date for listings (e.g. 27 مايو 2026).
-String formatListingPublicationDateAr(DateTime date) {
-  const months = [
-    'يناير',
-    'فبراير',
-    'مارس',
-    'أبريل',
-    'مايو',
-    'يونيو',
-    'يوليو',
-    'أغسطس',
-    'سبتمبر',
-    'أكتوبر',
-    'نوفمبر',
-    'ديسمبر',
-  ];
-  return '${date.day} ${months[date.month - 1]} ${date.year}';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../l10n/l10n_provider.dart';
+
+/// Localized publication date (e.g. June 17, 2026 / 17 Haziran 2026).
+String formatListingPublicationDate(DateTime date, Locale locale) {
+  return DateFormat.yMMMMd(intlDisplayLocale(locale)).format(date);
 }

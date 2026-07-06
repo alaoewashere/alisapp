@@ -2,8 +2,10 @@ import 'category_asset_image.dart';
 import '../../core/utils/cached_network_image_utils.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/constants/category_asset_icons.dart';
 import '../../core/constants/category_fallback_icon.dart';
+import '../../core/constants/main_category_icons.dart';
 import '../../core/utils/category_tree.dart';
 import '../../features/home/widgets/category_grid.dart';
 import '../../features/listings/widgets/vehicle_brand_logo.dart';
@@ -36,9 +38,12 @@ class CategoryIcon extends StatelessWidget {
 
     final assetPath = CategoryAssetIcons.assetForSlug(category.slug);
     if (assetPath != null) {
+      final isMainCategory = MainCategoryIcons.hasAsset(category.slug);
       return CategoryAssetImage(
         assetPath: assetPath,
         size: size,
+        showPlate: !isMainCategory,
+        color: isMainCategory ? AppColors.pureWhite : null,
         fallback: _EmojiIconBox(
           category: category,
           accent: accent ?? parseCategoryColor(category.colorHex),

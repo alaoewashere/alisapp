@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/core/moderation/posting_ban_utils.dart';
+import 'package:Sello/l10n/app_localizations_ar.dart';
 import 'package:Sello/shared/models/profile_model.dart';
 
 ProfileModel _profile({
@@ -23,6 +24,8 @@ ProfileModel _profile({
 }
 
 void main() {
+  final l10n = AppLocalizationsAr();
+
   group('effectiveModerationViolationCount', () {
     test('returns 0 when no prior violation', () {
       expect(effectiveModerationViolationCount(_profile()), 0);
@@ -82,11 +85,11 @@ void main() {
     });
   });
 
-  group('PostingBanInfo.blockedDialogBodyAr', () {
+  group('PostingBanInfo.blockedDialogBody', () {
     test('first-time ban copy mentions two days', () {
       const info = PostingBanInfo(isFirstBan: true);
       expect(
-        info.blockedDialogBodyAr(),
+        info.blockedDialogBody(l10n),
         contains('يومين'),
       );
     });
@@ -94,7 +97,7 @@ void main() {
     test('escalated ban copy mentions one month', () {
       const info = PostingBanInfo(isFirstBan: false);
       expect(
-        info.blockedDialogBodyAr(),
+        info.blockedDialogBody(l10n),
         contains('شهر كامل'),
       );
     });
@@ -102,22 +105,23 @@ void main() {
     test('permanent ban copy', () {
       const info = PostingBanInfo(isFirstBan: false, isPermanent: true);
       expect(
-        info.blockedDialogBodyAr(),
+        info.blockedDialogBody(l10n),
         contains('بشكل دائم'),
       );
     });
   });
 
-  group('postingBanMessageAr', () {
+  group('postingBanMessage', () {
     test('permanent message', () {
-      final msg = postingBanMessageAr(
+      final msg = postingBanMessage(
+        l10n,
         _profile(isBanned: true, bannedUntil: null),
       );
       expect(msg, contains('بشكل دائم'));
     });
 
     test('empty when not actively banned', () {
-      expect(postingBanMessageAr(_profile()), '');
+      expect(postingBanMessage(l10n, _profile()), '');
     });
   });
 }

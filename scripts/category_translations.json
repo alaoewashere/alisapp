@@ -1,0 +1,772 @@
+{
+  "real_estate": {
+    "en": "Real Estate",
+    "ku": "خانوووبەرە",
+    "tr": "Emlak"
+  },
+  "cars": {
+    "en": "Vehicles",
+    "ku": "ئۆتۆمبێل",
+    "tr": "Araçlar"
+  },
+  "electronics": {
+    "en": "Electronics",
+    "ku": "ئەلیکترۆنی",
+    "tr": "Elektronik"
+  },
+  "buy_sell": {
+    "en": "Marketplace",
+    "ku": "بازاڕ",
+    "tr": "Pazar"
+  },
+  "tutoring": {
+    "en": "Tutoring",
+    "ku": "وانە تایبەت",
+    "tr": "Özel Ders"
+  },
+  "jobs": {
+    "en": "Jobs",
+    "ku": "کار",
+    "tr": "İş İlanları"
+  },
+  "pets": {
+    "en": "Pets",
+    "ku": "ئاژەڵ",
+    "tr": "Evcil Hayvan"
+  },
+  "home_help": {
+    "en": "Home Help",
+    "ku": "یارمەتی ماڵ",
+    "tr": "Ev Yardımı"
+  },
+  "re_residential": {
+    "en": "Residential",
+    "ku": "نیشتەجێبوون",
+    "tr": "Konut"
+  },
+  "re_tourism": {
+    "en": "Tourism Properties",
+    "ku": "خاوەنداڕی گەشتیاری",
+    "tr": "Turizm Tesisleri"
+  },
+  "re_shared": {
+    "en": "Shared Ownership",
+    "ku": "خاوەنداڕی هاوبەش",
+    "tr": "Ortak Mülkiyet"
+  },
+  "re_land": {
+    "en": "Land",
+    "ku": "زەوی",
+    "tr": "Arsa"
+  },
+  "re_projects": {
+    "en": "Housing Projects",
+    "ku": "پڕۆژەی نیشتەجێبوون",
+    "tr": "Konut Projeleri"
+  },
+  "re_commercial": {
+    "en": "Commercial Shops",
+    "ku": "دوکانە بازرگانییەکان",
+    "tr": "Ticari Dükkanlar"
+  },
+  "re_residential_sale": {
+    "en": "For Sale",
+    "ku": "بۆ فرۆشتن",
+    "tr": "Satılık"
+  },
+  "re_residential_rent": {
+    "en": "For Rent",
+    "ku": "بۆ کرێ",
+    "tr": "Kiralık"
+  },
+  "re_tourism_sale": {
+    "en": "For Sale",
+    "ku": "بۆ فرۆشتن",
+    "tr": "Satılık"
+  },
+  "re_tourism_rent": {
+    "en": "For Rent",
+    "ku": "بۆ کرێ",
+    "tr": "Kiralık"
+  },
+  "re_shared_sale": {
+    "en": "For Sale",
+    "ku": "بۆ فرۆشتن",
+    "tr": "Satılık"
+  },
+  "re_shared_rent": {
+    "en": "For Rent",
+    "ku": "بۆ کرێ",
+    "tr": "Kiralık"
+  },
+  "re_land_residential": {
+    "en": "Residential",
+    "ku": "نیشتەجێبوون",
+    "tr": "Konut"
+  },
+  "re_land_commercial": {
+    "en": "Commercial",
+    "ku": "بازرگانی",
+    "tr": "Ticari"
+  },
+  "re_land_agricultural": {
+    "en": "Agricultural",
+    "ku": "کشتوکاڵ",
+    "tr": "Tarım"
+  },
+  "re_land_industrial": {
+    "en": "Industrial",
+    "ku": "پیشەسازی",
+    "tr": "Sanayi"
+  },
+  "re_land_tourism": {
+    "en": "Tourism",
+    "ku": "گەشتیاری",
+    "tr": "Turizm"
+  },
+  "re_projects_new": {
+    "en": "New Housing Project",
+    "ku": "پڕۆژەی نیشتەجێبوونی نوێ",
+    "tr": "Yeni Konut Projesi"
+  },
+  "re_projects_complex": {
+    "en": "Residential Complex",
+    "ku": "کۆمپلێکسی نیشتەجێبوون",
+    "tr": "Konut Kompleksi"
+  },
+  "re_projects_compound": {
+    "en": "Compound",
+    "ku": "کۆمپاوند",
+    "tr": "Site"
+  },
+  "re_commercial_sale": {
+    "en": "For Sale",
+    "ku": "بۆ فرۆشتن",
+    "tr": "Satılık"
+  },
+  "re_commercial_rent": {
+    "en": "For Rent",
+    "ku": "بۆ کرێ",
+    "tr": "Kiralık"
+  },
+  "re_residential_sale_apartment": {
+    "en": "Apartment",
+    "ku": "شوقە",
+    "tr": "Daire"
+  },
+  "re_residential_sale_villa": {
+    "en": "Villa",
+    "ku": "ڤیلا",
+    "tr": "Villa"
+  },
+  "re_residential_sale_house": {
+    "en": "House",
+    "ku": "خانوو",
+    "tr": "Ev"
+  },
+  "re_residential_sale_duplex": {
+    "en": "Duplex",
+    "ku": "دوبلێکس",
+    "tr": "Dubleks"
+  },
+  "re_residential_sale_palace": {
+    "en": "Palace",
+    "ku": "قەسر",
+    "tr": "Saray"
+  },
+  "re_residential_sale_studio": {
+    "en": "Studio",
+    "ku": "ستودیۆ",
+    "tr": "Stüdyo"
+  },
+  "re_residential_rent_apartment": {
+    "en": "Apartment",
+    "ku": "شوقە",
+    "tr": "Daire"
+  },
+  "re_residential_rent_villa": {
+    "en": "Villa",
+    "ku": "ڤیلا",
+    "tr": "Villa"
+  },
+  "re_residential_rent_house": {
+    "en": "House",
+    "ku": "خانوو",
+    "tr": "Ev"
+  },
+  "re_residential_rent_duplex": {
+    "en": "Duplex",
+    "ku": "دوبلێکس",
+    "tr": "Dubleks"
+  },
+  "re_residential_rent_room": {
+    "en": "Room",
+    "ku": "ژوور",
+    "tr": "Oda"
+  },
+  "re_residential_rent_studio": {
+    "en": "Studio",
+    "ku": "ستودیۆ",
+    "tr": "Stüdyo"
+  },
+  "re_tourism_sale_hotel": {
+    "en": "Hotel",
+    "ku": "هۆتێل",
+    "tr": "Otel"
+  },
+  "re_tourism_sale_resort": {
+    "en": "Resort",
+    "ku": "ڕیزۆرت",
+    "tr": "Tatil Köyü"
+  },
+  "re_tourism_sale_chalet": {
+    "en": "Chalet",
+    "ku": "شالێ",
+    "tr": "Şale"
+  },
+  "re_tourism_sale_resthouse": {
+    "en": "Rest House",
+    "ku": "استراحة",
+    "tr": "Dinlenme Evi"
+  },
+  "re_tourism_sale_motel": {
+    "en": "Motel",
+    "ku": "موتێل",
+    "tr": "Motel"
+  },
+  "re_tourism_rent_hotel": {
+    "en": "Hotel",
+    "ku": "هۆتێل",
+    "tr": "Otel"
+  },
+  "re_tourism_rent_resort": {
+    "en": "Resort",
+    "ku": "ڕیزۆرت",
+    "tr": "Tatil Köyü"
+  },
+  "re_tourism_rent_chalet": {
+    "en": "Chalet",
+    "ku": "شالێ",
+    "tr": "Şale"
+  },
+  "re_tourism_rent_resthouse": {
+    "en": "Rest House",
+    "ku": "استراحة",
+    "tr": "Dinlenme Evi"
+  },
+  "re_tourism_rent_motel": {
+    "en": "Motel",
+    "ku": "موتێل",
+    "tr": "Motel"
+  },
+  "re_commercial_sale_office": {
+    "en": "Office",
+    "ku": "نووسینگە",
+    "tr": "Ofis"
+  },
+  "re_commercial_sale_shop": {
+    "en": "Shop",
+    "ku": "دوکان",
+    "tr": "Dükkan"
+  },
+  "re_commercial_sale_warehouse": {
+    "en": "Warehouse",
+    "ku": "کۆگا",
+    "tr": "Depo"
+  },
+  "re_commercial_sale_factory": {
+    "en": "Factory",
+    "ku": "کارگە",
+    "tr": "Fabrika"
+  },
+  "re_commercial_sale_restaurant": {
+    "en": "Restaurant",
+    "ku": "چێشتخانە",
+    "tr": "Restoran"
+  },
+  "re_commercial_sale_hotel": {
+    "en": "Hotel",
+    "ku": "هۆتێل",
+    "tr": "Otel"
+  },
+  "re_commercial_sale_gym": {
+    "en": "Gym",
+    "ku": "هۆڵی وەرزش",
+    "tr": "Spor Salonu"
+  },
+  "re_commercial_sale_gas": {
+    "en": "Gas Station",
+    "ku": "وێستگەی سووتەمەنی",
+    "tr": "Benzin İstasyonu"
+  },
+  "re_commercial_rent_office": {
+    "en": "Office",
+    "ku": "نووسینگە",
+    "tr": "Ofis"
+  },
+  "re_commercial_rent_shop": {
+    "en": "Shop",
+    "ku": "دوکان",
+    "tr": "Dükkan"
+  },
+  "re_commercial_rent_warehouse": {
+    "en": "Warehouse",
+    "ku": "کۆگا",
+    "tr": "Depo"
+  },
+  "re_commercial_rent_factory": {
+    "en": "Factory",
+    "ku": "کارگە",
+    "tr": "Fabrika"
+  },
+  "re_commercial_rent_restaurant": {
+    "en": "Restaurant",
+    "ku": "چێشتخانە",
+    "tr": "Restoran"
+  },
+  "re_commercial_rent_wedding": {
+    "en": "Wedding Hall",
+    "ku": "هۆڵی ئاهەنگ",
+    "tr": "Düğün Salonu"
+  },
+  "re_commercial_rent_showroom": {
+    "en": "Showroom",
+    "ku": "پێشانگا",
+    "tr": "Showroom"
+  },
+  "veh_automobile": {
+    "en": "Cars",
+    "ku": "ئەتومبێل",
+    "tr": "Arabalar"
+  },
+  "veh_rental": {
+    "en": "Car Rentals",
+    "ku": "ئەتومبێلی کرێ",
+    "tr": "Kiralık Arabalar"
+  },
+  "veh_electric": {
+    "en": "Electric Cars",
+    "ku": "ئەتومبێلی کارەبایی",
+    "tr": "Elektrikli Arabalar"
+  },
+  "veh_motorcycle": {
+    "en": "Motorcycles",
+    "ku": "موتەر",
+    "tr": "Motosikletler"
+  },
+  "veh_minivan": {
+    "en": "Vans & Minivans",
+    "ku": "ڤان و مینی ڤان",
+    "tr": "Van ve Minivan"
+  },
+  "veh_commercial": {
+    "en": "Commercial Vehicles",
+    "ku": "ئامێری بازرگانی",
+    "tr": "Ticari Araçlar"
+  },
+  "veh_suv_pickup": {
+    "en": "SUV & Pickup",
+    "ku": "SUV و پیکاپ",
+    "tr": "SUV ve Pickup"
+  },
+  "veh_marine": {
+    "en": "Marine Vehicles",
+    "ku": "ئامێری دeryایی",
+    "tr": "Deniz Araçları"
+  },
+  "veh_damaged": {
+    "en": "Damaged Cars",
+    "ku": "ئەتومبێلی تێکچوو",
+    "tr": "Hasarlı Arabalar"
+  },
+  "veh_caravan": {
+    "en": "Caravan",
+    "ku": "کارavan",
+    "tr": "Karavan"
+  },
+  "veh_classic": {
+    "en": "Classic Cars",
+    "ku": "ئەتومبێلی کلاسیک",
+    "tr": "Klasik Arabalar"
+  },
+  "veh_aircraft": {
+    "en": "Aircraft",
+    "ku": "فڕۆکە",
+    "tr": "Hava Araçları"
+  },
+  "veh_accessible": {
+    "en": "Accessible Vehicles",
+    "ku": "ئەتومبێلی کەمئەندام",
+    "tr": "Engelli Araçları"
+  },
+  "veh_aircraft_planes": {
+    "en": "Planes",
+    "ku": "فڕۆکە",
+    "tr": "Uçaklar"
+  },
+  "veh_aircraft_helicopters": {
+    "en": "Helicopters",
+    "ku": "هێلیکۆپتەر",
+    "tr": "Helikopterler"
+  },
+  "elec_smartphones": {
+    "en": "Smartphones",
+    "ku": "مۆبایلی زیرەک",
+    "tr": "Akıllı Telefonlar"
+  },
+  "elec_tablets": {
+    "en": "Tablets",
+    "ku": "تابلێت",
+    "tr": "Tabletler"
+  },
+  "elec_laptops": {
+    "en": "Laptops & Computers",
+    "ku": "لaptop و کۆمپیوتەر",
+    "tr": "Laptop ve Bilgisayar"
+  },
+  "elec_displays": {
+    "en": "TVs & Displays",
+    "ku": "تەلەفزیۆن و شاشە",
+    "tr": "TV ve Ekranlar"
+  },
+  "elec_cameras": {
+    "en": "Cameras",
+    "ku": "کامێرا",
+    "tr": "Kameralar"
+  },
+  "elec_audio": {
+    "en": "Audio & Speakers",
+    "ku": "دەنگ و بڵندگۆ",
+    "tr": "Ses ve Hoparlörler"
+  },
+  "elec_gaming": {
+    "en": "Video Games",
+    "ku": "یاری ڤیدیۆیی",
+    "tr": "Video Oyunları"
+  },
+  "elec_wearables": {
+    "en": "Smartwatches & Wearables",
+    "ku": "کاتژمێری زیرەک",
+    "tr": "Akıllı Saatler"
+  },
+  "elec_printers": {
+    "en": "Printers & Accessories",
+    "ku": "چاپکەر و پێکهاتەکان",
+    "tr": "Yazıcılar"
+  },
+  "elec_networking": {
+    "en": "Networking & Routers",
+    "ku": "تۆڕ و ڕاوتەر",
+    "tr": "Ağ ve Yönlendiriciler"
+  },
+  "elec_smart_home": {
+    "en": "Smart Home Devices",
+    "ku": "ئامێری ماڵی زیرەک",
+    "tr": "Akıllı Ev Cihazları"
+  },
+  "elec_parts": {
+    "en": "Parts & Accessories",
+    "ku": "پارچە و ئیکسسۆوار",
+    "tr": "Parça ve Aksesuar"
+  },
+  "elec_appliances": {
+    "en": "Home Appliances",
+    "ku": "ئامێری کارەبایی ماڵ",
+    "tr": "Ev Aletleri"
+  },
+  "elec_ac": {
+    "en": "Air Conditioners",
+    "ku": "کۆندیشن",
+    "tr": "Klima"
+  },
+  "elec_desktops": {
+    "en": "Desktop Computers",
+    "ku": "کۆمپیوتەری مێز",
+    "tr": "Masaüstü Bilgisayar"
+  },
+  "elec_drones": {
+    "en": "Drones",
+    "ku": "درۆن",
+    "tr": "Drone"
+  },
+  "elec_projectors": {
+    "en": "Projectors",
+    "ku": "پڕۆجێکتۆر",
+    "tr": "Projektör"
+  },
+  "elec_medical": {
+    "en": "Home Medical Devices",
+    "ku": "ئامێری پزیشکی ماڵ",
+    "tr": "Ev Tipi Tıbbi Cihazlar"
+  },
+  "jobs_it": {
+    "en": "IT & Programming",
+    "ku": "IT و بەرنامەسازی",
+    "tr": "BT ve Programlama"
+  },
+  "jobs_engineering": {
+    "en": "Engineering & Construction",
+    "ku": "ئەندازیاری و بیناسازی",
+    "tr": "Mühendislik ve İnşaat"
+  },
+  "jobs_medical": {
+    "en": "Medicine & Health",
+    "ku": "پزیشکی و تەندروستی",
+    "tr": "Tıp ve Sağlık"
+  },
+  "jobs_business": {
+    "en": "Business & Finance",
+    "ku": "بازرگانی و دارایی",
+    "tr": "İş ve Finans"
+  },
+  "jobs_education": {
+    "en": "Education & Training",
+    "ku": "پەروەردە و ڕاهێنان",
+    "tr": "Eğitim ve Öğretim"
+  },
+  "jobs_oil_energy": {
+    "en": "Oil & Energy",
+    "ku": "نەوت و وزە",
+    "tr": "Petrol ve Enerji"
+  },
+  "jobs_media": {
+    "en": "Media & Design",
+    "ku": "میدیا و دیزاین",
+    "tr": "Medya ve Tasarım"
+  },
+  "jobs_hospitality": {
+    "en": "Hospitality & Tourism",
+    "ku": "میوانداری و گەشتیاری",
+    "tr": "Otelcilik ve Turizm"
+  },
+  "jobs_trades": {
+    "en": "Trades & Crafts",
+    "ku": "پیشە و دەستکاری",
+    "tr": "Zanaat ve El Sanatları"
+  },
+  "jobs_freelance": {
+    "en": "Freelance & Remote",
+    "ku": "کارکردنی ئازاد",
+    "tr": "Serbest ve Uzaktan"
+  },
+  "souq_mobile": {
+    "en": "Mobiles & Accessories",
+    "ku": "مۆبایل و ئیکسسۆوار",
+    "tr": "Telefon ve Aksesuar"
+  },
+  "souq_computer": {
+    "en": "Computers & Laptops",
+    "ku": "کۆمپیوتەر و laptop",
+    "tr": "Bilgisayar ve Laptop"
+  },
+  "souq_tv_audio": {
+    "en": "TV & Audio",
+    "ku": "تەلەفزیۆن و دەنگ",
+    "tr": "TV ve Ses"
+  },
+  "souq_appliances": {
+    "en": "Home Appliances",
+    "ku": "ئامێری ماڵ",
+    "tr": "Ev Aletleri"
+  },
+  "souq_kitchen": {
+    "en": "Kitchen Appliances",
+    "ku": "ئامێری چێشتخانە",
+    "tr": "Mutfak Aletleri"
+  },
+  "souq_gaming": {
+    "en": "Gaming & Entertainment",
+    "ku": "یاری و کات بەسەربردن",
+    "tr": "Oyun ve Eğlence"
+  },
+  "souq_fashion": {
+    "en": "Fashion & Clothing",
+    "ku": "جلوبەرگ و مۆدە",
+    "tr": "Moda ve Giyim"
+  },
+  "souq_beauty": {
+    "en": "Health & Beauty",
+    "ku": "تەندروستی و جوانکاری",
+    "tr": "Sağlık ve Güzellik"
+  },
+  "souq_furniture": {
+    "en": "Furniture",
+    "ku": "کەلوپەل و مۆبیلیات",
+    "tr": "Mobilya"
+  },
+  "souq_sports": {
+    "en": "Sports & Fitness",
+    "ku": "وەرزش و تەندروستی",
+    "tr": "Spor ve Fitness"
+  },
+  "souq_baby": {
+    "en": "Baby & Maternity",
+    "ku": "منداڵ و دایکایەتی",
+    "tr": "Bebek ve Anne"
+  },
+  "souq_books": {
+    "en": "Books & Education",
+    "ku": "کتێب و پەروەردە",
+    "tr": "Kitap ve Eğitim"
+  },
+  "souq_music": {
+    "en": "Music & Instruments",
+    "ku": "مۆسیقا و ئامێر",
+    "tr": "Müzik ve Enstrüman"
+  },
+  "souq_hobbies": {
+    "en": "Hobbies & Collectibles",
+    "ku": "هەوای و کۆکردنەوە",
+    "tr": "Hobi ve Koleksiyon"
+  },
+  "souq_jewelry": {
+    "en": "Jewelry & Gold",
+    "ku": "زێڕ و زیو",
+    "tr": "Mücevher ve Altın"
+  },
+  "souq_building": {
+    "en": "Building Materials",
+    "ku": "بناء و ماددە",
+    "tr": "Yapı Malzemeleri"
+  },
+  "souq_garden": {
+    "en": "Garden & Agriculture",
+    "ku": "باخچە و کشتوکاڵ",
+    "tr": "Bahçe ve Tarım"
+  },
+  "souq_food": {
+    "en": "Food & Beverages",
+    "ku": "خواردن و خواردنەوە",
+    "tr": "Yiyecek ve İçecek"
+  },
+  "souq_misc": {
+    "en": "Miscellaneous",
+    "ku": "هەمەجۆر",
+    "tr": "Diğer"
+  },
+  "tutor_school": {
+    "en": "School Tutoring",
+    "ku": "وانەی قوتابخانە",
+    "tr": "Okul Dersleri"
+  },
+  "tutor_university": {
+    "en": "University Tutoring",
+    "ku": "وانەی زانکۆ",
+    "tr": "Üniversite Dersleri"
+  },
+  "tutor_languages": {
+    "en": "Language Learning",
+    "ku": "فێrbوونی زمان",
+    "tr": "Dil Eğitimi"
+  },
+  "tutor_quran": {
+    "en": "Quran & Religious Studies",
+    "ku": "قورئان و زانستی ئایینی",
+    "tr": "Kuran ve Din"
+  },
+  "tutor_professional": {
+    "en": "Professional Skills",
+    "ku": "لێهاتوویی پیشەیی",
+    "tr": "Mesleki Beceriler"
+  },
+  "pets_dogs": {
+    "en": "Dogs",
+    "ku": "سەگ",
+    "tr": "Köpekler"
+  },
+  "pets_cats": {
+    "en": "Cats",
+    "ku": "پشیلە",
+    "tr": "Kediler"
+  },
+  "pets_birds": {
+    "en": "Birds",
+    "ku": "باڵندە",
+    "tr": "Kuşlar"
+  },
+  "pets_fish": {
+    "en": "Fish & Aquariums",
+    "ku": "ماسی و ئاکوارێوم",
+    "tr": "Balık ve Akvaryum"
+  },
+  "pets_farm": {
+    "en": "Farm Animals",
+    "ku": "ئاژەڵی مەزرە",
+    "tr": "Çiftlik Hayvanları"
+  },
+  "pets_reptiles": {
+    "en": "Reptiles & Amphibians",
+    "ku": "خشók و دووجگە",
+    "tr": "Sürüngenler"
+  },
+  "pets_rabbits": {
+    "en": "Rabbits & Rodents",
+    "ku": "کەروێشک",
+    "tr": "Tavşan ve Kemirgenler"
+  },
+  "pets_accessories": {
+    "en": "Pet Supplies",
+    "ku": "پێداویستی ئاژەڵ",
+    "tr": "Pet Malzemeleri"
+  },
+  "pets_services": {
+    "en": "Pet Services",
+    "ku": "خزمەتگوزاری ئاژەڵ",
+    "tr": "Pet Hizmetleri"
+  },
+  "pets_lost_found": {
+    "en": "Lost & Found",
+    "ku": "ونبوو و دۆزراوە",
+    "tr": "Kayıp ve Bulunan"
+  },
+  "home_cleaning": {
+    "en": "House Cleaning",
+    "ku": "پاککردنەوەی ماڵ",
+    "tr": "Ev Temizliği"
+  },
+  "home_cooking": {
+    "en": "Cooking & Catering",
+    "ku": "چێشتلێنان",
+    "tr": "Yemek Hazırlama"
+  },
+  "home_childcare": {
+    "en": "Childcare",
+    "ku": "چاودێری منداڵ",
+    "tr": "Çocuk Bakımı"
+  },
+  "home_eldercare": {
+    "en": "Elderly & Patient Care",
+    "ku": "چاودێری پیر و نەخۆش",
+    "tr": "Yaşlı ve Hasta Bakımı"
+  },
+  "home_driver": {
+    "en": "Private Driver",
+    "ku": "شۆفێری تایبەت",
+    "tr": "Özel Şoför"
+  },
+  "home_gardening": {
+    "en": "Garden & Pool",
+    "ku": "باخچە و مەلەوانگە",
+    "tr": "Bahçe ve Havuz"
+  },
+  "home_maintenance": {
+    "en": "Home Maintenance",
+    "ku": "چاککردنەوەی ماڵ",
+    "tr": "Ev Bakımı"
+  },
+  "home_moving": {
+    "en": "Moving & Furniture",
+    "ku": "گواستنەوەی کەلوپەل",
+    "tr": "Taşıma"
+  },
+  "home_security": {
+    "en": "Security & Guarding",
+    "ku": "ئاسایش و پاسەوانی",
+    "tr": "Güvenlik"
+  },
+  "home_laundry": {
+    "en": "Laundry & Ironing",
+    "ku": "جلوشۆردن و ئistri",
+    "tr": "Çamaşır ve Ütü"
+  }
+}

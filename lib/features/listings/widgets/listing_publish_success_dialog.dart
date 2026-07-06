@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/l10n/l10n_provider.dart';
 
 /// Success moment after a listing is submitted — stays until the user dismisses.
 Future<void> showListingPublishSuccessDialog(BuildContext context) async {
@@ -26,13 +29,14 @@ Future<void> showListingPublishSuccessDialog(BuildContext context) async {
   return completer.future;
 }
 
-class ListingPublishSuccessDialog extends StatelessWidget {
+class ListingPublishSuccessDialog extends ConsumerWidget {
   const ListingPublishSuccessDialog({super.key, required this.onDone});
 
   final VoidCallback onDone;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -57,7 +61,7 @@ class ListingPublishSuccessDialog extends StatelessWidget {
                     child: IconButton(
                       onPressed: onDone,
                       icon: Icon(Icons.close, color: scheme.onSurface),
-                      tooltip: 'إغلاق',
+                      tooltip: strings.closeTooltip,
                     ),
                   ),
                   Container(
@@ -75,7 +79,7 @@ class ListingPublishSuccessDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'تم ✓',
+                    strings.publishSuccessDone,
                     style: textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: scheme.onSurface,
@@ -83,7 +87,7 @@ class ListingPublishSuccessDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'إعلانك قيد المراجعة',
+                    strings.listingPendingReviewTitle,
                     textAlign: TextAlign.center,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -92,7 +96,7 @@ class ListingPublishSuccessDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'سيظهر للجميع بعد الموافقة',
+                    strings.listingVisibleAfterApproval,
                     textAlign: TextAlign.center,
                     style: textTheme.bodyMedium?.copyWith(
                       color: scheme.onSurfaceVariant,
@@ -103,7 +107,7 @@ class ListingPublishSuccessDialog extends StatelessWidget {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: onDone,
-                      child: const Text('موافق'),
+                      child: Text(strings.okAction),
                     ),
                   ),
                 ],

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/result.dart';
 import '../../features/auth/providers/auth_provider.dart';
@@ -26,6 +27,7 @@ class _PasswordResetEmailSentScreenState
   bool _resending = false;
 
   Future<void> _resend() async {
+    final strings = ref.read(appLocalizationsProvider);
     setState(() => _resending = true);
     final result = await ref
         .read(authNotifierProvider.notifier)
@@ -38,7 +40,7 @@ class _PasswordResetEmailSentScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'تم إرسال الرابط مرة أخرى',
+              strings.passwordResetResent,
               style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
@@ -52,6 +54,8 @@ class _PasswordResetEmailSentScreenState
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -60,8 +64,8 @@ class _PasswordResetEmailSentScreenState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AuthDarkHeader(
-              title: 'تم إرسال الرابط',
-              subtitle: 'تم إرسال رابط إعادة التعيين إلى بريدك',
+              title: strings.passwordResetSentTitle,
+              subtitle: strings.passwordResetSentSubtitle,
               leading: AppBackButton(
                 onPressed: () => context.go(AppRoutes.login),
               ),
@@ -89,7 +93,7 @@ class _PasswordResetEmailSentScreenState
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'افتح الرابط في بريدك لإنشاء كلمة مرور جديدة. قد يستغرق وصول الرسالة بضع دقائق.',
+                      strings.passwordResetInstructions,
                       textAlign: TextAlign.center,
                       style: AppFonts.sans(
                         fontSize: 14,
@@ -99,7 +103,7 @@ class _PasswordResetEmailSentScreenState
                     ),
                     const SizedBox(height: 32),
                     AuthPrimaryButton(
-                      label: 'إعادة الإرسال',
+                      label: strings.resendLink,
                       loading: _resending,
                       loginStyle: true,
                       onPressed: _resending ? null : _resend,
@@ -108,7 +112,7 @@ class _PasswordResetEmailSentScreenState
                     TextButton(
                       onPressed: () => context.go(AppRoutes.login),
                       child: Text(
-                        'العودة لتسجيل الدخول',
+                        strings.backToLogin,
                         style: AppFonts.sans(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,

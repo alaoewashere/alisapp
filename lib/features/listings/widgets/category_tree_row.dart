@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/category_tree.dart';
 import '../../../shared/models/category_model.dart';
 import 'vehicle_brand_logo.dart';
 
 /// Sahibinden-style row for drilling into the category tree.
-class CategoryTreeRow extends StatelessWidget {
+class CategoryTreeRow extends ConsumerWidget {
   const CategoryTreeRow({
     super.key,
     required this.category,
@@ -28,7 +31,8 @@ class CategoryTreeRow extends StatelessWidget {
   static const _iconSize = 48.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final isBrandRow = showBrandStyle && isVehicleBrand(category);
     final showSubtitle = subtitle.isNotEmpty && !isBrandRow;
 
@@ -54,7 +58,7 @@ class CategoryTreeRow extends StatelessWidget {
                     textDirection: TextDirection.rtl,
                     children: [
                       Text(
-                        category.nameAr,
+                        category.localizedName(localeCode),
                         textDirection: TextDirection.rtl,
                         textAlign: TextAlign.right,
                         maxLines: 1,
@@ -105,16 +109,16 @@ class CategoryTreeRow extends StatelessWidget {
 }
 
 /// Top-of-list "show all listings in this category" row for category browse.
-class CategoryAllListingsRow extends StatelessWidget {
+class CategoryAllListingsRow extends ConsumerWidget {
   const CategoryAllListingsRow({
     super.key,
-    required this.categoryNameAr,
+    required this.categoryName,
     required this.onTap,
     this.listingCount,
     this.loading = false,
   });
 
-  final String categoryNameAr;
+  final String categoryName;
   final VoidCallback? onTap;
   final int? listingCount;
   final bool loading;
@@ -122,7 +126,9 @@ class CategoryAllListingsRow extends StatelessWidget {
   static const _rowHeight = 72.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+
     return Material(
       color: AppColors.fieldCarbon,
       child: InkWell(
@@ -142,7 +148,7 @@ class CategoryAllListingsRow extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
-                    'كل إعلانات $categoryNameAr',
+                    strings.allCategoryListings(categoryName),
                     textDirection: TextDirection.rtl,
                     textAlign: TextAlign.right,
                     maxLines: 2,

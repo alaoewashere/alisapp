@@ -1,10 +1,11 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/utils/chat_date_utils.dart';
 import '../../../core/utils/phone_links.dart';
 import '../../../core/supabase/supabase_client.dart';
@@ -18,10 +19,6 @@ import '../../../core/moderation/moderation_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/listing_context_card.dart';
 import '../widgets/message_bubble.dart';
-
-final _networkStatusProvider = StreamProvider<List<ConnectivityResult>>((ref) {
-  return Connectivity().onConnectivityChanged;
-});
 
 final _chatScrollControllerProvider =
     Provider.autoDispose.family<ScrollController, String>((ref, conversationId) {
@@ -52,6 +49,7 @@ class ChatScreen extends ConsumerWidget {
     final conversationAsync = ref.watch(conversationProvider(conversationId));
     final messagesAsync = ref.watch(messagesStreamProvider(conversationId));
     final pending = ref.watch(pendingMessagesProvider(conversationId));
+    final strings = ref.watch(appLocalizationsProvider);
 
     ref.listen(messagesStreamProvider(conversationId), (prev, next) {
       final prevLen = prev?.value?.length ?? 0;
@@ -59,7 +57,10 @@ class ChatScreen extends ConsumerWidget {
       if (nextLen > prevLen && ref.read(chatNearBottomProvider)) {
         _scrollToBottom(ref);
       }
-      if (nextLen > prevLen) {
+      // Mark read both when a new message arrives AND when the chat first opens
+      // (so unread badges clear on open, not only on the next message).
+      final justOpened = (prev?.value == null) && next.hasValue;
+      if (nextLen > prevLen || justOpened) {
         ref.read(chatNotifierProvider.notifier).markAsRead(conversationId);
       }
     });
@@ -68,25 +69,18 @@ class ChatScreen extends ConsumerWidget {
       backgroundColor: AppColors.chatBackground,
       resizeToAvoidBottomInset: true,
       appBar: conversationAsync.when(
-        loading: () => _buildLoadingAppBar(context),
-        error: (_, _) => _buildLoadingAppBar(context),
+        loading: () => _buildLoadingAppBar(context, strings),
+        error: (_, _) => _buildLoadingAppBar(context, strings),
         data: (conversation) {
           if (conversation == null) {
-            return _buildLoadingAppBar(context);
+            return _buildLoadingAppBar(context, strings);
           }
-          return _ChatAppBar(conversation: conversation);
+          return _ChatAppBar(conversation: conversation, strings: strings);
         },
       ),
       body: Column(
         children: [
-          _ChatOfflineBanner(),
-          conversationAsync.maybeWhen(
-            data: (conversation) {
-              if (conversation == null) return const SizedBox.shrink();
-              return ListingContextCard(conversation: conversation);
-            },
-            orElse: () => const SizedBox.shrink(),
-          ),
+          const _SafeMeetupBanner(),
           Expanded(
             child: messagesAsync.when(
               loading: () => const _MessagesShimmer(),
@@ -100,7 +94,7 @@ class ChatScreen extends ConsumerWidget {
                 if (merged.isEmpty) {
                   return Center(
                     child: Text(
-                      'ابدأ المحادثة',
+                      strings.startConversation,
                       style: AppFonts.tajawal(
                         fontSize: 14,
                         color: AppColors.textMuted,
@@ -118,13 +112,16 @@ class ChatScreen extends ConsumerWidget {
               },
             ),
           ),
-          _ChatInputBar(conversationId: conversationId),
+          _ChatInputBar(conversationId: conversationId, strings: strings),
         ],
       ),
     );
   }
 
-  PreferredSizeWidget _buildLoadingAppBar(BuildContext context) {
+  PreferredSizeWidget _buildLoadingAppBar(
+    BuildContext context,
+    AppLocalizations strings,
+  ) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0.5,
@@ -137,7 +134,7 @@ class ChatScreen extends ConsumerWidget {
         },
       ),
       title: Text(
-        'محادثة',
+        strings.conversation,
         style: AppFonts.cairo(
           fontSize: 15,
           fontWeight: FontWeight.w700,
@@ -172,9 +169,13 @@ class ChatScreen extends ConsumerWidget {
 }
 
 class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _ChatAppBar({required this.conversation});
+  const _ChatAppBar({
+    required this.conversation,
+    required this.strings,
+  });
 
   final ConversationModel conversation;
+  final AppLocalizations strings;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -196,7 +197,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.storefront_outlined),
-              title: const Text('عرض الإعلان'),
+              title: Text(strings.viewListing),
               onTap: () {
                 Navigator.pop(ctx);
                 context.push('/listing/${conversation.listingId}');
@@ -204,21 +205,21 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             ListTile(
               leading: const Icon(Icons.block_outlined),
-              title: const Text('حظر المستخدم'),
+              title: Text(strings.blockUser),
               onTap: () {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('ميزة الحظر قريباً')),
+                  SnackBar(content: Text(strings.blockFeatureComingSoon)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.flag_outlined),
-              title: const Text('الإبلاغ عن المحادثة'),
+              title: Text(strings.reportConversation),
               onTap: () {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم استلام بلاغك')),
+                  SnackBar(content: Text(strings.reportReceived)),
                 );
               },
             ),
@@ -231,7 +232,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final c = conversation;
-    final name = c.otherUserName ?? 'مستخدم';
+    final name = c.otherUserName ?? strings.defaultUser;
 
     return AppBar(
       backgroundColor: AppColors.canvas,
@@ -285,7 +286,7 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 if (_isOnline)
                   Text(
-                    'متصل الآن',
+                    strings.onlineNow,
                     style: AppFonts.tajawal(
                       fontSize: 11,
                       color: AppColors.approved,
@@ -357,6 +358,13 @@ class _MessagesList extends ConsumerWidget {
           child: Column(
             children: [
               if (showDate) ChatDateSeparator(date: message.createdAt),
+              if (message.isListingCard && message.listingTitle != null)
+                ListingContextCard(
+                  listingId: message.listingId!,
+                  title: message.listingTitle!,
+                  imageUrl: message.listingImage,
+                  price: message.listingPrice,
+                ),
               if (userId != null)
                 MessageBubble(
                   message: message,
@@ -374,9 +382,13 @@ class _MessagesList extends ConsumerWidget {
 }
 
 class _ChatInputBar extends ConsumerStatefulWidget {
-  const _ChatInputBar({required this.conversationId});
+  const _ChatInputBar({
+    required this.conversationId,
+    required this.strings,
+  });
 
   final String conversationId;
+  final AppLocalizations strings;
 
   @override
   ConsumerState<_ChatInputBar> createState() => _ChatInputBarState();
@@ -474,31 +486,42 @@ class _ChatInputBarState extends ConsumerState<_ChatInputBar> {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (hasText)
-                  GestureDetector(
-                    onTap: _send,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.send_rounded,
-                        color: AppColors.canvas,
-                        size: 18,
-                      ),
+                // Send — always present; volt + glow when there's text to send.
+                GestureDetector(
+                  onTap: hasText ? _send : null,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: hasText ? AppColors.volt : AppColors.surfaceMuted,
+                      shape: BoxShape.circle,
+                      boxShadow: hasText
+                          ? const [
+                              BoxShadow(
+                                color: Color(0x4DD4FF3A),
+                                blurRadius: 12,
+                                offset: Offset(0, 3),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Icon(
+                      Icons.send_rounded,
+                      color: hasText ? AppColors.canvas : AppColors.textMuted,
+                      size: 20,
                     ),
                   ),
-                const SizedBox(width: 8),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 120),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
+                        horizontal: 18,
+                        vertical: 11,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceMuted,
@@ -512,7 +535,7 @@ class _ChatInputBarState extends ConsumerState<_ChatInputBar> {
                           color: AppColors.pureWhite,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'اكتب رسالة...',
+                          hintText: widget.strings.typeMessage,
                           hintStyle: AppFonts.tajawal(
                             fontSize: 14,
                             color: AppColors.textMuted,
@@ -529,28 +552,41 @@ class _ChatInputBarState extends ConsumerState<_ChatInputBar> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                if (!hasText)
-                  IconButton(
-                    icon: const Icon(
-                      Icons.mic_none_rounded,
-                      color: AppColors.textMuted,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                  ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.sentiment_satisfied_outlined,
-                    color: AppColors.textMuted,
-                    size: 24,
-                  ),
-                  onPressed: () {},
-                ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// Subtle persistent reminder to meet safely — builds buyer/seller trust.
+class _SafeMeetupBanner extends StatelessWidget {
+  const _SafeMeetupBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      color: AppColors.volt.withValues(alpha: 0.06),
+      child: Row(
+        children: [
+          Icon(Icons.shield_outlined, size: 15, color: AppColors.volt),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'للأمان: قابل الطرف الآخر بمكان عام، وافحص الغرض قبل الدفع.',
+              style: AppFonts.cairo(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textMuted,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -574,40 +610,3 @@ class _MessagesShimmer extends StatelessWidget {
   }
 }
 
-class _ChatOfflineBanner extends ConsumerWidget {
-  const _ChatOfflineBanner();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final networkAsync = ref.watch(_networkStatusProvider);
-    final offline =
-        networkAsync.value?.contains(ConnectivityResult.none) ?? false;
-    if (!offline) return const SizedBox.shrink();
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: AppColors.surfaceMuted,
-      child: Row(
-        children: [
-          const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.primary,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            'جاري إعادة الاتصال...',
-            style: AppFonts.cairo(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

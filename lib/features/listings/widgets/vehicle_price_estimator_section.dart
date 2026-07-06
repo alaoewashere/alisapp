@@ -5,6 +5,7 @@ import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/vehicle_listing_utils.dart';
@@ -68,10 +69,11 @@ class _VehiclePriceEstimatorSectionState
       if (kDebugMode) {
         debugPrint('VehiclePriceEstimator: estimate failed: $e');
       }
+      final strings = ref.read(appLocalizationsProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'تعذّر تقدير السعر، حاول مرة أخرى',
+            strings.priceEstimateFailed,
             style: AppFonts.cairo(),
             textAlign: TextAlign.right,
           ),
@@ -110,6 +112,8 @@ class _EstimatorPromptButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
+
     return Material(
       color: AppColors.volt,
       borderRadius: BorderRadius.circular(14),
@@ -122,7 +126,7 @@ class _EstimatorPromptButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '✨ احسب السعر المقترح',
+                strings.calculateSuggestedPrice,
                 style: AppFonts.cairo(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -162,13 +166,7 @@ class _EstimatorResultCard extends StatelessWidget {
 
   final PriceEstimate estimate;
 
-  String get _confidenceLabel => switch (estimate.confidence) {
-        'high' => 'عالية',
-        'medium' => 'متوسطة',
-        _ => 'منخفضة',
-      };
-
-  Color get _confidenceColor => switch (estimate.confidence) {
+  Color _confidenceColor(String confidence) => switch (confidence) {
         'high' => AppColors.approved,
         'medium' => AppColors.pending,
         _ => AppColors.rejected,
@@ -176,6 +174,14 @@ class _EstimatorResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
+    final confidenceLabel = switch (estimate.confidence) {
+      'high' => strings.confidenceHigh,
+      'medium' => strings.confidenceMedium,
+      _ => strings.confidenceLow,
+    };
+    final confidenceColor = _confidenceColor(estimate.confidence);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -195,7 +201,7 @@ class _EstimatorResultCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'تقدير الذكاء الاصطناعي',
+                strings.aiPriceEstimateTitle,
                 style: AppFonts.cairo(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -206,15 +212,15 @@ class _EstimatorResultCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _confidenceColor.withValues(alpha: 0.15),
+                  color: confidenceColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  _confidenceLabel,
+                  confidenceLabel,
                   style: AppFonts.cairo(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: _confidenceColor,
+                    color: confidenceColor,
                   ),
                 ),
               ),
@@ -222,7 +228,7 @@ class _EstimatorResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            '${arabicNumber(estimate.minPrice)} — ${arabicNumber(estimate.maxPrice)} د.ع',
+            '${arabicNumber(estimate.minPrice)} — ${arabicNumber(estimate.maxPrice)} ${strings.currencyIqd}',
             textAlign: TextAlign.center,
             style: AppFonts.inter(
               fontSize: 20,
@@ -243,7 +249,7 @@ class _EstimatorResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'هذا تقدير تقريبي وليس سعراً نهائياً',
+            strings.priceEstimateDisclaimer,
             textAlign: TextAlign.center,
             style: AppFonts.cairo(
               fontSize: 10,

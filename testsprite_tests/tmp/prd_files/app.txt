@@ -1,0 +1,374 @@
+# Sello App — Conversation Context Export
+*Exported: June 16, 2026*
+
+This document summarizes the full context of this conversation: the app background, every issue raised, and every Cursor prompt produced. Use it as a reference or paste relevant sections into Cursor for continuity.
+
+---
+
+## App Background (from prior session log)
+
+- **Name:** Sello
+- **Type:** Arabic RTL classifieds marketplace
+- **Stack:** Flutter, Supabase, Riverpod, Go Router
+- **Platform:** iOS (iPhone 17 simulator, iOS 26.5), plus a web admin panel
+- Full design system reference already produced separately as `DESIGN.md` (color palette, typography, components, screen inventory, Supabase schema, RTL rules).
+
+---
+
+## 1. Visual Redesign — Match New Color/Typography/Nav Reference
+
+**Request:** Reskin the entire app to match a reference fintech-style screenshot: Deep Canvas (#131315), Volt Green (#D4FF3A), Pure White, Field Carbon (#18181A); Inter/Geist-inspired type hierarchy; floating pill bottom nav with circular active-tab highlight; softer corners/shadows throughout.
+
+**Prompt delivered:** Full theme-token remap (colors → scaffold/cards/buttons/nav), typography weight adjustments (kept Thmanyah fonts), bottom nav redesigned as floating capsule with Volt Green active circle, increased border radii across cards/buttons/inputs/modals, subtle low-opacity borders and soft shadows replacing harsh borders — explicitly scoped to **theme-only**, no logic/feature/routing changes.
+
+**Follow-up clarification:** Confirmed this applies globally (light→dark flip across home/auth/search/chat/account), flagged the center "+" FAB handling as an open design decision.
+
+---
+
+## 2. Bottom Nav Positioning — Too High
+
+**Issue:** Floating bottom nav sat too high, overlapping content above it.
+
+**Prompt delivered:** Move nav lower using `SafeArea` bottom inset (not large fixed margin); add matching bottom padding/scroll padding to page content so list items aren't hidden behind it. No shape/color/logic changes.
+
+---
+
+## 3. Excess Empty Space Below Content
+
+**Issue:** After the nav-position fix, a visible empty gap appeared between last content row and the nav bar.
+
+**Prompt delivered:** Trim `contentBottomPadding`; ensure padding is scroll-padding only (invisible until scrolled to end); check for placeholder/empty grid cells. No nav changes.
+
+---
+
+## 4. Replace 📦 Emoji Icons with Custom Asset
+
+**Issue:** Category selection screens used the 📦 box emoji as a placeholder icon.
+
+**Prompt delivered:** Find/replace every 📦 instance in the category picker with `Image.asset('assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png')`, matching existing container sizing; register asset in `pubspec.yaml`.
+
+---
+
+## 5. Subscription Badge Redesign (مجاني / برو / مميز)
+
+**Issue:** Wanted a "luxury" metallic-gradient pill badge style (reference: silver glossy "مجاني" pill) applied to all 3 tiers, each with a distinct color.
+
+**Clarified via question:** It's about the 3 existing subscription tiers, not a new badge category.
+
+**Prompt delivered:** `PackageBadge` reusable widget — diagonal (135°) gradient pill per tier: مجاني = silver (#9A9A9E→#4A4A4E), برو = green (#B8C27A→#48521C), مميز = gold (#F5D77A→#C9921E). Applied across listing cards, detail page, and package selection screen. Visual-only, no tier logic change.
+
+---
+
+## 6. Phone Verification (WhatsApp OTP) + Username Lock at Signup
+
+**Issue:** Phone number field was free-text/unvalidated; wanted WhatsApp OTP verification flow. Also wanted username moved to signup and made immutable afterward.
+
+**Prompt delivered:**
+- **Phone OTP:** Edit profile shows verified number or "لم يتم التحقق" + verify button → bottom sheet for number entry → Supabase Edge Function `send-whatsapp-otp` generates/stores/send OTP via WhatsApp API → dedicated OTP screen (6-digit boxes, countdown, resend) → on success updates `profiles.phone` + `phone_verified`. New table `phone_verifications`; new column `phone_verified`.
+- **Username:** Moved to sign-up screen with real-time uniqueness validation (✓/✗ متاح); edit profile shows it read-only with 🔒 lock icon and explanatory text; DB unique constraint on `profiles.username`.
+
+---
+
+## 7. Username/Phone Field Layout Cleanup + OTP Send Button Not Navigating
+
+**Issue:** Messy spacing around username/phone fields; "إرسال رمز واتساب" button did nothing (stayed on same page).
+
+**Prompt delivered:**
+- Tightened label-to-field and field-to-field spacing (6-8px / 16px); restyled username field (inline lock hint) and phone field (placeholder + small link below box, not large separate element); fixed blank email field.
+- Diagnosed likely cause of dead button: missing/incorrect navigation call (e.g. stray `Navigator.pop()` instead of `context.push()`); added validation, loading state, success navigation to OTP screen with phone number passed as param, and error surfacing.
+
+---
+
+## 8. Login Screen Redesign — Volt Green Blob Mismatch
+
+**Issue:** Login screen had a jarring full-width Volt Green wave/blob header that broke the app's dark theme consistency.
+
+**Prompt delivered:** Removed colored blob; replaced with dark header (palm logo + "مرحباً بك" + subtitle on Deep Canvas). Standardized input fields (Field Carbon, Volt Green focus border, 14px radius). Restyled social login icons from white circles to Field Carbon circles with brand-colored icons inside. Kept existing primary button and bottom "سجّل الآن" link as-is.
+
+---
+
+## 9. Admin Page Theme + Listing Approval Persistence Bug
+
+**Issue:** Admin panel needed the same dark/Volt Green theme; approving a listing appeared to work but reverted to "قيد المراجعة" after hot restart (DB write not persisting).
+
+**Clarified via questions:** Same theme as app (not distinct admin look); bug confirmed as "shows success in UI but reverts on restart."
+
+**Prompt delivered:**
+- Theme: Deep Canvas background, Field Carbon cards/tables, Volt Green approve buttons, red-bordered reject buttons, themed status badges/pills, themed tab selector — all via existing `AppColors`/`AppTextStyles` tokens.
+- Bug: Diagnosed as likely RLS policy blocking admin UPDATE, or optimistic local-state update with no real DB write/await, or status-value mismatch (casing/Arabic vs English enum). Prompt instructs checking RLS admin policy, confirming `await`ed `.update()` calls with caught errors, re-fetching from DB after write (not just optimistic local state), and adding visible error surfacing via SnackBar.
+
+---
+
+## 10. Chat Input Crash + Photo Upload Step Redesign
+
+**Issue:** Tapping chat input field crashed with "TextEditingController used after being disposed" + massive RenderFlex overflow; separately, the listing-creation photo upload step (الصور) still had light-mode/inconsistent styling.
+
+**Prompt delivered:**
+- **Crash fix:** Diagnosed controller lifecycle mismatch (disposed by wrong owner, or stale reference held during async Realtime callback) and unbounded layout in the input bar. Instructed to confirm Same-State ownership of controller, use `ref.onDispose()` for Riverpod-managed controllers, constrain input bar layout with `SafeArea`/`Expanded`, add `mounted` guards before controller use.
+- **Photos step restyle:** Deep Canvas background, Field Carbon thumbnails/upload row, Volt Green add-photo button and cover badge, gold-toned Pro upsell lock text, themed bottom toolbar icons — visual-only, no upload/reorder/Pro-gating logic changes.
+
+---
+
+## 11. Replace Generic Letter Icons in Lessons/Subjects Grid
+
+**Issue:** Subject cards (الفيزياء، الرياضيات، الأحياء، الكيمياء، اللغة الإنجليزية، اللغة العربية, etc.) showed a generic "i" letter-circle placeholder icon instead of real subject icons.
+
+**Prompt delivered:** Replace every instance of this placeholder across all subject cards in the grid with `Image.asset('assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png')`, matching existing circular container sizing; confirm `pubspec.yaml` asset registration. No layout/label/navigation changes.
+
+---
+
+## 12. Admin Listings Page — Invisible Badge Text, Duplicate Sidebar Highlight, Logo Swap
+
+**Issue:** White/black status pills had invisible text (color matched background); sidebar showed two sections highlighted as "active" simultaneously; wanted the Sello text logo replaced with an image asset.
+
+**Prompt delivered:**
+- Explicit per-status pill colors with guaranteed text contrast: نشط/مقبول = Volt Green + dark text, مباع = grey + white text, مرفوض = red + white text, قيد المراجعة = Field Carbon + border + white text. Same fix applied to filter tabs.
+- Sidebar active-state bug diagnosed as route-binding issue (multiple flags true at once) — fix to derive highlight strictly from current route match, ensuring exactly one item highighted at a time.
+- Logo swap: replace existing Sello wordmark/icon with `Image.asset('assets/app_logo.png')`, keeping or removing subtitle depending on whether the asset already contains wordmark text.
+
+---
+
+## 13. Featured Listing Card — Title Truncation
+
+**Issue:** Long listing titles (e.g. "sportage model 2025 prestige full...") got cut off almost immediately on featured carousel cards.
+
+**Prompt delivered:** Allow title to wrap to `maxLines: 2` with ellipsis only as a last resort; adjust card height/padding to fit 2 lines without disturbing price/badge layout; slight font-size reduction if needed; RTL-safe wrapping. Scoped to `FeaturedListingCard` title only.
+
+---
+
+## 14. Re-attempt: Admin "التحكم" Panel Fix (First Attempt Failed)
+
+**Issue:** Prior fix for the admin control panel (dropdown, package toggle labels, white box) was not actually applied — dropdown still blank/white, toggle still showed old "إعلان مُروَّج"/"إعلان مميز" labels instead of the new 3-tier system, whole card still rendered solid white.
+
+**Prompt delivered:** Forceful re-do prompt requiring verification of each fix:
+- Dropdown: explicit text color on both the dropdown AND each `DropdownMenuItem` (common dual-binding bug), restyled to Field Carbon + white text for theme consistency.
+- Toggle → radio group: hardcoded "إعلان مُروَّج" string must be found and removed entirely, replaced with single-select radio group (مجاني / برو / مميز) bound live to the listing's actual `listing_package` value, persisting changes to Supabase.
+- Card background: explicit Field Carbon background matching sibling panels (البائع, إجراءات), removing default white Card/Material leftover.
+- Required a verification/testing step before considering it done.
+
+---
+
+## 15. Monetization Model — 2 Free Posts/Month, Then Standard Pricing
+
+**Issue:** Wanted: every user gets 2 truly free مجاني-tier posts per month; the 3rd+ مجاني attempt in that month gets charged at the عادي/standard price instead of being blocked.
+
+**Clarified via questions:** Not an upgrade-forced block — switches to standard pricing. Counter resets monthly (not lifetime).
+
+**Prompt delivered:**
+- DB: `free_posts_this_month` + `free_posts_month_reset_at` on `profiles` (or separate quota table); Postgres function `get_or_reset_monthly_free_count(user_id)` handling monthly rollover.
+- App logic: on مجاني selection, check quota — under 2 → genuinely free, increment counter; at/over 2 → switch to standard paid flow with confirmation dialog and price shown, does NOT touch the free counter. برو/مميز unaffected.
+- UI: live "X من 2 متبقي" status line on the مجاني option, switching to exhausted-quota messaging when 0 remain.
+- Testing checklist included (first 2 free, 3rd charged, monthly reset, Pro/Premium unaffected).
+
+---
+
+## 16. Package Selection Screen — Card Redesign + Final Pricing
+
+**Issue:** Package cards were cramped small pills with no detail; needed full pricing set: مجاني = 10,000 IQD, برو = 16,000 IQD, مميز = 20,000 IQD. Also a 12px RenderFlex overflow on this screen.
+
+**Prompt delivered:**
+- Redesigned as full-width stacked cards: tier badge (reusing `PackageBadge` gradients), large Volt Green price, duration, 2-3 feature bullets, Volt Green selected-border / Field Carbon unselected state.
+- Pricing set exactly as specified, with explicit reconciliation against the monthly free-quota system: مجاني shows "0 د.ع (X من 2 متبقي)" while quota remains, switching to flat 10,000 د.ع display once exhausted; برو/مميز always flat-priced (16,000 / 20,000).
+- Overflow fix: wrap cards in scrollable container, intrinsic/flexible card heights instead of fixed.
+
+---
+
+## Key Recurring Patterns in This Session
+
+- **Theme consistency:** Repeated requests to apply the Deep Canvas / Field Carbon / Volt Green dark theme to screens that had light-mode or inconsistent leftovers (login, admin panel, photos step, lessons grid).
+- **Visual-only scoping discipline:** Nearly every prompt explicitly instructs "no logic/routing/data changes" to prevent feature regressions during restyling passes.
+- **Persistence/state bugs:** Two confirmed cases (listing approval, admin package toggle) where UI appeared to update successfully but didn't persist to Supabase — root-caused to optimistic local state without real DB writes, or RLS/binding issues.
+- **Iterative correction:** At least one re-prompt (#14) was needed because Cursor's first attempt didn't actually apply the requested change — the follow-up prompt added explicit verification steps to close that gap.
+- **Business logic addition:** The free-post quota + tiered pricing system (#15, #16) was the most complex feature added, requiring new DB columns, a Postgres function, and careful interaction with the existing package tier system.
+
+---
+
+*For the full design system reference (colors, typography, components, screens, schema), see the separately exported `DESIGN.md`.*
+
+# Sello App — Conversation Context Export
+*Exported: June 16, 2026*
+
+This document summarizes the full context of this conversation: the app background, every issue raised, and every Cursor prompt produced. Use it as a reference or paste relevant sections into Cursor for continuity.
+
+---
+
+## App Background (from prior session log)
+
+- **Name:** Sello
+- **Type:** Arabic RTL classifieds marketplace
+- **Stack:** Flutter, Supabase, Riverpod, Go Router
+- **Platform:** iOS (iPhone 17 simulator, iOS 26.5), plus a web admin panel
+- Full design system reference already produced separately as `DESIGN.md` (color palette, typography, components, screen inventory, Supabase schema, RTL rules).
+
+---
+
+## 1. Visual Redesign — Match New Color/Typography/Nav Reference
+
+**Request:** Reskin the entire app to match a reference fintech-style screenshot: Deep Canvas (#131315), Volt Green (#D4FF3A), Pure White, Field Carbon (#18181A); Inter/Geist-inspired type hierarchy; floating pill bottom nav with circular active-tab highlight; softer corners/shadows throughout.
+
+**Prompt delivered:** Full theme-token remap (colors → scaffold/cards/buttons/nav), typography weight adjustments (kept Thmanyah fonts), bottom nav redesigned as floating capsule with Volt Green active circle, increased border radii across cards/buttons/inputs/modals, subtle low-opacity borders and soft shadows replacing harsh borders — explicitly scoped to **theme-only**, no logic/feature/routing changes.
+
+**Follow-up clarification:** Confirmed this applies globally (light→dark flip across home/auth/search/chat/account), flagged the center "+" FAB handling as an open design decision.
+
+---
+
+## 2. Bottom Nav Positioning — Too High
+
+**Issue:** Floating bottom nav sat too high, overlapping content above it.
+
+**Prompt delivered:** Move nav lower using `SafeArea` bottom inset (not large fixed margin); add matching bottom padding/scroll padding to page content so list items aren't hidden behind it. No shape/color/logic changes.
+
+---
+
+## 3. Excess Empty Space Below Content
+
+**Issue:** After the nav-position fix, a visible empty gap appeared between last content row and the nav bar.
+
+**Prompt delivered:** Trim `contentBottomPadding`; ensure padding is scroll-padding only (invisible until scrolled to end); check for placeholder/empty grid cells. No nav changes.
+
+---
+
+## 4. Replace 📦 Emoji Icons with Custom Asset
+
+**Issue:** Category selection screens used the 📦 box emoji as a placeholder icon.
+
+**Prompt delivered:** Find/replace every 📦 instance in the category picker with `Image.asset('assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png')`, matching existing container sizing; register asset in `pubspec.yaml`.
+
+---
+
+## 5. Subscription Badge Redesign (مجاني / برو / مميز)
+
+**Issue:** Wanted a "luxury" metallic-gradient pill badge style (reference: silver glossy "مجاني" pill) applied to all 3 tiers, each with a distinct color.
+
+**Clarified via question:** It's about the 3 existing subscription tiers, not a new badge category.
+
+**Prompt delivered:** `PackageBadge` reusable widget — diagonal (135°) gradient pill per tier: مجاني = silver (#9A9A9E→#4A4A4E), برو = green (#B8C27A→#48521C), مميز = gold (#F5D77A→#C9921E). Applied across listing cards, detail page, and package selection screen. Visual-only, no tier logic change.
+
+---
+
+## 6. Phone Verification (WhatsApp OTP) + Username Lock at Signup
+
+**Issue:** Phone number field was free-text/unvalidated; wanted WhatsApp OTP verification flow. Also wanted username moved to signup and made immutable afterward.
+
+**Prompt delivered:**
+- **Phone OTP:** Edit profile shows verified number or "لم يتم التحقق" + verify button → bottom sheet for number entry → Supabase Edge Function `send-whatsapp-otp` generates/stores/send OTP via WhatsApp API → dedicated OTP screen (6-digit boxes, countdown, resend) → on success updates `profiles.phone` + `phone_verified`. New table `phone_verifications`; new column `phone_verified`.
+- **Username:** Moved to sign-up screen with real-time uniqueness validation (✓/✗ متاح); edit profile shows it read-only with 🔒 lock icon and explanatory text; DB unique constraint on `profiles.username`.
+
+---
+
+## 7. Username/Phone Field Layout Cleanup + OTP Send Button Not Navigating
+
+**Issue:** Messy spacing around username/phone fields; "إرسال رمز واتساب" button did nothing (stayed on same page).
+
+**Prompt delivered:**
+- Tightened label-to-field and field-to-field spacing (6-8px / 16px); restyled username field (inline lock hint) and phone field (placeholder + small link below box, not large separate element); fixed blank email field.
+- Diagnosed likely cause of dead button: missing/incorrect navigation call (e.g. stray `Navigator.pop()` instead of `context.push()`); added validation, loading state, success navigation to OTP screen with phone number passed as param, and error surfacing.
+
+---
+
+## 8. Login Screen Redesign — Volt Green Blob Mismatch
+
+**Issue:** Login screen had a jarring full-width Volt Green wave/blob header that broke the app's dark theme consistency.
+
+**Prompt delivered:** Removed colored blob; replaced with dark header (palm logo + "مرحباً بك" + subtitle on Deep Canvas). Standardized input fields (Field Carbon, Volt Green focus border, 14px radius). Restyled social login icons from white circles to Field Carbon circles with brand-colored icons inside. Kept existing primary button and bottom "سجّل الآن" link as-is.
+
+---
+
+## 9. Admin Page Theme + Listing Approval Persistence Bug
+
+**Issue:** Admin panel needed the same dark/Volt Green theme; approving a listing appeared to work but reverted to "قيد المراجعة" after hot restart (DB write not persisting).
+
+**Clarified via questions:** Same theme as app (not distinct admin look); bug confirmed as "shows success in UI but reverts on restart."
+
+**Prompt delivered:**
+- Theme: Deep Canvas background, Field Carbon cards/tables, Volt Green approve buttons, red-bordered reject buttons, themed status badges/pills, themed tab selector — all via existing `AppColors`/`AppTextStyles` tokens.
+- Bug: Diagnosed as likely RLS policy blocking admin UPDATE, or optimistic local-state update with no real DB write/await, or status-value mismatch (casing/Arabic vs English enum). Prompt instructs checking RLS admin policy, confirming `await`ed `.update()` calls with caught errors, re-fetching from DB after write (not just optimistic local state), and adding visible error surfacing via SnackBar.
+
+---
+
+## 10. Chat Input Crash + Photo Upload Step Redesign
+
+**Issue:** Tapping chat input field crashed with "TextEditingController used after being disposed" + massive RenderFlex overflow; separately, the listing-creation photo upload step (الصور) still had light-mode/inconsistent styling.
+
+**Prompt delivered:**
+- **Crash fix:** Diagnosed controller lifecycle mismatch (disposed by wrong owner, or stale reference held during async Realtime callback) and unbounded layout in the input bar. Instructed to confirm Same-State ownership of controller, use `ref.onDispose()` for Riverpod-managed controllers, constrain input bar layout with `SafeArea`/`Expanded`, add `mounted` guards before controller use.
+- **Photos step restyle:** Deep Canvas background, Field Carbon thumbnails/upload row, Volt Green add-photo button and cover badge, gold-toned Pro upsell lock text, themed bottom toolbar icons — visual-only, no upload/reorder/Pro-gating logic changes.
+
+---
+
+## 11. Replace Generic Letter Icons in Lessons/Subjects Grid
+
+**Issue:** Subject cards (الفيزياء، الرياضيات، الأحياء، الكيمياء، اللغة الإنجليزية، اللغة العربية, etc.) showed a generic "i" letter-circle placeholder icon instead of real subject icons.
+
+**Prompt delivered:** Replace every instance of this placeholder across all subject cards in the grid with `Image.asset('assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png')`, matching existing circular container sizing; confirm `pubspec.yaml` asset registration. No layout/label/navigation changes.
+
+---
+
+## 12. Admin Listings Page — Invisible Badge Text, Duplicate Sidebar Highlight, Logo Swap
+
+**Issue:** White/black status pills had invisible text (color matched background); sidebar showed two sections highlighted as "active" simultaneously; wanted the Sello text logo replaced with an image asset.
+
+**Prompt delivered:**
+- Explicit per-status pill colors with guaranteed text contrast: نشط/مقبول = Volt Green + dark text, مباع = grey + white text, مرفوض = red + white text, قيد المراجعة = Field Carbon + border + white text. Same fix applied to filter tabs.
+- Sidebar active-state bug diagnosed as route-binding issue (multiple flags true at once) — fix to derive highlight strictly from current route match, ensuring exactly one item highighted at a time.
+- Logo swap: replace existing Sello wordmark/icon with `Image.asset('assets/app_logo.png')`, keeping or removing subtitle depending on whether the asset already contains wordmark text.
+
+---
+
+## 13. Featured Listing Card — Title Truncation
+
+**Issue:** Long listing titles (e.g. "sportage model 2025 prestige full...") got cut off almost immediately on featured carousel cards.
+
+**Prompt delivered:** Allow title to wrap to `maxLines: 2` with ellipsis only as a last resort; adjust card height/padding to fit 2 lines without disturbing price/badge layout; slight font-size reduction if needed; RTL-safe wrapping. Scoped to `FeaturedListingCard` title only.
+
+---
+
+## 14. Re-attempt: Admin "التحكم" Panel Fix (First Attempt Failed)
+
+**Issue:** Prior fix for the admin control panel (dropdown, package toggle labels, white box) was not actually applied — dropdown still blank/white, toggle still showed old "إعلان مُروَّج"/"إعلان مميز" labels instead of the new 3-tier system, whole card still rendered solid white.
+
+**Prompt delivered:** Forceful re-do prompt requiring verification of each fix:
+- Dropdown: explicit text color on both the dropdown AND each `DropdownMenuItem` (common dual-binding bug), restyled to Field Carbon + white text for theme consistency.
+- Toggle → radio group: hardcoded "إعلان مُروَّج" string must be found and removed entirely, replaced with single-select radio group (مجاني / برو / مميز) bound live to the listing's actual `listing_package` value, persisting changes to Supabase.
+- Card background: explicit Field Carbon background matching sibling panels (البائع, إجراءات), removing default white Card/Material leftover.
+- Required a verification/testing step before considering it done.
+
+---
+
+## 15. Monetization Model — 2 Free Posts/Month, Then Standard Pricing
+
+**Issue:** Wanted: every user gets 2 truly free مجاني-tier posts per month; the 3rd+ مجاني attempt in that month gets charged at the عادي/standard price instead of being blocked.
+
+**Clarified via questions:** Not an upgrade-forced block — switches to standard pricing. Counter resets monthly (not lifetime).
+
+**Prompt delivered:**
+- DB: `free_posts_this_month` + `free_posts_month_reset_at` on `profiles` (or separate quota table); Postgres function `get_or_reset_monthly_free_count(user_id)` handling monthly rollover.
+- App logic: on مجاني selection, check quota — under 2 → genuinely free, increment counter; at/over 2 → switch to standard paid flow with confirmation dialog and price shown, does NOT touch the free counter. برو/مميز unaffected.
+- UI: live "X من 2 متبقي" status line on the مجاني option, switching to exhausted-quota messaging when 0 remain.
+- Testing checklist included (first 2 free, 3rd charged, monthly reset, Pro/Premium unaffected).
+
+---
+
+## 16. Package Selection Screen — Card Redesign + Final Pricing
+
+**Issue:** Package cards were cramped small pills with no detail; needed full pricing set: مجاني = 10,000 IQD, برو = 16,000 IQD, مميز = 20,000 IQD. Also a 12px RenderFlex overflow on this screen.
+
+**Prompt delivered:**
+- Redesigned as full-width stacked cards: tier badge (reusing `PackageBadge` gradients), large Volt Green price, duration, 2-3 feature bullets, Volt Green selected-border / Field Carbon unselected state.
+- Pricing set exactly as specified, with explicit reconciliation against the monthly free-quota system: مجاني shows "0 د.ع (X من 2 متبقي)" while quota remains, switching to flat 10,000 د.ع display once exhausted; برو/مميز always flat-priced (16,000 / 20,000).
+- Overflow fix: wrap cards in scrollable container, intrinsic/flexible card heights instead of fixed.
+
+---
+
+## Key Recurring Patterns in This Session
+
+- **Theme consistency:** Repeated requests to apply the Deep Canvas / Field Carbon / Volt Green dark theme to screens that had light-mode or inconsistent leftovers (login, admin panel, photos step, lessons grid).
+- **Visual-only scoping discipline:** Nearly every prompt explicitly instructs "no logic/routing/data changes" to prevent feature regressions during restyling passes.
+- **Persistence/state bugs:** Two confirmed cases (listing approval, admin package toggle) where UI appeared to update successfully but didn't persist to Supabase — root-caused to optimistic local state without real DB writes, or RLS/binding issues.
+- **Iterative correction:** At least one re-prompt (#14) was needed because Cursor's first attempt didn't actually apply the requested change — the follow-up prompt added explicit verification steps to close that gap.
+- **Business logic addition:** The free-post quota + tiered pricing system (#15, #16) was the most complex feature added, requiring new DB columns, a Postgres function, and careful interaction with the existing package tier system.
+
+---
+
+*For the full design system reference (colors, typography, components, screens, schema), see the separately exported `DESIGN.md`.*
+

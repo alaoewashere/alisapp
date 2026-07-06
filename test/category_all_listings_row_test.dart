@@ -10,7 +10,7 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: CategoryAllListingsRow(
-            categoryNameAr: 'العقارات',
+            categoryName: 'العقارات',
             listingCount: 42,
             onTap: () {},
           ),

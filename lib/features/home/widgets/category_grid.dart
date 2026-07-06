@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/category_asset_icons.dart';
 import '../../../core/constants/category_fallback_icon.dart';
+import '../../../core/l10n/category_locale.dart';
 import '../../../core/theme/app_decorations.dart';
 import '../../../shared/widgets/category_asset_image.dart';
 import '../../../shared/models/category_model.dart';
 
-class CategoryGrid extends StatelessWidget {
+class CategoryGrid extends ConsumerWidget {
   const CategoryGrid({
     super.key,
     required this.categories,
@@ -51,7 +53,8 @@ class CategoryGrid extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final displayCategories = categories.take(6).toList();
 
     return SingleChildScrollView(
@@ -62,7 +65,7 @@ class CategoryGrid extends StatelessWidget {
           for (var i = 0; i < displayCategories.length; i++) ...[
             if (i > 0) const SizedBox(width: 8),
             _CategoryPill(
-              label: displayCategories[i].nameAr,
+              label: displayCategories[i].localizedName(localeCode),
               slug: displayCategories[i].slug,
               iconName: displayCategories[i].icon,
               selected: selectedId == displayCategories[i].id,

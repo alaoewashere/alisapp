@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:Sello/core/theme/app_fonts.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/models/listing_model.dart';
@@ -19,6 +20,7 @@ class FeaturedListingsCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (listings.isEmpty) return const SizedBox.shrink();
+    final strings = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -30,7 +32,7 @@ class FeaturedListingsCarousel extends StatelessWidget {
               const Icon(Icons.star_rounded, color: AppColors.gold, size: 20),
               const SizedBox(width: 6),
               Text(
-                'إعلانات مميزة',
+                strings.featuredListingsTitle,
                 style: AppFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

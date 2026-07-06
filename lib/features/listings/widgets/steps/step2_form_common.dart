@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_governorates.dart';
 import '../../../../core/constants/iraq_neighborhoods.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/digit_input_formatter.dart';
+import '../../../../core/l10n/category_locale.dart';
+import '../../../../core/l10n/l10n_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_form_fields.dart';
 import '../../../../theme/app_text_styles.dart';
+import '../../../../core/l10n/listing_attribute_locale.dart';
 import '../../constants/listing_form_options.dart';
 import '../../providers/edit_listing_form_mode.dart';
 import '../../providers/post_listing_provider.dart';
@@ -22,9 +26,27 @@ class Step2PickerOption {
   final String label;
 }
 
-String step2PickerSheetTitle(String label) {
+String step2PickerSheetTitle(AppLocalizations l10n, String label) {
   final cleaned = label.replaceAll('*', '').trim();
-  return 'اختر $cleaned';
+  return l10n.choosePickerTitle(cleaned);
+}
+
+List<Step2PickerOption> step2AttributePickerOptions(
+  List<String> values,
+  AppLocalizations l10n,
+) {
+  return values
+      .map(
+        (value) => Step2PickerOption(
+          value: value,
+          label: localizeListingAttribute(value, l10n),
+        ),
+      )
+      .toList();
+}
+
+String step2AttributeLabel(String value, AppLocalizations l10n) {
+  return localizeListingAttribute(value, l10n);
 }
 
 /// iOS-style bottom sheet picker used across the post-listing flow.
@@ -185,7 +207,7 @@ class _Step2PickerSheetState extends State<_Step2PickerSheet> {
                       textDirection: TextDirection.rtl,
                       style: AppTextStyles.input,
                       decoration: InputDecoration(
-                        hintText: 'بحث...',
+                        hintText: context.l10n.searchEllipsis,
                         hintStyle: AppTextStyles.hint,
                         prefixIcon: const Icon(Icons.search, size: 20),
                         filled: true,
@@ -209,7 +231,7 @@ class _Step2PickerSheetState extends State<_Step2PickerSheet> {
                     shrinkWrap: true,
                     padding: EdgeInsets.only(bottom: bottomInset + 8),
                     itemCount: indexes.length,
-                    separatorBuilder: (_, __) => const Divider(
+                    separatorBuilder: (_, _) => const Divider(
                       height: 1,
                       thickness: 1,
                       indent: 16,
@@ -398,12 +420,12 @@ class Step2OtherTextField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.onChanged,
-    this.label = 'حدد القيمة',
+    this.label,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
-  final String label;
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
@@ -413,7 +435,9 @@ class Step2OtherTextField extends StatelessWidget {
         controller: controller,
         textDirection: TextDirection.rtl,
         style: AppTextStyles.input,
-        decoration: AppFormDecorations.underline(hintText: label),
+        decoration: AppFormDecorations.underline(
+          hintText: label ?? context.l10n.specifyValue,
+        ),
         onChanged: onChanged,
       ),
     );
@@ -485,14 +509,14 @@ class Step2ChipSelector extends StatefulWidget {
     required this.selected,
     required this.onSelected,
     this.includeOther = true,
-    this.otherFieldLabel = 'حدد القيمة',
+    this.otherFieldLabel,
   });
 
   final List<String> options;
   final String? selected;
   final ValueChanged<String?> onSelected;
   final bool includeOther;
-  final String otherFieldLabel;
+  final String? otherFieldLabel;
 
   @override
   State<Step2ChipSelector> createState() => _Step2ChipSelectorState();
@@ -557,6 +581,7 @@ class _Step2ChipSelectorState extends State<Step2ChipSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -565,7 +590,7 @@ class _Step2ChipSelectorState extends State<Step2ChipSelector> {
           runSpacing: 8,
           children: _allOptions.map((option) {
             return Step2PillChip(
-              label: option,
+              label: step2AttributeLabel(option, l10n),
               selected: _chipSelection == option,
               onTap: () {
                 if (option == ListingFormOptions.other) {
@@ -602,7 +627,7 @@ class Step2MultiChipSelector extends StatefulWidget {
     required this.onToggle,
     this.onOtherChanged,
     this.includeOther = true,
-    this.otherFieldLabel = 'حدد القيمة',
+    this.otherFieldLabel,
   });
 
   final List<String> options;
@@ -610,7 +635,7 @@ class Step2MultiChipSelector extends StatefulWidget {
   final ValueChanged<String> onToggle;
   final ValueChanged<String?>? onOtherChanged;
   final bool includeOther;
-  final String otherFieldLabel;
+  final String? otherFieldLabel;
 
   @override
   State<Step2MultiChipSelector> createState() => _Step2MultiChipSelectorState();
@@ -671,6 +696,7 @@ class _Step2MultiChipSelectorState extends State<Step2MultiChipSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -680,14 +706,14 @@ class _Step2MultiChipSelectorState extends State<Step2MultiChipSelector> {
           children: _allOptions.map((option) {
             if (option == ListingFormOptions.other) {
               return Step2PillChip(
-                label: option,
+                label: step2AttributeLabel(option, l10n),
                 selected: _otherSelected,
                 onTap: () => _toggleOther(!_otherSelected),
               );
             }
             final isSelected = widget.selected.contains(option);
             return Step2PillChip(
-              label: option,
+              label: step2AttributeLabel(option, l10n),
               selected: isSelected,
               onTap: () => widget.onToggle(option),
             );
@@ -715,7 +741,7 @@ class Step2LabeledDropdown extends StatefulWidget {
     required this.items,
     required this.onChanged,
     this.includeOther = true,
-    this.otherFieldLabel = 'حدد القيمة',
+    this.otherFieldLabel,
   });
 
   final String label;
@@ -723,7 +749,7 @@ class Step2LabeledDropdown extends StatefulWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final bool includeOther;
-  final String otherFieldLabel;
+  final String? otherFieldLabel;
 
   @override
   State<Step2LabeledDropdown> createState() => _Step2LabeledDropdownState();
@@ -743,14 +769,16 @@ class _Step2LabeledDropdownState extends State<Step2LabeledDropdown> {
           ListingFormOptions.isCustomValue(widget.value, widget.items));
 
   String get _displayValue {
-    if (_showOtherField)
+    final choose = context.l10n.chooseOption;
+    if (_showOtherField) {
       return widget.value?.trim().isNotEmpty == true
           ? widget.value!.trim()
-          : 'اختر';
-    if (widget.value != null && widget.value!.isNotEmpty) {
-      return widget.value!;
+          : choose;
     }
-    return 'اختر';
+    if (widget.value != null && widget.value!.isNotEmpty) {
+      return step2AttributeLabel(widget.value!, context.l10n);
+    }
+    return choose;
   }
 
   @override
@@ -790,11 +818,12 @@ class _Step2LabeledDropdownState extends State<Step2LabeledDropdown> {
   }
 
   Future<void> _openPicker() async {
-    final picked = await showStep2PickerSheet(
+    final l10n = context.l10n;
+    final picked = await showStep2PickerSheetForOptions(
       context: context,
-      title: step2PickerSheetTitle(widget.label),
-      options: _allItems,
-      selected: _showOtherField ? ListingFormOptions.other : widget.value,
+      title: step2PickerSheetTitle(l10n, widget.label),
+      options: step2AttributePickerOptions(_allItems, l10n),
+      selectedValue: _showOtherField ? ListingFormOptions.other : widget.value,
     );
     if (!mounted || picked == null) return;
 
@@ -844,7 +873,7 @@ class Step2SearchableDropdown extends StatefulWidget {
     required this.items,
     required this.onChanged,
     this.includeOther = true,
-    this.otherFieldLabel = 'حدد القيمة',
+    this.otherFieldLabel,
   });
 
   final String label;
@@ -852,7 +881,7 @@ class Step2SearchableDropdown extends StatefulWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final bool includeOther;
-  final String otherFieldLabel;
+  final String? otherFieldLabel;
 
   @override
   State<Step2SearchableDropdown> createState() =>
@@ -873,8 +902,13 @@ class _Step2SearchableDropdownState extends State<Step2SearchableDropdown> {
           ListingFormOptions.isCustomValue(widget.value, widget.items));
 
   String get _displayValue {
-    if (widget.value == null || widget.value!.isEmpty) return 'اختر';
-    return widget.value!;
+    if (widget.value == null || widget.value!.isEmpty) {
+      return context.l10n.chooseOption;
+    }
+    if (_showOtherField) {
+      return widget.value!.trim();
+    }
+    return step2AttributeLabel(widget.value!, context.l10n);
   }
 
   @override
@@ -914,11 +948,12 @@ class _Step2SearchableDropdownState extends State<Step2SearchableDropdown> {
   }
 
   Future<void> _openPicker() async {
-    final picked = await showStep2PickerSheet(
+    final l10n = context.l10n;
+    final picked = await showStep2PickerSheetForOptions(
       context: context,
-      title: step2PickerSheetTitle(widget.label),
-      options: _allItems,
-      selected: _showOtherField ? ListingFormOptions.other : widget.value,
+      title: step2PickerSheetTitle(l10n, widget.label),
+      options: step2AttributePickerOptions(_allItems, l10n),
+      selectedValue: _showOtherField ? ListingFormOptions.other : widget.value,
       searchable: true,
     );
     if (!mounted || picked == null) return;
@@ -961,7 +996,7 @@ class _Step2SearchableDropdownState extends State<Step2SearchableDropdown> {
   }
 }
 
-class Step2GovernoratePicker extends StatelessWidget {
+class Step2GovernoratePicker extends ConsumerWidget {
   const Step2GovernoratePicker({
     super.key,
     required this.value,
@@ -971,23 +1006,30 @@ class Step2GovernoratePicker extends StatelessWidget {
   final String? value;
   final ValueChanged<String?> onChanged;
 
-  static final _options = iraqiGovernorates
-      .map((g) => Step2PickerOption(value: g.slug, label: g.nameAr))
+  static List<Step2PickerOption> _options(String localeCode) => iraqiGovernorates
+      .map(
+        (g) => Step2PickerOption(
+          value: g.slug,
+          label: g.displayName(localeCode),
+        ),
+      )
       .toList();
 
-  String? get _displayLabel {
+  String? _displayLabel(String? value, String localeCode) {
     if (value == null) return null;
-    for (final option in _options) {
+    for (final option in _options(localeCode)) {
       if (option.value == value) return option.label;
     }
     return null;
   }
 
-  Future<void> _openPicker(BuildContext context) async {
+  Future<void> _openPicker(BuildContext context, WidgetRef ref) async {
+    final strings = ref.read(appLocalizationsProvider);
+    final localeCode = ref.read(categoryLocaleCodeProvider);
     final picked = await showStep2PickerSheetForOptions(
       context: context,
-      title: step2PickerSheetTitle('المحافظة'),
-      options: _options,
+      title: step2PickerSheetTitle(strings, strings.governorate),
+      options: _options(localeCode),
       selectedValue: value,
       searchable: true,
     );
@@ -995,19 +1037,21 @@ class Step2GovernoratePicker extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Step2PickerTriggerRow(
-        label: 'المحافظة *',
-        displayValue: _displayLabel ?? 'اختر',
-        onTap: () => _openPicker(context),
+        label: strings.governorateRequired,
+        displayValue: _displayLabel(value, localeCode) ?? strings.chooseOption,
+        onTap: () => _openPicker(context, ref),
       ),
     );
   }
 }
 
-class Step2NeighborhoodPicker extends StatelessWidget {
+class Step2NeighborhoodPicker extends ConsumerWidget {
   const Step2NeighborhoodPicker({
     super.key,
     required this.governorateSlug,
@@ -1019,36 +1063,37 @@ class Step2NeighborhoodPicker extends StatelessWidget {
   final String? selectedSlug;
   final ValueChanged<String?> onChanged;
 
-  List<Step2PickerOption> get _options => neighborhoodsForGovernorate(
+  List<Step2PickerOption> _options(String? governorateSlug, String localeCode) =>
+      neighborhoodsForGovernorate(
         governorateSlug,
       )
           .map(
             (area) => Step2PickerOption(
               value: area.slug,
-              label: area.nameAr,
+              label: area.displayName(localeCode),
             ),
           )
           .toList();
 
-  String? get _displayLabel {
+  String? _displayLabel(String? selectedSlug, String localeCode) {
     if (selectedSlug == null) return null;
-    return neighborhoodBySlug(selectedSlug!)?.nameAr;
+    return neighborhoodBySlug(selectedSlug)?.displayName(localeCode);
   }
 
-  Future<void> _openPicker(BuildContext context) async {
-    final options = _options;
+  Future<void> _openPicker(BuildContext context, WidgetRef ref) async {
+    final strings = ref.read(appLocalizationsProvider);
+    final localeCode = ref.read(categoryLocaleCodeProvider);
+    final options = _options(governorateSlug, localeCode);
     if (options.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('اختر المحافظة أولاً لعرض المناطق المتاحة'),
-        ),
+        SnackBar(content: Text(strings.chooseGovernorateFirst)),
       );
       return;
     }
 
     final picked = await showStep2PickerSheetForOptions(
       context: context,
-      title: step2PickerSheetTitle('المنطقة / الحي'),
+      title: step2PickerSheetTitle(strings, strings.neighborhoodLabel),
       options: options,
       selectedValue: selectedSlug,
       searchable: true,
@@ -1057,13 +1102,15 @@ class Step2NeighborhoodPicker extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Step2PickerTriggerRow(
-        label: 'المنطقة / الحي (اختياري)',
-        displayValue: _displayLabel ?? 'اختر',
-        onTap: () => _openPicker(context),
+        label: strings.neighborhoodOptional,
+        displayValue: _displayLabel(selectedSlug, localeCode) ?? strings.chooseOption,
+        onTap: () => _openPicker(context, ref),
       ),
     );
   }
@@ -1083,20 +1130,46 @@ class Step2IqdField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      inputFormatters: [appDigitsOnly()],
-      textDirection: TextDirection.ltr,
-      style: AppTextStyles.price.copyWith(fontSize: 15),
-      decoration: AppFormDecorations.underline(
-        hintText: label,
-        suffixText: 'د.ع',
-      ),
-      onChanged: (v) {
-        if (onChanged == null) return;
-        onChanged!(double.tryParse(v.replaceAll(',', '')));
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [appThousands()],
+          textDirection: TextDirection.ltr,
+          style: AppTextStyles.price.copyWith(fontSize: 15),
+          decoration: AppFormDecorations.underline(
+            hintText: label,
+            suffixText: context.l10n.currencyIqd,
+          ),
+          onChanged: (v) {
+            if (onChanged == null) return;
+            onChanged!(double.tryParse(v.replaceAll(',', '')));
+          },
+        ),
+        // Live USD estimate so big IQD figures are easy to sanity-check.
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (context, value, _) {
+            final iqd = double.tryParse(value.text.replaceAll(',', '')) ?? 0;
+            final usd = formatUsdApprox(iqd);
+            if (usd.isEmpty) return const SizedBox(height: 4);
+            return Padding(
+              padding: const EdgeInsetsDirectional.only(top: 4, start: 2),
+              child: Text(
+                usd,
+                textDirection: TextDirection.ltr,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
@@ -1139,9 +1212,10 @@ class Step2NegotiableSwitch extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
+    final strings = ref.watch(appLocalizationsProvider);
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      title: const Text('قابل للتفاوض'),
+      title: Text(strings.negotiable),
       value: state.isNegotiable,
       onChanged: (v) => notifier.updateField('isNegotiable', v),
     );
@@ -1157,7 +1231,7 @@ class Step2GridWithOther extends StatefulWidget {
     required this.icons,
     required this.value,
     required this.onChanged,
-    this.otherFieldLabel = 'حدد النوع',
+    this.otherFieldLabel,
     this.crossAxisCount = 3,
   });
 
@@ -1166,7 +1240,7 @@ class Step2GridWithOther extends StatefulWidget {
   final Map<String, IconData> icons;
   final String? value;
   final ValueChanged<String?> onChanged;
-  final String otherFieldLabel;
+  final String? otherFieldLabel;
   final int crossAxisCount;
 
   @override

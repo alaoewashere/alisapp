@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../core/utils/electronics_listing_utils.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/electronics_listing_metadata.dart';
 import '../../constants/electronics_listing_options.dart';
 import '../../providers/post_listing_provider.dart';
@@ -62,6 +63,13 @@ class _Step2ElectronicsDetailsState
     final kind = electronicsFormKind(state.categoryPath);
     final details = state.electronicsDetails;
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
+    final title = switch (kind) {
+      ElectronicsFormKind.phone => strings.electronicsPhoneDetailsTitle,
+      ElectronicsFormKind.laptop => strings.electronicsLaptopDetailsTitle,
+      ElectronicsFormKind.tv => strings.electronicsTvDetailsTitle,
+      ElectronicsFormKind.none => strings.electronicsDetailsTitle,
+    };
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -71,7 +79,7 @@ class _Step2ElectronicsDetailsState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              electronicsFormTitle(kind),
+              title,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -89,20 +97,22 @@ class _Step2ElectronicsDetailsState
             const SizedBox(height: 16),
             const Step2TitleDescriptionFields(),
             ...switch (kind) {
-              ElectronicsFormKind.phone => _phoneFields(details, theme),
-              ElectronicsFormKind.laptop => _laptopFields(details, theme),
-              ElectronicsFormKind.tv => _tvFields(details, theme),
+              ElectronicsFormKind.phone =>
+                _phoneFields(details, theme, strings),
+              ElectronicsFormKind.laptop =>
+                _laptopFields(details, theme, strings),
+              ElectronicsFormKind.tv => _tvFields(details, theme, strings),
               ElectronicsFormKind.none => const <Widget>[],
             },
             const SizedBox(height: 24),
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [appDigitsOnly()],
+              inputFormatters: [appThousands()],
               textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(
-                labelText: 'السعر *',
-                suffixText: 'د.ع',
+              decoration: InputDecoration(
+                labelText: strings.priceRequiredLabel,
+                suffixText: strings.currencyIqd,
               ),
               onChanged: (v) {
                 final parsed = double.tryParse(v.replaceAll(',', ''));
@@ -112,7 +122,7 @@ class _Step2ElectronicsDetailsState
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('قابل للتفاوض'),
+              title: Text(strings.negotiable),
               value: state.isNegotiable,
               onChanged: (v) => notifier.updateField('isNegotiable', v),
             ),
@@ -132,6 +142,7 @@ class _Step2ElectronicsDetailsState
   List<Widget> _brandModelFields(
     ElectronicsListingMetadata details,
     List<String> brandOptions,
+    AppLocalizations strings,
   ) {
     final brands = {
       ...brandOptions,
@@ -140,14 +151,14 @@ class _Step2ElectronicsDetailsState
 
     return [
       Step2LabeledDropdown(
-        label: 'الماركة',
+        label: strings.brandLabel,
         value: details.brand,
         items: brands,
         onChanged: (v) => _update((d) => d.copyWith(brand: v)),
       ),
       TextField(
         controller: _modelController,
-        decoration: const InputDecoration(labelText: 'الموديل'),
+        decoration: InputDecoration(labelText: strings.modelLabel),
         onChanged: (v) => _update((d) => d.copyWith(model: v)),
       ),
       const SizedBox(height: 12),
@@ -157,28 +168,29 @@ class _Step2ElectronicsDetailsState
   List<Widget> _phoneFields(
     ElectronicsListingMetadata details,
     ThemeData theme,
+    AppLocalizations strings,
   ) {
     return [
-      ..._brandModelFields(details, ElectronicsListingOptions.phoneBrands),
+      ..._brandModelFields(details, ElectronicsListingOptions.phoneBrands, strings),
       Step2LabeledDropdown(
-        label: 'التخزين',
+        label: strings.storageLabel,
         value: details.storage,
         items: ElectronicsListingOptions.storageOptions,
         onChanged: (v) => _update((d) => d.copyWith(storage: v)),
       ),
       Step2LabeledDropdown(
-        label: 'الرام',
+        label: strings.ramLabel,
         value: details.ram,
         items: ElectronicsListingOptions.phoneRamOptions,
         onChanged: (v) => _update((d) => d.copyWith(ram: v)),
       ),
       Step2LabeledDropdown(
-        label: 'اللون',
+        label: strings.colorLabel,
         value: details.color,
         items: ElectronicsListingOptions.phoneColors,
         onChanged: (v) => _update((d) => d.copyWith(color: v)),
       ),
-      Text('الحالة *', style: theme.textTheme.titleSmall),
+      Text(strings.conditionRequiredLabel, style: theme.textTheme.titleSmall),
       const SizedBox(height: 8),
       Step2ChipSelector(
         options: ElectronicsListingOptions.phoneConditions,
@@ -191,8 +203,8 @@ class _Step2ElectronicsDetailsState
         keyboardType: TextInputType.number,
         inputFormatters: [appDigitsOnly()],
         textDirection: TextDirection.ltr,
-        decoration: const InputDecoration(
-          labelText: 'صحة البطارية',
+        decoration: InputDecoration(
+          labelText: strings.batteryHealthLabel,
           suffixText: '%',
         ),
         onChanged: (v) {
@@ -205,18 +217,18 @@ class _Step2ElectronicsDetailsState
       ),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: const Text('مع العلبة'),
+        title: Text(strings.withBoxLabel),
         value: details.hasBox ?? false,
         onChanged: (v) => _update((d) => d.copyWith(hasBox: v)),
       ),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: const Text('مع الشاحن'),
+        title: Text(strings.withChargerLabel),
         value: details.hasCharger ?? false,
         onChanged: (v) => _update((d) => d.copyWith(hasCharger: v)),
       ),
       Step2LabeledDropdown(
-        label: 'الضمان',
+        label: strings.warrantyLabel,
         value: details.warranty,
         items: ElectronicsListingOptions.warrantyOptions,
         onChanged: (v) => _update((d) => d.copyWith(warranty: v)),
@@ -227,34 +239,35 @@ class _Step2ElectronicsDetailsState
   List<Widget> _laptopFields(
     ElectronicsListingMetadata details,
     ThemeData theme,
+    AppLocalizations strings,
   ) {
     return [
-      ..._brandModelFields(details, ElectronicsListingOptions.laptopBrands),
+      ..._brandModelFields(details, ElectronicsListingOptions.laptopBrands, strings),
       Step2LabeledDropdown(
-        label: 'المعالج',
+        label: strings.processorLabel,
         value: details.processor,
         items: ElectronicsListingOptions.processorOptions,
         onChanged: (v) => _update((d) => d.copyWith(processor: v)),
       ),
       Step2LabeledDropdown(
-        label: 'الرام',
+        label: strings.ramLabel,
         value: details.ram,
         items: ElectronicsListingOptions.laptopRamOptions,
         onChanged: (v) => _update((d) => d.copyWith(ram: v)),
       ),
       Step2LabeledDropdown(
-        label: 'التخزين',
+        label: strings.storageLabel,
         value: details.storage,
         items: ElectronicsListingOptions.laptopStorageOptions,
         onChanged: (v) => _update((d) => d.copyWith(storage: v)),
       ),
       Step2LabeledDropdown(
-        label: 'حجم الشاشة (بوصة)',
+        label: strings.screenSizeInchesLabel,
         value: details.screenSize,
         items: ElectronicsListingOptions.laptopScreenSizes,
         onChanged: (v) => _update((d) => d.copyWith(screenSize: v)),
       ),
-      Text('الحالة *', style: theme.textTheme.titleSmall),
+      Text(strings.conditionRequiredLabel, style: theme.textTheme.titleSmall),
       const SizedBox(height: 8),
       Step2ChipSelector(
         options: ElectronicsListingOptions.laptopConditions,
@@ -264,7 +277,7 @@ class _Step2ElectronicsDetailsState
       const SizedBox(height: 12),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: const Text('مع العلبة'),
+        title: Text(strings.withBoxLabel),
         value: details.hasBox ?? false,
         onChanged: (v) => _update((d) => d.copyWith(hasBox: v)),
       ),
@@ -274,28 +287,29 @@ class _Step2ElectronicsDetailsState
   List<Widget> _tvFields(
     ElectronicsListingMetadata details,
     ThemeData theme,
+    AppLocalizations strings,
   ) {
     return [
-      ..._brandModelFields(details, ElectronicsListingOptions.tvBrands),
+      ..._brandModelFields(details, ElectronicsListingOptions.tvBrands, strings),
       Step2LabeledDropdown(
-        label: 'حجم الشاشة (بوصة)',
+        label: strings.screenSizeInchesLabel,
         value: details.screenSize,
         items: ElectronicsListingOptions.tvScreenSizes,
         onChanged: (v) => _update((d) => d.copyWith(screenSize: v)),
       ),
       Step2LabeledDropdown(
-        label: 'الدقة',
+        label: strings.resolutionLabel,
         value: details.resolution,
         items: ElectronicsListingOptions.resolutionOptions,
         onChanged: (v) => _update((d) => d.copyWith(resolution: v)),
       ),
       SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: const Text('سمارت TV'),
+        title: Text(strings.smartTvBadge),
         value: details.smart ?? false,
         onChanged: (v) => _update((d) => d.copyWith(smart: v)),
       ),
-      Text('الحالة *', style: theme.textTheme.titleSmall),
+      Text(strings.conditionRequiredLabel, style: theme.textTheme.titleSmall),
       const SizedBox(height: 8),
       Step2ChipSelector(
         options: ElectronicsListingOptions.tvConditions,

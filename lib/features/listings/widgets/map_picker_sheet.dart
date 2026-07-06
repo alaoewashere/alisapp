@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/config/maps_config.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/utils/map_geocoding_service.dart';
 import '../../../core/utils/map_location_service.dart';
 
-class MapPickerSheet extends StatefulWidget {
+class MapPickerSheet extends ConsumerStatefulWidget {
   const MapPickerSheet({
     super.key,
     this.initialLat,
@@ -17,10 +20,10 @@ class MapPickerSheet extends StatefulWidget {
   final double? initialLng;
 
   @override
-  State<MapPickerSheet> createState() => _MapPickerSheetState();
+  ConsumerState<MapPickerSheet> createState() => _MapPickerSheetState();
 }
 
-class _MapPickerSheetState extends State<MapPickerSheet> {
+class _MapPickerSheetState extends ConsumerState<MapPickerSheet> {
   LatLng? _initialPosition;
   LatLng? _position;
   bool _mapReady = false;
@@ -39,13 +42,14 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
       await Future<void>.delayed(const Duration(milliseconds: 500));
       if (!mounted) return;
 
+      final strings = ref.read(appLocalizationsProvider);
+
       if (!MapsConfig.isConfigured) {
         setState(() {
           _initialPosition = _defaultPosition();
           _position = _initialPosition;
           _mapUnavailable = true;
-          _statusMessage =
-              'الخريطة غير متاحة حالياً. يمكنك تأكيد موقع بغداد الافتراضي أو إغلاق النافذة.';
+          _statusMessage = strings.locationMapUnavailableStatus;
         });
         return;
       }
@@ -60,11 +64,12 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
         debugPrint('MapPickerSheet init failed: $e\n$stack');
       }
       if (!mounted) return;
+      final strings = ref.read(appLocalizationsProvider);
       setState(() {
         _initialPosition = _defaultPosition();
         _position = _initialPosition;
         _mapUnavailable = true;
-        _statusMessage = 'تعذّر تحميل الخريطة. تم استخدام موقع بغداد الافتراضي.';
+        _statusMessage = strings.locationMapLoadFailedStatus;
       });
     }
   }
@@ -77,6 +82,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
   }
 
   Future<void> _useCurrentLocation() async {
+    final strings = ref.read(appLocalizationsProvider);
     try {
       final latLng = await resolveDeviceLocation();
       if (!mounted) return;
@@ -85,11 +91,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
           widget.initialLat == null &&
           widget.initialLng == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'تعذّر تحديد موقعك. تم استخدام موقع بغداد الافتراضي.',
-            ),
-          ),
+          SnackBar(content: Text(strings.locationGpsFailedSnack)),
         );
       }
 
@@ -99,7 +101,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
       if (kDebugMode) debugPrint('Current location failed: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذّر الحصول على الموقع')),
+        SnackBar(content: Text(strings.locationFetchFailedSnack)),
       );
     }
   }
@@ -131,6 +133,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
 
     return SizedBox(
@@ -138,7 +141,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
       child: Column(
         children: [
           AppBar(
-            title: const Text('تحديد الموقع'),
+            title: Text(strings.locationPickerTitle),
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
@@ -147,7 +150,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
               ),
             ],
           ),
-          Expanded(child: _buildMapArea()),
+          Expanded(child: _buildMapArea(strings)),
           SafeArea(
             top: false,
             child: Padding(
@@ -166,7 +169,8 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
                   ],
                   if (_position != null)
                     Text(
-                      'الإحداثيات: ${_position!.latitude.toStringAsFixed(5)}, '
+                      '${strings.locationCoordinates}: '
+                      '${_position!.latitude.toStringAsFixed(5)}, '
                       '${_position!.longitude.toStringAsFixed(5)}',
                       textAlign: TextAlign.center,
                       textDirection: TextDirection.ltr,
@@ -176,7 +180,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
                   OutlinedButton.icon(
                     onPressed: _useCurrentLocation,
                     icon: const Icon(Icons.my_location),
-                    label: const Text('استخدام موقعي الحالي'),
+                    label: Text(strings.locationUseCurrentLocation),
                   ),
                   const SizedBox(height: 8),
                   FilledButton(
@@ -187,7 +191,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
                             height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('تأكيد الموقع'),
+                        : Text(strings.locationConfirm),
                   ),
                 ],
               ),
@@ -198,7 +202,7 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
     );
   }
 
-  Widget _buildMapArea() {
+  Widget _buildMapArea(AppLocalizations strings) {
     if (_initialPosition == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -207,6 +211,8 @@ class _MapPickerSheetState extends State<MapPickerSheet> {
       return _MapFallback(
         position: _position ?? _initialPosition!,
         unavailable: _mapUnavailable,
+        unavailableLabel: strings.locationMapUnavailable,
+        loadingLabel: strings.locationLoadingMap,
       );
     }
 
@@ -239,10 +245,14 @@ class _MapFallback extends StatelessWidget {
   const _MapFallback({
     required this.position,
     required this.unavailable,
+    required this.unavailableLabel,
+    required this.loadingLabel,
   });
 
   final LatLng position;
   final bool unavailable;
+  final String unavailableLabel;
+  final String loadingLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -261,9 +271,7 @@ class _MapFallback extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                unavailable
-                    ? 'الخريطة غير متاحة'
-                    : 'جاري تحميل الخريطة...',
+                unavailable ? unavailableLabel : loadingLabel,
                 style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),

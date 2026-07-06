@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_colors.dart';
+import '../../../core/theme/app_fonts.dart';
 import '../../../core/constants/app_governorates.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/arabic_number.dart';
+import '../../../core/utils/category_tree.dart';
 import '../../../core/utils/digit_input_formatter.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/filter_model.dart';
-import '../../home/providers/home_provider.dart';
+import '../providers/post_listing_provider.dart' show allCategoriesProvider;
 import '../providers/search_provider.dart';
 
 void showFilterSheet(
@@ -42,6 +46,12 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   double _sliderMin = 0;
   double _sliderMax = 50000000;
 
+  // Full drill path (e.g. [Vehicles, Cars, Mercedes-Benz]) — kept visible as
+  // a breadcrumb so the selection is never hidden, and rebuilt from the
+  // saved filter whenever the sheet reopens so nothing is lost on "back".
+  List<CategoryModel> _categoryPath = [];
+  bool _categoryPathInitialized = false;
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +64,40 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     );
     _sliderMin = _draft.minPrice ?? 0;
     _sliderMax = _draft.maxPrice ?? 50000000;
+  }
+
+  void _initCategoryPathIfNeeded(List<CategoryModel> all) {
+    if (_categoryPathInitialized) return;
+    _categoryPathInitialized = true;
+    final selectedId = _draft.effectiveCategoryId;
+    if (selectedId != null) {
+      _categoryPath = buildCategoryPath(selectedId, all);
+    }
+  }
+
+  void _selectCategoryAtLevel(int level, CategoryModel category) {
+    final alreadySelected =
+        level < _categoryPath.length && _categoryPath[level].id == category.id;
+    setState(() {
+      if (alreadySelected) {
+        // Tapping the selected chip again backs out one level — the level
+        // above stays selected, it's never wiped entirely.
+        _categoryPath = _categoryPath.sublist(0, level);
+      } else {
+        _categoryPath = [..._categoryPath.sublist(0, level), category];
+      }
+    });
+    final newId = _categoryPath.isEmpty ? null : _categoryPath.last.id;
+    _updateDraft(_draft.copyWith(
+      categoryId: newId,
+      clearCategory: newId == null,
+      clearSubcategory: true,
+    ));
+  }
+
+  void _clearCategoryPath() {
+    setState(() => _categoryPath = []);
+    _updateDraft(_draft.copyWith(clearCategory: true, clearSubcategory: true));
   }
 
   @override
@@ -92,9 +136,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final categoriesAsync = ref.watch(categoriesProvider);
+    final categoriesAsync = ref.watch(allCategoriesProvider);
     final countAsync = ref.watch(filterPreviewCountProvider);
     final theme = Theme.of(context);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -104,8 +150,18 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
       builder: (_, scrollController) {
         return Column(
           children: [
+            // Grab handle.
+            Container(
+              margin: const EdgeInsets.only(top: 10, bottom: 2),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.glassBorder,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+              padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
               child: Row(
                 children: [
                   IconButton(
@@ -114,7 +170,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                   ),
                   Expanded(
                     child: Text(
-                      'الفلاتر',
+                      strings.filtersTitle,
                       style: theme.textTheme.titleLarge,
                       textAlign: TextAlign.center,
                     ),
@@ -128,9 +184,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         setState(() {
                           _sliderMin = 0;
                           _sliderMax = 50000000;
+                          _categoryPath = [];
                         });
                       },
-                      child: const Text('مسح الكل'),
+                      child: Text(strings.clearAll),
                     )
                   else
                     const SizedBox(width: 48),
@@ -142,67 +199,24 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 controller: scrollController,
                 padding: const EdgeInsets.all(16),
                 children: [
-                  Text('الفئة', style: theme.textTheme.titleSmall),
+                  Text(strings.categorySection, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   categoriesAsync.when(
                     loading: () => const LinearProgressIndicator(),
                     error: (e, _) => Text('$e'),
                     data: (all) {
-                      final parents =
-                          all.where((CategoryModel c) => c.isParent).toList();
-                      final subs = _draft.categoryId == null
-                          ? <CategoryModel>[]
-                          : all
-                              .where(
-                                (CategoryModel c) =>
-                                    c.parentId == _draft.categoryId,
-                              )
-                              .toList();
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: parents.map((c) {
-                              final selected = _draft.categoryId == c.id;
-                              return FilterChip(
-                                label: Text(c.nameAr),
-                                selected: selected,
-                                onSelected: (_) {
-                                  _updateDraft(_draft.copyWith(
-                                    categoryId: selected ? null : c.id,
-                                    clearSubcategory: true,
-                                  ));
-                                },
-                              );
-                            }).toList(),
-                          ),
-                          if (subs.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: subs.map((c) {
-                                final selected = _draft.subcategoryId == c.id;
-                                return FilterChip(
-                                  label: Text(c.nameAr),
-                                  selected: selected,
-                                  onSelected: (_) {
-                                    _updateDraft(_draft.copyWith(
-                                      subcategoryId: selected ? null : c.id,
-                                    ));
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ],
+                      _initCategoryPathIfNeeded(all);
+                      return _CategoryDrillDown(
+                        all: all,
+                        path: _categoryPath,
+                        localeCode: localeCode,
+                        onSelect: _selectCategoryAtLevel,
+                        onClear: _clearCategoryPath,
                       );
                     },
                   ),
                   const SizedBox(height: 20),
-                  Text('المحافظة', style: theme.textTheme.titleSmall),
+                  Text(strings.governorate, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
                     initialValue: _draft.governorate,
@@ -210,14 +224,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                       border: OutlineInputBorder(),
                     ),
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: null,
-                        child: Text('جميع المحافظات'),
+                        child: Text(strings.allGovernorates),
                       ),
                       ...iraqiGovernorates.map(
                         (g) => DropdownMenuItem(
                           value: g.slug,
-                          child: Text(g.nameAr),
+                          child: Text(g.displayName(localeCode)),
                         ),
                       ),
                     ],
@@ -229,7 +243,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text('نطاق السعر', style: theme.textTheme.titleSmall),
+                  Text(strings.priceRangeLabel, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -239,9 +253,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                           keyboardType: TextInputType.number,
                           inputFormatters: [appDigitsOnly()],
                           style: theme.textTheme.bodyLarge,
-                          decoration: const InputDecoration(
-                            labelText: 'من',
-                            suffixText: 'د.ع',
+                          decoration: InputDecoration(
+                            labelText: strings.fromLabel,
+                            suffixText: strings.currencyIqd,
                           ),
                           onChanged: (_) => _syncPriceFromFields(),
                         ),
@@ -253,9 +267,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                           keyboardType: TextInputType.number,
                           inputFormatters: [appDigitsOnly()],
                           style: theme.textTheme.bodyLarge,
-                          decoration: const InputDecoration(
-                            labelText: 'إلى',
-                            suffixText: 'د.ع',
+                          decoration: InputDecoration(
+                            labelText: strings.toLabel,
+                            suffixText: strings.currencyIqd,
                           ),
                           onChanged: (_) => _syncPriceFromFields(),
                         ),
@@ -284,13 +298,18 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     },
                   ),
                   const SizedBox(height: 12),
-                  Text('الحالة', style: theme.textTheme.titleSmall),
+                  Text(strings.conditionLabel, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     children: FilterCondition.values.map((c) {
+                      final label = switch (c) {
+                        FilterCondition.all => strings.allCategories,
+                        FilterCondition.newItem => strings.conditionNew,
+                        FilterCondition.used => strings.conditionUsed,
+                      };
                       return ChoiceChip(
-                        label: Text(c.labelAr),
+                        label: Text(label),
                         selected: _draft.condition == c,
                         onSelected: (_) => _updateDraft(
                           _draft.copyWith(condition: c),
@@ -299,17 +318,17 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     }).toList(),
                   ),
                   const SizedBox(height: 16),
-                  Text('خيارات إضافية', style: theme.textTheme.titleSmall),
+                  Text(strings.additionalOptions, style: theme.textTheme.titleSmall),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('إعلانات مميزة فقط'),
+                    title: Text(strings.featuredOnlyLabel),
                     value: _draft.isFeaturedOnly,
                     onChanged: (v) =>
                         _updateDraft(_draft.copyWith(isFeaturedOnly: v)),
                   ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('قابل للتفاوض فقط'),
+                    title: Text(strings.negotiableOnlyLabel),
                     value: _draft.isNegotiableOnly,
                     onChanged: (v) =>
                         _updateDraft(_draft.copyWith(isNegotiableOnly: v)),
@@ -321,13 +340,36 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: FilledButton(
-                  onPressed: _apply,
-                  child: countAsync.when(
-                    data: (count) =>
-                        Text('عرض ${arabicNumber(count)} نتيجة'),
-                    loading: () => const Text('عرض النتائج...'),
-                    error: (_, _) => const Text('عرض النتائج'),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: FilledButton(
+                    onPressed: _apply,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.volt,
+                      foregroundColor: AppColors.canvas,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      textStyle: AppFonts.cairo(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    child: countAsync.when(
+                      data: (count) => Text(
+                        strings.showResultsCount(arabicNumber(count)),
+                      ),
+                      loading: () => const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.canvas,
+                        ),
+                      ),
+                      error: (_, _) => Text(strings.showResults),
+                    ),
                   ),
                 ),
               ),
@@ -335,6 +377,81 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           ],
         );
       },
+    );
+  }
+}
+
+/// Multi-level category picker using cascading dropdowns — one per tree level.
+class _CategoryDrillDown extends StatelessWidget {
+  const _CategoryDrillDown({
+    required this.all,
+    required this.path,
+    required this.localeCode,
+    required this.onSelect,
+    required this.onClear,
+  });
+
+  final List<CategoryModel> all;
+  final List<CategoryModel> path;
+  final String localeCode;
+  final void Function(int level, CategoryModel category) onSelect;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = context.l10n;
+
+    final levels = <List<CategoryModel>>[
+      childrenOf(null, all),
+      for (final node in path) childrenOf(node.id, all),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var level = 0; level < levels.length; level++)
+          if (levels[level].isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: DropdownButtonFormField<int?>(
+                key: ValueKey('cat_${level}_${level > 0 ? path[level - 1].id : 0}'),
+                initialValue: level < path.length ? path[level].id : null,
+                decoration: InputDecoration(
+                  labelText: level == 0
+                      ? strings.categorySection
+                      : path[level - 1].localizedName(localeCode),
+                  border: const OutlineInputBorder(),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
+                isExpanded: true,
+                items: [
+                  const DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text('الكل'),
+                  ),
+                  ...levels[level].map(
+                    (c) => DropdownMenuItem<int?>(
+                      value: c.id,
+                      child: Text(c.localizedName(localeCode)),
+                    ),
+                  ),
+                ],
+                onChanged: (id) {
+                  if (id == null) {
+                    if (level == 0) {
+                      onClear();
+                    } else {
+                      onSelect(level - 1, path[level - 1]);
+                    }
+                  } else {
+                    final cat = levels[level].firstWhere((c) => c.id == id);
+                    onSelect(level, cat);
+                  }
+                },
+              ),
+            ),
+      ],
     );
   }
 }

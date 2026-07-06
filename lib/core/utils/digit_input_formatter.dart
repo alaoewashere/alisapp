@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 /// Accepts Western (0-9), Eastern Arabic (٠-٩), and Persian (۰-۹) numerals.
 class WesternDigitsInputFormatter extends TextInputFormatter {
@@ -53,3 +54,34 @@ class WesternDigitsInputFormatter extends TextInputFormatter {
 /// Eastern Arabic (٠-٩), and Persian (۰-۹) digits.
 WesternDigitsInputFormatter appDigitsOnly({int? maxLength}) =>
     WesternDigitsInputFormatter(maxLength: maxLength);
+
+/// Live thousands-separator formatter for price fields — normalises any digits
+/// to Western and shows "1,250,000" as the user types. Parsers must strip commas
+/// (the post-listing flow already does `.replaceAll(',', '')`).
+class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  ThousandsSeparatorInputFormatter({this.maxDigits = 12});
+
+  final int maxDigits;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var digits = WesternDigitsInputFormatter.toWestern(newValue.text);
+    if (digits.length > maxDigits) digits = digits.substring(0, maxDigits);
+    if (digits.isEmpty) return const TextEditingValue(text: '');
+
+    final number = int.tryParse(digits);
+    if (number == null) return oldValue;
+
+    final formatted = NumberFormat('#,###', 'en_US').format(number);
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+ThousandsSeparatorInputFormatter appThousands({int maxDigits = 12}) =>
+    ThousandsSeparatorInputFormatter(maxDigits: maxDigits);

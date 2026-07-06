@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/moderation/moderation_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/animal_listing_utils.dart';
@@ -107,7 +108,10 @@ class EditListingNotifier extends Notifier<EditListingState> {
       final listing =
           await ref.read(listingsRepositoryProvider).getListingById(listingId);
       if (listing == null) {
-        state = state.copyWith(loading: false, error: 'الإعلان غير موجود');
+        state = state.copyWith(
+          loading: false,
+          error: ref.read(appLocalizationsProvider).listingNotFound,
+        );
         return;
       }
 
@@ -115,7 +119,7 @@ class EditListingNotifier extends Notifier<EditListingState> {
       if (currentUserId == null || listing.userId != currentUserId) {
         state = state.copyWith(
           loading: false,
-          error: 'لا يمكنك تعديل هذا الإعلان',
+          error: ref.read(appLocalizationsProvider).cannotEditListingError,
         );
         return;
       }
@@ -201,7 +205,7 @@ class EditListingNotifier extends Notifier<EditListingState> {
     } catch (_) {
       state = state.copyWith(
         loading: false,
-        error: 'تعذّر تحميل الإعلان',
+        error: ref.read(appLocalizationsProvider).loadListingFailedError,
       );
     }
   }
@@ -233,7 +237,10 @@ class EditListingNotifier extends Notifier<EditListingState> {
       return EditListingSaveOutcome(
         success: false,
         moderationDialog: ModerationDialogVariant.postingBan,
-        postingBanMessage: postingBanMessageAr(profile),
+        postingBanMessage: postingBanMessage(
+          ref.read(appLocalizationsProvider),
+          profile,
+        ),
       );
     }
 
@@ -246,12 +253,16 @@ class EditListingNotifier extends Notifier<EditListingState> {
     final post = ref.read(postListingProvider);
 
     if (post.title.trim().isEmpty) {
-      postNotifier.setValidationError('أدخل عنوان الإعلان');
+      postNotifier.setValidationError(
+        ref.read(appLocalizationsProvider).enterListingTitleError,
+      );
       return const EditListingSaveOutcome(success: false);
     }
 
     if (state.existingImages.isEmpty && post.images.isEmpty) {
-      postNotifier.setValidationError('أضف صورة واحدة على الأقل');
+      postNotifier.setValidationError(
+        ref.read(appLocalizationsProvider).addAtLeastOnePhotoError,
+      );
       return const EditListingSaveOutcome(success: false);
     }
 
@@ -430,7 +441,10 @@ class EditListingNotifier extends Notifier<EditListingState> {
           moderationDialog: ModerationDialogVariant.blocked,
         );
       }
-      state = state.copyWith(loading: false, error: 'تعذّر حفظ التعديلات');
+      state = state.copyWith(
+        loading: false,
+        error: ref.read(appLocalizationsProvider).saveEditsFailedError,
+      );
       return const EditListingSaveOutcome(success: false);
     }
   }

@@ -6,22 +6,33 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/supabase/public_profiles_query.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/listing_package_utils.dart';
-import '../../../shared/models/filter_model.dart';
+import '../../../core/utils/listing_translation.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/models/report_model.dart';
+import '../models/listing_analytics.dart';
 import '../models/listing_density.dart';
 
+typedef LocaleCodeReader = String Function();
+
 final listingsRepositoryProvider = Provider<ListingsRepository>((ref) {
-  return ListingsRepository(ref.watch(supabaseClientProvider));
+  return ListingsRepository(
+    ref.watch(supabaseClientProvider),
+    localeCode: () => ref.read(localeProvider.notifier).currentCode,
+  );
 });
 
 class ListingsRepository {
-  ListingsRepository(this._client);
+  ListingsRepository(
+    this._client, {
+    LocaleCodeReader? localeCode,
+  }) : _localeCode = localeCode ?? (() => 'ar');
 
   final SupabaseClient _client;
+  final LocaleCodeReader _localeCode;
   static const _uuid = Uuid();
 
   static const _listingSelect = '''
@@ -61,7 +72,7 @@ class ListingsRepository {
     String? userIdForFavorites,
   }) async {
     final data = await _featuredListingsBaseQuery()
-        .order('created_at', ascending: false)
+        .order('bumped_at', ascending: false)
         .limit(limit);
 
     final listings = await _mapListings(data, userIdForFavorites);
@@ -74,7 +85,7 @@ class ListingsRepository {
     String? userIdForFavorites,
   }) async {
     final data = await _featuredListingsBaseQuery()
-        .order('created_at', ascending: false)
+        .order('bumped_at', ascending: false)
         .range(page * pageSize, (page + 1) * pageSize - 1);
 
     final listings = await _mapListings(data, userIdForFavorites);
@@ -151,7 +162,7 @@ class ListingsRepository {
     int pageSize = AppConstants.listingsPageSize,
     String? userIdForFavorites,
   }) async {
-    final filteredQuery = _filteredListingsQuery(
+    final filteredQuery = await _filteredListingsQuery(
       categoryId: int.parse(categoryId),
       listingType: listingType,
       filter: filter,
@@ -172,7 +183,7 @@ class ListingsRepository {
     int pageSize = AppConstants.listingsPageSize,
     String? userIdForFavorites,
   }) async {
-    final filteredQuery = _filteredListingsQuery(filter: filter);
+    final filteredQuery = await _filteredListingsQuery(filter: filter);
 
     final data = await _applySorting(filteredQuery, filter.sortBy).range(
       page * pageSize,
@@ -185,7 +196,7 @@ class ListingsRepository {
   }
 
   Future<int> countSearchResults(FilterModel filter) async {
-    final filteredQuery = _filteredListingsQuery(filter: filter, select: 'id');
+    final filteredQuery = await _filteredListingsQuery(filter: filter, select: 'id');
     final data = await filteredQuery;
     return (data as List).length;
   }
@@ -240,10 +251,10 @@ class ListingsRepository {
     FilterModel filters = const FilterModel(),
     String? userIdForFavorites,
   }) async {
-    final filteredQuery = _filteredListingsQuery(filter: filters);
+    final filteredQuery = await _filteredListingsQuery(filter: filters);
 
     final data = await filteredQuery
-        .order('created_at', ascending: false)
+        .order('bumped_at', ascending: false)
         .range(page * pageSize, (page + 1) * pageSize - 1);
 
     return _mapListings(data, userIdForFavorites);
@@ -1077,6 +1088,22 @@ class ListingsRepository {
     } catch (_) {}
   }
 
+  /// Returns analytics summary for a Premium listing owned by the current user.
+  Future<ListingAnalytics?> fetchAnalytics(String listingId) async {
+    try {
+      final data = await _client.rpc('get_listing_analytics', params: {
+        'p_listing_id': listingId,
+      });
+      if (data == null) return null;
+      final map = data is Map
+          ? Map<String, dynamic>.from(data)
+          : Map<String, dynamic>.from(data as Map);
+      return ListingAnalytics.fromJson(map);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> updateAutoRenew({
     required String listingId,
     required bool autoRenew,
@@ -1181,29 +1208,40 @@ class ListingsRepository {
         );
   }
 
-  /// Pro before free, then newest within tier — mirrors [sortListingsByPackagePriority].
+  /// Pro before free, then by bumped_at (auto-bump keeps Pro listings fresh).
   dynamic _applyLatestListingsOrder(dynamic query) {
     return query
         .order('is_boosted', ascending: false)
-        .order('created_at', ascending: false);
+        .order('bumped_at', ascending: false);
+  }
+
+  /// Listings are tagged at the leaf (brand/model) category level, but users
+  /// filter at any ancestor (e.g. "Vehicles" or "Mercedes-Benz"). Large
+  /// branches can have thousands of descendant ids, so instead of pulling
+  /// them all to the client and sending a huge `category_id IN (...)` list
+  /// (which was slow enough to look like an infinite load), the containment
+  /// check runs inside Postgres via this set-returning RPC.
+  dynamic _listingsQuerySourceForCategory(int categoryId, String select) {
+    return _client
+        .rpc('listings_under_category', params: {'root_id': categoryId})
+        .select(select);
   }
 
   /// Builds filter chain only — never call order/limit/range before this returns.
-  dynamic _filteredListingsQuery({
+  Future<dynamic> _filteredListingsQuery({
     int? categoryId,
     String? listingType,
     FilterModel? filter,
     String select = _listingSelect,
-  }) {
-    dynamic query = _client
-        .from('listings')
-        .select(select)
-        .eq('status', 'approved')
-        .eq('availability', 'active');
+  }) async {
+    final effectiveCategoryId = filter?.effectiveCategoryId ?? categoryId;
 
-    if (categoryId != null) {
-      query = query.eq('category_id', categoryId);
-    }
+    dynamic query = effectiveCategoryId != null
+        ? _listingsQuerySourceForCategory(effectiveCategoryId, select)
+        : _client.from('listings').select(select);
+
+    query = query.eq('status', 'approved').eq('availability', 'active');
+
     if (listingType != null && listingType.isNotEmpty) {
       query = query.eq('listing_type', listingType);
     }
@@ -1211,15 +1249,12 @@ class ListingsRepository {
     return _applyFilters(query, filter);
   }
 
-  dynamic _applyFilters(dynamic query, FilterModel? filters) {
+  Future<dynamic> _applyFilters(dynamic query, FilterModel? filters) async {
     if (filters == null) return query;
 
     if (filters.query != null && filters.query!.trim().isNotEmpty) {
       final q = filters.query!.trim();
       query = query.or('title_ar.ilike.%$q%,title.ilike.%$q%');
-    }
-    if (filters.effectiveCategoryId != null) {
-      query = query.eq('category_id', filters.effectiveCategoryId!);
     }
     if (filters.governorate != null) {
       query = query.eq('governorate', filters.governorate!);
@@ -1250,7 +1285,7 @@ class ListingsRepository {
 
   dynamic _applySorting(dynamic query, SearchSortBy sortBy) {
     return switch (sortBy) {
-      SearchSortBy.newest => query.order('created_at', ascending: false),
+      SearchSortBy.newest => query.order('bumped_at', ascending: false),
       SearchSortBy.cheapest => query.order('price', ascending: true),
       SearchSortBy.expensive => query.order('price', ascending: false),
       SearchSortBy.mostViewed => query.order('views_count', ascending: false),
@@ -1277,7 +1312,7 @@ class ListingsRepository {
       favoriteIds = (favs as List).map((e) => e['listing_id'] as String).toSet();
     }
 
-    return maps.map((map) {
+    final listings = maps.map((map) {
       final images = (map['listing_images'] as List?) ?? [];
       if (images.isNotEmpty) {
         images.sort((a, b) {
@@ -1303,7 +1338,13 @@ class ListingsRepository {
       map['is_favorite'] = favoriteIds.contains(map['id']);
       return ListingModel.fromJson(map);
     }).toList();
+
+    return translateListingsForLocale(listings, _localeCode());
   }
+
+  /// Localizes already-mapped listings (e.g. favorites fetched outside [_mapListings]).
+  Future<List<ListingModel>> localizeListings(List<ListingModel> listings) =>
+      translateListingsForLocale(listings, _localeCode());
 
   Future<List<Map<String, dynamic>>> enrichListingMaps(
     List<Map<String, dynamic>> maps,
@@ -1344,5 +1385,23 @@ class ListingsRepository {
       params: {'p_user_id': userId},
     );
     return (result as num?)?.toInt() ?? 0;
+  }
+
+  /// Launch-week promo end date (app_settings key `free_posts_unlimited_until`)
+  /// — while now() is before this, every user can post standard listings for
+  /// free with no monthly cap. Null when the setting isn't configured.
+  Future<DateTime?> fetchFreePostsUnlimitedUntil() async {
+    try {
+      final row = await _client
+          .from('app_settings')
+          .select('value')
+          .eq('key', 'free_posts_unlimited_until')
+          .maybeSingle();
+      final value = row?['value'] as String?;
+      if (value == null) return null;
+      return DateTime.tryParse(value);
+    } catch (_) {
+      return null;
+    }
   }
 }

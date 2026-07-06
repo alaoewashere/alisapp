@@ -1,11 +1,12 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 import { corsHeaders, jsonResponse } from '../_shared/security.ts'
 
-const AUTO_APPROVE = Deno.env.get('PURCHASE_AUTO_APPROVE') !== 'false'
+// Opt-in for local/dev only. Production must approve via admin or validate store receipts.
+const AUTO_APPROVE = Deno.env.get('PURCHASE_AUTO_APPROVE') === 'true'
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const origin = req.headers.get('Origin')
 
   if (req.method === 'OPTIONS') {

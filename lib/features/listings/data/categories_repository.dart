@@ -45,6 +45,32 @@ class CategoriesRepository {
     return all;
   }
 
+  /// Lightweight `{id: parentId}` map for every category — only two int columns,
+  /// so it is cheap to load and lets us resolve a leaf listing's root category
+  /// client-side without pulling the full 5k-row tree.
+  Future<Map<int, int?>> fetchParentMap() async {
+    final map = <int, int?>{};
+    var from = 0;
+
+    while (true) {
+      final data = await _client
+          .from('categories')
+          .select('id, parent_id')
+          .order('id', ascending: true)
+          .range(from, from + _pageSize - 1);
+
+      final rows = data as List;
+      for (final row in rows) {
+        final r = row as Map<String, dynamic>;
+        map[r['id'] as int] = r['parent_id'] as int?;
+      }
+      if (rows.length < _pageSize) break;
+      from += _pageSize;
+    }
+
+    return map;
+  }
+
   /// Direct children of [parentId] (always queries DB — used for drill-down).
   Future<List<CategoryModel>> fetchChildren(int parentId) async {
     return getChildCategories(parentId);
@@ -135,6 +161,37 @@ class CategoriesRepository {
       return counts;
     } catch (_) {
       return {};
+    }
+  }
+
+  /// Real trim options for [brandSlug] (e.g. 'veh_auto_br_toyota'); empty
+  /// when the brand has no curated list yet — caller should fall back to
+  /// [VehicleListingOptions.genericTrimOptions].
+  Future<List<String>> fetchVehicleTrimOptions(String brandSlug) async {
+    return _fetchVehicleOptions('vehicle_trim_options', brandSlug);
+  }
+
+  /// Real engine options for [brandSlug]; empty when uncovered — caller
+  /// should fall back to [VehicleListingOptions.genericEngineOptions].
+  Future<List<String>> fetchVehicleEngineOptions(String brandSlug) async {
+    return _fetchVehicleOptions('vehicle_engine_options', brandSlug);
+  }
+
+  Future<List<String>> _fetchVehicleOptions(
+    String table,
+    String brandSlug,
+  ) async {
+    try {
+      final data = await _client
+          .from(table)
+          .select('name')
+          .eq('brand_slug', brandSlug)
+          .order('sort_order');
+      return (data as List)
+          .map((row) => (row as Map<String, dynamic>)['name'] as String)
+          .toList();
+    } catch (_) {
+      return [];
     }
   }
 }

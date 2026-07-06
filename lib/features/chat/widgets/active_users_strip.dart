@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../shared/models/conversation_model.dart';
 import 'chat_user_avatar.dart';
@@ -43,7 +46,7 @@ List<ActiveChatUser> extractActiveChatUsers(
     result.add(
       ActiveChatUser(
         userId: otherId,
-        name: conversation.otherUserName ?? 'مستخدم',
+        name: conversation.otherUserName ?? '',
         avatarSeed: conversation.otherUserAvatarSeed,
         isOnline: isOnline,
         conversationId: conversation.id,
@@ -65,7 +68,7 @@ int countRecentlyActiveConversations(List<ConversationModel> conversations) {
 }
 
 /// Horizontal scrolling row of recently active chat partners.
-class ActiveUsersStrip extends StatelessWidget {
+class ActiveUsersStrip extends ConsumerWidget {
   const ActiveUsersStrip({
     super.key,
     required this.users,
@@ -78,8 +81,14 @@ class ActiveUsersStrip extends StatelessWidget {
   final void Function(ActiveChatUser user)? onUserTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (users.isEmpty) return const SizedBox.shrink();
+
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+    final countLabel = localeCode == 'ar'
+        ? arabicNumber(activeCount)
+        : '$activeCount';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -93,7 +102,7 @@ class ActiveUsersStrip extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'الرسائل والمحادثات',
+                      strings.chatMessagesHeader,
                       style: AppFonts.cairo(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -102,7 +111,7 @@ class ActiveUsersStrip extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'تواصل مباشرة مع المشترين والبائعين',
+                      strings.chatDirectContact,
                       style: AppFonts.cairo(
                         fontSize: 11,
                         color: AppColors.textMuted,
@@ -123,7 +132,7 @@ class ActiveUsersStrip extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '${arabicNumber(activeCount)} نشط',
+                    strings.activeUsersCount(countLabel),
                     style: AppFonts.cairo(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -144,7 +153,7 @@ class ActiveUsersStrip extends StatelessWidget {
             itemBuilder: (context, index) {
               final user = users[index];
               return ActiveUserChip(
-                name: user.name,
+                name: user.name.isEmpty ? strings.defaultUser : user.name,
                 avatarSeed: user.avatarSeed,
                 online: user.isOnline,
                 onTap: onUserTap != null ? () => onUserTap!(user) : null,

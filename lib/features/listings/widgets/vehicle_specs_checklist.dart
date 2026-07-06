@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/l10n/listing_attribute_locale.dart';
 import '../constants/vehicle_listing_options.dart';
 import 'vehicle_form_field_card.dart';
 
@@ -39,6 +41,7 @@ class _VehicleSpecsChecklistState extends State<VehicleSpecsChecklist> {
   @override
   Widget build(BuildContext context) {
     final groups = VehicleListingOptions.vehicleSpecGroups;
+    final strings = context.l10n;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -59,7 +62,7 @@ class _VehicleSpecsChecklistState extends State<VehicleSpecsChecklist> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              'تم اختيار $_selectedCount مواصفة',
+              strings.vehicleSpecsSelectedCount(_selectedCount.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -93,6 +96,7 @@ class _SpecAccordionGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     return VehicleFormFieldCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -104,7 +108,7 @@ class _SpecAccordionGroup extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    group.title,
+                    localizeListingAttribute(group.title, strings),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -150,7 +154,10 @@ class _SpecAccordionGroup extends StatelessWidget {
                             color: _dividerColor,
                           ),
                         _SpecCheckRow(
-                          label: group.specs[i],
+                          label: localizeListingAttribute(
+                            group.specs[i],
+                            strings,
+                          ),
                           isSelected: selected.contains(group.specs[i]),
                           onTap: () => onToggle(group.specs[i]),
                         ),

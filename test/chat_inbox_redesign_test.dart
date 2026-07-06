@@ -1,25 +1,38 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/core/constants/default_avatars.dart';
 import 'package:Sello/core/utils/chat_date_utils.dart';
 import 'package:Sello/features/chat/widgets/active_users_strip.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 import 'package:Sello/shared/models/conversation_model.dart';
 
 void main() {
-  group('formatConversationTimeAr', () {
-    test('formats minutes with Arabic-Indic numerals', () {
+  final arStrings = lookupAppLocalizations(const Locale('ar'));
+
+  group('formatConversationTime', () {
+    test('formats minutes with Western numerals', () {
       final time = DateTime.now().subtract(const Duration(minutes: 23));
-      expect(formatConversationTimeAr(time), '23 دقيقة');
+      expect(
+        formatConversationTime(time, arStrings, languageCode: 'ar'),
+        arStrings.minutesAgo('23'),
+      );
     });
 
     test('formats one hour naturally', () {
       final time = DateTime.now().subtract(const Duration(hours: 1));
-      expect(formatConversationTimeAr(time), 'ساعة واحدة');
+      expect(
+        formatConversationTime(time, arStrings, languageCode: 'ar'),
+        arStrings.oneHourAgo,
+      );
     });
 
     test('formats yesterday', () {
       final time = DateTime.now().subtract(const Duration(hours: 30));
-      expect(formatConversationTimeAr(time), 'أمس');
+      expect(
+        formatConversationTime(time, arStrings, languageCode: 'ar'),
+        arStrings.yesterday,
+      );
     });
   });
 

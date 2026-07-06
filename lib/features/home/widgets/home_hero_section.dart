@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
+
 /// Home header headline — blends with page gradient, no separate card surface.
 class HomeHeroSection extends StatelessWidget {
   const HomeHeroSection({super.key});
@@ -9,6 +11,7 @@ class HomeHeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).textTheme;
+    final strings = context.l10n;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -16,7 +19,7 @@ class HomeHeroSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'اشتري و بيع',
+            strings.homeHeroBuySell,
             style: theme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
@@ -24,7 +27,7 @@ class HomeHeroSection extends StatelessWidget {
             ),
           ),
           Text(
-            'بسهولة.',
+            strings.homeHeroEasily,
             style: theme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
@@ -33,7 +36,7 @@ class HomeHeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'اعثر على أفضل العروض بين يديك',
+            strings.homeHeroSubtitle,
             style: theme.bodySmall?.copyWith(
               color: AppColors.textMuted,
               height: 1.35,

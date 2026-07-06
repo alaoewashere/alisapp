@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/l10n_provider.dart';
 import '../supabase/supabase_client.dart';
 import '../../features/profile/data/profile_repository.dart';
 import 'blocked_words_repository.dart';
@@ -27,7 +28,7 @@ export 'posting_ban_utils.dart'
         extractPostingBanMessage,
         isUserPostingBanned,
         isUserPostingBannedError,
-        postingBanMessageAr;
+        postingBanMessage;
 
 final contentModerationServiceProvider =
     Provider<ContentModerationService>((ref) {
@@ -63,7 +64,7 @@ Future<bool> checkPostingBanGate(
 
   await showPostingBanDialog(
     context,
-    message: postingBanMessageAr(profile),
+    message: postingBanMessage(ref.read(appLocalizationsProvider), profile),
   );
   return true;
 }
@@ -112,7 +113,7 @@ Future<void> handlePostingBanOrBlockError(
     if (profile != null) {
       await showPostingBanDialog(
         context,
-        message: postingBanMessageAr(profile),
+        message: postingBanMessage(ref.read(appLocalizationsProvider), profile),
       );
     }
     return;

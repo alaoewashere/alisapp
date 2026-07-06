@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "Sello",
+  "appName": "SOUQAK",
   "home": "Home",
   "search": "Search",
   "favorites": "Favorites",
@@ -110,7 +110,1546 @@
   "categories": "Categories",
   "featured": "Featured",
   "sold": "Sold",
-  "searchHint": "Search Sello...",
+  "searchHint": "Search SOUQAK...",
   "otpSent": "Verification code sent. Check your messages.",
-  "newOtpSent": "New code sent"
+  "newOtpSent": "New code sent",
+  "homeHeroBuySell": "Buy & sell",
+  "homeHeroEasily": "with ease.",
+  "homeHeroSubtitle": "Find the best deals at your fingertips",
+  "homeExtendedSearchHint": "Search cars, apartments, electronics...",
+  "browseCategories": "Browse categories",
+  "viewAll": "View all",
+  "featuredListingsTitle": "Featured listings",
+  "latestListingsTitle": "Latest listings",
+  "failedLoadCategories": "Failed to load categories",
+  "failedLoadListings": "Failed to load listings",
+  "searchResultsCount": "{count} results",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapTooltip": "Listing density map",
+  "favoritesTooltip": "Favorites",
+  "splashTagline": "Your go-to app for buying and selling",
+  "welcomeToSouqak": "Welcome to SOUQAK",
+  "chooseYourLanguage": "Choose your language",
+  "languageChangeHint": "You can change the language anytime in Settings",
+  "skip": "Skip",
+  "createAccount": "Create account",
+  "signUpOverline": "Create your account",
+  "createAccountTitle": "Create account",
+  "firstName": "First name",
+  "lastName": "Last name",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "confirmPasswordLabel": "Confirm password",
+  "alreadyHaveAccount": "Already have an account? ",
+  "signInLink": "Sign in",
+  "signUpAgreementPrefix": "By signing up, you agree to the ",
+  "termsLink": "Terms of Use",
+  "andConnector": " and ",
+  "privacyLink": "Privacy Policy",
+  "welcomeBack": "Welcome back",
+  "forgotPassword": "Forgot password?",
+  "noAccountYet": "Don't have an account? ",
+  "signUpNow": "Sign up now",
+  "firstNameHint": "Mohammed",
+  "lastNameHint": "Ahmed",
+  "understood": "Got it",
+  "heatmapTutorialTitle": "See listing density in your area on the map",
+  "heatmapTutorialSubtitle": "Tap the map icon to view the most active areas",
+  "smartAlertsTutorialTitle": "Set your search criteria once and get notified when a matching listing is posted",
+  "smartAlertsTutorialSubtitle": "Tap the bell icon to manage your smart alerts",
+  "agreeToTerms": "I agree to the terms",
+  "agreeToPrivacy": "I agree to the privacy policy",
+  "continueWithPhone": "Continue with phone",
+  "phoneOtpHint": "We will send you a verification code via WhatsApp",
+  "sendCode": "Send code",
+  "otpSentTo": "We sent a code to\n{phone}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "otpResendIn": "Resend in {seconds}s",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "otpCanResendNow": "You can resend the code",
+  "otpNotReceived": "Didn't receive the code?",
+  "otpHelpText": "• Make sure {phone} is correct\n• Wait up to a minute — SMS may be delayed\n• Twilio: add your number to the souqiq-otp Sender Pool\n• Enable an SMS provider (Twilio or MessageBird) in Supabase\n• For development: add your number as Test OTP in Supabase\n• See supabase/README.md — Phone OTP section",
+  "@otpHelpText": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "completeProfileTitle": "Complete your profile",
+  "tapToChooseAvatar": "Tap to choose your avatar",
+  "profileNameReadError": "Could not read your name from the account. Please sign in again.",
+  "sessionExpiredPleaseLogin": "Your session expired. Please sign in again.",
+  "back": "Back",
+  "searchInSouqak": "Search SOUQAK",
+  "mySmartAlertsTooltip": "My smart alerts",
+  "filtersTooltip": "Filters",
+  "noSuggestions": "No suggestions",
+  "searchForQuery": "Search for \"{query}\"",
+  "@searchForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCardFailed": "Could not create share card. Try again.",
+  "followersLabel": "Followers",
+  "myListedAds": "My listings",
+  "mySmartAlerts": "My smart alerts",
+  "defaultUser": "User",
+  "otherSettings": "Other settings",
+  "accountDetails": "Account details",
+  "passwordSettings": "Password",
+  "aboutApp": "About the app",
+  "aboutAppDescription": "SOUQAK — your local classifieds marketplace in Iraq. Buy and sell easily in one app.",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "helpFaq": "Help / FAQ",
+  "contactSupport": "Contact Support",
+  "supportChatIntro": "Need help? Message our support team and we'll get back to you soon.",
+  "logoutAction": "Sign out",
+  "logoutConfirmBodyExtended": "Are you sure you want to sign out?",
+  "deleteAccountConfirmBody": "Are you sure you want to delete your account? This cannot be undone.",
+  "startConversation": "Start the conversation",
+  "conversation": "Conversation",
+  "viewListing": "View listing",
+  "blockUser": "Block user",
+  "blockFeatureComingSoon": "Block feature coming soon",
+  "reportConversation": "Report conversation",
+  "reportReceived": "Your report was received",
+  "onlineNow": "Online now",
+  "typeMessage": "Type a message...",
+  "reconnecting": "Reconnecting...",
+  "chooseRecoveryMethod": "Choose how to recover your account",
+  "continueViaEmail": "Continue with email",
+  "linkedEmailHint": "Email linked to your account",
+  "continueViaPhone": "Continue with phone",
+  "linkedPhoneHint": "Phone linked to your account",
+  "sendAction": "Send",
+  "emailNotRegistered": "This email is not registered",
+  "phoneNotRegistered": "This phone number is not registered",
+  "listingPostedToday": "Today",
+  "listingPostedOneDayAgo": "1 day ago",
+  "listingPostedDaysAgo": "{count} days ago",
+  "@listingPostedDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homeFeedLatestTitle": "Latest listings",
+  "otpSentViaWhatsapp": "A verification code was sent via WhatsApp to",
+  "otpResendCode": "Resend code",
+  "otpVerifyButton": "Verify",
+  "otpInvalidCode": "Incorrect code",
+  "otpVerifiedSuccess": "Verified successfully!",
+  "otpSigningIn": "Signing you in...",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "now": "Now",
+  "oneMinuteAgo": "1 minute ago",
+  "twoMinutesAgo": "2 minutes ago",
+  "minutesAgo": "{count} min ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "oneHourAgo": "1 hour ago",
+  "twoHoursAgo": "2 hours ago",
+  "hoursAgo": "{count} hr ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoDaysAgo": "2 days ago",
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "myMessages": "My Messages",
+  "loginToViewMessages": "Sign in to view messages",
+  "noMessagesYet": "No messages yet",
+  "contactSellersPrompt": "Start chatting with sellers",
+  "deleteConversationTitle": "Delete conversation",
+  "deleteConversationBody": "Delete this conversation?",
+  "chatMessagesHeader": "Messages & chats",
+  "chatDirectContact": "Chat directly with buyers and sellers",
+  "activeUsersCount": "{count} active",
+  "@activeUsersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingBadge": "Listing",
+  "startChatDefault": "Start chatting",
+  "categoryRealEstate": "Real Estate",
+  "categoryVehicles": "Vehicles",
+  "categoryElectronics": "Electronics",
+  "categoryBuySell": "Marketplace",
+  "categoryTutoring": "Tutoring",
+  "categoryJobs": "Jobs",
+  "categoryPets": "Pets",
+  "categoryHomeHelp": "Home Help",
+  "categorySubtitleRealEstate": "Residential, land, commercial...",
+  "categorySubtitleVehicles": "Cars, rentals, motorcycles...",
+  "categorySubtitleElectronics": "Phones, laptops, TVs...",
+  "categorySubtitleBuySell": "Phones, computers, clothes, furniture...",
+  "categorySubtitleTutoring": "School, university, languages, Quran...",
+  "categorySubtitleJobs": "Tech, engineering, medical, oil...",
+  "categorySubtitlePets": "Dogs, cats, birds, farm...",
+  "categorySubtitleHomeHelp": "Cleaning, cooking, nanny, driver...",
+  "listingNotFound": "Listing not found",
+  "tabListing": "Listing",
+  "tabDescription": "Description",
+  "tabLocation": "Location",
+  "sellerOtherListings": "More from this seller",
+  "reportThisListing": "Report this listing",
+  "negotiable": "Negotiable",
+  "videoTour": "🎥 Video tour",
+  "paintConditionTitle": "Body & paint condition",
+  "allPartsOriginal": "All parts original",
+  "viewsCount": "{count} views",
+  "@viewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumber": "Listing ID",
+  "listingDate": "Listed on",
+  "noDescriptionAdded": "No description provided",
+  "locationNotSet": "Location not set",
+  "selectedLocation": "Selected location",
+  "sellerLabel": "Seller",
+  "theSeller": "Seller",
+  "memberSinceYear": "Member since {year}",
+  "@memberSinceYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "listingsCountLabel": "{count} listings",
+  "@listingsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAllSellerListings": "View all listings",
+  "safetyTipsTitle": "Safety tips",
+  "safetyTipPublicPlace": "Meet the seller in a public place",
+  "safetyTipNoPrepay": "Don't pay before inspecting the item",
+  "safetyTipInspect": "Inspect the item before buying",
+  "rateSeller": "Rate the seller",
+  "priceLabel": "Price",
+  "locationLabel": "Location",
+  "conditionLabel": "Condition",
+  "packageFree": "Free",
+  "packagePro": "Pro",
+  "packagePremium": "Premium",
+  "statusActive": "Active",
+  "statusExpired": "Expired",
+  "statusPending": "Pending",
+  "chooseOption": "Choose",
+  "allCategories": "All",
+  "noCategories": "No categories",
+  "noSubcategories": "No subcategories",
+  "allCategoryListings": "All {name} listings",
+  "@allCategoryListings": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "allGovernorates": "All governorates",
+  "postListingStep1": "Step 1",
+  "postListingStep2": "Step 2",
+  "postListingStep3": "Step 3",
+  "postListingStep4": "Step 4",
+  "postListingStep5": "Step 5",
+  "postListingStep6": "Step 6",
+  "postListingStep7": "Step 7",
+  "postListingStep8": "Step 8",
+  "postListingStepFallback": "Step {step}",
+  "@postListingStepFallback": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "nextStep": "Next",
+  "saveAsDraft": "Save as draft",
+  "titleMinLengthError": "Title must be at least 5 characters",
+  "addPhotoRequired": "Please add at least one photo",
+  "draftSaved": "Draft saved",
+  "confirmListingFeeTitle": "Confirm listing fee",
+  "confirmListingFeeBody": "You have used your two free listings this month. A standard listing fee ({price}) will be charged for this ad.",
+  "@confirmListingFeeBody": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmAndPay": "Confirm & pay {price}",
+  "@confirmAndPay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "publishingListing": "Publishing listing...",
+  "uploadingPhotos": "Uploading photos... ({current}/{total})",
+  "@uploadingPhotos": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "searchEllipsis": "Search...",
+  "specifyValue": "Specify value",
+  "specifyType": "Specify type",
+  "choosePickerTitle": "Choose {label}",
+  "@choosePickerTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "governorateRequired": "Governorate *",
+  "neighborhoodOptional": "Area / neighborhood (optional)",
+  "neighborhoodLabel": "Area / neighborhood",
+  "chooseGovernorateFirst": "Select a governorate first to see available areas",
+  "currencyIqd": "IQD",
+  "listingDetailsTitle": "Listing details",
+  "optionalLabel": "Optional",
+  "listingTypeLabel": "Listing type *",
+  "conditionNew": "New",
+  "conditionUsed": "Used",
+  "listingTitleLabel": "Listing title",
+  "listingTitleHint": "Enter your listing title",
+  "listingDescriptionLabel": "Listing description",
+  "listingDescriptionHint": "Add a detailed description...",
+  "removeArea": "Remove area",
+  "pickLocationOnMap": "Pick location on map",
+  "coordinatesLabel": "Coordinates: {coords}",
+  "@coordinatesLabel": {
+    "placeholders": {
+      "coords": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedAreaLabel": "Selected area: {area}",
+  "@selectedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestedAreaLabel": "Suggested area: {area}",
+  "@suggestedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "removeLocation": "Remove location",
+  "mapNotConfigured": "Map is not configured. Add GOOGLE_MAPS_API_KEY or select governorate only.",
+  "mapOpenFailed": "Could not open map. You can continue by selecting governorate only.",
+  "photosTitle": "Photos",
+  "photosSubtitle": "Add up to {max} photos — drag to reorder",
+  "@photosSubtitle": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "firstPhotoIsCover": "First photo is the cover",
+  "maxPhotosLimit": "Maximum {max} photos",
+  "@maxPhotosLimit": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "noPhotosYet": "No photos added yet",
+  "photosHelpSell": "Photos increase your chances of selling",
+  "photoTipGoodLight": "Good lighting",
+  "photoTipClearPhotos": "Clear photos",
+  "photoTipMultipleAngles": "Multiple angles",
+  "reviewListingTitle": "Review listing",
+  "detailsSection": "Details",
+  "categorySection": "Category",
+  "editAction": "Edit",
+  "showMore": "Show more",
+  "showLess": "Show less",
+  "retryAction": "Try again",
+  "selectedSpecsCount": "{count} specs selected",
+  "@selectedSpecsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedFeaturesCount": "{count} features selected",
+  "@selectedFeaturesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "exchangePossible": "Open to exchange",
+  "deliveryAvailable": "Delivery available",
+  "smartTvBadge": "Smart TV",
+  "contactTitle": "Contact",
+  "contactInfoSection": "Contact info",
+  "contactPreferencesTitle": "Contact preferences",
+  "contactPreferencesHelp": "Choose how buyers can contact you for this listing.\n\n• Phone & messages: contact via phone and in-app messages\n• Phone only: phone number shown without in-app messages\n• Messages only: in-app messages only",
+  "choosePackage": "Choose a package",
+  "freePostsRemainingLabel": "0 IQD ({remaining} free listing left this week)",
+  "@freePostsRemainingLabel": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "freePostsUsedWarning": "You have used your free listings. A standard listing fee will apply.",
+  "roomsCountBadge": "{count} rooms",
+  "@roomsCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLoadFailed": "Could not load profile",
+  "changesSavedSuccess": "Changes saved successfully",
+  "saveError": "Error while saving",
+  "enterName": "Enter your name",
+  "usernameLabel": "Username",
+  "usernameCannotChange": "Username cannot be changed",
+  "changePhoneNumber": "Change number",
+  "verifyPhoneAction": "✓ Verify phone",
+  "notVerified": "Not verified",
+  "changePhoto": "Change photo",
+  "verifyPhoneTitle": "Verify phone number",
+  "whatsappSixDigitHint": "We will send a 6-digit code via WhatsApp",
+  "sendWhatsappCode": "Send WhatsApp code",
+  "enterValidPhone": "Enter a valid phone number",
+  "phoneVerifiedSuccess": "Phone number verified successfully",
+  "ratingsTitle": "Ratings",
+  "noRatingsYet": "No ratings yet",
+  "loadMore": "Load more",
+  "noReviewLeft": "No comment left",
+  "ratingSubmitFailed": "Could not submit rating, try again",
+  "rateExperienceTitle": "How was your experience?",
+  "addCommentOptional": "Add a comment (optional)",
+  "submitRating": "Submit rating",
+  "ratingsHelpCommunity": "Your ratings help the community trust sellers",
+  "chooseAvatarTitle": "Choose your avatar",
+  "priceHistoryTitle": "Price history",
+  "priceDroppedSummary": "Price dropped from {from} to {to} over {duration}",
+  "@priceDroppedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "priceIncreasedSummary": "Price increased from {from} to {to}",
+  "@priceIncreasedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPriceLabel": "Original price",
+  "currentPriceLabel": "Current price",
+  "lessThanOneWeek": "Less than a week",
+  "oneWeek": "One week",
+  "twoWeeks": "Two weeks",
+  "weeksCount": "{count} weeks",
+  "@weeksCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "moderationYouAreBanned": "You are banned",
+  "moderationBannedTitle": "Banned",
+  "moderationWarningTitle": "Warning",
+  "moderationPostingBanDefault": "You are currently banned from chat and posting.",
+  "moderationBlockedBody": "You exceeded the allowed violations limit and your message was not sent.",
+  "moderationCensoredBody": "An inappropriate word was used in your message and was removed. Please follow the usage rules.",
+  "postingBanPermanent": "You are permanently banned from chat and posting",
+  "postingBanUntil": "You are banned from chat and posting until {date}",
+  "@postingBanUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postingBanPermanentReason": "You have been permanently banned from chat and posting for repeated use of inappropriate language.",
+  "postingBanFirstReason": "You have been banned from chat and posting for 2 days for using inappropriate language. If repeated, you will be banned for a full month.",
+  "postingBanRepeatReason": "You have been banned from chat and posting for a full month for repeated use of inappropriate language.",
+  "usernameSetupTitle": "Choose your username",
+  "usernameSetupSubtitle": "This name will appear on your profile and listings",
+  "usernameHint": "username",
+  "usernameFormatRules": "Only English letters, numbers, and underscores allowed",
+  "skipForNow": "Skip for now",
+  "genericErrorRetry": "An error occurred, try again",
+  "emailVerifyTitle": "Verify email",
+  "otpSentToEmailPrompt": "Enter the code we sent to",
+  "newPasswordTitle": "New password",
+  "newPasswordSubtitle": "Enter a new password for your account",
+  "passwordChangedSuccess": "Password changed successfully",
+  "allListings": "All listings",
+  "categoryNotFoundMigration": "\"{name}\" was not found in the database. Apply migrations in Supabase then reload the app.",
+  "@categoryNotFoundMigration": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyAccountTitle": "Verify account",
+  "verifyAccountSubtitle": "Before continuing, please verify your identity",
+  "whyVerification": "Why verification?",
+  "verificationBenefitsBody": "Verifying your account gives you a blue trust badge and increases buyer confidence in your listings. We review your documents confidentially and never share them.",
+  "verifiedSellerBadge": "Verified seller badge on your profile and listings",
+  "reviewWithin24Hours": "Review within 24 hours",
+  "documentsStoredSecurely": "Your documents are stored securely",
+  "verifyIdentityAction": "Verify identity →",
+  "chooseDocumentType": "Choose document type",
+  "nationalId": "National ID",
+  "drivingLicense": "Driving license",
+  "passport": "Passport",
+  "captureDocumentTitle": "Capture document",
+  "documentFront": "Front side",
+  "documentBack": "Back side",
+  "submitForReview": "Submit for review",
+  "capturePhoto": "Take photo",
+  "chooseFromGallery": "Choose from gallery",
+  "documentBackRequired": "Please photograph the back of the document",
+  "verificationSubmitFailed": "Could not submit request, try again",
+  "verificationSentSuccess": "Sent successfully",
+  "verificationReviewNotice": "Your request will be reviewed within 24 hours and you will be notified upon approval",
+  "backToHome": "Back to home",
+  "newSmartAlert": "New smart alert",
+  "alertNameHint": "Alert name *",
+  "alertNameRequired": "Alert name is required",
+  "modelYear": "Model year",
+  "fromLabel": "From",
+  "toLabel": "To",
+  "allIraq": "All Iraq",
+  "saveAlert": "Save alert",
+  "alertSavedSuccess": "Alert saved ✓ We will notify you when a matching listing is posted",
+  "alertSaveFailed": "Could not save alert: {error}",
+  "@alertSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newAlert": "New alert",
+  "loginToManageAlerts": "Sign in to manage alerts",
+  "noAlertsYet": "No alerts yet",
+  "createAlertNow": "Create an alert now",
+  "saveSearchAsAlert": "Save this search as a smart alert 🔔",
+  "alertLimitFreeReached": "Free users reached the limit (3 alerts)",
+  "upgradeProUnlimitedAlerts": "Upgrade to Pro for unlimited alerts",
+  "listingBoostedSuccess": "Your listing was boosted successfully",
+  "boostYourListing": "Boost your listing",
+  "boostListingSubtitle": "Choose the right package to increase your listing visibility",
+  "markAsSoldAction": "Sold",
+  "markAsSoldTitle": "Mark as sold",
+  "markAsSoldBody": "Mark this listing as sold?",
+  "deleteListingTitle": "Delete listing",
+  "deleteListingBody": "Delete this listing?",
+  "promoteListing": "Promote",
+  "republishListing": "Republish",
+  "restoreListing": "Restore",
+  "listingNumberWithRef": "Listing ID: #{ref}",
+  "@listingNumberWithRef": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumberDash": "Listing ID: —",
+  "contactUsOnSouqak": "Contact us on SOUQAK",
+  "pendingApprovalTitle": "Pending admin approval",
+  "pendingApprovalBody": "Edit, delete, sold, and WhatsApp will appear after approval",
+  "messageSeller": "Message seller",
+  "cannotMessageSelf": "You cannot message yourself",
+  "openChatFailed": "Could not open chat",
+  "markedAsSoldSuccess": "Marked as sold",
+  "rateBuyer": "Rate the buyer",
+  "deleteListingConfirmBody": "Are you sure? This cannot be undone.",
+  "listingDeletedSuccess": "Listing deleted",
+  "reportChooseReason": "Choose a reason or enter report details",
+  "reportSubmittedThanks": "Report submitted. Thank you for helping.",
+  "reportSubmitFailed": "Could not submit report",
+  "reportDetailsLabel": "Report details",
+  "submitReport": "Submit report",
+  "reportReasonDuplicate": "Duplicate listing",
+  "reportReasonMisleadingPrice": "Misleading price",
+  "reportReasonFakePhotos": "Fake photos",
+  "reportReasonInappropriate": "Inappropriate content",
+  "reportReasonFraud": "Fraud or scam",
+  "reportReasonOther": "Other",
+  "filtersTitle": "Filters",
+  "clearAll": "Clear all",
+  "priceRangeLabel": "Price range",
+  "additionalOptions": "More options",
+  "featuredOnlyLabel": "Featured only",
+  "negotiableOnlyLabel": "Negotiable only",
+  "showResultsCount": "Show {count} results",
+  "@showResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "showResultsLoading": "Show results...",
+  "showResults": "Show results",
+  "editChangesSaved": "Changes saved ✓",
+  "editListingTitle": "Edit listing",
+  "saveEdits": "Save changes",
+  "heatmapTitle": "Listing map",
+  "heatmapLoadFailed": "Could not load density data",
+  "heatmapNoActiveListings": "No active listings in the shown areas right now",
+  "heatmapClusterSummary": "{areas} areas · {total} listings",
+  "@heatmapClusterSummary": {
+    "placeholders": {
+      "areas": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapSelectArea": "Select an area to view listings",
+  "showListingsAction": "View listings",
+  "heatmapFilterCars": "Cars",
+  "heatmapDensityCars": "{count} cars for sale now in {area}",
+  "@heatmapDensityCars": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityRealEstate": "{count} real estate listings now in {area}",
+  "@heatmapDensityRealEstate": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityElectronics": "{count} electronics listings now in {area}",
+  "@heatmapDensityElectronics": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityGeneric": "{count} active listings now in {area}",
+  "@heatmapDensityGeneric": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "listingPendingReviewStats": "Your listing is under review — stats update automatically after publishing",
+  "contactStatLabel": "Contacts",
+  "autoRenewLabel": "Auto-renew",
+  "autoRenewAfterApproval": "Enabled after admin approves the listing",
+  "expiresInDays": "Expires in {days} days",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "priceChangeTitle": "Change price",
+  "priceChangeWarning": "Note: price changes appear to all buyers in price history",
+  "confirmChange": "Confirm change",
+  "publishSuccessDone": "Done ✓",
+  "listingPendingReviewTitle": "Your listing is under review",
+  "listingVisibleAfterApproval": "It will appear publicly after approval",
+  "okAction": "OK",
+  "closeTooltip": "Close",
+  "addPhotoLabel": "Add photo",
+  "coverPhotoLabel": "Cover",
+  "priceEstimateFailed": "Could not estimate price, try again",
+  "calculateSuggestedPrice": "✨ Calculate suggested price",
+  "confidenceHigh": "High",
+  "confidenceMedium": "Medium",
+  "confidenceLow": "Low",
+  "aiPriceEstimateTitle": "AI price estimate",
+  "priceEstimateDisclaimer": "This is an approximate estimate, not a final price",
+  "phoneOtpWhatsappHint": "We will send you a verification code via WhatsApp",
+  "passwordResetResent": "Link sent again",
+  "passwordResetSentTitle": "Link sent",
+  "passwordResetSentSubtitle": "A reset link was sent to your email",
+  "passwordResetInstructions": "Open the link in your email to create a new password. The message may take a few minutes to arrive.",
+  "resendLink": "Resend",
+  "backToLogin": "Back to sign in",
+  "videoLoadFailed": "Could not load video",
+  "listingsOnSouqakCount": "{count} listings on SOUQAK",
+  "@listingsOnSouqakCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleDetailsTitle": "Vehicle details",
+  "basicInfoTitle": "Basic information",
+  "vehicleTrimLabel": "Trim",
+  "trimExampleHint": "e.g. SE",
+  "mileageLabel": "Mileage",
+  "engineLabel": "Engine",
+  "cylindersLabel": "Cylinders",
+  "paintStatusLabel": "Paint condition",
+  "fuelRequiredLabel": "Fuel *",
+  "importCountryLabel": "Import country",
+  "plateLabel": "Plate",
+  "transmissionRequiredLabel": "Transmission *",
+  "seatCountLabel": "Number of seats",
+  "seatMaterialLabel": "Seat material",
+  "specsSectionTitle": "Specifications",
+  "priceRequiredLabel": "Price *",
+  "conditionRequiredLabel": "Condition *",
+  "yearLabel": "Year",
+  "chooseColorPlaceholder": "Choose color",
+  "chooseCustomColorTitle": "Choose a custom color",
+  "colorLabel": "Color",
+  "paintOriginalLabel": "Original",
+  "paintLocalLabel": "Local paint",
+  "paintPaintedLabel": "Repainted",
+  "paintReplacedLabel": "Replaced",
+  "vehicleSpecsSelectedCount": "{count} specs selected",
+  "@vehicleSpecsSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "electronicsPhoneDetailsTitle": "Phone details",
+  "electronicsLaptopDetailsTitle": "Laptop details",
+  "electronicsTvDetailsTitle": "TV details",
+  "electronicsDetailsTitle": "Electronics details",
+  "brandLabel": "Brand",
+  "modelLabel": "Model",
+  "storageLabel": "Storage",
+  "ramLabel": "RAM",
+  "batteryHealthLabel": "Battery health",
+  "withBoxLabel": "With box",
+  "withChargerLabel": "With charger",
+  "warrantyLabel": "Warranty",
+  "processorLabel": "Processor",
+  "screenSizeInchesLabel": "Screen size (inches)",
+  "resolutionLabel": "Resolution",
+  "realEstateDetailsTitle": "Property details",
+  "propertyTypeRequiredLabel": "Property type *",
+  "offerTypeRequiredLabel": "Offer type *",
+  "areaSqmRequiredLabel": "Area (m²) *",
+  "sqmUnit": "m²",
+  "floorLabel": "Floor",
+  "roomsCountLabel": "Number of rooms",
+  "bathroomsCountLabel": "Number of bathrooms",
+  "buildingAgeYearsLabel": "Building age (years)",
+  "finishingLabel": "Finishing",
+  "deedTypeLabel": "Deed type",
+  "featuresSectionTitle": "Features",
+  "brandOptionalLabel": "Brand (optional)",
+  "exchangePossibleQuestion": "Open to exchange?",
+  "deliveryAvailableQuestion": "Delivery available?",
+  "deliveryCostRequiredLabel": "Delivery cost *",
+  "jobDetailsTitle": "Job details",
+  "jobTypeRequiredLabel": "Employment type *",
+  "sectorRequiredLabel": "Sector *",
+  "experienceRequiredLabel": "Experience required",
+  "educationRequiredLabel": "Education required",
+  "genderPreferenceLabel": "Gender preference",
+  "salaryTypeLabel": "Salary type",
+  "salaryMinRequiredLabel": "Minimum salary *",
+  "salaryMaxLabel": "Maximum salary",
+  "benefitsSectionTitle": "Benefits",
+  "serviceDetailsTitle": "Service details",
+  "genderLabel": "Gender",
+  "nationalityLabel": "Nationality",
+  "workHoursRequiredLabel": "Working hours *",
+  "weekDaysLabel": "Days per week",
+  "yearsExperienceLabel": "Years of experience",
+  "expectedSalaryRequiredLabel": "Expected salary *",
+  "languagesSectionTitle": "Languages",
+  "animalDetailsTitle": "Pet details",
+  "ageMonthsLabel": "Age (months)",
+  "vaccinatedQuestion": "Vaccinated?",
+  "hasDocumentsQuestion": "Has documents?",
+  "trainedQuestion": "Trained?",
+  "tutoringDetailsTitle": "Lesson details",
+  "subjectRequiredLabel": "Subject *",
+  "studyStageRequiredLabel": "Study level *",
+  "curriculumLabel": "Curriculum",
+  "teachingMethodRequiredLabel": "Teaching method *",
+  "acceptedGenderLabel": "Accepted gender",
+  "pricePerHourRequiredLabel": "Price/hour *",
+  "educationQualificationLabel": "Qualification",
+  "viewOnMapLabel": "View on map",
+  "videoSectionTitle": "Video",
+  "currentVideoReplaceHint": "Current video — replace it with a new one below",
+  "addDemoVideoTitle": "Add a demo video (up to 60 seconds)",
+  "proSubscribersOnly": "Available for Pro and Premium subscribers only",
+  "upgradeToProLock": "Upgrade to Pro 🔒",
+  "processingVideoProgress": "Processing video... {percent}%",
+  "@processingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseVideoLabel": "Choose video",
+  "recordVideoLabel": "Record video",
+  "videoProcessFailed": "Could not process video",
+  "invalidVideoError": "Invalid video",
+  "imageProcessFailed": "Could not process image",
+  "chooseCategoryError": "Choose a category",
+  "chooseContactPreferenceError": "Choose a contact preference",
+  "chooseGovernorateError": "Choose a governorate",
+  "enterValidPriceError": "Enter a valid price",
+  "chooseProductConditionError": "Choose item condition",
+  "chooseConditionError": "Choose condition",
+  "chooseFuelTypeError": "Choose fuel type",
+  "chooseTransmissionError": "Choose transmission",
+  "choosePropertyTypeError": "Choose property type",
+  "chooseOfferTypeError": "Choose offer type",
+  "enterAreaSqmError": "Enter area in square meters",
+  "chooseDeliveryCostError": "Choose delivery cost",
+  "chooseSubjectError": "Choose subject",
+  "chooseStudyStageError": "Choose study level",
+  "chooseTeachingMethodError": "Choose teaching method",
+  "enterValidHourlyPriceError": "Enter a valid hourly rate",
+  "chooseJobTypeError": "Choose employment type",
+  "chooseSectorError": "Choose sector",
+  "enterMinSalaryError": "Enter minimum salary",
+  "salaryMaxMustExceedMinError": "Maximum salary must be greater than minimum",
+  "chooseAnimalTypeFromCategoriesError": "Choose animal type from categories",
+  "chooseServiceTypeFromCategoriesError": "Choose service type from categories",
+  "chooseWorkHoursError": "Choose working hours",
+  "enterExpectedSalaryError": "Enter expected salary",
+  "titleTooLongError": "Title is too long (100 characters max)",
+  "descriptionTooLongError": "Description is too long (2000 characters max)",
+  "uploadingPhotosSimple": "Uploading photos...",
+  "uploadingVideoProgress": "Uploading video... {percent}%",
+  "@uploadingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "publishListingFailedError": "Could not publish listing. Try again.",
+  "chooseCategoryMinimumError": "Choose a category at minimum",
+  "draftTitleFallback": "Draft",
+  "saveDraftFailedError": "Could not save draft",
+  "cannotEditListingError": "You cannot edit this listing",
+  "loadListingFailedError": "Could not load listing",
+  "enterListingTitleError": "Enter listing title",
+  "addAtLeastOnePhotoError": "Add at least one photo",
+  "saveEditsFailedError": "Could not save changes",
+  "chatListingIntro": "Hi, I'm interested in your listing: {title}",
+  "@chatListingIntro": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameChecking": "Checking...",
+  "usernameAvailable": "Available ✓",
+  "usernameTaken": "Already taken ✗",
+  "usernameRules": "3–20 chars: English letters, numbers, and _ only",
+  "ratingsCount": "({count} reviews)",
+  "@ratingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "authSessionFailed": "Sign-in failed. Try again.",
+  "chooseAvatar": "Choose your photo",
+  "avatarIconsSection": "Avatar icons",
+  "chooseDefaultAvatar": "Choose a default avatar",
+  "orUploadPhotoHint": "Or upload from camera/gallery above",
+  "countryIraq": "Iraq",
+  "matchingListingsCount": "{count} matching listings",
+  "@matchingListingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsTitle": "Search results",
+  "searchResultCount": "{count} results",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "filterCategoryLabel": "Category",
+  "filterPriceLabel": "Price",
+  "filterFeaturedLabel": "Featured",
+  "accountVerifiedBanner": "Your account is verified ✓",
+  "verificationPendingBanner": "Verification request under review ⏳",
+  "verificationRejectedWithReason": "Your request was rejected — {reason}",
+  "@verificationRejectedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "verificationRejectedBanner": "Verification request rejected",
+  "verifyAccountPrompt": "Verify your account for the trust badge 🔒",
+  "vehicleYearLabel": "Year",
+  "vehicleTrimShortLabel": "Trim",
+  "vehicleEngineShortLabel": "Engine",
+  "vehicleCylinderShortLabel": "Cylinder",
+  "photosSectionTitle": "Photos",
+  "currentPhotosTitle": "Current photos",
+  "clearAllFilters": "Clear all",
+  "noResultsForQuery": "No results for \"{query}\"",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "tryChangingSearchOrFilters": "Try changing your search or filters",
+  "clearFilters": "Clear filters",
+  "loadingMore": "Loading more...",
+  "noResultsFound": "No results found",
+  "attr_1aae214b": "8 airbags",
+  "colorOther": "Other",
+  "colorWhite": "White",
+  "attr_1a93e294": "Foreign",
+  "colorRed": "Red",
+  "colorGreen": "Green",
+  "attr_10f56232": "Erbil",
+  "propLand": "Land",
+  "attr_60b69dc6": "Rabbit",
+  "colorBlue": "Blue",
+  "colorBlack": "Black",
+  "attr_97418f6f": "German",
+  "attr_dd1fbe22": "American",
+  "genderFemale": "Female",
+  "transAutomatic": "Automatic",
+  "attr_0d67ce95": "European",
+  "attr_ea410cd6": "Online",
+  "attr_9967c75e": "Annual leave",
+  "attr_fd5a68db": "LED lighting",
+  "attr_cfb972ef": "Adaptive lighting",
+  "attr_0d092cb1": "Automatic high beams",
+  "attr_407ad989": "Laser lighting",
+  "attr_8c495f8e": "Ambient lighting",
+  "attr_367395e4": "IELTS prep",
+  "attr_9f6457d2": "TOEFL prep",
+  "attr_00f135f8": "Secondary",
+  "genderFemales": "Females",
+  "attr_0402b2d3": "English",
+  "offerRent": "Rent",
+  "offerDailyRent": "Daily rent",
+  "attr_5c22c7bc": "Primary",
+  "attr_a910430c": "Biology",
+  "attr_b1a8fcf3": "Business & finance",
+  "attr_127a0207": "Safety",
+  "attr_e8ade886": "Security sector",
+  "attr_782faf71": "Economics",
+  "attr_6466c2b3": "Programming",
+  "attr_7b2d355f": "Basra",
+  "attr_3659f4ca": "History & Geography",
+  "attr_3dbbe072": "Tajweed",
+  "attr_5fa7f4ab": "Islamic education",
+  "attr_68b31032": "Design",
+  "attr_595073bb": "Traffic sign recognition",
+  "attr_a8071737": "Education & training",
+  "attr_2f29a34b": "Computer & technology",
+  "attr_b5bf961a": "Hillah",
+  "attr_6f5c12c4": "Exterior",
+  "attr_479c9dd4": "Diwaniyah",
+  "attr_d10c7f46": "Comfort",
+  "attr_a8590e6c": "Ramadi",
+  "attr_ec996beb": "Mathematics",
+  "attr_2ad56620": "Agriculture",
+  "attr_b23b84b6": "Sulaymaniyah",
+  "attr_47499b9d": "Pharmacy",
+  "attr_df03b4c2": "Hospitality & restaurants",
+  "attr_dbdc9141": "Medicine",
+  "attr_2f1f707b": "Medicine & health",
+  "attr_a23d2f98": "General science",
+  "attr_fc2fc74a": "Amarah",
+  "attr_308b4c85": "Fiqh",
+  "attr_057cd7d5": "Physics",
+  "attr_4cfcf3c2": "Law",
+  "attr_1429981f": "Holy Quran",
+  "attr_c8f1808b": "Kut",
+  "attr_569ec1ad": "Chemistry",
+  "attr_4469156a": "German language",
+  "attr_8bcb4c90": "English language",
+  "attr_51a02272": "Turkish language",
+  "attr_b99f79d6": "Arabic language",
+  "attr_37ae3826": "French language",
+  "attr_568f6457": "Kurdish language",
+  "attr_00ea8179": "Sales & marketing",
+  "attr_3f2ef321": "Accounting",
+  "attr_f3a2d580": "Financial accounting",
+  "attr_b4a66258": "Iraqi curriculum",
+  "attr_878d6350": "Mosul",
+  "attr_8f465ea8": "Nasiriyah",
+  "attr_1c675f3a": "Najaf",
+  "attr_1ace1501": "Oil & energy",
+  "attr_d83c25fb": "Transport & logistics",
+  "attr_45fbf259": "Engineering & construction",
+  "attr_4bfb21c0": "Adults",
+  "attr_b7e8e36b": "No experience",
+  "warrantyNo": "No warranty",
+  "attr_1fbfc2a7": "No plate",
+  "colorOrange": "Orange",
+  "attr_f8104802": "British",
+  "attr_40153b66": "Baghdad",
+  "attr_13ac665b": "Bachelor's",
+  "attr_7acac848": "Balcony",
+  "fuelPetrol": "Petrol",
+  "colorPurple": "Purple",
+  "colorBrown": "Brown",
+  "colorBeige": "Beige",
+  "offerSale": "Sale",
+  "attr_d1c3aa46": "Health insurance",
+  "attr_8fe0629c": "Auto hold",
+  "attr_6ef15709": "Automatic climate control",
+  "attr_36db3f98": "Traction control",
+  "attr_674fb279": "Training",
+  "attr_f730823c": "Heated seats",
+  "attr_2751dcce": "Turkish",
+  "attr_5e98ac49": "Remote start",
+  "attr_0e8965c7": "IT & programming",
+  "attr_39990cf8": "Tikrit",
+  "attr_b3d78ccb": "Driver attention alert",
+  "attr_ece0d086": "Rear cross-traffic alert",
+  "attr_30ad1cb0": "Cleaning",
+  "attr_61ff3500": "Electric power steering",
+  "colorTitanium": "Titanium",
+  "attr_5dfc333a": "High school",
+  "colorTricolor": "Tricolor",
+  "attr_2b649c53": "University",
+  "attr_3f0a5345": "Leather",
+  "attr_596cc57e": "Generator",
+  "conditionGood": "Good",
+  "attr_e7873977": "Gardening",
+  "attr_6c532953": "Garden",
+  "attr_57bf3353": "Security",
+  "attr_9e07c1b5": "Accident history",
+  "attr_e4439193": "Water tank",
+  "attr_c6c026c9": "Gulf",
+  "attr_b3371774": "Horse",
+  "attr_bf2575b9": "Diploma",
+  "attr_f7fc7de3": "Keyless entry",
+  "attr_eebeffb8": "Heated steering wheel",
+  "attr_bc432f3e": "PhD",
+  "attr_c114e728": "Dohuk",
+  "attr_166ce8c7": "Part-time",
+  "attr_03e6fabe": "Full-time",
+  "fuelDiesel": "Diesel",
+  "genderMale": "Male",
+  "genderMales": "Males",
+  "colorGold": "Gold",
+  "attr_ed91d68c": "Salary + commission",
+  "attr_4bd160a2": "Fixed salary",
+  "attr_d9033ee1": "Radar",
+  "attr_d021c755": "Childcare",
+  "attr_f730c844": "Elderly care",
+  "attr_20484d19": "Remote parking",
+  "colorGray": "Gray",
+  "attr_9863b154": "Push-button start",
+  "attr_91d7a73d": "Reptile",
+  "attr_603ab93b": "Driver",
+  "attr_fe80509e": "Samarra",
+  "attr_ec4f948f": "Housing",
+  "attr_5ae5476a": "Fish",
+  "attr_48c1891a": "Wireless charger",
+  "attr_5f5265a7": "Display screen",
+  "propApartment": "Apartment",
+  "attr_1fcda818": "Morning",
+  "attr_1980be67": "Home maintenance",
+  "attr_a78786af": "Chinese",
+  "attr_adfa037c": "Front fog lights",
+  "warrantyYes": "With warranty",
+  "attr_e579ab86": "Bird",
+  "attr_71c665ee": "Title deed",
+  "attr_7a206f76": "Cooking",
+  "attr_e5dbc387": "Iraqi",
+  "attr_da88eccb": "Arabic",
+  "attr_aa4460d5": "Head-up display (HUD)",
+  "attr_8127bee7": "Contract",
+  "attr_571581cc": "Sale contract",
+  "attr_155ac5cf": "Computer science",
+  "attr_7173aff1": "Commission",
+  "attr_e3668c0d": "Remote",
+  "fuelGas": "Gas",
+  "attr_a1a423e6": "Laundry & ironing",
+  "furnishedNo": "Unfurnished",
+  "attr_1a0bd9b9": "Persian",
+  "attr_29519ce6": "Sunroof",
+  "attr_aa282cda": "French",
+  "colorSilver": "Silver",
+  "propHotel": "Hotel",
+  "attr_eda90053": "At home",
+  "attr_d2157926": "At my office",
+  "propVilla": "Villa",
+  "attr_a826a507": "Cat",
+  "attr_4b021528": "Child lock",
+  "attr_60cbec0a": "Central locking",
+  "attr_f283f661": "Fabric",
+  "attr_df6d261d": "360° camera",
+  "attr_1f94f275": "Rear camera",
+  "attr_ea2d0f4a": "Cameras",
+  "attr_8d564a08": "Karbala",
+  "attr_aa03d946": "Kurdish",
+  "attr_4e1a505f": "Kirkuk",
+  "genderBoth": "Both",
+  "attr_f6ec7e07": "Dog",
+  "fuelElectric": "Electric",
+  "attr_38ad1ced": "Korean",
+  "attr_10da4bc1": "Digital cockpit",
+  "attr_3a1306fc": "Temporary",
+  "attr_0cfe7e2c": "Temporary plate",
+  "attr_9e37b135": "Master's",
+  "attr_14184253": "Intermediate",
+  "attr_5443be84": "Adaptive cruise control",
+  "deliveryFree": "Free",
+  "propCommercial": "Commercial shop",
+  "genderMixed": "Mixed",
+  "deliveryPaid": "Paid",
+  "attr_463b559b": "Blind spot monitor",
+  "attr_3e6b7c47": "Heated side mirrors",
+  "attr_5e7c67c4": "Power mirrors",
+  "colorSpotted": "Spotted",
+  "propFarm": "Farm",
+  "attr_726ee881": "Mixed",
+  "attr_abbb3685": "Evening",
+  "attr_b1f57e19": "Traffic jam assist",
+  "attr_1c5815dd": "Emergency brake assist",
+  "attr_1d2d9327": "Pool",
+  "attr_908b36c3": "Tire pressure sensors",
+  "propWarehouse": "Warehouse",
+  "attr_f4bcb528": "Armrest",
+  "attr_50eeda55": "Partially repainted",
+  "attr_d7f99058": "Fully repainted",
+  "attr_c29ac455": "Elevator",
+  "furnishedYes": "Furnished",
+  "attr_bc8dd527": "Massage seats",
+  "conditionFair": "Fair",
+  "attr_4827979f": "Live-in",
+  "attr_4a9d2ecf": "Bonuses",
+  "propOffice": "Office",
+  "conditionScreenBroken": "Screen cracked",
+  "conditionExcellent": "Excellent",
+  "attr_a274e886": "Other subjects",
+  "attr_8c812969": "Transport",
+  "attr_5830d091": "Parking",
+  "furnishedPartial": "Partially furnished",
+  "attr_d80ed6a2": "Start-stop system",
+  "attr_3b085d0f": "Harman Kardon sound system",
+  "attr_f6cf560b": "Clean",
+  "attr_301b8203": "Moving",
+  "attr_3edd4576": "Power windows",
+  "fuelHybrid": "Hybrid",
+  "attr_f0f27452": "Software engineering",
+  "attr_d50cbb11": "Hill holder",
+  "attr_a5d7347c": "Meals",
+  "colorPink": "Pink",
+  "attr_da3d03ec": "Drive mode",
+  "attr_065a7470": "Power of attorney",
+  "attr_f5e2c57f": "Japanese",
+  "transManual": "Manual",
+  "attr_1111f817": "Full day",
+  "yesLabel": "Yes",
+  "noLabel": "No",
+  "transCvt": "CVT",
+  "resultsCount": "{count} results",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortNewest": "Newest",
+  "sortCheapest": "Cheapest",
+  "sortExpensive": "Most expensive",
+  "sortMostViewed": "Most viewed",
+  "statusSold": "Sold",
+  "statusDeleted": "Deleted",
+  "statusRejected": "Rejected",
+  "listingTypeSale": "For sale",
+  "listingTypeRent": "For rent",
+  "contactPhoneAndMessages": "Phone & messages",
+  "contactPhoneOnly": "Phone only",
+  "contactMessagesOnly": "Messages only",
+  "packageStandardFull": "Standard listing",
+  "packageProFull": "Pro listing",
+  "packagePremiumFull": "Premium listing",
+  "chooseCategoryTitle": "Choose category",
+  "categoriesLoadError": "Could not load categories",
+  "tryDifferentSearchOrFilters": "Try a different search term or filters",
+  "listingFallbackTitle": "Listing",
+  "validationPhoneRequired": "Enter your phone number",
+  "validationPhoneInvalid": "Invalid phone number",
+  "validationPhoneInvalidIq": "Invalid Iraqi phone number",
+  "validationOtpRequired": "Enter the 6-digit verification code",
+  "validationFieldRequired": "{field} is required",
+  "@validationFieldRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationPriceRequired": "Enter the price",
+  "validationPriceInvalid": "Invalid price",
+  "validationEmailRequired": "Enter your email",
+  "validationEmailInvalid": "Invalid email address",
+  "validationPasswordRequired": "Enter your password",
+  "validationPasswordMinLength": "Password must be at least {count} characters",
+  "@validationPasswordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "validationPasswordLowercase": "Add a lowercase letter (a-z)",
+  "validationPasswordUppercase": "Add an uppercase letter (A-Z)",
+  "validationPasswordDigit": "Add a digit (0-9)",
+  "validationPasswordSymbol": "Add a special character (!@#...)",
+  "validationConfirmPasswordRequired": "Confirm your password",
+  "validationPasswordMismatch": "Passwords do not match",
+  "validationWeakPassword": "Password must be at least 8 characters with upper, lower, digit, and symbol",
+  "authNetworkError": "Check your internet connection",
+  "authRateLimitGeneric": "Too many requests. Wait a minute and try again.",
+  "authRateLimitSeconds": "Too many requests. Wait {seconds} seconds and try again.",
+  "@authRateLimitSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "authInvalidCredentials": "Incorrect email or password.",
+  "authInvalidEmail": "Invalid email address",
+  "authEmailExists": "This email is already registered",
+  "authEmailNotConfirmed": "Please confirm your email before signing in.",
+  "authSignupDisabled": "Sign-up is currently unavailable.",
+  "authSmsFailed": "Could not send SMS. Check Supabase SMS settings.",
+  "authPhoneInvalidFormat": "Invalid phone number. Use +9647XXXXXXXX.",
+  "authGenericError": "Authentication failed. Please try again.",
+  "authOperationFailed": "Could not complete the operation. Please try again.",
+  "loginRequiredFirst": "You must sign in first",
+  "metaPropertyType": "Property type",
+  "metaOfferType": "Offer type",
+  "metaArea": "Area",
+  "metaFloor": "Floor",
+  "metaTotalFloors": "Total floors",
+  "metaRooms": "Rooms",
+  "metaBathrooms": "Bathrooms",
+  "metaBuildingAge": "Building age",
+  "metaFurnishing": "Furnishing",
+  "metaYear": "Year",
+  "metaTrim": "Trim",
+  "metaEngine": "Engine",
+  "metaCylinders": "Cylinders",
+  "metaLanguages": "Languages",
+  "metaSalary": "Salary",
+  "metaExperience": "Experience",
+  "metaGender": "Gender",
+  "metaAge": "Age",
+  "metaBreed": "Breed",
+  "metaServiceType": "Service type",
+  "metaAvailability": "Availability",
+  "metaBrand": "Brand",
+  "metaModel": "Model",
+  "metaStorage": "Storage",
+  "metaCondition": "Condition",
+  "metaItemType": "Item type",
+  "metaSubject": "Subject",
+  "metaLevel": "Level",
+  "metaJobType": "Job type",
+  "metaWorkMode": "Work mode",
+  "metaEducation": "Education",
+  "metaDetailsSection": "Details",
+  "bodyConditionTitle": "Body & Paint Condition",
+  "bodyPartSelected": "{selected}/{total} parts selected",
+  "@bodyPartSelected": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bodyPartOriginal": "Original",
+  "bodyPartLocalPaint": "Local Paint",
+  "bodyPartPainted": "Painted",
+  "bodyPartReplaced": "Replaced",
+  "next": "Next",
+  "allCarPartsOriginalFull": "All car parts are original. No painted or replaced parts.",
+  "carPaintPanelFrontBumper": "Front bumper",
+  "carPaintPanelHood": "Hood",
+  "carPaintPanelFrontLeftFender": "Front left fender",
+  "carPaintPanelFrontRightFender": "Front right fender",
+  "carPaintPanelFrontLeftDoor": "Front left door",
+  "carPaintPanelFrontRightDoor": "Front right door",
+  "carPaintPanelRoof": "Roof",
+  "carPaintPanelRearLeftDoor": "Rear left door",
+  "carPaintPanelRearRightDoor": "Rear right door",
+  "carPaintPanelTrunk": "Trunk",
+  "carPaintPanelRearLeftFender": "Rear left fender",
+  "carPaintPanelRearRightFender": "Rear right fender",
+  "carPaintPanelRearBumper": "Rear bumper",
+  "locationPickerTitle": "Set Location",
+  "locationCoordinates": "Coordinates",
+  "locationUseCurrentLocation": "Use My Current Location",
+  "locationConfirm": "Confirm Location",
+  "locationMapUnavailableStatus": "Map is unavailable. You can confirm the default Baghdad location or close this window.",
+  "locationMapLoadFailedStatus": "Could not load the map. Default Baghdad location was used.",
+  "locationGpsFailedSnack": "Could not determine your location. Default Baghdad location was used.",
+  "locationFetchFailedSnack": "Could not get location",
+  "locationMapUnavailable": "Map unavailable",
+  "locationLoadingMap": "Loading map...",
+  "statYear": "Year",
+  "statCategory": "Category",
+  "statKm": "KM",
+  "statMile": "MI",
+  "statEngine": "Engine",
+  "statCylinders": "Cylinders",
+  "sectionDetails": "Details",
+  "sectionSpecs": "Specifications",
+  "sectionBodyCondition": "Body & Paint Condition",
+  "listedOn": "Listed on",
+  "fieldCondition": "Condition",
+  "fieldPaintCondition": "Paint Condition",
+  "fieldFuel": "Fuel",
+  "fieldImportCountry": "Import Country",
+  "fieldPlate": "Plate",
+  "fieldTransmission": "Transmission",
+  "fieldSeats": "Seats",
+  "fieldSeatMaterial": "Seat Material",
+  "fieldColor": "Color",
+  "metaDeliveryCost": "Delivery cost",
+  "metaPricePerHour": "Price/hour",
+  "metaSalaryMin": "Minimum salary",
+  "metaSalaryMax": "Maximum salary",
+  "metaSector": "Sector",
+  "metaExperienceRequired": "Experience required",
+  "metaEducationRequired": "Education required",
+  "metaGenderPreference": "Gender preference",
+  "metaTeachingMethod": "Teaching method",
+  "metaQualifications": "Qualifications",
+  "metaStudyStages": "Study levels",
+  "metaAnimalType": "Animal type",
+  "metaHasPapers": "Has papers",
+  "metaVaccinated": "Vaccinated",
+  "metaTrained": "Trained",
+  "metaDaysPerWeek": "Days per week",
+  "metaExpectedSalary": "Expected salary",
+  "metaWorkHours": "Working hours",
+  "metaAgeMonths": "{count} months",
+  "@metaAgeMonths": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metaRam": "RAM",
+  "metaBatteryHealth": "Battery health",
+  "metaWarranty": "Warranty",
+  "metaProcessor": "Processor",
+  "metaScreenSize": "Screen size",
+  "metaResolution": "Resolution",
+  "metaWithBox": "With box",
+  "metaWithCharger": "With charger",
+  "metaSmartTv": "Smart TV",
+  "mainCategory": "Main Category",
+  "subCategory": "Subcategory",
+  "categoryDetail": "Detail",
+  "termsTitle": "Terms of Use",
+  "termsSection1Title": "Introduction",
+  "termsSection1Body": "Welcome to Souqak. By using the app or creating an account, you agree to these terms. Please read them carefully. If you do not agree, please do not use the service.",
+  "termsSection2Title": "App Usage",
+  "termsSection2Body": "You may use Souqak to buy and sell goods and services within the laws of Iraq. Posting misleading, illegal, or offensive content is prohibited. We reserve the right to remove any content that violates these terms without prior notice.",
+  "termsSection3Title": "User Rights",
+  "termsSection3Body": "You retain ownership of content you post. You grant Souqak a non-exclusive license to display it within the app for service purposes. You have the right to edit your profile, listings, and delete your account.",
+  "termsSection4Title": "Responsibilities",
+  "termsSection4Body": "You are responsible for the accuracy of your account information, listings, and interactions with other users. Souqak is an intermediary platform and does not guarantee every listing or transaction. We recommend verifying products and sellers before purchasing.",
+  "termsSection5Title": "Termination",
+  "termsSection5Body": "We may suspend or terminate your account if you violate these terms or are suspected of fraudulent activity. You may also delete your account at any time from the app settings.",
+  "privacyTitle": "Privacy Policy",
+  "privacySection1Title": "What Information We Collect",
+  "privacySection1Body": "We collect information you provide during registration such as name, email, phone number, and username, as well as listing data you publish and your in-app messages. We may also collect technical data such as device type and IP address for security and service improvement purposes.",
+  "privacySection2Title": "How We Use Your Data",
+  "privacySection2Body": "We use your data to operate your account, display your listings, enable communication between users, and send notifications related to smart alerts and messages. We also use aggregated data to improve the user experience, prevent fraud, and ensure platform security.",
+  "privacySection3Title": "Data Sharing",
+  "privacySection3Body": "We do not sell your personal data to third parties. We may share limited information with service providers who help us host data and send notifications, subject to confidentiality obligations. We may disclose information upon lawful request or to protect user rights and platform safety.",
+  "privacySection4Title": "Data Security",
+  "privacySection4Body": "We apply technical and organizational measures to protect your data from unauthorized access, loss, or modification. However, absolute security of any internet transmission cannot be guaranteed, so we recommend using a strong password and not sharing login credentials.",
+  "privacySection5Title": "Contact Us",
+  "privacySection5Body": "If you have questions about the privacy policy or wish to exercise your data rights, you can contact us through the support email listed in the app settings. We will respond to your requests as soon as possible in accordance with applicable laws.",
+  "packageDurationDays": "{count} days",
+  "@packageDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkgStandardFeature1Title": "Basic listing",
+  "pkgStandardFeature1Desc": "Published in search results among standard listings",
+  "pkgStandardFeature2Title": "Messages & calls",
+  "pkgStandardFeature2Desc": "Buyers contact you based on your preferences",
+  "pkgProFeature1Title": "Verified profile badge",
+  "pkgProFeature1Desc": "Build buyer trust on your listing card",
+  "pkgProFeature2Title": "Higher visibility",
+  "pkgProFeature2Desc": "Shown above standard listings in the same category",
+  "pkgProFeature3Title": "Statistics",
+  "pkgProFeature3Desc": "Views and engagement for your listing",
+  "pkgPremiumFeature1Title": "Featured carousel",
+  "pkgPremiumFeature1Desc": "Shown in the featured section on the home page",
+  "pkgPremiumFeature2Title": "Top ranking",
+  "pkgPremiumFeature2Desc": "Highest priority in search and category results",
+  "pkgPremiumFeature3Title": "Boosted exposure",
+  "pkgPremiumFeature3Desc": "Prominent placement to increase views",
+  "pkgProFeature4Title": "Weekly auto-renewal",
+  "pkgProFeature4Desc": "Your listing returns to the top of its category every week",
+  "pkgProFeature5Title": "More photos & video",
+  "pkgProFeature5Desc": "Add up to 15 photos and one video to your listing",
+  "pkgProFeature6Title": "Direct WhatsApp button",
+  "pkgProFeature6Desc": "Instant WhatsApp contact from the listing card",
+  "pkgProFeature7Title": "Pro frame & badge",
+  "pkgProFeature7Desc": "A distinctive frame and \"Pro\" badge make your listing stand out",
+  "pkgPremiumFeature4Title": "Daily auto-renewal",
+  "pkgPremiumFeature4Desc": "Your listing returns to the top of its category every day",
+  "pkgPremiumFeature5Title": "Notify interested buyers",
+  "pkgPremiumFeature5Desc": "Buyers interested in your category get a notification",
+  "pkgPremiumFeature6Title": "Advanced analytics",
+  "pkgPremiumFeature6Desc": "Detailed insights: view sources and peak hours",
+  "loadingMore": "Loading more...",
+  "currentPhotos": "Current photos",
+  "completePayment": "Complete Payment",
+  "paymentSuccess": "Payment Successful ✓",
+  "paymentFailed": "Payment failed, please try again",
+  "startPayment": "Start payment"
 }

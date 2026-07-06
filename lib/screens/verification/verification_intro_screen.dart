@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../shared/widgets/app_back_button.dart';
@@ -9,11 +11,12 @@ import '../../features/auth/widgets/auth_form_styles.dart';
 import '../../features/auth/widgets/auth_hero_header.dart';
 
 /// Screen 1 — verification intro with dark canvas header.
-class VerificationIntroScreen extends StatelessWidget {
+class VerificationIntroScreen extends ConsumerWidget {
   const VerificationIntroScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Scaffold(
       backgroundColor: AppColors.canvas,
       body: Directionality(
@@ -22,8 +25,8 @@ class VerificationIntroScreen extends StatelessWidget {
           children: [
             AuthDarkHeader(
               showLogo: false,
-              title: 'توثيق الحساب',
-              subtitle: 'قبل المتابعة، يرجى توثيق هويتك',
+              title: strings.verifyAccountTitle,
+              subtitle: strings.verifyAccountSubtitle,
               leading: AppBackButton(onPressed: () => context.pop()),
               titleStyle: AppFonts.cairo(
                 fontSize: 22,
@@ -52,7 +55,7 @@ class VerificationIntroScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'لماذا التوثيق؟',
+                      strings.whyVerification,
                       style: AppFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -61,8 +64,7 @@ class VerificationIntroScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'توثيق حسابك يمنحك شارة الثقة الزرقاء ويزيد من ثقة المشترين في إعلاناتك. '
-                      'نراجع وثائقك بسرية تامة ولا نشاركها مع أي طرف.',
+                      strings.verificationBenefitsBody,
                       textAlign: TextAlign.center,
                       style: AppFonts.cairo(
                         fontSize: 14,
@@ -71,9 +73,9 @@ class VerificationIntroScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _Bullet(text: 'شارة «بائع موثّق» على ملفك وإعلاناتك'),
-                    _Bullet(text: 'مراجعة خلال 24 ساعة'),
-                    _Bullet(text: 'وثائقك محفوظة بشكل آمن'),
+                    _Bullet(text: strings.verifiedSellerBadge),
+                    _Bullet(text: strings.reviewWithin24Hours),
+                    _Bullet(text: strings.documentsStoredSecurely),
                   ],
                 ),
               ),
@@ -83,7 +85,7 @@ class VerificationIntroScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
                 child: AuthPrimaryButton(
-                  label: 'توثيق الهوية ←',
+                  label: strings.verifyIdentityAction,
                   onPressed: () =>
                       context.push(AppRoutes.verificationDocumentType),
                 ),

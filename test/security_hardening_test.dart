@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Sello/core/supabase/public_profiles_query.dart';
 import 'package:Sello/core/utils/secure_log.dart';
@@ -21,6 +23,16 @@ void main() {
       expect(scrubbed, isNot(contains('+9647701234567')));
       expect(scrubbed, contains('[email]'));
       expect(scrubbed, contains('[phone]'));
+    });
+  });
+
+  group('listing package guard migration', () {
+    test('strips client listing_package on insert', () {
+      final migration = File(
+        'supabase/migrations/20260724000000_guard_listing_package_metadata.sql',
+      ).readAsStringSync();
+      expect(migration, contains('listing_package'));
+      expect(migration, contains('trusted_package_update'));
     });
   });
 

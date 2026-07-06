@@ -1,0 +1,14 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://127.0.0.1:8080",
+  "executionArgs": {
+    "projectName": "my_app",
+    "projectPath": "/Users/iconicali/my_app",
+    "testIds": [],
+    "additionalInstruction": "Test the Sello Flutter web app at http://localhost:8080. Guest browsing only (no login). Focus on home feed, search, category browse, and listing detail. App is RTL Arabic by default.",
+    "serverMode": "development"
+  },
+  "serverPort": 8080
+}

@@ -1,11 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Sello/core/supabase/supabase_client.dart';
-import 'package:Sello/features/favorites/data/favorites_repository.dart';
 import 'package:Sello/features/favorites/providers/favorites_provider.dart';
+import 'package:Sello/features/listings/data/listings_repository.dart';
+
+class _StubListingsRepo extends ListingsRepository {
+  _StubListingsRepo() : super(null as dynamic);
+}
 
 class _FakeFavoritesRepository extends FavoritesRepository {
-  _FakeFavoritesRepository(Set<String> ids) : super(null) {
+  _FakeFavoritesRepository(Set<String> ids) : super(null, _StubListingsRepo()) {
     _ids = Set<String>.from(ids);
   }
 

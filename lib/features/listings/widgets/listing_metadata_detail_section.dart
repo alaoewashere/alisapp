@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/listing_metadata_detail_rows.dart';
 
 /// Label/value rows + optional chip groups (vehicle-style listing details).
-class ListingMetadataDetailSection extends StatelessWidget {
+class ListingMetadataDetailSection extends ConsumerWidget {
   const ListingMetadataDetailSection({
     super.key,
     required this.rows,
@@ -14,8 +16,9 @@ class ListingMetadataDetailSection extends StatelessWidget {
   final List<MetadataChipGroup> chipGroups;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = ref.watch(appLocalizationsProvider);
     final visibleGroups =
         chipGroups.where((group) => group.chips.isNotEmpty).toList();
 
@@ -27,7 +30,7 @@ class ListingMetadataDetailSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (rows.isNotEmpty) ...[
-          Text('التفاصيل', style: theme.textTheme.titleMedium),
+          Text(l10n.sectionDetails, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           ...rows.map(
             (row) => Padding(
@@ -61,7 +64,7 @@ class ListingMetadataDetailSection extends StatelessWidget {
           if (rows.isNotEmpty || group != visibleGroups.first)
             const SizedBox(height: 16),
           if (rows.isEmpty && group == visibleGroups.first) ...[
-            Text('التفاصيل', style: theme.textTheme.titleMedium),
+            Text(l10n.sectionDetails, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
           ],
           Text(group.title, style: theme.textTheme.titleMedium),

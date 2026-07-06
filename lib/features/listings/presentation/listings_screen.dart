@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/category_locale.dart';
 import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/router/app_router.dart';
 import '../../../core/utils/category_tree.dart';
+import '../../../shared/models/filter_model.dart';
 import '../../home/providers/home_provider.dart';
 import '../../home/widgets/listing_card.dart';
 import '../providers/post_listing_provider.dart';
+import '../providers/search_provider.dart';
+import '../widgets/filter_sheet.dart';
 import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
@@ -42,10 +47,30 @@ class ListingsScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: AppBackButton(onPressed: () => context.pop()),
         title: isAll
-            ? const Text('جميع الإعلانات')
+            ? Text(strings.allListings)
             : Text(
-                titleAsync ?? 'الإعلانات',
+                titleAsync ?? strings.listingsLabel,
               ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune),
+            tooltip: strings.filtersTitle,
+            onPressed: () {
+              // Pre-seed the filter with the category being browsed so it
+              // opens already matching where the user currently is, not blank.
+              if (!isAll) {
+                ref.read(filterProvider.notifier).setFilter(
+                      FilterModel(categoryId: int.parse(categoryId)),
+                    );
+              }
+              showFilterSheet(
+                context,
+                ref,
+                onApplied: () => context.push(AppRoutes.searchResults),
+              );
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -62,7 +87,7 @@ class ListingsScreen extends ConsumerWidget {
               SizedBox(
                 height: MediaQuery.sizeOf(context).height * 0.6,
                 child: AppErrorWidget(
-                  message: 'فشل تحميل الإعلانات',
+                  message: strings.failedLoadListings,
                   onRetry: () {
                     if (isAll) {
                       ref.invalidate(recentListingsProvider);
@@ -105,9 +130,10 @@ class ListingsScreen extends ConsumerWidget {
 }
 
 final _categoryTitleProvider = Provider.family<String?, int>((ref, categoryId) {
+  final localeCode = ref.watch(categoryLocaleCodeProvider);
   final allAsync = ref.watch(allCategoriesProvider);
   return allAsync.maybeWhen(
-    data: (all) => categoryById(categoryId, all)?.nameAr,
+    data: (all) => categoryById(categoryId, all)?.localizedName(localeCode),
     orElse: () => null,
   );
 });

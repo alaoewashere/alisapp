@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../shared/models/vehicle_listing_metadata.dart';
 
 /// Four icon stat cards for vehicle listings (iqcars.net style).
-class VehicleStatsRow extends StatelessWidget {
+class VehicleStatsRow extends ConsumerWidget {
   const VehicleStatsRow({super.key, required this.vehicle});
 
   final VehicleListingMetadata vehicle;
 
   @override
-  Widget build(BuildContext context) {
-    final mileageUnit = vehicle.mileageUnit;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = ref.watch(appLocalizationsProvider);
     final mileageValue = vehicle.mileage != null
         ? _formatMileageValue(vehicle.mileage!)
         : '—';
@@ -22,7 +24,7 @@ class VehicleStatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.calendar_today_outlined,
             value: vehicle.year != null ? vehicle.year.toString() : '—',
-            subLabel: 'السنة',
+            subLabel: l10n.statYear,
           ),
         ),
         const SizedBox(width: 8),
@@ -30,7 +32,7 @@ class VehicleStatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.format_list_bulleted,
             value: vehicle.trim.isNotEmpty ? vehicle.trim : '—',
-            subLabel: 'الفئة',
+            subLabel: l10n.statCategory,
           ),
         ),
         const SizedBox(width: 8),
@@ -38,7 +40,7 @@ class VehicleStatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.speed,
             value: mileageValue,
-            subLabel: mileageUnit.labelAr,
+            subLabel: l10n.statKm,
           ),
         ),
         const SizedBox(width: 8),
@@ -46,7 +48,7 @@ class VehicleStatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.settings,
             value: _formatEngineValue(vehicle.engine),
-            subLabel: 'محرك',
+            subLabel: l10n.statEngine,
           ),
         ),
         const SizedBox(width: 8),
@@ -54,7 +56,7 @@ class VehicleStatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.build_outlined,
             value: _formatCylindersValue(vehicle.cylinders),
-            subLabel: 'أسطوانة',
+            subLabel: l10n.statCylinders,
           ),
         ),
       ],

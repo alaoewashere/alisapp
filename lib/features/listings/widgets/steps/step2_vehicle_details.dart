@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/enum_localizations.dart';
+import '../../../../core/l10n/l10n_provider.dart';
+import '../../../../core/utils/category_tree.dart';
 import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../shared/models/category_model.dart';
 import '../../../../shared/models/listing_model.dart';
 import '../../../../shared/models/vehicle_listing_metadata.dart';
 import '../../constants/vehicle_listing_options.dart';
@@ -26,9 +30,7 @@ class Step2VehicleDetails extends ConsumerStatefulWidget {
 }
 
 class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
-  late final TextEditingController _trimController;
   late final TextEditingController _mileageController;
-  late final TextEditingController _engineController;
   late final TextEditingController _priceController;
 
   @override
@@ -42,11 +44,9 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
     });
     final vehicle = ref.read(postListingProvider).vehicleDetails;
     final price = ref.read(postListingProvider).price;
-    _trimController = TextEditingController(text: vehicle.trim);
     _mileageController = TextEditingController(
       text: vehicle.mileage?.toString() ?? '',
     );
-    _engineController = TextEditingController(text: vehicle.engine);
     _priceController = TextEditingController(
       text: price != null ? price.round().toString() : '',
     );
@@ -54,11 +54,18 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
 
   @override
   void dispose() {
-    _trimController.dispose();
     _mileageController.dispose();
-    _engineController.dispose();
     _priceController.dispose();
     super.dispose();
+  }
+
+  /// The brand node within the selected category drill-down (e.g. "Toyota"),
+  /// used to look up real trim/engine options for that brand.
+  CategoryModel? _selectedBrand(List<CategoryModel> path) {
+    for (final c in path) {
+      if (isVehicleBrand(c)) return c;
+    }
+    return null;
   }
 
   void _updateVehicle(
@@ -74,6 +81,25 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
     final notifier = ref.read(postListingProvider.notifier);
     final vehicle = state.vehicleDetails;
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
+
+    final brandSlug = _selectedBrand(state.categoryPath)?.slug;
+    final curatedTrims = brandSlug == null
+        ? const <String>[]
+        : ref
+            .watch(vehicleTrimOptionsProvider(brandSlug))
+            .maybeWhen(data: (v) => v, orElse: () => const <String>[]);
+    final trimOptions = curatedTrims.isNotEmpty
+        ? curatedTrims
+        : VehicleListingOptions.genericTrimOptions;
+    final curatedEngines = brandSlug == null
+        ? const <String>[]
+        : ref
+            .watch(vehicleEngineOptionsProvider(brandSlug))
+            .maybeWhen(data: (v) => v, orElse: () => const <String>[]);
+    final engineOptions = curatedEngines.isNotEmpty
+        ? curatedEngines
+        : VehicleListingOptions.genericEngineOptions;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -83,7 +109,7 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'تفاصيل المركبة',
+              strings.vehicleDetailsTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -101,29 +127,28 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
             const SizedBox(height: 16),
             const Step2TitleDescriptionFields(),
             Text(
-              'المعلومات الأساسية',
+              strings.basicInfoTitle,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.textDark,
               ),
             ),
             const SizedBox(height: 12),
-            _VehicleTextFieldCard(
-              label: 'الفئة',
-              controller: _trimController,
-              hint: 'مثال: SE',
-              textDirection: TextDirection.rtl,
+            _VehiclePickerField(
+              label: strings.vehicleTrimLabel,
+              value: vehicle.trim,
+              items: trimOptions,
               onChanged: (v) => _updateVehicle((d) => d.copyWith(trim: v)),
             ),
             const SizedBox(height: 12),
             _VehicleTextFieldCard(
-              label: 'المسافة',
+              label: strings.mileageLabel,
               controller: _mileageController,
               hint: '0',
               textDirection: TextDirection.ltr,
               keyboardType: TextInputType.number,
               inputFormatters: [appDigitsOnly()],
-              unitLabel: vehicle.mileageUnit.labelAr,
+              unitLabel: vehicle.mileageUnit.localizedLabel(strings),
               onUnitTap: () {
                 final next = vehicle.mileageUnit == MileageUnit.km
                     ? MileageUnit.mile
@@ -146,85 +171,86 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
                   _updateVehicle((d) => d.copyWith(year: year)),
             ),
             const SizedBox(height: 12),
-            _VehicleTextFieldCard(
-              label: 'المحرك',
-              controller: _engineController,
-              hint: '2.0T',
-              textDirection: TextDirection.ltr,
+            _VehiclePickerField(
+              label: strings.engineLabel,
+              value: vehicle.engine,
+              items: engineOptions,
               onChanged: (v) => _updateVehicle((d) => d.copyWith(engine: v)),
             ),
             const SizedBox(height: 12),
             _VehiclePickerField(
-              label: 'الأسطوانات',
+              label: strings.cylindersLabel,
               value: vehicle.cylinders,
               items: VehicleListingOptions.cylinderOptions,
               onChanged: (v) =>
                   _updateVehicle((d) => d.copyWith(cylinders: v)),
             ),
             const SizedBox(height: 24),
-            Text('التفاصيل', style: theme.textTheme.titleSmall),
+            Text(strings.detailsSection, style: theme.textTheme.titleSmall),
             const SizedBox(height: 12),
             Step2LabeledDropdown(
-              label: 'الحالة *',
+              label: strings.conditionRequiredLabel,
               value: switch (state.condition) {
-                ListingCondition.newItem => 'جديد',
-                ListingCondition.used => 'مستعمل',
+                ListingCondition.newItem => strings.conditionNew,
+                ListingCondition.used => strings.conditionUsed,
                 null => null,
               },
-              items: const ['جديد', 'مستعمل'],
+              items: [strings.conditionNew, strings.conditionUsed],
               onChanged: (v) {
                 notifier.updateField(
                   'condition',
                   switch (v) {
-                    'جديد' => ListingCondition.newItem,
-                    'مستعمل' => ListingCondition.used,
+                    final n when n == strings.conditionNew =>
+                      ListingCondition.newItem,
+                    final u when u == strings.conditionUsed =>
+                      ListingCondition.used,
                     _ => null,
                   },
                 );
               },
             ),
             Step2LabeledDropdown(
-              label: 'وضع الطلاء',
+              label: strings.paintStatusLabel,
               value: vehicle.paintParts,
               items: VehicleListingOptions.paintPartOptions,
               onChanged: (v) =>
                   _updateVehicle((d) => d.copyWith(paintParts: v)),
             ),
             Step2LabeledDropdown(
-              label: 'الوقود *',
+              label: strings.fuelRequiredLabel,
               value: vehicle.fuel,
               items: VehicleListingOptions.fuelOptions,
               onChanged: (v) => _updateVehicle((d) => d.copyWith(fuel: v)),
             ),
             Step2LabeledDropdown(
-              label: 'بلد الاستيراد',
+              label: strings.importCountryLabel,
               value: vehicle.importCountry,
               items: VehicleListingOptions.importCountryOptions,
               onChanged: (v) =>
                   _updateVehicle((d) => d.copyWith(importCountry: v)),
             ),
             Step2LabeledDropdown(
-              label: 'اللوحة',
+              label: strings.plateLabel,
               value: vehicle.plate,
               items: VehicleListingOptions.plateOptions,
               onChanged: (v) => _updateVehicle((d) => d.copyWith(plate: v)),
             ),
             Step2LabeledDropdown(
-              label: 'ناقل الحركة *',
+              label: strings.transmissionRequiredLabel,
               value: vehicle.transmission,
               items: VehicleListingOptions.transmissionOptions,
               onChanged: (v) =>
                   _updateVehicle((d) => d.copyWith(transmission: v)),
             ),
             Step2LabeledDropdown(
-              label: 'عدد المقاعد',
+              label: strings.seatCountLabel,
               value: vehicle.seatNumber,
               items: VehicleListingOptions.seatNumberOptions,
               onChanged: (v) =>
                   _updateVehicle((d) => d.copyWith(seatNumber: v)),
             ),
             Step2LabeledDropdown(
-              label: 'مادة المقاعد',
+              label: strings.seatMaterialLabel,
               value: vehicle.seatMaterial,
               items: VehicleListingOptions.seatMaterialOptions,
               onChanged: (v) =>
@@ -240,7 +266,7 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
                   _updateVehicle((d) => d.copyWith(customColor: hex)),
             ),
             const SizedBox(height: 24),
-            Text('المواصفات', style: theme.textTheme.titleSmall),
+            Text(strings.specsSectionTitle, style: theme.textTheme.titleSmall),
             const SizedBox(height: 12),
             VehicleSpecsChecklist(
               selected: vehicle.selectedSpecs,
@@ -255,11 +281,11 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
             TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [appDigitsOnly()],
+              inputFormatters: [appThousands()],
               textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(
-                labelText: 'السعر *',
-                suffixText: 'د.ع',
+              decoration: InputDecoration(
+                labelText: strings.priceRequiredLabel,
+                suffixText: strings.currencyIqd,
               ),
               onChanged: (v) {
                 final parsed = double.tryParse(v.replaceAll(',', ''));
@@ -269,7 +295,7 @@ class _Step2VehicleDetailsState extends ConsumerState<Step2VehicleDetails> {
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('قابل للتفاوض'),
+              title: Text(strings.negotiable),
               value: state.isNegotiable,
               onChanged: (v) => notifier.updateField('isNegotiable', v),
             ),
@@ -415,7 +441,7 @@ class _VehicleYearPickerField extends StatelessWidget {
     final labels = options.map((y) => y.toString()).toList();
     final picked = await showStep2PickerSheet(
       context: context,
-      title: step2PickerSheetTitle('السنة'),
+      title: step2PickerSheetTitle(context.l10n, context.l10n.yearLabel),
       options: labels,
       selected: year?.toString(),
     );
@@ -425,7 +451,8 @@ class _VehicleYearPickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayValue = year != null ? year.toString() : 'اختر';
+    final displayValue =
+        year != null ? year.toString() : context.l10n.chooseOption;
 
     return _VehicleFieldCard(
       child: Material(
@@ -434,7 +461,7 @@ class _VehicleYearPickerField extends StatelessWidget {
           onTap: () => _openPicker(context),
           child: Row(
             children: [
-              const _VehicleFieldLabel(label: 'السنة'),
+              _VehicleFieldLabel(label: context.l10n.yearLabel),
               const Spacer(),
               Text(
                 displayValue,
@@ -485,15 +512,16 @@ class _VehiclePickerFieldState extends State<_VehiclePickerField> {
       ListingFormOptions.isCustomValue(widget.value, widget.items);
 
   String get _displayValue {
+    final choose = context.l10n.chooseOption;
     if (_showOtherField) {
       return widget.value?.trim().isNotEmpty == true
           ? widget.value!.trim()
-          : 'اختر';
+          : choose;
     }
     if (widget.value != null && widget.value!.isNotEmpty) {
-      return widget.value!;
+      return step2AttributeLabel(widget.value!, context.l10n);
     }
-    return 'اختر';
+    return choose;
   }
 
   @override
@@ -533,11 +561,12 @@ class _VehiclePickerFieldState extends State<_VehiclePickerField> {
   }
 
   Future<void> _openPicker() async {
-    final picked = await showStep2PickerSheet(
+    final l10n = context.l10n;
+    final picked = await showStep2PickerSheetForOptions(
       context: context,
-      title: step2PickerSheetTitle(widget.label),
-      options: _allItems,
-      selected: _showOtherField ? ListingFormOptions.other : widget.value,
+      title: step2PickerSheetTitle(l10n, widget.label),
+      options: step2AttributePickerOptions(_allItems, l10n),
+      selectedValue: _showOtherField ? ListingFormOptions.other : widget.value,
     );
     if (!mounted || picked == null) return;
 
@@ -587,7 +616,7 @@ class _VehiclePickerFieldState extends State<_VehiclePickerField> {
             const SizedBox(height: 12),
             Step2OtherTextField(
               controller: _otherController,
-              label: 'حدد القيمة',
+              label: context.l10n.specifyValue,
               onChanged: (value) {
                 final trimmed = value.trim();
                 widget.onChanged(trimmed.isEmpty ? null : trimmed);

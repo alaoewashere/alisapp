@@ -1,0 +1,810 @@
+[
+  {
+    "id": "TC001",
+    "title": "Browse the home feed and open a listing",
+    "description": "This verifies that a guest can land on the marketplace home feed, scroll through listings, and open a listing detail page successfully.",
+    "category": "Guest Home Browse",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Tap a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the seller information section is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Browse featured listings from the home feed",
+    "description": "A guest can land on the home feed, scroll through featured and latest listings, and open a listing detail from the feed.",
+    "category": "Sello marketplace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Scroll the home feed again"
+      },
+      {
+        "type": "action",
+        "description": "Open a listing card from the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a listing detail page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify listing photos, price, and seller information are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Inspect listing photos, price, and seller details",
+    "description": "A guest shopper can open a listing detail page and review the gallery, price, and seller information before leaving the page.",
+    "category": "guest marketplace browsing and discovery",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify listing photos, price, and seller information are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Browse a category from the home feed",
+    "description": "This verifies that a guest can open a category from the home feed, browse the filtered listings, and open a listing from that category.",
+    "category": "Guest Home Browse",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Tap a category tile from the home grid"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the category listings"
+      },
+      {
+        "type": "action",
+        "description": "Tap a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the category-browse listings view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail view is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Open a listing from the category grid",
+    "description": "A guest can use a category item from the home feed to browse category listings and open a listing detail.",
+    "category": "Sello marketplace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Select a category from the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Scroll the category listings"
+      },
+      {
+        "type": "action",
+        "description": "Open a listing card from the category results"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a category listings page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a listing detail page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Continue browsing from the home tab",
+    "description": "This verifies that a guest can open the home tab, scroll the marketplace feed, and reach a listing detail page from bottom navigation entry points.",
+    "category": "Guest Home Browse",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /home"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the home feed"
+      },
+      {
+        "type": "action",
+        "description": "Tap a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail view is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Open a category from the home feed and browse results",
+    "description": "A guest shopper can open a category from the home feed, scroll through category-filtered listings, and open a listing detail page.",
+    "category": "Category Browse",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a category grid item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify category-filtered listings are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Scroll the category results"
+      },
+      {
+        "type": "action",
+        "description": "Click a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Search for a listing and inspect related items",
+    "description": "A guest can search for a listing by keyword, open a result, and view the seller's other listings.",
+    "category": "Sello marketplace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /search"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a listing keyword"
+      },
+      {
+        "type": "action",
+        "description": "Submit the search"
+      },
+      {
+        "type": "action",
+        "description": "Open a search result"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify search results are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the seller's other listings are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Search for listings by keyword",
+    "description": "This verifies that a guest can search for a listing by keyword and see matching results.",
+    "category": "Search Listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /search"
+      },
+      {
+        "type": "action",
+        "description": "Enter a search query into the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify matching listing results are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Search for a listing and inspect seller listings",
+    "description": "A guest shopper can search by keyword, open a result, and review the seller's other listings from the listing detail page.",
+    "category": "guest marketplace browsing and discovery",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /search"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a keyword that matches a listing"
+      },
+      {
+        "type": "action",
+        "description": "Submit the search"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify search results are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click a listing result"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail page is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the seller section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify seller's other listings are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Browse listings within a category",
+    "description": "A guest can open a category page from browsing and scroll through category-filtered listings before opening one.",
+    "category": "Sello marketplace",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /categories/valid-category"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the category listings"
+      },
+      {
+        "type": "action",
+        "description": "Open a listing card from the category page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify category-filtered listings are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a listing detail page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Open a searched listing and review related seller listings",
+    "description": "This verifies that a guest can search for a listing, open its detail page, and inspect the seller's other listings row.",
+    "category": "Search Listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /search"
+      },
+      {
+        "type": "action",
+        "description": "Enter a search query into the search field"
+      },
+      {
+        "type": "action",
+        "description": "Tap a matching listing result"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the seller's other listings row is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Review seller information on a listing detail page",
+    "description": "This verifies that a guest can open a listing detail page and view the seller information section clearly.",
+    "category": "Listing Detail",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Tap a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the seller information section is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Open the profile page as a signed-in member",
+    "description": "A signed-in member can access the profile screen and view the account menu.",
+    "category": "Account Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials for a member account"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the profile screen is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the account menu is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Switch app language without signing in",
+    "description": "A guest can open the language settings, change the app language, and continue using the app in the updated language layout.",
+    "category": "Language Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /language"
+      },
+      {
+        "type": "action",
+        "description": "Select Arabic"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app language is updated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the layout remains usable in the selected language"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Access profile as a signed-in member",
+    "description": "This verifies that a signed-in member can open the profile page and access account-related sections.",
+    "category": "Profile and Settings Access",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the account menu is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the profile page is accessible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Open the settings page as a signed-in member",
+    "description": "A signed-in member can access the settings screen after logging in.",
+    "category": "App Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials for a member account"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings screen is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify app settings options are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Access settings as a signed-in member",
+    "description": "This verifies that a signed-in member can open the settings page and view app settings controls.",
+    "category": "Profile and Settings Access",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify app settings controls are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings page is accessible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Change between supported languages",
+    "description": "A guest can switch among the supported languages from the language picker and each selection updates the interface.",
+    "category": "Language Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /language"
+      },
+      {
+        "type": "action",
+        "description": "Select English"
+      },
+      {
+        "type": "action",
+        "description": "Select Kurdish"
+      },
+      {
+        "type": "action",
+        "description": "Select Turkish"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected language is applied"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the language picker remains usable after switching"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Change the app language without signing in",
+    "description": "This verifies that a guest can open the language picker, switch app language, and keep the app usable in a localized layout.",
+    "category": "Language Switching",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /language"
+      },
+      {
+        "type": "action",
+        "description": "Select a different app language"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app updates to the selected language"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the localized layout remains usable"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Use the app in an Arabic RTL layout",
+    "description": "This verifies that a guest can switch to Arabic and continue browsing the app in a right-to-left layout without breaking discovery flows.",
+    "category": "Language Switching",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /language"
+      },
+      {
+        "type": "action",
+        "description": "Select Arabic as the app language"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the home feed is displayed in a right-to-left layout"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify listing discovery remains usable"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Browse the home feed in a right-to-left language",
+    "description": "An Arabic RTL user can browse the home feed and open listings while the layout remains usable in a right-to-left presentation.",
+    "category": "guest marketplace browsing and discovery",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /language"
+      },
+      {
+        "type": "action",
+        "description": "Select Arabic as the app language"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the home feed is displayed in a right-to-left layout"
+      },
+      {
+        "type": "action",
+        "description": "Click a listing card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the listing detail page is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Preserve RTL usability after language change",
+    "description": "A guest using an RTL language can change language and keep the app usable with RTL-oriented content and navigation.",
+    "category": "Language Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /language"
+      },
+      {
+        "type": "action",
+        "description": "Select Arabic"
+      },
+      {
+        "type": "action",
+        "description": "Return to browsing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify RTL-oriented content is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify browsing remains usable after the language change"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "Redirect guests away from profile access",
+    "description": "A guest user who opens the profile route is redirected away from the protected page and cannot access account content.",
+    "category": "Account Profile",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the guest is redirected to the login screen"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify profile content is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "See an empty state for a search with no matches",
+    "description": "This verifies that a guest who searches for a term with no matches sees an empty results state instead of listings.",
+    "category": "Search Listings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /search"
+      },
+      {
+        "type": "action",
+        "description": "Enter a query with no matches into the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC026",
+    "title": "Open the phone login entry screen",
+    "description": "A guest can navigate to the phone login entry screen and see the phone-based sign-in form.",
+    "category": "Phone Login Entry",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /phone"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the phone login entry screen is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the phone number field is available"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC027",
+    "title": "Redirect guests away from settings access",
+    "description": "A guest user who opens the settings route is redirected away from the protected page and cannot access app settings.",
+    "category": "App Settings",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the guest is redirected to the login screen"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify settings content is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC028",
+    "title": "Show an empty state for no search results",
+    "description": "A guest shopper can submit a search with no matches and see an empty results state instead of listings.",
+    "category": "guest marketplace browsing and discovery",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /search"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the search field with a rare keyword that should have no matches"
+      },
+      {
+        "type": "action",
+        "description": "Submit the search"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty search results state is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

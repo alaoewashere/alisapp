@@ -3,15 +3,16 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../shared/models/listing_model.dart';
 import 'listing_display_title.dart';
 
 const _shareBaseUrl = 'https://souqiq.com/listing';
 
-Future<void> shareListingUrl(ListingModel listing) async {
+Future<void> shareListingUrl(ListingModel listing, AppLocalizations strings) async {
   final text = StringBuffer()
     ..writeln(listingDisplayTitle(listing))
-    ..writeln(listing.formattedPrice)
+    ..writeln(listing.formattedPriceFor(strings))
     ..write('$_shareBaseUrl/${listing.id}');
 
   final imageUrl = listing.coverImageUrl ??

@@ -5,15 +5,13 @@ import '../constants/car_paint_panels.dart';
 class CarPaintSummaryGroup {
   const CarPaintSummaryGroup({
     required this.condition,
-    required this.labelAr,
     required this.color,
-    required this.panelNamesAr,
+    required this.panelKeys,
   });
 
   final String condition;
-  final String labelAr;
   final Color color;
-  final List<String> panelNamesAr;
+  final List<String> panelKeys;
 }
 
 List<CarPaintSummaryGroup> buildCarPaintSummaryGroups(
@@ -26,17 +24,16 @@ List<CarPaintSummaryGroup> buildCarPaintSummaryGroups(
     CarPaintCondition.painted,
     CarPaintCondition.replaced,
   ]) {
-    final names = kCarPaintPanels
+    final panelKeys = kCarPaintPanels
         .where((panel) => panelConditions[panel.key] == condition)
-        .map((panel) => panel.nameAr)
+        .map((panel) => panel.key)
         .toList();
-    if (names.isEmpty) continue;
+    if (panelKeys.isEmpty) continue;
     groups.add(
       CarPaintSummaryGroup(
         condition: condition,
-        labelAr: carPaintConditionLabelAr(condition),
         color: carPaintColorForCondition(condition),
-        panelNamesAr: names,
+        panelKeys: panelKeys,
       ),
     );
   }

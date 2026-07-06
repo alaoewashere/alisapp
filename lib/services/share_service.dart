@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../core/constants/deep_link_constants.dart';
 import '../core/utils/listing_display_title.dart';
+import '../l10n/app_localizations.dart';
 import '../shared/models/listing_model.dart';
 import '../shared/models/profile_model.dart';
 
@@ -18,6 +19,7 @@ class ShareService {
   static Future<void> shareListingToWhatsApp({
     required GlobalKey repaintKey,
     required ListingModel listing,
+    required AppLocalizations strings,
   }) async {
     final bytes = await _capturePng(repaintKey);
 
@@ -34,8 +36,8 @@ class ShareService {
     await SharePlus.instance.share(
       ShareParams(
         files: [XFile(file.path)],
-        text: '$title\n${listing.formattedPrice} د.ع\n'
-            'شاهد الإعلان على سيلو:\n$link',
+        text: '$title\n${listing.formattedPriceFor(strings)}\n'
+            'شاهد الإعلان على سـوقك:\n$link',
       ),
     );
   }
@@ -54,7 +56,7 @@ class ShareService {
     await SharePlus.instance.share(
       ShareParams(
         files: [XFile(file.path)],
-        text: 'تصفح إعلاناتي على سيلو:\n'
+        text: 'تصفح إعلاناتي على سـوقك:\n'
             '${DeepLinkConstants.sellerUrl(profile.id)}',
       ),
     );

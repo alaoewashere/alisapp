@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:Sello/core/constants/app_constants.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/l10n/l10n_provider.dart';
 
-/// Flat palm-tree brand logo — no shadow or background card.
+/// Souqak brand logo image — flat, no shadow or background card.
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,
@@ -27,7 +30,7 @@ class AppLogo extends StatelessWidget {
 }
 
 /// Compact header row: logo + brand name for RTL home app bar.
-class AppBrandHeader extends StatelessWidget {
+class AppBrandHeader extends ConsumerWidget {
   const AppBrandHeader({
     super.key,
     this.logoSize = 36,
@@ -39,10 +42,11 @@ class AppBrandHeader extends StatelessWidget {
   final String? subtitle;
   final bool showSubtitle;
 
-  static const brandNameAr = 'Sello';
+  static const brandNameAr = AppConstants.appNameAr;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -53,16 +57,15 @@ class AppBrandHeader extends StatelessWidget {
           children: [
             Text(
               brandNameAr,
-              style: AppFonts.cairo(
+              style: AppFonts.brandNameArDisplay(
                 fontSize: 16,
-                fontWeight: FontWeight.w900,
                 color: AppColors.textDark,
                 height: 1.1,
               ),
             ),
             if (showSubtitle)
               Text(
-                subtitle ?? 'العراق',
+                subtitle ?? strings.countryIraq,
                 style: AppFonts.cairo(
                   fontSize: 10,
                   color: AppColors.textMuted,

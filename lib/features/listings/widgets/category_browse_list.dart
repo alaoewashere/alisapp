@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
 import '../../../core/constants/category_asset_icons.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/theme/app_decorations.dart';
 import '../../../shared/widgets/app_bottom_nav.dart';
 import '../../../shared/widgets/category_asset_image.dart';
 import '../../../shared/models/category_model.dart';
 
-class CategoryBrowseList extends StatelessWidget {
+class CategoryBrowseList extends ConsumerWidget {
   const CategoryBrowseList({
     super.key,
     required this.categories,
@@ -20,8 +23,10 @@ class CategoryBrowseList extends StatelessWidget {
   final void Function(BrowseCategoryItem item) onCategoryTap;
 
   @override
-  Widget build(BuildContext context) {
-    final items = buildBrowseCategoryItems(categories);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+    final strings = ref.watch(appLocalizationsProvider);
+    final items = buildBrowseCategoryItems(categories, localeCode, strings);
 
     return GridView.builder(
       padding: EdgeInsets.fromLTRB(
@@ -41,6 +46,7 @@ class CategoryBrowseList extends StatelessWidget {
         final item = items[index];
         return _BrowseCategoryBentoCard(
           item: item,
+          title: browseCategoryTitle(item.style.slug, strings),
           onTap: () => onCategoryTap(item),
         );
       },
@@ -51,10 +57,12 @@ class CategoryBrowseList extends StatelessWidget {
 class _BrowseCategoryBentoCard extends StatelessWidget {
   const _BrowseCategoryBentoCard({
     required this.item,
+    required this.title,
     required this.onTap,
   });
 
   final BrowseCategoryItem item;
+  final String title;
   final VoidCallback onTap;
 
   @override
@@ -110,7 +118,7 @@ class _BrowseCategoryBentoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  style.nameAr,
+                  title,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

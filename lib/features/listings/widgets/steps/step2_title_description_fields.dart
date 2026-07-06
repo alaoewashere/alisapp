@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../theme/app_form_fields.dart';
 import '../../../../theme/app_text_styles.dart';
 import '../../providers/post_listing_provider.dart';
@@ -38,11 +39,12 @@ class _Step2TitleDescriptionFieldsState
   Widget build(BuildContext context) {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const AppFieldGroupLabel(label: 'عنوان الإعلان', required: true),
+        AppFieldGroupLabel(label: strings.listingTitleLabel, required: true),
         AppFormFieldGroup(
           children: [
             TextFormField(
@@ -51,17 +53,23 @@ class _Step2TitleDescriptionFieldsState
               minLines: 1,
               maxLines: 2,
               textDirection: TextDirection.rtl,
+              textInputAction: TextInputAction.done,
               style: AppTextStyles.input,
               decoration: AppFormDecorations.underline(
-                hintText: 'اكتب عنوان إعلانك هنا',
+                hintText: strings.listingTitleHint,
               ).copyWith(counterText: ''),
               onChanged: (v) => notifier.updateField('title', v),
+              onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
             ),
           ],
         ),
         AppFieldCharCounter(current: state.title.length, max: 100),
         const SizedBox(height: 24),
-        const AppFieldGroupLabel(label: 'وصف الإعلان', optional: true),
+        AppFieldGroupLabel(
+          label: strings.listingDescriptionLabel,
+          optional: true,
+          optionalLabel: strings.optionalLabel,
+        ),
         AppFormFieldGroup(
           children: [
             TextFormField(
@@ -70,17 +78,19 @@ class _Step2TitleDescriptionFieldsState
               minLines: 5,
               maxLines: 10,
               textDirection: TextDirection.rtl,
+              textInputAction: TextInputAction.done,
               style: AppTextStyles.body.copyWith(fontSize: 15),
               decoration: AppFormDecorations.underline(
-                hintText: 'أضف وصفاً تفصيلياً لإعلانك...',
+                hintText: strings.listingDescriptionHint,
                 alignLabelWithHint: true,
               ).copyWith(counterText: ''),
               onChanged: (v) => notifier.updateField('description', v),
+              onFieldSubmitted: (_) => FocusScope.of(context).unfocus(),
             ),
           ],
         ),
         AppFieldCharCounter(current: state.description.length, max: 2000),
-        const AppListingFormSectionDivider(),
+        AppListingFormSectionDivider(label: strings.listingDetailsTitle),
       ],
     );
   }

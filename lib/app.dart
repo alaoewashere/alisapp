@@ -7,6 +7,7 @@ import 'core/l10n/l10n_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/web/sello_web_ready_marker.dart';
 import 'features/auth/widgets/auth_session_handler.dart';
 import 'features/chat/widgets/onesignal_handler.dart';
 import 'l10n/app_localizations.dart';
@@ -34,10 +35,27 @@ class SouqIqApp extends ConsumerWidget {
       ),
       routerConfig: router,
       builder: (context, child) {
-        return Directionality(
-          textDirection: localeTextDirection(normalized),
-          child: AuthSessionHandler(
-            child: OneSignalHandler(child: child ?? const SizedBox.shrink()),
+        // Card/price layouts are sized for normal text scale. Some devices
+        // ship with much larger system font sizes (accessibility settings),
+        // which overflowed fixed-height listing cards. Clamp instead of
+        // disabling scaling entirely, so accessibility text still grows —
+        // just not enough to break the grid.
+        final mediaQuery = MediaQuery.of(context);
+        final clampedScaler = mediaQuery.textScaler.clamp(
+          minScaleFactor: 0.85,
+          maxScaleFactor: 1.15,
+        );
+
+        return SelloWebReadyMarker(
+          child: MediaQuery(
+            data: mediaQuery.copyWith(textScaler: clampedScaler),
+            child: Directionality(
+              textDirection: localeTextDirection(normalized),
+              child: AuthSessionHandler(
+                child:
+                    OneSignalHandler(child: child ?? const SizedBox.shrink()),
+              ),
+            ),
           ),
         );
       },

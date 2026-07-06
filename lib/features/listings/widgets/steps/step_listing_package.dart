@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/l10n/listing_package_locale.dart';
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/package_badge.dart';
 import '../../../../shared/models/listing_model.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../constants/listing_package_config.dart';
 import '../../providers/post_listing_provider.dart';
 
@@ -30,6 +33,7 @@ class _StepListingPackageState extends ConsumerState<StepListingPackage> {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,23 +47,36 @@ class _StepListingPackageState extends ConsumerState<StepListingPackage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'اختر الباقة',
+                    strings.choosePackage,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
                   ...ListingPackageConfig.options.map((option) {
+                    final localized =
+                        LocalizedListingPackageOption.fromConfig(option, strings);
                     final isLast =
                         option.package == ListingPackage.premium;
+                    final isDisabled =
+                        !ListingPackageConfig.isSelectable(option.package);
                     return Padding(
                       padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
                       child: _PackageTierCard(
-                        option: option,
+                        localized: localized,
                         isSelected: state.listingPackage == option.package,
+                        isDisabled: isDisabled,
                         freePostsRemaining: state.freePostsRemaining,
                         quotaLoaded: state.freePostQuotaLoaded,
-                        onTap: () => notifier.setListingPackage(option.package),
+                        promoActive: state.isFreePostsUnlimitedPromoActive,
+                        strings: strings,
+                        onTap: isDisabled
+                            ? () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(strings.comingSoon)),
+                                );
+                              }
+                            : () => notifier.setListingPackage(option.package),
                       ),
                     );
                   }),
@@ -91,8 +108,8 @@ class _StepListingPackageState extends ConsumerState<StepListingPackage> {
                   ),
                 ),
                 onPressed: notifier.confirmListingPackage,
-                child: const Text(
-                  'متابعة',
+                child: Text(
+                  strings.continueAction,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -109,111 +126,134 @@ class _StepListingPackageState extends ConsumerState<StepListingPackage> {
 
 class _PackageTierCard extends StatelessWidget {
   const _PackageTierCard({
-    required this.option,
+    required this.localized,
     required this.isSelected,
+    required this.isDisabled,
     required this.freePostsRemaining,
     required this.quotaLoaded,
+    this.promoActive = false,
+    required this.strings,
     required this.onTap,
   });
 
-  final ListingPackageOption option;
+  final LocalizedListingPackageOption localized;
   final bool isSelected;
+  final bool isDisabled;
   final int freePostsRemaining;
   final bool quotaLoaded;
+  final bool promoActive;
+  final AppLocalizations strings;
   final VoidCallback onTap;
 
+  ListingPackageOption get option => localized.option;
+
   String _priceLabel() {
+    if (isDisabled) return strings.comingSoon;
+    if (option.package == ListingPackage.standard && promoActive) {
+      return 'مجاني بدون حد — عرض الإطلاق';
+    }
     if (option.package == ListingPackage.standard &&
         quotaLoaded &&
         freePostsRemaining > 0) {
-      return '0 د.ع (متبقي $freePostsRemaining من 2 إعلان مجاني)';
+      return strings.freePostsRemainingLabel(freePostsRemaining.toString());
     }
-    return formatPackagePriceIqd(option.priceIqd);
+    return formatPackagePriceWithL10n(option.priceIqd, strings);
   }
 
   @override
   Widget build(BuildContext context) {
-    final showQuotaWarning = option.package == ListingPackage.standard &&
+    final showQuotaWarning = !isDisabled &&
+        option.package == ListingPackage.standard &&
+        !promoActive &&
         quotaLoaded &&
         freePostsRemaining <= 0;
+    final highlighted = isSelected && !isDisabled;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.fieldCarbon
-                : AppColors.fieldCarbon,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: isSelected ? AppColors.volt : AppColors.borderLight,
-              width: isSelected ? 2 : 1,
+    return Opacity(
+      opacity: isDisabled ? 0.55 : 1,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: AppColors.fieldCarbon,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: highlighted ? AppColors.volt : AppColors.borderLight,
+                width: highlighted ? 2 : 1,
+              ),
+              boxShadow: highlighted
+                  ? [
+                      BoxShadow(
+                        color: AppColors.volt.withValues(alpha: 0.22),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : null,
             ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: AppColors.volt.withValues(alpha: 0.22),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          transform: Matrix4.identity()..scale(isSelected ? 1.02 : 1.0),
-          transformAlignment: Alignment.center,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PackageBadge(
-                          package: option.package,
-                          size: PackageBadgeSize.compact,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          option.labelAr,
-                          style: AppFonts.sans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.pureWhite,
+            transform: Matrix4.identity()
+              ..scaleByDouble(
+                highlighted ? 1.02 : 1.0,
+                highlighted ? 1.02 : 1.0,
+                1.0,
+                1,
+              ),
+            transformAlignment: Alignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PackageBadge(
+                            package: option.package,
+                            size: PackageBadgeSize.compact,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 10),
+                          Text(
+                            localized.label,
+                            style: AppFonts.sans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.pureWhite,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (isSelected)
-                    Icon(
-                      Icons.check_circle_rounded,
-                      color: AppColors.volt,
-                      size: 22,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _priceLabel(),
-                style: AppFonts.inter(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.volt,
-                  height: 1.2,
+                    if (highlighted)
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.volt,
+                        size: 22,
+                      ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 12),
+                Text(
+                  _priceLabel(),
+                  style: AppFonts.inter(
+                    fontSize: isDisabled ? 16 : 22,
+                    fontWeight: FontWeight.w800,
+                    color: isDisabled
+                        ? AppColors.pureWhite.withValues(alpha: 0.55)
+                        : AppColors.volt,
+                    height: 1.2,
+                  ),
+                ),
               const SizedBox(height: 6),
               Text(
-                option.durationLabelAr,
+                localized.durationLabel,
                 style: AppFonts.sans(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -223,7 +263,7 @@ class _PackageTierCard extends StatelessWidget {
               if (showQuotaWarning) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'تم استخدام إعلانيك المجانيين. سيتم تحصيل رسوم الإعلان العادي.',
+                  strings.freePostsUsedWarning,
                   style: AppFonts.sans(
                     fontSize: 12,
                     color: AppColors.pending,
@@ -232,7 +272,7 @@ class _PackageTierCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 14),
-              ...option.features.map(
+              ...localized.features.map(
                 (feature) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -282,6 +322,7 @@ class _PackageTierCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

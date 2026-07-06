@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/dicebear_avatars.dart';
+import '../../core/l10n/l10n_provider.dart';
 import 'dicebear_avatar_cell.dart';
 
 /// Wrapped grid of selectable DiceBear avatars for profile setup.
-class AvatarSelectionGrid extends StatelessWidget {
+class AvatarSelectionGrid extends ConsumerWidget {
   const AvatarSelectionGrid({
     super.key,
     required this.selectedSeed,
@@ -19,14 +21,15 @@ class AvatarSelectionGrid extends StatelessWidget {
   final bool enabled;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final activeSeed = DiceBearAvatars.resolveSeed(selectedSeed);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'اختر صورة افتراضية',
+          strings.chooseDefaultAvatar,
           style: AppFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -35,7 +38,7 @@ class AvatarSelectionGrid extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'أو ارفع صورتك من الكاميرا / المعرض أعلاه',
+          strings.orUploadPhotoHint,
           style: AppFonts.cairo(
             fontSize: 12,
             color: AppColors.textMuted,
@@ -45,16 +48,12 @@ class AvatarSelectionGrid extends StatelessWidget {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          alignment: WrapAlignment.center,
           children: [
             for (final seed in DiceBearAvatars.seeds)
-              Opacity(
-                opacity: enabled ? 1 : 0.5,
-                child: DiceBearAvatarCell(
-                  seed: seed,
-                  selected: seed == activeSeed,
-                  onTap: enabled ? () => onSelected(seed) : () {},
-                ),
+              DiceBearAvatarCell(
+                seed: seed,
+                selected: activeSeed == seed,
+                onTap: enabled ? () => onSelected(seed) : () {},
               ),
           ],
         ),

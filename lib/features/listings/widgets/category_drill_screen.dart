@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../data/categories_repository.dart';
@@ -27,6 +28,7 @@ class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
     final notifier = ref.read(postListingProvider.notifier);
     final allAsync = ref.watch(allCategoriesProvider);
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
     final isRoot = !state.canPopCategoryDrill;
     final drillStack = state.categoryDrillStack;
 
@@ -47,7 +49,7 @@ class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
                 child: TextButton.icon(
                   onPressed: _loadingLevel ? null : notifier.popCategoryDrillLevel,
                   icon: const Icon(Icons.arrow_back),
-                  label: const Text('رجوع'),
+                  label: Text(strings.back),
                 ),
               ),
             if (state.categoryPath.isNotEmpty)
@@ -60,7 +62,7 @@ class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                'اختر الفئة',
+                strings.chooseCategoryTitle,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.textDark,
@@ -154,7 +156,7 @@ class _CategoryDrillScreenState extends ConsumerState<CategoryDrillScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _loadingLevel = false);
-      notifier.setValidationError('تعذّر تحميل الفئات');
+      notifier.setValidationError(ref.read(appLocalizationsProvider).categoriesLoadError);
     }
   }
 }

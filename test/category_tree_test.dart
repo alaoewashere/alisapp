@@ -167,6 +167,29 @@ void main() {
       subtitleForCategory(tutoring, const []),
       'مدرسة ، جامعة ، لغات ، قرآن',
     );
+    expect(
+      subtitleForCategory(tutoring, const [], localeCode: 'en'),
+      'School, University, Languages, Quran',
+    );
+    expect(
+      subtitleForCategory(tutoring, const [], localeCode: 'tr'),
+      'Okul, Üniversite, Diller, Kuran',
+    );
+  });
+
+  test('subtitleForCategory prefers DB description over fallback', () {
+    const school = CategoryModel(
+      id: 50,
+      slug: 'tutor_school',
+      nameAr: 'دروس المدرسة',
+      descriptionEn: 'Mathematics, Physics, Chemistry, Biology',
+      icon: 'category',
+    );
+
+    expect(
+      subtitleForCategory(school, const [], localeCode: 'en'),
+      'Mathematics, Physics, Chemistry, Biology',
+    );
   });
 
   test('isCategoryBrowseRoot includes jobs', () {
@@ -250,6 +273,25 @@ void main() {
     expect(
       subtitleForCategory(homeHelp, const []),
       'تنظيف ، طبخ ، مربيات ، سائق',
+    );
+    expect(
+      subtitleForCategory(homeHelp, const [], localeCode: 'en'),
+      'Cleaning, Cooking, Childcare, Driver',
+    );
+  });
+
+  test('subtitleForCategory shows English fallback for home_cleaning branch', () {
+    const homeCleaning = CategoryModel(
+      id: 801,
+      slug: 'home_cleaning',
+      nameAr: 'تنظيف المنازل',
+      nameEn: 'House Cleaning',
+      icon: 'category',
+    );
+
+    expect(
+      subtitleForCategory(homeCleaning, const [], localeCode: 'en'),
+      'Daily cleaning, Weekly cleaning, Deep cleaning, Post-construction',
     );
   });
 

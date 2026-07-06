@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../features/listings/providers/post_listing_provider.dart';
 import '../../../features/listings/widgets/steps/step2_form_common.dart';
 import '../../../models/smart_alert_category.dart';
@@ -23,25 +25,29 @@ class SmartAlertCategoryPickers extends ConsumerWidget {
     required List<CategoryModel> options,
     required void Function(CategoryModel picked) onPicked,
     CategoryModel? selected,
+    required String localeCode,
   }) async {
     if (options.isEmpty) return;
 
-    final labels = options.map((c) => c.nameAr).toList();
+    final labels = options.map((c) => c.localizedName(localeCode)).toList();
     final pickedLabel = await showStep2PickerSheet(
       context: context,
       title: title,
       options: labels,
-      selected: selected?.nameAr,
+      selected: selected?.localizedName(localeCode),
       searchable: labels.length > 8,
     );
     if (pickedLabel == null) return;
 
-    final picked = options.firstWhere((c) => c.nameAr == pickedLabel);
-    onPicked(picked);
+    final index = labels.indexOf(pickedLabel);
+    if (index < 0) return;
+    onPicked(options[index]);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final allAsync = ref.watch(allCategoriesProvider);
 
     return allAsync.when(
@@ -51,7 +57,7 @@ class SmartAlertCategoryPickers extends ConsumerWidget {
       ),
       error: (e, _) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Text('تعذّر تحميل الفئات: $e'),
+        child: Text('${strings.failedLoadCategories}: $e'),
       ),
       data: (all) {
         final rows = <Widget>[];
@@ -59,13 +65,16 @@ class SmartAlertCategoryPickers extends ConsumerWidget {
         final roots = childrenOf(all, null);
         rows.add(
           Step2PickerTriggerRow(
-            label: smartAlertPickerLabelForParent(null, 0),
-            displayValue: path.isEmpty ? 'الكل' : path.first.nameAr,
+            label: smartAlertPickerLabelForParent(null, 0, strings),
+            displayValue: path.isEmpty
+                ? strings.allCategories
+                : path.first.localizedName(localeCode),
             onTap: () => _pick(
               context: context,
-              title: smartAlertPickerLabelForParent(null, 0),
+              title: smartAlertPickerLabelForParent(null, 0, strings),
               options: roots,
               selected: path.isEmpty ? null : path.first,
+              localeCode: localeCode,
               onPicked: (picked) => onPathChanged([picked]),
             ),
           ),
@@ -78,18 +87,21 @@ class SmartAlertCategoryPickers extends ConsumerWidget {
 
           final nextDepth = depth + 1;
           final hasChild = path.length > nextDepth;
-          final label = smartAlertPickerLabelForParent(parent, nextDepth);
+          final label = smartAlertPickerLabelForParent(parent, nextDepth, strings);
 
           rows.add(const SizedBox(height: 8));
           rows.add(
             Step2PickerTriggerRow(
               label: label,
-              displayValue: hasChild ? path[nextDepth].nameAr : 'اختر',
+              displayValue: hasChild
+                  ? path[nextDepth].localizedName(localeCode)
+                  : strings.chooseOption,
               onTap: () => _pick(
                 context: context,
                 title: label,
                 options: children,
                 selected: hasChild ? path[nextDepth] : null,
+                localeCode: localeCode,
                 onPicked: (picked) {
                   onPathChanged([...path.sublist(0, nextDepth), picked]);
                 },

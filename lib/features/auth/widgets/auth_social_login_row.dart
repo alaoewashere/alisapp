@@ -12,6 +12,7 @@ class AuthSocialLoginRow extends StatelessWidget {
     this.appleLoading = false,
     this.onFacebookPressed,
     this.onPhonePressed,
+    this.showPhone = true,
   });
 
   final VoidCallback? onGooglePressed;
@@ -20,6 +21,7 @@ class AuthSocialLoginRow extends StatelessWidget {
   final bool appleLoading;
   final VoidCallback? onFacebookPressed;
   final VoidCallback? onPhonePressed;
+  final bool showPhone;
 
   static const _iconSize = 52.0;
   static const _gap = 16.0;
@@ -35,18 +37,24 @@ class AuthSocialLoginRow extends StatelessWidget {
           onPressed: onGooglePressed,
         ),
         const SizedBox(width: _gap),
+        // Sign in with Apple — Apple's HIG "white" appearance (black logo on a
+        // white button) so it's clearly a tappable button on the dark theme.
         _SocialIconButton(
           assetPath: 'assets/icons/apple.svg',
           loading: appleLoading,
           onPressed: onApplePressed,
+          backgroundColor: AppColors.pureWhite,
+          iconColor: Colors.black,
         ),
         const SizedBox(width: _gap),
         _SocialIconButton(
           assetPath: 'assets/icons/facebook.svg',
           onPressed: onFacebookPressed,
         ),
-        const SizedBox(width: _gap),
-        _PhoneIconButton(onPressed: onPhonePressed),
+        if (showPhone) ...[
+          const SizedBox(width: _gap),
+          _PhoneIconButton(onPressed: onPhonePressed),
+        ],
       ],
     );
   }
@@ -75,29 +83,37 @@ class _SocialIconButton extends StatelessWidget {
     required this.assetPath,
     required this.onPressed,
     this.loading = false,
+    this.backgroundColor,
+    this.iconColor,
   });
 
   final String assetPath;
   final VoidCallback? onPressed;
   final bool loading;
+  final Color? backgroundColor;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     return _SocialCircleButton(
       onPressed: loading ? null : onPressed,
+      backgroundColor: backgroundColor,
       child: loading
-          ? const SizedBox(
+          ? SizedBox(
               width: 22,
               height: 22,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.pureWhite,
+                color: iconColor ?? AppColors.pureWhite,
               ),
             )
           : SvgPicture.asset(
               assetPath,
               width: 24,
               height: 24,
+              colorFilter: iconColor != null
+                  ? ColorFilter.mode(iconColor!, BlendMode.srcIn)
+                  : null,
             ),
     );
   }
@@ -107,15 +123,17 @@ class _SocialCircleButton extends StatelessWidget {
   const _SocialCircleButton({
     required this.onPressed,
     required this.child,
+    this.backgroundColor,
   });
 
   final VoidCallback? onPressed;
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.fieldCarbon,
+      color: backgroundColor ?? AppColors.fieldCarbon,
       shape: CircleBorder(
         side: BorderSide(color: AppColors.glassBorder),
       ),

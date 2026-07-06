@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../shared/models/animal_listing_metadata.dart';
 import '../../../../core/utils/animal_listing_utils.dart';
 import '../../constants/animal_listing_options.dart';
@@ -42,16 +43,17 @@ class _Step2AnimalDetailsState extends ConsumerState<Step2AnimalDetails> {
     final details = ref.watch(postListingProvider).animalDetails;
     final notifier = ref.read(postListingProvider.notifier);
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
     final animalType =
         deriveAnimalDetailsFromPath(ref.watch(postListingProvider).categoryPath)
             .animalType ??
         details.animalType;
 
     return Step2FormShell(
-      title: 'تفاصيل الحيوان',
+      title: strings.animalDetailsTitle,
       children: [
         Step2IntDropdown(
-          label: 'العمر (بالأشهر)',
+          label: strings.ageMonthsLabel,
           value: details.ageMonths,
           min: 1,
           max: 240,
@@ -61,7 +63,7 @@ class _Step2AnimalDetailsState extends ConsumerState<Step2AnimalDetails> {
                 : d.copyWith(ageMonths: v),
           ),
         ),
-        Text('الجنس', style: theme.textTheme.titleSmall),
+        Text(strings.genderLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: AnimalListingOptions.genders,
@@ -71,24 +73,24 @@ class _Step2AnimalDetailsState extends ConsumerState<Step2AnimalDetails> {
         const SizedBox(height: 8),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('ملقح؟'),
+          title: Text(strings.vaccinatedQuestion),
           value: details.vaccinated ?? false,
           onChanged: (v) => _update((d) => d.copyWith(vaccinated: v)),
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('يمتلك وثائق؟'),
+          title: Text(strings.hasDocumentsQuestion),
           value: details.hasPapers ?? false,
           onChanged: (v) => _update((d) => d.copyWith(hasPapers: v)),
         ),
         if (AnimalListingOptions.showTrainedToggle(animalType))
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('مدرب؟'),
+            title: Text(strings.trainedQuestion),
             value: details.trained ?? false,
             onChanged: (v) => _update((d) => d.copyWith(trained: v)),
           ),
-        Text('اللون', style: theme.textTheme.titleSmall),
+        Text(strings.colorLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: AnimalListingOptions.colors,
@@ -97,7 +99,7 @@ class _Step2AnimalDetailsState extends ConsumerState<Step2AnimalDetails> {
         ),
         const SizedBox(height: 12),
         Step2IqdField(
-          label: 'السعر *',
+          label: strings.priceRequiredLabel,
           controller: _priceController,
           onChanged: (v) => notifier.updateField('price', v),
         ),

@@ -3,26 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../shared/models/conversation_model.dart';
 
-/// Pinned listing preview shown at the top of a chat tied to a listing.
+/// Inline listing preview shown in the message timeline at the point a
+/// listing was actually shared — not a single banner frozen to whichever
+/// listing started the conversation.
 class ListingContextCard extends StatelessWidget {
-  const ListingContextCard({super.key, required this.conversation});
+  const ListingContextCard({
+    super.key,
+    required this.listingId,
+    required this.title,
+    this.imageUrl,
+    this.price,
+  });
 
-  final ConversationModel conversation;
+  final String listingId;
+  final String title;
+  final String? imageUrl;
+  final double? price;
 
   @override
   Widget build(BuildContext context) {
-    final title = conversation.listingTitle;
-    if (title == null || title.isEmpty) return const SizedBox.shrink();
-
-    final imageUrl = conversation.listingImage;
-    final price = conversation.listingPrice;
+    final strings = context.l10n;
+    final price = this.price;
 
     return GestureDetector(
-      onTap: () => context.push('/listing/${conversation.listingId}'),
+      onTap: () => context.push('/listing/$listingId'),
       child: Container(
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.all(12),
@@ -61,7 +69,7 @@ class ListingContextCard extends StatelessWidget {
                   if (price != null) ...[
                     const SizedBox(height: 2),
                     Text(
-                      formatIQD(price),
+                      formatIQDWithL10n(price, strings),
                       style: AppFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -80,7 +88,7 @@ class ListingContextCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'إعلان',
+                strings.listingBadge,
                 style: AppFonts.cairo(
                   fontSize: 10,
                   color: AppColors.primary,

@@ -30,6 +30,7 @@ import '../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../features/chat/presentation/chat_screen.dart';
 import '../../features/chat/presentation/conversations_screen.dart';
 import '../../features/favorites/presentation/favorites_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/home/presentation/home_feed_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/models/home_listings_feed_type.dart';
@@ -41,13 +42,17 @@ import '../../features/listings/presentation/post_listing_screen.dart';
 import '../../features/listings/presentation/listing_heatmap_screen.dart';
 import '../../features/listings/presentation/search_results_screen.dart';
 import '../../features/listings/presentation/search_screen.dart';
+import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/profile/data/profile_repository.dart';
 import '../../screens/settings/edit_profile_screen.dart';
-import '../../screens/settings/profile_phone_otp_screen.dart';
 import '../../features/profile/presentation/my_listings_screen.dart';
 import '../../features/profile/presentation/notifications_settings_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/support/presentation/support_chat_screen.dart';
 import '../../screens/settings/language_screen.dart';
+import '../../screens/legal/privacy_policy_screen.dart';
+import '../../screens/legal/terms_of_use_screen.dart';
 import '../../screens/settings/settings_screen.dart';
 import '../../features/profile/presentation/seller_profile_screen.dart';
 import '../../shared/widgets/app_bottom_nav.dart';
@@ -57,14 +62,17 @@ import '../../models/smart_alert.dart';
 import '../../shared/models/listing_model.dart';
 
 abstract final class AppRoutes {
+  static const splash = '/splash';
+  static const intro = '/intro';
   static const home = '/';
   static const homeNav = '/home';
   static const login = '/login';
   static const phone = '/phone';
   static const signUp = '/sign-up';
+  static const terms = '/terms';
+  static const privacy = '/privacy';
   static const forgotPassword = '/forgot-password';
   static const phoneVerify = '/phone-verify';
-  static const profilePhoneVerify = '/profile-phone-verify';
   static const emailVerify = '/email-verify';
   static const passwordResetEmailSent = '/password-reset-email-sent';
   static const resetPassword = '/reset-password';
@@ -83,6 +91,7 @@ abstract final class AppRoutes {
   static const post = '/post';
   static const myListings = '/my-listings';
   static const favorites = '/favorites';
+  static const notifications = '/notifications';
   static const conversations = '/conversations';
   static const chat = '/chat/:id';
   static const profile = '/profile';
@@ -91,6 +100,7 @@ abstract final class AppRoutes {
   static const language = '/language';
   static const editProfile = '/edit-profile';
   static const notificationsSettings = '/notifications-settings';
+  static const supportChat = '/support';
   static const smartAlerts = '/smart-alerts';
   static const createSmartAlert = '/smart-alerts/create';
   static const verificationIntro = '/verification';
@@ -157,7 +167,7 @@ bool isGuestBlockedPath(String path) {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.splash,
     redirect: (context, state) async {
       try {
         return await _resolveRedirect(ref, state);
@@ -169,6 +179,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
     },
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (_, _) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.intro,
+        builder: (_, _) => const OnboardingScreen(),
+      ),
       ShellRoute(
         builder: (context, state, child) => AppBottomNav(child: child),
         routes: [
@@ -247,6 +265,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const SignUpScreen(),
       ),
       GoRoute(
+        path: AppRoutes.terms,
+        builder: (_, _) => const TermsOfUseScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.privacy,
+        builder: (_, _) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.forgotPassword,
         builder: (_, _) => const ForgotPasswordScreen(),
       ),
@@ -258,15 +284,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-        path: AppRoutes.profilePhoneVerify,
-        builder: (_, state) => ProfilePhoneOtpScreen(
-          phone: state.uri.queryParameters['phone'] ?? '',
-        ),
-      ),
-      GoRoute(
         path: AppRoutes.emailVerify,
         builder: (_, state) => EmailVerifyScreen(
           email: state.uri.queryParameters['email'] ?? '',
+          purpose: state.uri.queryParameters['purpose'] ?? 'reset',
         ),
       ),
       GoRoute(
@@ -304,6 +325,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.favorites,
         builder: (_, _) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (_, _) => const NotificationsScreen(),
       ),
       GoRoute(
         path: AppRoutes.editListing,
@@ -366,6 +391,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const NotificationsSettingsScreen(),
       ),
       GoRoute(
+        path: AppRoutes.supportChat,
+        builder: (_, _) => const SupportChatScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.smartAlerts,
         builder: (_, _) => const MyAlertsScreen(),
       ),
@@ -426,6 +455,8 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
       : null;
   final isGuest = ref.read(isGuestProvider);
   final path = state.matchedLocation;
+  if (path == AppRoutes.splash) return null;
+
   final isLanguageOnboarding =
       state.uri.queryParameters['onboarding'] != 'false';
 
@@ -439,6 +470,8 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
   final isAuthFlow = path == AppRoutes.login ||
       path == AppRoutes.phone ||
       path == AppRoutes.signUp ||
+      path == AppRoutes.terms ||
+      path == AppRoutes.privacy ||
       path == AppRoutes.forgotPassword ||
       path == AppRoutes.phoneVerify ||
       path == AppRoutes.emailVerify ||
@@ -458,12 +491,8 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
   }
 
   if (session == null) {
-    if (path == AppRoutes.home || path == AppRoutes.homeNav) {
-      if (isGuest) return null;
-      return AppRoutes.login;
-    }
     if (isAuthFlow) return null;
-    if (isGuest && isGuestAllowedPath(path)) return null;
+    if (isGuestAllowedPath(path)) return null;
     if (isGuest && isGuestBlockedPath(path)) return AppRoutes.home;
     return AppRoutes.login;
   }
@@ -500,8 +529,7 @@ Future<String?> _resolveRedirect(Ref ref, GoRouterState state) async {
   }
 
   if (!profileComplete && path != AppRoutes.profileSetup) {
-    if (path == AppRoutes.editProfile ||
-        path == AppRoutes.profilePhoneVerify) {
+    if (path == AppRoutes.editProfile) {
       return null;
     }
     return AppRoutes.profileSetup;

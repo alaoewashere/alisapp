@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_governorates.dart';
+import '../core/l10n/category_locale.dart';
+import '../core/l10n/l10n_provider.dart';
+import '../shared/widgets/app_logo.dart';
 import '../core/constants/deep_link_constants.dart';
 import '../core/utils/arabic_number.dart';
 import '../shared/models/profile_model.dart';
 import 'sello_watermark.dart';
 
 /// Off-screen 1080×600 landscape profile card captured via [repaintKey].
-class ProfileShareCard extends StatelessWidget {
+class ProfileShareCard extends ConsumerWidget {
   const ProfileShareCard({
     super.key,
     required this.repaintKey,
@@ -24,25 +28,13 @@ class ProfileShareCard extends StatelessWidget {
   static const cardWidth = 1080.0;
   static const cardHeight = 600.0;
 
-  String get _cityLabel {
-    if (profile.city?.trim().isNotEmpty == true) {
-      return profile.city!.trim();
-    }
-    if (profile.governorate?.trim().isNotEmpty == true) {
-      return governorateNameAr(profile.governorate!);
-    }
-    return '';
-  }
-
-  String get _initial {
-    final name = profile.fullName.trim();
-    if (name.isEmpty) return '؟';
-    return name[0];
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final sellerLink = DeepLinkConstants.sellerUrl(profile.id);
+    final cityLabel = _cityLabel(localeCode);
+    final initial = _initial;
 
     return RepaintBoundary(
       key: repaintKey,
@@ -60,13 +52,7 @@ class ProfileShareCard extends StatelessWidget {
                   child: ColoredBox(
                     color: AppColors.primary,
                     child: Center(
-                      child: Image.asset(
-                        'assets/app_logo.png',
-                        width: 80,
-                        height: 80,
-                        color: Colors.white,
-                        colorBlendMode: BlendMode.srcIn,
-                      ),
+                      child: AppLogo(size: 80),
                     ),
                   ),
                 ),
@@ -82,7 +68,7 @@ class ProfileShareCard extends StatelessWidget {
                         textDirection: TextDirection.rtl,
                         child: Column(
                           children: [
-                            _ProfileAvatar(profile: profile, initial: _initial),
+                            _ProfileAvatar(profile: profile, initial: initial),
                             const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -112,20 +98,22 @@ class ProfileShareCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              '${arabicNumber(listingCount)} إعلاناً على سيلو',
+                              strings.listingsOnSouqakCount(
+                                arabicNumber(listingCount),
+                              ),
                               style: AppFonts.cairo(
                                 fontSize: 15,
                                 color: AppColors.textMuted,
                               ),
                             ),
-                            if (_cityLabel.isNotEmpty) ...[
+                            if (cityLabel.isNotEmpty) ...[
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    _cityLabel,
+                                    cityLabel,
                                     style: AppFonts.cairo(
                                       fontSize: 14,
                                       color: AppColors.textMuted,
@@ -174,6 +162,27 @@ class ProfileShareCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _cityLabel(String localeCode) {
+    if (profile.city?.trim().isNotEmpty == true) {
+      return profile.city!.trim();
+    }
+    if (profile.governorate?.trim().isNotEmpty == true) {
+      final slug = profile.governorate!.trim();
+      for (final governorate in iraqiGovernorates) {
+        if (governorate.slug == slug) {
+          return governorate.displayName(localeCode);
+        }
+      }
+    }
+    return '';
+  }
+
+  String get _initial {
+    final name = profile.fullName.trim();
+    if (name.isEmpty) return '?';
+    return name[0];
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:Sello/core/constants/app_assets.dart';
 import 'package:Sello/features/auth/widgets/auth_hero_header.dart';
 import 'package:Sello/shared/widgets/app_logo.dart';
 
@@ -38,6 +39,29 @@ void main() {
     expect(find.byType(AppLogo), findsOneWidget);
     expect(find.byType(ClipPath), findsNothing);
     expect(find.byType(AuthDarkHeader), findsOneWidget);
+  });
+
+  testWidgets('AuthDarkHeader supports custom transparent logo', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: AuthDarkHeader(
+            title: 'مرحباً بك',
+            logo: AuthHeaderLogo(),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(AuthHeaderLogo), findsOneWidget);
+    expect(find.byType(AppLogo), findsOneWidget);
+    expect(find.byType(ColorFiltered), findsNothing);
+
+    final image = tester.widget<Image>(find.byType(Image));
+    expect(image.image, const AssetImage(AppAssets.appLogo));
+    expect(image.width, 90);
+    expect(image.height, 90);
+    expect(image.fit, BoxFit.contain);
   });
 
   testWidgets('AuthDarkHeader supports overline and leading without logo', (tester) async {

@@ -1,5 +1,5 @@
 name: Sello
-description: "Sello — Iraq Classifieds Marketplace"
+description: "SOUQAK — Iraq Classifieds Marketplace"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+5
 
 environment:
   sdk: ^3.12.0
@@ -94,21 +94,22 @@ dev_dependencies:
   freezed: ^3.2.5
   build_runner: ^2.15.0
   flutter_launcher_icons: ^0.14.4
+  patrol: ^4.6.1
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/app_icon.png
+  image_path: assets/souqak_app_icon.png
   remove_alpha_ios: true
-  background_color_ios: "#1A1A1A"
-  adaptive_icon_background: "#1A1A1A"
-  adaptive_icon_foreground: assets/app_icon.png
+  background_color_ios: "#131315"
+  adaptive_icon_background: "#131315"
+  adaptive_icon_foreground: assets/souqak_app_icon.png
   macos:
     generate: true
   web:
     generate: true
-    background_color: "#1A1A1A"
-    theme_color: "#1A1A1A"
+    background_color: "#131315"
+    theme_color: "#131315"
   windows:
     generate: true
 
@@ -125,7 +126,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/app_logo.png
+    - .env
+    - assets/images/Soukaq-removebg-preview.png
     - assets/images/
     - assets/images/forgot_password.jpg
     - assets/images/car_diagram.png
@@ -142,6 +144,7 @@ flutter:
     - assets/jobs-icons/
     - assets/animals-icons/
     - assets/assistant/
+    - assets/main_categories_icon/
     - assets/Navigation-Menu-Horizontal--Streamline-Ultimate.png
 
   # To add assets to your application, add an assets section, like this:
@@ -192,3 +195,10 @@ flutter:
           weight: 700
         - asset: assets/fonts/thmanyahseriftext/thmanyahseriftext-Black.otf
           weight: 900
+
+patrol:
+  app_name: SOUQAK
+  android:
+    package_name: com.iraq.marketplace.souqiq
+  ios:
+    bundle_id: com.iraq.marketplace.souqiq

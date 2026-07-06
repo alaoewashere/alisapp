@@ -1,6 +1,6 @@
 {
   "@@locale": "ku",
-  "appName": "Sello",
+  "appName": "SOUQAK",
   "home": "سەرەکی",
   "search": "گەڕان",
   "favorites": "دڵخوازەکان",
@@ -110,7 +110,1544 @@
   "categories": "پۆلەکان",
   "featured": "تایبەت",
   "sold": "فرۆشراو",
-  "searchHint": "گەڕان لە Sello...",
+  "searchHint": "گەڕان لە SOUQAK...",
   "otpSent": "کۆد نێردرا. پەیامەکانت بپشکنە.",
-  "newOtpSent": "کۆدی نوێ نێردرا"
+  "newOtpSent": "کۆدی نوێ نێردرا",
+  "homeHeroBuySell": "بکڕە و بفرۆشە",
+  "homeHeroEasily": "بە ئاسانی.",
+  "homeHeroSubtitle": "باشترین دەستکەوتەکان بدۆزەرەوە",
+  "homeExtendedSearchHint": "گەڕان بۆ ئۆتۆمبێل، شوقە، ئەلیکترۆنی...",
+  "browseCategories": "گەڕان لە پۆلەکان",
+  "viewAll": "هەمووی ببینە",
+  "featuredListingsTitle": "ڕێکلامە تایبەتەکان",
+  "latestListingsTitle": "نوێترین ڕێکلامەکان",
+  "failedLoadCategories": "بارکردنی پۆلەکان سەرکەوتوو نەبوو",
+  "failedLoadListings": "بارکردنی ڕێکلامەکان سەرکەوتوو نەبوو",
+  "searchResultsCount": "{count} ئەنجام",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapTooltip": "چڕی ڕێکلامەکان",
+  "favoritesTooltip": "دڵخوازەکان",
+  "splashTagline": "ئەپەکەت بۆ کڕین و فرۆشتن",
+  "welcomeToSouqak": "بەخێربێیت بۆ SOUQAK",
+  "chooseYourLanguage": "زمانەکەت هەڵبژێرە",
+  "languageChangeHint": "دەتوانیت زمان لە هەر کاتێکدا لە ڕێکخستنەکان بگۆڕیت",
+  "skip": "تێپەڕاندن",
+  "createAccount": "دروستکردنی هەژمار",
+  "signUpOverline": "هەژمارەکەت دروست بکە",
+  "createAccountTitle": "دروستکردنی هەژمار",
+  "firstName": "ناوی یەکەم",
+  "lastName": "ناوی کۆتایی",
+  "emailLabel": "ئیمەیڵ",
+  "passwordLabel": "وشەی نهێنی",
+  "confirmPasswordLabel": "پشتڕاستکردنەوەی وشەی نهێنی",
+  "alreadyHaveAccount": "هەژمارت هەیە؟ ",
+  "signInLink": "بچۆ ژوورەوە",
+  "signUpAgreementPrefix": "بە تۆمارکردن، ڕازیت لە ",
+  "termsLink": "مەرجەکانی بەکارهێنان",
+  "andConnector": " و ",
+  "privacyLink": "سیاسەتی تایبەتمەندی",
+  "welcomeBack": "بەخێربێیتەوە",
+  "forgotPassword": "وشەی نهێنیت لەبیرچووە؟",
+  "noAccountYet": "هەژمارت نییە؟ ",
+  "signUpNow": "ئێستا تۆمار ببە",
+  "firstNameHint": "محمد",
+  "lastNameHint": "ئەحمەد",
+  "understood": "تێگەیشتم",
+  "heatmapTutorialTitle": "چڕی ڕێکلامەکان لە ناوچەکەت لەسەر نەخشە ببینە",
+  "heatmapTutorialSubtitle": "ئایکۆنی نەخشە دابگرە بۆ بینینی چالاکترین ناوچەکان",
+  "smartAlertsTutorialTitle": "پێوەرەکانی گەڕان یەکجار دابنێ و ئاگادار ببەرەوە کاتێک ڕێکلامێکی نوێ دەگونجێت",
+  "smartAlertsTutorialSubtitle": "ئایکۆنی زەنگ دابگرە بۆ بەڕێوەبردنی ئاگادارکردنەوەکان",
+  "agreeToTerms": "ڕازیم بە مەرجەکان",
+  "agreeToPrivacy": "ڕازیم بە سیاسەتی تایبەتمەندی",
+  "continueWithPhone": "بەردەوامبوون بە ژمارەی تەلەفۆن",
+  "phoneOtpHint": "کۆدی پشتڕاستکردنەوە لە ڕێگەی واتساپ دەنێرین",
+  "sendCode": "ناردنی کۆد",
+  "otpSentTo": "کۆدێکمان نارد بۆ\n{phone}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "otpResendIn": "دووبارە ناردن لە {seconds} چ",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "otpCanResendNow": "دەتوانیت کۆد دووبارە بنێریت",
+  "otpNotReceived": "کۆدەکەت نەگەیشت؟",
+  "otpHelpText": "• دڵنیابە {phone} دروستە\n• چەند خولەکێک چاوەڕێ بکە — SMS دەکرێت دواکەوت بێت\n• Twilio: ژمارەکەت زیاد بکە بۆ Sender Pool بۆ souqiq-otp\n• دابینکەری SMS (Twilio یان MessageBird) لە Supabase چالاک بکە\n• بۆ گەشەپێدان: ژمارەکەت وەک Test OTP لە Supabase زیاد بکە\n• supabase/README.md — بەشی Phone OTP ببینە",
+  "@otpHelpText": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "completeProfileTitle": "پرۆفایلەکەت تەواو بکە",
+  "tapToChooseAvatar": "دابگرە بۆ هەڵبژاردنی وێنەی خۆت",
+  "profileNameReadError": "نەتوانرا ناو لە هەژمارەوە بخوێنرێتەوە. دووبارە بچۆ ژوورەوە.",
+  "sessionExpiredPleaseLogin": "دانیشتنەکەت بەسەرچوو، تکایە دووبارە بچۆ ژوورەوە",
+  "back": "گەڕانەوە",
+  "searchInSouqak": "لە SOUQAK بگەڕێ",
+  "mySmartAlertsTooltip": "ئاگادارکردنەوەکانی من",
+  "filtersTooltip": "فلتەرەکان",
+  "noSuggestions": "پێشنیار نییە",
+  "searchForQuery": "گەڕان بۆ \"{query}\"",
+  "@searchForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCardFailed": "نەتوانرا کارت دروست بکرێت، دووبارە هەوڵ بدەرەوە",
+  "followersLabel": "شوێنکەوتوو",
+  "myListedAds": "ڕێکلامەکانم",
+  "mySmartAlerts": "ئاگادارکردنەوەکانی من",
+  "defaultUser": "بەکارهێنەر",
+  "otherSettings": "ڕێکخستنەکانی تر",
+  "accountDetails": "وردەکاری هەژمار",
+  "passwordSettings": "وشەی نهێنی",
+  "aboutApp": "دەربارەی ئەپ",
+  "aboutAppDescription": "SOUQAK — بازاڕی ڕێکلامی ناوخۆییت لە عێراق. بە ئاسانی بکڕە و بفرۆشە لە یەک ئەپدا.",
+  "versionLabel": "وەشان {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "helpFaq": "یارمەتی / پرسیارە باوەکان",
+  "logoutAction": "چوونەدەرەوە",
+  "logoutConfirmBodyExtended": "دڵنیایت دەتەوێت بچیتە دەرەوە؟",
+  "deleteAccountConfirmBody": "دڵنیایت دەتەوێت هەژمارەکەت بسڕیتەوە؟ ناتوانرێت ئەم کارە بگەڕێنرێتەوە.",
+  "startConversation": "گفتوگۆ دەستپێبکە",
+  "conversation": "گفتوگۆ",
+  "viewListing": "ڕێکلام ببینە",
+  "blockUser": "بەکارهێنەر بلۆک بکە",
+  "blockFeatureComingSoon": "تایبەتمەندی بلۆککردن بەمزوانە",
+  "reportConversation": "گفتوگۆ ڕاپۆرت بکە",
+  "reportReceived": "ڕاپۆرتەکەت وەرگیرا",
+  "onlineNow": "ئێستا سەرهێڵە",
+  "typeMessage": "پەیام بنووسە...",
+  "reconnecting": "دووبارە پەیوەستبوونەوە...",
+  "chooseRecoveryMethod": "ڕێگای گەڕاندنەوەی هەژمار هەڵبژێرە",
+  "continueViaEmail": "بەردەوامبوون بە ئیمەیڵ",
+  "linkedEmailHint": "ئیمەیڵی پەیوەست بە هەژمار",
+  "continueViaPhone": "بەردەوامبوون بە مۆبایل",
+  "linkedPhoneHint": "مۆبایلی پەیوەست بە هەژمار",
+  "sendAction": "ناردن",
+  "emailNotRegistered": "ئەم ئیمەیڵە تۆمار نەکراوە",
+  "phoneNotRegistered": "ئەم ژمارەیە تۆمار نەکراوە",
+  "listingPostedToday": "ئەمڕۆ",
+  "listingPostedOneDayAgo": "١ ڕۆژ",
+  "listingPostedDaysAgo": "{count} ڕۆژ",
+  "@listingPostedDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homeFeedLatestTitle": "نوێترین ڕێکلامەکان",
+  "otpSentViaWhatsapp": "کۆد لە ڕێگەی واتساپ نێردرا بۆ",
+  "otpResendCode": "دووبارە ناردنی کۆد",
+  "otpVerifyButton": "پشتڕاستکردنەوە",
+  "otpInvalidCode": "کۆد هەڵەیە",
+  "otpVerifiedSuccess": "بە سەرکەوتوویی پشتڕاستکرایەوە!",
+  "otpSigningIn": "چوونەژوورەوە...",
+  "today": "ئەمڕۆ",
+  "yesterday": "دوێنێ",
+  "now": "ئێستا",
+  "oneMinuteAgo": "١ خولەک",
+  "twoMinutesAgo": "٢ خولەک",
+  "minutesAgo": "{count} خولەک",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "oneHourAgo": "١ کاتژمێر",
+  "twoHoursAgo": "٢ کاتژمێر",
+  "hoursAgo": "{count} کاتژمێر",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoDaysAgo": "٢ ڕۆژ",
+  "daysAgo": "{count} ڕۆژ",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "myMessages": "پەیامەکانم",
+  "loginToViewMessages": "بچۆ ژوورەوە بۆ بینینی پەیامەکان",
+  "noMessagesYet": "هێشتا پەیام نییە",
+  "contactSellersPrompt": "دەستپێبکە بە پەیوەندی لەگەڵ فرۆشیارەکان",
+  "deleteConversationTitle": "سڕینەوەی گفتوگۆ",
+  "deleteConversationBody": "ئەم گفتوگۆیە بسڕیتەوە؟",
+  "chatMessagesHeader": "پەیام و گفتوگۆ",
+  "chatDirectContact": "ڕاستەوخۆ پەیوەندی لەگەڵ کڕیار و فرۆشیار",
+  "activeUsersCount": "{count} چالاک",
+  "@activeUsersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingBadge": "ڕێکلام",
+  "startChatDefault": "دەستپێکردنی گفتوگۆ",
+  "categoryRealEstate": "خانوووبەرە",
+  "categoryVehicles": "ئۆتۆمبێل",
+  "categoryElectronics": "ئەلیکترۆنی",
+  "categoryBuySell": "بازاڕ",
+  "categoryTutoring": "وانە تایبەت",
+  "categoryJobs": "کار",
+  "categoryPets": "ئاژەڵ",
+  "categoryHomeHelp": "یارمەتی ماڵ",
+  "categorySubtitleRealEstate": "نیشتەجێبوون، زەوی، بازرگانی...",
+  "categorySubtitleVehicles": "ئۆتۆمبێل، کرێ، ماتۆڕ...",
+  "categorySubtitleElectronics": "مۆبایل، لاپتۆپ، تەلەڤیزیۆن...",
+  "categorySubtitleBuySell": "مۆبایل، کۆمپیوتەر، جلوبەرگ...",
+  "categorySubtitleTutoring": "قوتابخانە، زانکۆ، زمان...",
+  "categorySubtitleJobs": "تەکنەلۆژیا، ئەندازیاری، پزیشکی...",
+  "categorySubtitlePets": "سەگ، پشیلە، باڵندە...",
+  "categorySubtitleHomeHelp": "پاککردنەوە، چێشت، مامۆستا...",
+  "listingNotFound": "ڕێکلام نەدۆزرایەوە",
+  "tabListing": "ڕێکلام",
+  "tabDescription": "وەسف",
+  "tabLocation": "شوێن",
+  "sellerOtherListings": "ڕێکلامەکانی تر لەم فرۆشیارە",
+  "reportThisListing": "گزارکردنی ئەم ڕێکلامە",
+  "negotiable": "گفتوگۆ دەکرێت",
+  "videoTour": "🎥 گەشت بە ڤیدیۆ",
+  "paintConditionTitle": "دۆخی بۆدی و ڕەنگ",
+  "allPartsOriginal": "هەموو پارچەکان ڕەسەن",
+  "viewsCount": "{count} بینین",
+  "@viewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumber": "ژمارەی ڕێکلام",
+  "listingDate": "بەرواری ڕێکلام",
+  "noDescriptionAdded": "وەسف زیاد نەکراوە",
+  "locationNotSet": "شوێن دیاری نەکراوە",
+  "selectedLocation": "شوێنی دیاریکراو",
+  "sellerLabel": "فرۆشیار",
+  "theSeller": "فرۆشیار",
+  "memberSinceYear": "ئەندام لە {year}",
+  "@memberSinceYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "listingsCountLabel": "{count} ڕێکلام",
+  "@listingsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAllSellerListings": "هەموو ڕێکلامەکان ببینە",
+  "safetyTipsTitle": "ئامۆژگاری سەلامەتی",
+  "safetyTipPublicPlace": "لە شوێنێکی گشتی چاوپێکەوتن بکە",
+  "safetyTipNoPrepay": "پێش بینینی کاڵا پارە مەدە",
+  "safetyTipInspect": "پێش کڕین دۆخی کاڵا بپشکنە",
+  "rateSeller": "هەڵسەنگاندنی فرۆشیار",
+  "priceLabel": "نرخ",
+  "locationLabel": "شوێن",
+  "conditionLabel": "دۆخ",
+  "packageFree": "بەخۆڕایی",
+  "packagePro": "پڕۆ",
+  "packagePremium": "تایبەت",
+  "statusActive": "چالاک",
+  "statusExpired": "بەسەرچوو",
+  "statusPending": "چاوەڕوان",
+  "chooseOption": "هەڵبژێرە",
+  "allCategories": "هەموو",
+  "noCategories": "هیچ پۆلێک نییە",
+  "noSubcategories": "هیچ ژێرپۆلێک نییە",
+  "allCategoryListings": "هەموو ڕیکلامەکانی {name}",
+  "@allCategoryListings": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "allGovernorates": "هەموو پارێزگاکان",
+  "postListingStep1": "هەنگاوی ١",
+  "postListingStep2": "هەنگاوی ٢",
+  "postListingStep3": "هەنگاوی ٣",
+  "postListingStep4": "هەنگاوی ٤",
+  "postListingStep5": "هەنگاوی ٥",
+  "postListingStep6": "هەنگاوی ٦",
+  "postListingStep7": "هەنگاوی ٧",
+  "postListingStep8": "هەنگاوی ٨",
+  "postListingStepFallback": "هەنگاو {step}",
+  "@postListingStepFallback": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "nextStep": "دواتر",
+  "saveAsDraft": "پاشەکەوت وەک ڕەشنووس",
+  "titleMinLengthError": "ناونیشان دەبێت لانیکەم ٥ پیت بێت",
+  "addPhotoRequired": "تکایە لانیکەم یەک وێنە زیاد بکە",
+  "draftSaved": "ڕەشنووس پاشەکەوت کرا",
+  "confirmListingFeeTitle": "پشتڕاستکردنەوەی کرێی ڕێکلام",
+  "confirmListingFeeBody": "دوو ڕێکلامی بەخۆڕایی ئەم مانگە بەکارهێنا. کرێی ڕێکلامی ئاسایی ({price}) دەگیرێت.",
+  "@confirmListingFeeBody": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmAndPay": "پشتڕاستکردنەوە و پارەدان {price}",
+  "@confirmAndPay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "publishingListing": "بڵاوکردنەوەی ڕێکلام...",
+  "uploadingPhotos": "بارکردنی وێنەکان... ({current}/{total})",
+  "@uploadingPhotos": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "searchEllipsis": "گەڕان...",
+  "specifyValue": "نرخ دیاری بکە",
+  "specifyType": "جۆر دیاری بکە",
+  "choosePickerTitle": "هەڵبژێرە {label}",
+  "@choosePickerTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "governorateRequired": "پارێزگا *",
+  "neighborhoodOptional": "ناوچە / گەڕەک (ئارەزوومەندانە)",
+  "neighborhoodLabel": "ناوچە / گەڕەک",
+  "chooseGovernorateFirst": "سەرەتا پارێزگا هەڵبژێرە بۆ بینینی ناوچەکان",
+  "currencyIqd": "IQD",
+  "listingDetailsTitle": "وردەکاری ڕێکلام",
+  "optionalLabel": "ئارەزوومەندانە",
+  "listingTypeLabel": "جۆری ڕێکلام *",
+  "conditionNew": "نوێ",
+  "conditionUsed": "بەکارهێنراو",
+  "listingTitleLabel": "ناونیشانی ڕێکلام",
+  "listingTitleHint": "ناونیشانی ڕێکلامەکەت بنووسە",
+  "listingDescriptionLabel": "وەسفی ڕێکلام",
+  "listingDescriptionHint": "وەسفێکی ورد زیاد بکە...",
+  "removeArea": "لابردنی ناوچە",
+  "pickLocationOnMap": "دیاریکردنی شوێن لەسەر نەخشە",
+  "coordinatesLabel": "هاوڕێژەکان: {coords}",
+  "@coordinatesLabel": {
+    "placeholders": {
+      "coords": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedAreaLabel": "ناوچەی هەڵبژێردراو: {area}",
+  "@selectedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestedAreaLabel": "ناوچەی پێشنیارکراو: {area}",
+  "@suggestedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "removeLocation": "لابردنی شوێن",
+  "mapNotConfigured": "نەخشە ڕێکخراو نییە. GOOGLE_MAPS_API_KEY زیاد بکە یان تەنها پارێزگا هەڵبژێرە.",
+  "mapOpenFailed": "نەتوانی نەخشە بکەرەوە. دەتوانیت بە هەڵبژاردنی پارێزگا بەردەوام بیت.",
+  "photosTitle": "وێنەکان",
+  "photosSubtitle": "تا {max} وێنە زیاد بکە — ڕاکێشە بۆ ڕێکخستنەوە",
+  "@photosSubtitle": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "firstPhotoIsCover": "یەکەم وێنە بەرگە",
+  "maxPhotosLimit": "زۆرترین {max} وێنە",
+  "@maxPhotosLimit": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "noPhotosYet": "هێشتا هیچ وێنەیەک زیاد نەکراوە",
+  "photosHelpSell": "وێنەکان دەرفەتی فرۆشتن زیاد دەکەن",
+  "photoTipGoodLight": "ڕووناکی باش",
+  "photoTipClearPhotos": "وێنەی ڕوون",
+  "photoTipMultipleAngles": "گۆشەی جیاواز",
+  "reviewListingTitle": "پێداچوونەوەی ڕێکلام",
+  "detailsSection": "وردەکاری",
+  "categorySection": "پۆل",
+  "editAction": "دەستکاری",
+  "showMore": "زیاتر پیشان بدە",
+  "showLess": "کەمتر پیشان بدە",
+  "retryAction": "دووبارە هەوڵبدەرەوە",
+  "selectedSpecsCount": "{count} تایبەتمەندی هەڵبژێردراو",
+  "@selectedSpecsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedFeaturesCount": "{count} تایبەتمەندی هەڵبژێردراو",
+  "@selectedFeaturesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "exchangePossible": "گۆڕینەوە دەکرێت",
+  "deliveryAvailable": "گەیاندن بەردەستە",
+  "smartTvBadge": "Smart TV",
+  "contactTitle": "پەیوەندی",
+  "contactInfoSection": "زانیاری پەیوەندی",
+  "contactPreferencesTitle": "هەڵبژاردنی پەیوەندی",
+  "contactPreferencesHelp": "هەڵبژێرە کڕیارەکان چۆن پەیوەندیت پێوە بکەن.\n\n• تەلەفۆن و پەیام: پەیوەندی بە تەلەفۆن و پەیامی ناو ئەپ\n• تەنها تەلەفۆن: ژمارەی تەلەفۆن بەبێ پەیامی ناو ئەپ\n• تەنها پەیام: تەنها پەیامی ناو ئەپ",
+  "choosePackage": "پاکێج هەڵبژێرە",
+  "freePostsRemainingLabel": "0 IQD ({remaining} لە ٢ ڕێکلامی بەخۆڕایی ماوە)",
+  "@freePostsRemainingLabel": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "freePostsUsedWarning": "ڕێکلامە بەخۆڕاییەکانت بەکارهێنا. کرێی ڕێکلامی ئاسایی دەگیرێت.",
+  "roomsCountBadge": "{count} ژوور",
+  "@roomsCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLoadFailed": "بارکردنی پرۆفایل سەرکەوتوو نەبوو",
+  "changesSavedSuccess": "گۆڕانکاریەکان بە سەرکەوتوویی پاشەکەوت کران",
+  "saveError": "هەڵە لە کاتی پاشەکەوتکردن",
+  "enterName": "ناو بنووسە",
+  "usernameLabel": "ناوی بەکارهێنەر",
+  "usernameCannotChange": "ناوی بەکارهێنەر ناگۆڕدرێت",
+  "changePhoneNumber": "گۆڕینی ژمارە",
+  "verifyPhoneAction": "✓ ژمارە پشتڕاست بکە",
+  "notVerified": "پشتڕاست نەکراوە",
+  "changePhoto": "گۆڕینی وێنە",
+  "verifyPhoneTitle": "پشتڕاستکردنەوەی ژمارەی تەلەفۆن",
+  "whatsappSixDigitHint": "کۆدێکی ٦ ژمارەیی لە ڕێگەی واتسئاپ دەنێرین",
+  "sendWhatsappCode": "ناردنی کۆدی واتسئاپ",
+  "enterValidPhone": "ژمارەی تەلەفۆنی دروست بنووسە",
+  "phoneVerifiedSuccess": "ژمارەی تەلەفۆن بە سەرکەوتوویی پشتڕاست کرا",
+  "ratingsTitle": "هەڵسەنگاندنەکان",
+  "noRatingsYet": "هێشتا هەڵسەنگاندن نییە",
+  "loadMore": "زیاتر بار بکە",
+  "noReviewLeft": "هیچ لێدوانێکی نەهێشتووە",
+  "ratingSubmitFailed": "ناردنی هەڵسەنگاندن سەرکەوتوو نەبوو، دووبارە هەوڵبدەرەوە",
+  "rateExperienceTitle": "ئەزموونەکەت چۆن بوو؟",
+  "addCommentOptional": "لێدوان زیاد بکە (ئارەزوومەندانە)",
+  "submitRating": "ناردنی هەڵسەنگاندن",
+  "ratingsHelpCommunity": "هەڵسەنگاندنەکانت یارمەتی کۆمەڵگا دەدەن بۆ متمانە بە فرۆشیارەکان",
+  "chooseAvatarTitle": "وێنەی خۆت هەڵبژێرە",
+  "priceHistoryTitle": "مێژووی نرخ",
+  "priceDroppedSummary": "نرخ لە {from} بۆ {to} کەمبووەوە لە ماوەی {duration}",
+  "@priceDroppedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "priceIncreasedSummary": "نرخ لە {from} بۆ {to} بەرزبووەوە",
+  "@priceIncreasedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPriceLabel": "نرخی سەرەتایی",
+  "currentPriceLabel": "نرخی ئێستا",
+  "lessThanOneWeek": "کەمتر لە هەفتەیەک",
+  "oneWeek": "هەفتەیەک",
+  "twoWeeks": "دوو هەفتە",
+  "weeksCount": "{count} هەفتە",
+  "@weeksCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "moderationYouAreBanned": "تۆ قەدەغەکراویت",
+  "moderationBannedTitle": "قەدەغەکرا",
+  "moderationWarningTitle": "ئاگاداری",
+  "moderationPostingBanDefault": "ئێستا قەدەغەکراویت لە گفتوگۆ و بڵاوکردنەوە.",
+  "moderationBlockedBody": "سنووری ڕێگەپێدراوی پێشێلکاری تێپەڕاند و پەیامەکەت نەنێردرا.",
+  "moderationCensoredBody": "وشەیەکی نەگونجاو لە پەیامەکەتدا بەکارهات و لابرا. تکایە پابەند بە یاساکان بە.",
+  "postingBanPermanent": "بە شێوەی هەمیشەیی قەدەغەکراویت لە گفتوگۆ و بڵاوکردنەوە",
+  "postingBanUntil": "قەدەغەکراویت لە گفتوگۆ و بڵاوکردنەوە تا {date}",
+  "@postingBanUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postingBanPermanentReason": "بە شێوەی هەمیشەیی قەدەغەکراویت لە گفتوگۆ و بڵاوکردنەوە بەهۆی دووبارە بەکارهێنانی زمانێکی نەگونجاو.",
+  "postingBanFirstReason": "بۆ ماوەی دوو ڕۆژ قەدەغەکراویت لە گفتوگۆ و بڵاوکردنەوە بەهۆی بەکارهێنانی زمانێکی نەگونجاو. ئەگەر دووبارە بێت بۆ ماوەی مانگێکی تەواو قەدەغە دەکرێیت.",
+  "postingBanRepeatReason": "بۆ ماوەی مانگێکی تەواو قەدەغەکراویت لە گفتوگۆ و بڵاوکردنەوە بەهۆی دووبارە بەکارهێنانی زمانێکی نەگونجاو.",
+  "usernameSetupTitle": "ناوی بەکارهێنەرەکەت هەڵبژێرە",
+  "usernameSetupSubtitle": "ئەم ناوە لە پرۆفایل و ڕێکلامەکانتدا دەردەکەوێت",
+  "usernameHint": "ناوی_بەکارهێنەر",
+  "usernameFormatRules": "تەنها پیتە ئینگلیزیەکان، ژمارە و هێڵی خوارەوە ڕێگەپێدراون",
+  "skipForNow": "ئێستا تێپەڕێنە",
+  "genericErrorRetry": "هەڵەیەک ڕوویدا، دووبارە هەوڵبدەرەوە",
+  "emailVerifyTitle": "پشتڕاستکردنەوەی ئیمەیڵ",
+  "otpSentToEmailPrompt": "ئەو کۆدە بنووسە کە ناردمان بۆ",
+  "newPasswordTitle": "وشەی نهێنی نوێ",
+  "newPasswordSubtitle": "وشەی نهێنی نوێ بۆ هەژمارەکەت بنووسە",
+  "passwordChangedSuccess": "وشەی نهێنی گۆڕدرا",
+  "allListings": "هەموو ڕێکلامەکان",
+  "categoryNotFoundMigration": "\"{name}\" لە داتابەیس نەدۆزرایەوە. migrations لە Supabase جێبەجێ بکە و ئەپ دووبارە بار بکەرەوە.",
+  "@categoryNotFoundMigration": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyAccountTitle": "پشتڕاستکردنەوەی هەژمار",
+  "verifyAccountSubtitle": "پێش بەردەوامبوون، تکایە ناسنامەکەت پشتڕاست بکەرەوە",
+  "whyVerification": "بۆچی پشتڕاستکردنەوە؟",
+  "verificationBenefitsBody": "پشتڕاستکردنەوەی هەژمارەکەت نیشانەی متمانەی شین دەدات و متمانەی کڕیاران زیاد دەکات. بە نهێنی وردەکاریەکان دەپشکنین و لەگەڵ کەس ناهاوبەش دەکەین.",
+  "verifiedSellerBadge": "نیشانەی «فرۆشیاری پشتڕاستکراو» لە پرۆفایل و ڕێکلامەکانت",
+  "reviewWithin24Hours": "پێداچوونەوە لە ماوەی ٢٤ کاتژمێر",
+  "documentsStoredSecurely": "بەڵگەنامەکانت بە شێوەیەکی پارێزراو هەڵدەگیرێن",
+  "verifyIdentityAction": "پشتڕاستکردنەوەی ناسنامە ←",
+  "chooseDocumentType": "جۆری بەڵگەنامە هەڵبژێرە",
+  "nationalId": "ناسنامەی نیشتیمانی",
+  "drivingLicense": "مۆڵەتی شۆفێری",
+  "passport": "پاسپۆرت",
+  "captureDocumentTitle": "وێنەی بەڵگەنامە بگرە",
+  "documentFront": "ڕووی پێشەوە",
+  "documentBack": "ڕووی پشتەوە",
+  "submitForReview": "ناردن بۆ پێداچوونەوە",
+  "capturePhoto": "وێنە بگرە",
+  "chooseFromGallery": "هەڵبژاردن لە گالەری",
+  "documentBackRequired": "تکایە وێنەی پشتەوەی بەڵگەنامەکە بگرە",
+  "verificationSubmitFailed": "ناردنی داواکاری سەرکەوتوو نەبوو، دووبارە هەوڵبدەرەوە",
+  "verificationSentSuccess": "بە سەرکەوتوویی نێردرا",
+  "verificationReviewNotice": "داواکاریەکەت لە ماوەی ٢٤ کاتژمێر پێداچوونەوەی دەبێت و ئاگادارت دەکرێیتەوە",
+  "backToHome": "گەڕانەوە بۆ سەرەکی",
+  "newSmartAlert": "ئاگاداری زیرەکی نوێ",
+  "alertNameHint": "ناوی ئاگاداری *",
+  "alertNameRequired": "ناوی ئاگاداری پێویستە",
+  "modelYear": "ساڵی دروستکردن",
+  "fromLabel": "لە",
+  "toLabel": "بۆ",
+  "allIraq": "هەموو عێراق",
+  "saveAlert": "پاشەکەوتکردنی ئاگاداری",
+  "alertSavedSuccess": "ئاگاداری پاشەکەوت کرا ✓ کاتێک ڕێکلامی گونجاو بڵاوکرایەوە ئاگادارت دەکەینەوە",
+  "alertSaveFailed": "پاشەکەوتکردنی ئاگاداری سەرکەوتوو نەبوو: {error}",
+  "@alertSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newAlert": "ئاگاداری نوێ",
+  "loginToManageAlerts": "بچۆ ژوورەوە بۆ بەڕێوەبردنی ئاگاداریەکان",
+  "noAlertsYet": "هێشتا ئاگاداری نییە",
+  "createAlertNow": "ئێستا ئاگاداری دروست بکە",
+  "saveSearchAsAlert": "ئەم گەڕانە وەک ئاگاداری زیرەک پاشەکەوت بکە 🔔",
+  "alertLimitFreeReached": "بەکارهێنەرانی بەخۆڕایی گەیشتنە سنوور (٣ ئاگاداری)",
+  "upgradeProUnlimitedAlerts": "بەرزبکەرەوە بۆ Pro بۆ ئاگاداری بێسنوور",
+  "listingBoostedSuccess": "ڕێکلامەکەت بە سەرکەوتوویی بەرزکرایەوە",
+  "boostYourListing": "بەرزکردنەوەی ڕێکلامەکەت",
+  "boostListingSubtitle": "پاکێجی گونجاو هەڵبژێرە بۆ زیادکردنی بینینی ڕێکلامەکەت",
+  "markAsSoldAction": "فرۆشراو",
+  "markAsSoldTitle": "نیشانەکردن وەک فرۆشراو",
+  "markAsSoldBody": "ئەم ڕێکلامە وەک فرۆشراو نیشان بکەیت؟",
+  "deleteListingTitle": "سڕینەوەی ڕێکلام",
+  "deleteListingBody": "ئەم ڕێکلامە بسڕیتەوە؟",
+  "promoteListing": "بڵاوکردنەوە",
+  "republishListing": "دووبارە بڵاوکردنەوە",
+  "restoreListing": "گەڕاندنەوە",
+  "listingNumberWithRef": "ژمارەی ڕێکلام: #{ref}",
+  "@listingNumberWithRef": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumberDash": "ژمارەی ڕێکلام: —",
+  "contactUsOnSouqak": "پەیوەندیمان پێوە بکە لە سـوقک",
+  "pendingApprovalTitle": "چاوەڕوانی پەسەندکردنی بەڕێوەبەر",
+  "pendingApprovalBody": "دەستکاری، سڕینەوە، فرۆشراو و واتسئاپ دوای پەسەندکردن دەردەکەون",
+  "messageSeller": "پەیام بۆ فرۆشیار",
+  "cannotMessageSelf": "ناتوانیت پەیام بۆ خۆت بنێریت",
+  "openChatFailed": "نەتوانرا گفتوگۆ بکرێتەوە",
+  "markedAsSoldSuccess": "وەک فرۆشراو نیشانکرا",
+  "rateBuyer": "هەڵسەنگاندنی کڕیار",
+  "deleteListingConfirmBody": "دڵنیایت؟ ئەم کارە ناگەڕێتەوە.",
+  "listingDeletedSuccess": "ڕێکلام سڕایەوە",
+  "reportChooseReason": "هۆکار هەڵبژێرە یان وردەکاری گزار بنووسە",
+  "reportSubmittedThanks": "گزار نێردرا. سوپاس بۆ یارمەتی.",
+  "reportSubmitFailed": "ناردنی گزار سەرکەوتوو نەبوو",
+  "reportDetailsLabel": "وردەکاری گزار",
+  "submitReport": "ناردنی گزار",
+  "reportReasonDuplicate": "ڕێکلامی دووبارە",
+  "reportReasonMisleadingPrice": "نرخی گمراهکەر",
+  "reportReasonFakePhotos": "وێنەی ساختە",
+  "reportReasonInappropriate": "ناوەڕۆکی نەگونجاو",
+  "reportReasonFraud": "فێڵکاری یان قۆڵبڕین",
+  "reportReasonOther": "هیتر",
+  "filtersTitle": "فلتەرەکان",
+  "clearAll": "سڕینەوەی هەموو",
+  "priceRangeLabel": "مەودای نرخ",
+  "additionalOptions": "هەڵبژاردەی زیاتر",
+  "featuredOnlyLabel": "تەنها ڕێکلامی تایبەت",
+  "negotiableOnlyLabel": "تەنها گفتوگۆپێکراو",
+  "showResultsCount": "پیشاندانی {count} ئەنجام",
+  "@showResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "showResultsLoading": "پیشاندانی ئەنجامەکان...",
+  "showResults": "پیشاندانی ئەنجامەکان",
+  "editChangesSaved": "گۆڕانکاریەکان پاشەکەوت کران ✓",
+  "editListingTitle": "دەستکاری ڕێکلام",
+  "saveEdits": "پاشەکەوتکردنی گۆڕانکاریەکان",
+  "heatmapTitle": "نەخشەی ڕێکلام",
+  "heatmapLoadFailed": "بارکردنی داتای چڕی سەرکەوتوو نەبوو",
+  "heatmapNoActiveListings": "ئێستا ڕێکلامی چالاک لە ناوچەکانی پیشاندراو نییە",
+  "heatmapClusterSummary": "{areas} ناوچە · {total} ڕێکلام",
+  "@heatmapClusterSummary": {
+    "placeholders": {
+      "areas": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapSelectArea": "ناوچە هەڵبژێرە بۆ بینینی ڕێکلامەکان",
+  "showListingsAction": "بینینی ڕێکلامەکان",
+  "heatmapFilterCars": "ئۆتۆمبێل",
+  "heatmapDensityCars": "ئێستا {count} ئۆتۆمبێل بۆ فرۆشتن لە {area}",
+  "@heatmapDensityCars": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityRealEstate": "ئێستا {count} ڕێکلامی خانووبەرە لە {area}",
+  "@heatmapDensityRealEstate": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityElectronics": "ئێستا {count} ڕێکلامی ئەلیکترۆنی لە {area}",
+  "@heatmapDensityElectronics": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityGeneric": "ئێستا {count} ڕێکلامی چالاک لە {area}",
+  "@heatmapDensityGeneric": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "listingPendingReviewStats": "ڕێکلامەکەت لەژێر پێداچوونەوەیە — ئامارەکان دوای بڵاوکردنەوە خۆکار نوێ دەکرێنەوە",
+  "contactStatLabel": "پەیوەندی",
+  "autoRenewLabel": "نوێکردنەوەی خۆکار",
+  "autoRenewAfterApproval": "دوای پەسەندکردنی ڕێکلام لە بەڕێوەبەر چالاک دەبێت",
+  "expiresInDays": "لە {days} ڕۆژدا بەسەردەچێت",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "priceChangeTitle": "گۆڕینی نرخ",
+  "priceChangeWarning": "ئاگاداری: گۆڕینی نرخ بۆ هەموو کڕیاران لە مێژووی نرخ دەردەکەوێت",
+  "confirmChange": "پشتڕاستکردنەوەی گۆڕانکاری",
+  "publishSuccessDone": "تەواو ✓",
+  "listingPendingReviewTitle": "ڕێکلامەکەت لەژێر پێداچوونەوەیە",
+  "listingVisibleAfterApproval": "دوای پەسەندکردن بۆ هەموو دەردەکەوێت",
+  "okAction": "باشە",
+  "closeTooltip": "داخستن",
+  "addPhotoLabel": "زیادکردنی وێنە",
+  "coverPhotoLabel": "بەرگ",
+  "priceEstimateFailed": "خەمڵاندنی نرخ سەرکەوتوو نەبوو، دووبارە هەوڵبدەرەوە",
+  "calculateSuggestedPrice": "✨ نرخی پێشنیارکراو حیساب بکە",
+  "confidenceHigh": "بەرز",
+  "confidenceMedium": "مامناوەند",
+  "confidenceLow": "نزم",
+  "aiPriceEstimateTitle": "خەمڵاندنی نرخی زیرەکی دەستکرد",
+  "priceEstimateDisclaimer": "ئەمە خەمڵاندنی نزیکە، نرخی کۆتایی نییە",
+  "phoneOtpWhatsappHint": "کۆدی پشتڕاستکردنەوە لە ڕێگەی واتسئاپ دەنێرین",
+  "passwordResetResent": "بەستەر دووبارە نێردرا",
+  "passwordResetSentTitle": "بەستەر نێردرا",
+  "passwordResetSentSubtitle": "بەستەری نوێکردنەوە بۆ ئیمەیڵەکەت نێردرا",
+  "passwordResetInstructions": "بەستەرەکە لە ئیمەیڵەکەتدا بکەرەوە بۆ دروستکردنی وشەی نهێنی نوێ. ڕەنگە چەند خولەکێک بخایەنێت.",
+  "resendLink": "دووبارە ناردن",
+  "backToLogin": "گەڕانەوە بۆ چوونەژوورەوە",
+  "videoLoadFailed": "بارکردنی ڤیدیۆ سەرکەوتوو نەبوو",
+  "listingsOnSouqakCount": "{count} ڕێکلام لە سـوقک",
+  "@listingsOnSouqakCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleDetailsTitle": "وردەکاری ئۆتۆمبێل",
+  "basicInfoTitle": "زانیاری سەرەکی",
+  "vehicleTrimLabel": "جۆر",
+  "trimExampleHint": "نموونە: SE",
+  "mileageLabel": "مەودا",
+  "engineLabel": "بزوێنەر",
+  "cylindersLabel": "سلندەر",
+  "paintStatusLabel": "دۆخی ڕەنگ",
+  "fuelRequiredLabel": "سووتەمەنی *",
+  "importCountryLabel": "وڵاتی هاوردە",
+  "plateLabel": "تابلۆ",
+  "transmissionRequiredLabel": "گێڕ *",
+  "seatCountLabel": "ژمارەی کورسی",
+  "seatMaterialLabel": "مادەی کورسی",
+  "specsSectionTitle": "تایبەتمەندی",
+  "priceRequiredLabel": "نرخ *",
+  "conditionRequiredLabel": "دۆخ *",
+  "yearLabel": "ساڵ",
+  "chooseColorPlaceholder": "ڕەنگ هەڵبژێرە",
+  "chooseCustomColorTitle": "ڕەنگێکی تایبەت هەڵبژێرە",
+  "colorLabel": "ڕەنگ",
+  "paintOriginalLabel": "ڕەسەن",
+  "paintLocalLabel": "ڕەنگی ناوخۆیی",
+  "paintPaintedLabel": "ڕەنگکراو",
+  "paintReplacedLabel": "گۆڕدراو",
+  "vehicleSpecsSelectedCount": "{count} تایبەتمەندی هەڵبژێردرا",
+  "@vehicleSpecsSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "electronicsPhoneDetailsTitle": "وردەکاری مۆبایل",
+  "electronicsLaptopDetailsTitle": "وردەکاری لاپتۆپ",
+  "electronicsTvDetailsTitle": "وردەکاری تەلەڤیزیۆن",
+  "electronicsDetailsTitle": "وردەکاری ئەلیکترۆنی",
+  "brandLabel": "براند",
+  "modelLabel": "مۆدێل",
+  "storageLabel": "کۆگا",
+  "ramLabel": "RAM",
+  "batteryHealthLabel": "تەندروستی پاتری",
+  "withBoxLabel": "لەگەڵ سندوق",
+  "withChargerLabel": "لەگەڵ شەحنکەر",
+  "warrantyLabel": "گەرەنتی",
+  "processorLabel": "پرۆسێسەر",
+  "screenSizeInchesLabel": "قەبارەی شاشە (ئینچ)",
+  "resolutionLabel": "وردبینی",
+  "realEstateDetailsTitle": "وردەکاری خانووبەرە",
+  "propertyTypeRequiredLabel": "جۆری خانووبەرە *",
+  "offerTypeRequiredLabel": "جۆری پێشکەش *",
+  "areaSqmRequiredLabel": "ڕووبەر (m²) *",
+  "sqmUnit": "m²",
+  "floorLabel": "نهۆم",
+  "roomsCountLabel": "ژمارەی ژوور",
+  "bathroomsCountLabel": "ژمارەی حەمام",
+  "buildingAgeYearsLabel": "تەمەنی بینا (ساڵ)",
+  "finishingLabel": "تەواوکاری",
+  "deedTypeLabel": "جۆری بەڵگە",
+  "featuresSectionTitle": "تایبەتمەندی",
+  "brandOptionalLabel": "براند (ئارەزوومەندانە)",
+  "exchangePossibleQuestion": "گۆڕینەوە دەکرێت؟",
+  "deliveryAvailableQuestion": "گەیاندن بەردەستە؟",
+  "deliveryCostRequiredLabel": "تێچووی گەیاندن *",
+  "jobDetailsTitle": "وردەکاری کار",
+  "jobTypeRequiredLabel": "جۆری کار *",
+  "sectorRequiredLabel": "بەش *",
+  "experienceRequiredLabel": "ئەزموونی پێویست",
+  "educationRequiredLabel": "پێداویستی خوێندن",
+  "genderPreferenceLabel": "هەڵبژاردنی ڕەگەز",
+  "salaryTypeLabel": "جۆری موچە",
+  "salaryMinRequiredLabel": "کەمترین موچە *",
+  "salaryMaxLabel": "زۆرترین موچە",
+  "benefitsSectionTitle": "سوودەکان",
+  "serviceDetailsTitle": "وردەکاری خزمەتگوزاری",
+  "genderLabel": "ڕەگەز",
+  "nationalityLabel": "نەتەوە",
+  "workHoursRequiredLabel": "کاتەکانی کار *",
+  "weekDaysLabel": "ڕۆژەکانی هەفتە",
+  "yearsExperienceLabel": "ساڵانی ئەزموون",
+  "expectedSalaryRequiredLabel": "موچەی چاوەڕوانکراو *",
+  "languagesSectionTitle": "زمانەکان",
+  "animalDetailsTitle": "وردەکاری ئاژەڵ",
+  "ageMonthsLabel": "تەمەن (مانگ)",
+  "vaccinatedQuestion": "چەککراو؟",
+  "hasDocumentsQuestion": "بەڵگەنامەی هەیە؟",
+  "trainedQuestion": "ڕاهێنراو؟",
+  "tutoringDetailsTitle": "وردەکاری وانە",
+  "subjectRequiredLabel": "بابەت *",
+  "studyStageRequiredLabel": "ئاستی خوێندن *",
+  "curriculumLabel": "مەنهەج",
+  "teachingMethodRequiredLabel": "شێوازی فێرکردن *",
+  "acceptedGenderLabel": "ڕەگەزی قبوڵکراو",
+  "pricePerHourRequiredLabel": "نرخ/کاتژمێر *",
+  "educationQualificationLabel": "بڕوانامە",
+  "viewOnMapLabel": "بینین لەسەر نەخشە",
+  "videoSectionTitle": "ڤیدیۆ",
+  "currentVideoReplaceHint": "ڤیدیۆی ئێستا — دەتوانیت لە خوارەوە بیگۆڕیت",
+  "addDemoVideoTitle": "ڤیدیۆی ڕوونکردنەوە زیاد بکە (تا ٦٠ چرکە)",
+  "proSubscribersOnly": "تەنها بۆ بەشداربووانی Pro و Premium",
+  "upgradeToProLock": "بەرزبکەرەوە بۆ Pro 🔒",
+  "processingVideoProgress": "پڕۆسێسکردنی ڤیدیۆ... {percent}%",
+  "@processingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseVideoLabel": "ڤیدیۆ هەڵبژێرە",
+  "recordVideoLabel": "تۆمارکردنی ڤیدیۆ",
+  "videoProcessFailed": "پڕۆسێسکردنی ڤیدیۆ سەرکەوتوو نەبوو",
+  "invalidVideoError": "ڤیدیۆی نادروست",
+  "imageProcessFailed": "پڕۆسێسکردنی وێنە سەرکەوتوو نەبوو",
+  "chooseCategoryError": "پۆل هەڵبژێرە",
+  "chooseContactPreferenceError": "هەڵبژاردنی پەیوەندی هەڵبژێرە",
+  "chooseGovernorateError": "پارێزگا هەڵبژێرە",
+  "enterValidPriceError": "نرخێکی دروست بنووسە",
+  "chooseProductConditionError": "دۆخی کاڵا هەڵبژێرە",
+  "chooseConditionError": "دۆخ هەڵبژێرە",
+  "chooseFuelTypeError": "جۆری سووتەمەنی هەڵبژێرە",
+  "chooseTransmissionError": "گێڕ هەڵبژێرە",
+  "choosePropertyTypeError": "جۆری خانووبەرە هەڵبژێرە",
+  "chooseOfferTypeError": "جۆری پێشکەش هەڵبژێرە",
+  "enterAreaSqmError": "ڕووبەر بە مەتر چوارگۆشە بنووسە",
+  "chooseDeliveryCostError": "تێچووی گەیاندن هەڵبژێرە",
+  "chooseSubjectError": "بابەت هەڵبژێرە",
+  "chooseStudyStageError": "ئاستی خوێندن هەڵبژێرە",
+  "chooseTeachingMethodError": "شێوازی فێرکردن هەڵبژێرە",
+  "enterValidHourlyPriceError": "نرخێکی دروست بۆ کاتژمێر بنووسە",
+  "chooseJobTypeError": "جۆری کار هەڵبژێرە",
+  "chooseSectorError": "بەش هەڵبژێرە",
+  "enterMinSalaryError": "کەمترین موچە بنووسە",
+  "salaryMaxMustExceedMinError": "زۆرترین موچە دەبێت لە کەمترین زیاتر بێت",
+  "chooseAnimalTypeFromCategoriesError": "جۆری ئاژەڵ لە پۆلەکان هەڵبژێرە",
+  "chooseServiceTypeFromCategoriesError": "جۆری خزمەتگوزاری لە پۆلەکان هەڵبژێرە",
+  "chooseWorkHoursError": "کاتەکانی کار هەڵبژێرە",
+  "enterExpectedSalaryError": "موچەی چاوەڕوانکراو بنووسە",
+  "titleTooLongError": "ناونیشان زۆر درێژە (زۆرترین ١٠٠ پیت)",
+  "descriptionTooLongError": "وەسف زۆر درێژە (زۆرترین ٢٠٠٠ پیت)",
+  "uploadingPhotosSimple": "بارکردنی وێنەکان...",
+  "uploadingVideoProgress": "بارکردنی ڤیدیۆ... {percent}%",
+  "@uploadingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "publishListingFailedError": "بڵاوکردنەوەی ڕێکلام سەرکەوتوو نەبوو. دووبارە هەوڵبدەرەوە.",
+  "chooseCategoryMinimumError": "لانیکەم پۆل هەڵبژێرە",
+  "draftTitleFallback": "ڕەشنووس",
+  "saveDraftFailedError": "پاشەکەوتکردنی ڕەشنووس سەرکەوتوو نەبوو",
+  "cannotEditListingError": "ناتوانیت ئەم ڕێکلامە دەستکاری بکەیت",
+  "loadListingFailedError": "بارکردنی ڕێکلام سەرکەوتوو نەبوو",
+  "enterListingTitleError": "ناونیشانی ڕێکلام بنووسە",
+  "addAtLeastOnePhotoError": "لانیکەم یەک وێنە زیاد بکە",
+  "saveEditsFailedError": "پاشەکەوتکردنی گۆڕانکاریەکان سەرکەوتوو نەبوو",
+  "chatListingIntro": "سڵاو، ئارەزووم بە ڕێکلامەکەتە: {title}",
+  "@chatListingIntro": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameChecking": "پشکنین...",
+  "usernameAvailable": "بەردەستە ✓",
+  "usernameTaken": "پێشتر گیراوە ✗",
+  "usernameRules": "3–20 پیت: تەنها پیتی ئینگلیزی، ژمارە و _",
+  "ratingsCount": "({count} هەڵسەنگاندن)",
+  "@ratingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "authSessionFailed": "چوونەژوورەوە سەرکەوتوو نەبوو. دووبارە هەوڵبدەرەوە.",
+  "chooseAvatar": "وێنەکەت هەڵبژێرە",
+  "avatarIconsSection": "وێنەی ئایکۆن",
+  "chooseDefaultAvatar": "وێنەی بنەڕەتی هەڵبژێرە",
+  "orUploadPhotoHint": "یان لە کامێرا/گالەری سەرەوە بار بکە",
+  "countryIraq": "عێراق",
+  "matchingListingsCount": "{count} ڕێکلامی گونجاو",
+  "@matchingListingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsTitle": "ئەنجامەکانی گەڕان",
+  "searchResultCount": "{count} ئەنجام",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "filterCategoryLabel": "پۆل",
+  "filterPriceLabel": "نرخ",
+  "filterFeaturedLabel": "تایبەت",
+  "accountVerifiedBanner": "هەژمارەکەت پشتڕاستکراوە ✓",
+  "verificationPendingBanner": "داواکاری پشتڕاستکردنەوە لەژێر پێداچوونەوە ⏳",
+  "verificationRejectedWithReason": "داواکاریەکەت ڕەتکرایەوە — {reason}",
+  "@verificationRejectedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "verificationRejectedBanner": "داواکاری پشتڕاستکردنەوە ڕەتکرایەوە",
+  "verifyAccountPrompt": "هەژمارەکەت پشتڕاست بکەرەوە بۆ نیشانەی متمانە 🔒",
+  "vehicleYearLabel": "ساڵ",
+  "vehicleTrimShortLabel": "جۆر",
+  "vehicleEngineShortLabel": "بزوێنەر",
+  "vehicleCylinderShortLabel": "سلندەر",
+  "photosSectionTitle": "وێنەکان",
+  "currentPhotosTitle": "وێنەکانی ئێستا",
+  "clearAllFilters": "سڕینەوەی هەموو",
+  "noResultsForQuery": "هیچ ئەنجامێک نەدۆزرایەوە بۆ «{query}»",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "tryChangingSearchOrFilters": "وشەی گەڕان یان فلتەرەکان بگۆڕە",
+  "clearFilters": "سڕینەوەی فلتەرەکان",
+  "loadingMore": "بارکردنی زیاتر...",
+  "noResultsFound": "هیچ ئەنجامێک نەدۆزرایەوە",
+  "attr_1aae214b": "8 airbags",
+  "colorOther": "تر",
+  "colorWhite": "سپی",
+  "attr_1a93e294": "Foreign",
+  "colorRed": "Red",
+  "colorGreen": "سەوز",
+  "attr_10f56232": "Erbil",
+  "propLand": "زەوی",
+  "attr_60b69dc6": "Rabbit",
+  "colorBlue": "شین",
+  "colorBlack": "ڕەش",
+  "attr_97418f6f": "German",
+  "attr_dd1fbe22": "American",
+  "genderFemale": "Female",
+  "transAutomatic": "ئۆتۆماتیک",
+  "attr_0d67ce95": "European",
+  "attr_ea410cd6": "Online",
+  "attr_9967c75e": "Annual leave",
+  "attr_fd5a68db": "LED lighting",
+  "attr_cfb972ef": "Adaptive lighting",
+  "attr_0d092cb1": "Automatic high beams",
+  "attr_407ad989": "Laser lighting",
+  "attr_8c495f8e": "Ambient lighting",
+  "attr_367395e4": "IELTS prep",
+  "attr_9f6457d2": "TOEFL prep",
+  "attr_00f135f8": "Secondary",
+  "genderFemales": "Females",
+  "attr_0402b2d3": "English",
+  "offerRent": "کرێ",
+  "offerDailyRent": "Daily rent",
+  "attr_5c22c7bc": "Primary",
+  "attr_a910430c": "Biology",
+  "attr_b1a8fcf3": "Business & finance",
+  "attr_127a0207": "Safety",
+  "attr_e8ade886": "Security sector",
+  "attr_782faf71": "Economics",
+  "attr_6466c2b3": "Programming",
+  "attr_7b2d355f": "Basra",
+  "attr_3659f4ca": "History & Geography",
+  "attr_3dbbe072": "Tajweed",
+  "attr_5fa7f4ab": "Islamic education",
+  "attr_68b31032": "Design",
+  "attr_595073bb": "Traffic sign recognition",
+  "attr_a8071737": "Education & training",
+  "attr_2f29a34b": "Computer & technology",
+  "attr_b5bf961a": "Hillah",
+  "attr_6f5c12c4": "Exterior",
+  "attr_479c9dd4": "Diwaniyah",
+  "attr_d10c7f46": "Comfort",
+  "attr_a8590e6c": "Ramadi",
+  "attr_ec996beb": "Mathematics",
+  "attr_2ad56620": "Agriculture",
+  "attr_b23b84b6": "Sulaymaniyah",
+  "attr_47499b9d": "Pharmacy",
+  "attr_df03b4c2": "Hospitality & restaurants",
+  "attr_dbdc9141": "Medicine",
+  "attr_2f1f707b": "Medicine & health",
+  "attr_a23d2f98": "General science",
+  "attr_fc2fc74a": "Amarah",
+  "attr_308b4c85": "Fiqh",
+  "attr_057cd7d5": "Physics",
+  "attr_4cfcf3c2": "Law",
+  "attr_1429981f": "Holy Quran",
+  "attr_c8f1808b": "Kut",
+  "attr_569ec1ad": "Chemistry",
+  "attr_4469156a": "German language",
+  "attr_8bcb4c90": "English language",
+  "attr_51a02272": "Turkish language",
+  "attr_b99f79d6": "Arabic language",
+  "attr_37ae3826": "French language",
+  "attr_568f6457": "Kurdish language",
+  "attr_00ea8179": "Sales & marketing",
+  "attr_3f2ef321": "Accounting",
+  "attr_f3a2d580": "Financial accounting",
+  "attr_b4a66258": "Iraqi curriculum",
+  "attr_878d6350": "Mosul",
+  "attr_8f465ea8": "Nasiriyah",
+  "attr_1c675f3a": "Najaf",
+  "attr_1ace1501": "Oil & energy",
+  "attr_d83c25fb": "Transport & logistics",
+  "attr_45fbf259": "Engineering & construction",
+  "attr_4bfb21c0": "Adults",
+  "attr_b7e8e36b": "No experience",
+  "warrantyNo": "No warranty",
+  "attr_1fbfc2a7": "No plate",
+  "colorOrange": "Orange",
+  "attr_f8104802": "British",
+  "attr_40153b66": "Baghdad",
+  "attr_13ac665b": "Bachelor's",
+  "attr_7acac848": "Balcony",
+  "fuelPetrol": "بەنزین",
+  "colorPurple": "مۆر",
+  "colorBrown": "Brown",
+  "colorBeige": "Beige",
+  "offerSale": "فرۆشتن",
+  "attr_d1c3aa46": "Health insurance",
+  "attr_8fe0629c": "Auto hold",
+  "attr_6ef15709": "Automatic climate control",
+  "attr_36db3f98": "Traction control",
+  "attr_674fb279": "Training",
+  "attr_f730823c": "Heated seats",
+  "attr_2751dcce": "Turkish",
+  "attr_5e98ac49": "Remote start",
+  "attr_0e8965c7": "IT & programming",
+  "attr_39990cf8": "Tikrit",
+  "attr_b3d78ccb": "Driver attention alert",
+  "attr_ece0d086": "Rear cross-traffic alert",
+  "attr_30ad1cb0": "Cleaning",
+  "attr_61ff3500": "Electric power steering",
+  "colorTitanium": "تایتانیۆم",
+  "attr_5dfc333a": "High school",
+  "colorTricolor": "Tricolor",
+  "attr_2b649c53": "University",
+  "attr_3f0a5345": "Leather",
+  "attr_596cc57e": "Generator",
+  "conditionGood": "باش",
+  "attr_e7873977": "Gardening",
+  "attr_6c532953": "Garden",
+  "attr_57bf3353": "Security",
+  "attr_9e07c1b5": "Accident history",
+  "attr_e4439193": "Water tank",
+  "attr_c6c026c9": "Gulf",
+  "attr_b3371774": "Horse",
+  "attr_bf2575b9": "Diploma",
+  "attr_f7fc7de3": "Keyless entry",
+  "attr_eebeffb8": "Heated steering wheel",
+  "attr_bc432f3e": "PhD",
+  "attr_c114e728": "Dohuk",
+  "attr_166ce8c7": "Part-time",
+  "attr_03e6fabe": "Full-time",
+  "fuelDiesel": "دیزل",
+  "genderMale": "Male",
+  "genderMales": "Males",
+  "colorGold": "زێڕین",
+  "attr_ed91d68c": "Salary + commission",
+  "attr_4bd160a2": "Fixed salary",
+  "attr_d9033ee1": "Radar",
+  "attr_d021c755": "Childcare",
+  "attr_f730c844": "Elderly care",
+  "attr_20484d19": "Remote parking",
+  "colorGray": "Gray",
+  "attr_9863b154": "Push-button start",
+  "attr_91d7a73d": "Reptile",
+  "attr_603ab93b": "Driver",
+  "attr_fe80509e": "Samarra",
+  "attr_ec4f948f": "Housing",
+  "attr_5ae5476a": "Fish",
+  "attr_48c1891a": "Wireless charger",
+  "attr_5f5265a7": "Display screen",
+  "propApartment": "شوقە",
+  "attr_1fcda818": "Morning",
+  "attr_1980be67": "Home maintenance",
+  "attr_a78786af": "Chinese",
+  "attr_adfa037c": "Front fog lights",
+  "warrantyYes": "With warranty",
+  "attr_e579ab86": "Bird",
+  "attr_71c665ee": "Title deed",
+  "attr_7a206f76": "Cooking",
+  "attr_e5dbc387": "Iraqi",
+  "attr_da88eccb": "Arabic",
+  "attr_aa4460d5": "Head-up display (HUD)",
+  "attr_8127bee7": "Contract",
+  "attr_571581cc": "Sale contract",
+  "attr_155ac5cf": "Computer science",
+  "attr_7173aff1": "Commission",
+  "attr_e3668c0d": "Remote",
+  "fuelGas": "Gas",
+  "attr_a1a423e6": "Laundry & ironing",
+  "furnishedNo": "بێ دامەزران",
+  "attr_1a0bd9b9": "Persian",
+  "attr_29519ce6": "Sunroof",
+  "attr_aa282cda": "French",
+  "colorSilver": "زیو",
+  "propHotel": "Hotel",
+  "attr_eda90053": "At home",
+  "attr_d2157926": "At my office",
+  "propVilla": "ڤیلا",
+  "attr_a826a507": "Cat",
+  "attr_4b021528": "Child lock",
+  "attr_60cbec0a": "Central locking",
+  "attr_f283f661": "Fabric",
+  "attr_df6d261d": "360° camera",
+  "attr_1f94f275": "Rear camera",
+  "attr_ea2d0f4a": "Cameras",
+  "attr_8d564a08": "Karbala",
+  "attr_aa03d946": "Kurdish",
+  "attr_4e1a505f": "Kirkuk",
+  "genderBoth": "Both",
+  "attr_f6ec7e07": "Dog",
+  "fuelElectric": "کارەبایی",
+  "attr_38ad1ced": "Korean",
+  "attr_10da4bc1": "Digital cockpit",
+  "attr_3a1306fc": "Temporary",
+  "attr_0cfe7e2c": "Temporary plate",
+  "attr_9e37b135": "Master's",
+  "attr_14184253": "Intermediate",
+  "attr_5443be84": "Adaptive cruise control",
+  "deliveryFree": "بەخۆڕایی",
+  "propCommercial": "Commercial shop",
+  "genderMixed": "Mixed",
+  "deliveryPaid": "Paid",
+  "attr_463b559b": "Blind spot monitor",
+  "attr_3e6b7c47": "Heated side mirrors",
+  "attr_5e7c67c4": "Power mirrors",
+  "colorSpotted": "Spotted",
+  "propFarm": "Farm",
+  "attr_726ee881": "Mixed",
+  "attr_abbb3685": "Evening",
+  "attr_b1f57e19": "Traffic jam assist",
+  "attr_1c5815dd": "Emergency brake assist",
+  "attr_1d2d9327": "Pool",
+  "attr_908b36c3": "Tire pressure sensors",
+  "propWarehouse": "Warehouse",
+  "attr_f4bcb528": "Armrest",
+  "attr_50eeda55": "Partially repainted",
+  "attr_d7f99058": "Fully repainted",
+  "attr_c29ac455": "Elevator",
+  "furnishedYes": "دامەزراو",
+  "attr_bc8dd527": "Massage seats",
+  "conditionFair": "ناوەند",
+  "attr_4827979f": "Live-in",
+  "attr_4a9d2ecf": "Bonuses",
+  "propOffice": "Office",
+  "conditionScreenBroken": "Screen cracked",
+  "conditionExcellent": "نایاب",
+  "attr_a274e886": "Other subjects",
+  "attr_8c812969": "Transport",
+  "attr_5830d091": "Parking",
+  "furnishedPartial": "Partially furnished",
+  "attr_d80ed6a2": "Start-stop system",
+  "attr_3b085d0f": "Harman Kardon sound system",
+  "attr_f6cf560b": "Clean",
+  "attr_301b8203": "Moving",
+  "attr_3edd4576": "Power windows",
+  "fuelHybrid": "Hybrid",
+  "attr_f0f27452": "Software engineering",
+  "attr_d50cbb11": "Hill holder",
+  "attr_a5d7347c": "Meals",
+  "colorPink": "پەمبە",
+  "attr_da3d03ec": "Drive mode",
+  "attr_065a7470": "Power of attorney",
+  "attr_f5e2c57f": "Japanese",
+  "transManual": "دەستی",
+  "attr_1111f817": "Full day",
+  "yesLabel": "بەڵێ",
+  "noLabel": "نەخێر",
+  "transCvt": "CVT",
+  "resultsCount": "{count} ئەنجام",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortNewest": "نوێترین",
+  "sortCheapest": "هەرزانترین",
+  "sortExpensive": "گرانترین",
+  "sortMostViewed": "زۆرترین بینین",
+  "statusSold": "فرۆشراو",
+  "statusDeleted": "سڕاوە",
+  "statusRejected": "ڕەتکراو",
+  "listingTypeSale": "بۆ فرۆشتن",
+  "listingTypeRent": "بۆ کرێ",
+  "contactPhoneAndMessages": "تەلەفۆن و پەیام",
+  "contactPhoneOnly": "تەنها تەلەفۆن",
+  "contactMessagesOnly": "تەنها پەیام",
+  "packageStandardFull": "ڕیکلامی ئاسایی",
+  "packageProFull": "ڕیکلامی پڕۆ",
+  "packagePremiumFull": "ڕیکلامی تایبەت",
+  "chooseCategoryTitle": "پۆل هەڵبژێرە",
+  "categoriesLoadError": "بارکردنی پۆلەکان سەرکەوتوو نەبوو",
+  "tryDifferentSearchOrFilters": "وشەی گەڕان یان فیلتەرەکان بگۆڕە",
+  "listingFallbackTitle": "ڕیکلام",
+  "validationPhoneRequired": "ژمارەی تەلەفۆن بنووسە",
+  "validationPhoneInvalid": "ژمارەی تەلەفۆن نادروستە",
+  "validationPhoneInvalidIq": "ژمارەی تەلەفۆنی عێراقی نادروستە",
+  "validationOtpRequired": "کۆدی ٦ ژمارەیی بنووسە",
+  "validationFieldRequired": "{field} پێویستە",
+  "@validationFieldRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationPriceRequired": "نرخ بنووسە",
+  "validationPriceInvalid": "نرخی نادروست",
+  "validationEmailRequired": "ئیمەیڵ بنووسە",
+  "validationEmailInvalid": "ئیمەیڵی نادروست",
+  "validationPasswordRequired": "وشەی نهێنی بنووسە",
+  "validationPasswordMinLength": "وشەی نهێنی لانیکەم {count} پیت بێت",
+  "@validationPasswordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "validationPasswordLowercase": "پیتی بچووک زیاد بکە (a-z)",
+  "validationPasswordUppercase": "پیتی گەورە زیاد بکە (A-Z)",
+  "validationPasswordDigit": "ژمارە زیاد بکە (0-9)",
+  "validationPasswordSymbol": "هێما تایبەت زیاد بکە (!@#...)",
+  "validationConfirmPasswordRequired": "وشەی نهێنی دووبارە بنووسە",
+  "validationPasswordMismatch": "وشەکانی نهێنی یەکناگرنەوە",
+  "validationWeakPassword": "وشەی نهێنی لانیکەم ٨ پیت بێت لەگەڵ پیتی گەورە و بچووک و ژمارە و هێما",
+  "authNetworkError": "پەیوەندی ئینتەرنێت بپشکنە",
+  "authRateLimitGeneric": "داواکاری زۆر. یەک خولەک چاوەڕوان بە.",
+  "authRateLimitSeconds": "داواکاری زۆر. {seconds} چرکە چاوەڕوان بە.",
+  "@authRateLimitSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "authInvalidCredentials": "ئیمەیڵ یان وشەی نهێنی هەڵەیە.",
+  "authInvalidEmail": "ئیمەیڵی نادروست",
+  "authEmailExists": "ئەم ئیمەیڵە پێشتر تۆمارکراوە",
+  "authEmailNotConfirmed": "پێش چوونەژوورەوە ئیمەیڵەکەت دڵنیا بکەرەوە.",
+  "authSignupDisabled": "تۆمارکردن ئێستا بەردەست نییە.",
+  "authSmsFailed": "نەتوانرا SMS بنێردرێت.",
+  "authPhoneInvalidFormat": "ژمارەی تەلەفۆن نادروستە.",
+  "authGenericError": "هەڵە لە دڵنیاکردنەوە.",
+  "authOperationFailed": "کارەکە تەواو نەبوو.",
+  "loginRequiredFirst": "پێشتر دەبێت بچیتە ژوورەوە",
+  "metaPropertyType": "جۆری خانوو",
+  "metaOfferType": "جۆری پێشکەش",
+  "metaArea": "ڕووبەر",
+  "metaFloor": "نهۆم",
+  "metaTotalFloors": "ژمارەی نهۆم",
+  "metaRooms": "ژمارەی ژوور",
+  "metaBathrooms": "ژمارەی حەمام",
+  "metaBuildingAge": "تەمەنی بینا",
+  "metaFurnishing": "ڕاخستن",
+  "metaYear": "ساڵ",
+  "metaTrim": "جۆر",
+  "metaEngine": "بزوێنەر",
+  "metaCylinders": "سلندەر",
+  "metaLanguages": "زمانەکان",
+  "metaSalary": "موچە",
+  "metaExperience": "ئەزموون",
+  "metaGender": "ڕەگەز",
+  "metaAge": "تەمەن",
+  "metaBreed": "نەژاد",
+  "metaServiceType": "جۆری خزمەتگوزاری",
+  "metaAvailability": "بەردەستی",
+  "metaBrand": "براند",
+  "metaModel": "مۆدێل",
+  "metaStorage": "کۆگا",
+  "metaCondition": "دۆخ",
+  "metaItemType": "جۆری کاڵا",
+  "metaSubject": "بابەت",
+  "metaLevel": "ئاست",
+  "metaJobType": "جۆری کار",
+  "metaWorkMode": "شێوازی کار",
+  "metaEducation": "خوێندن",
+  "metaDetailsSection": "وردەکاری",
+  "bodyConditionTitle": "باری جەستە و بۆیە",
+  "bodyPartSelected": "{selected}/{total} پارچە هەڵبژێردرا",
+  "@bodyPartSelected": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bodyPartOriginal": "ئەسڵی",
+  "bodyPartLocalPaint": "بۆیەی ناوخۆیی",
+  "bodyPartPainted": "بۆیەکراو",
+  "bodyPartReplaced": "گۆڕدراو",
+  "next": "دواتر",
+  "allCarPartsOriginalFull": "هەموو پارچەکانی ئۆتۆمبێل ئەسڵین. هیچ پارچەیەک بۆیە نەکراوە یان نەگۆڕدراوە.",
+  "carPaintPanelFrontBumper": "بامپەری پێشەوە",
+  "carPaintPanelHood": "کاپۆتی پێشەوە",
+  "carPaintPanelFrontLeftFender": "گوڵەپێچی پێشەوەی چەپ",
+  "carPaintPanelFrontRightFender": "گوڵەپێچی پێشەوەی ڕاست",
+  "carPaintPanelFrontLeftDoor": "دەرگای پێشەوەی چەپ",
+  "carPaintPanelFrontRightDoor": "دەرگای پێشەوەی ڕاست",
+  "carPaintPanelRoof": "سەقف",
+  "carPaintPanelRearLeftDoor": "دەرگای دواوەی چەپ",
+  "carPaintPanelRearRightDoor": "دەرگای دواوەی ڕاست",
+  "carPaintPanelTrunk": "دەپۆی دواوە",
+  "carPaintPanelRearLeftFender": "گوڵەپێچی دواوەی چەپ",
+  "carPaintPanelRearRightFender": "گوڵەپێچی دواوەی ڕاست",
+  "carPaintPanelRearBumper": "بامپەری دواوە",
+  "locationPickerTitle": "شوێن دیاری بکە",
+  "locationCoordinates": "کۆردینات",
+  "locationUseCurrentLocation": "شوێنی ئێستام بەکاربێنە",
+  "locationConfirm": "شوێن پشتڕاست بکەرەوە",
+  "locationMapUnavailableStatus": "نەخشە بەردەست نییە. دەتوانیت شوێنی بنەڕەتی بەغدا پشتڕاست بکەیتەوە یان پەنجەرەکە دابخە.",
+  "locationMapLoadFailedStatus": "بارکردنی نەخشە سەرکەوتوو نەبوو. شوێنی بنەڕەتی بەغدا بەکارهات.",
+  "locationGpsFailedSnack": "دیاریکردنی شوێنەکەت سەرکەوتوو نەبوو. شوێنی بنەڕەتی بەغدا بەکارهات.",
+  "locationFetchFailedSnack": "وەرگرتنی شوێن سەرکەوتوو نەبوو",
+  "locationMapUnavailable": "نەخشە بەردەست نییە",
+  "locationLoadingMap": "بارکردنی نەخشە...",
+  "statYear": "ساڵ",
+  "statCategory": "پۆل",
+  "statKm": "کم",
+  "statMile": "میل",
+  "statEngine": "بزوێنەر",
+  "statCylinders": "سیلیندەر",
+  "sectionDetails": "وردەکاری",
+  "sectionSpecs": "تایبەتمەندی",
+  "sectionBodyCondition": "باری جەستە و بۆیە",
+  "listedOn": "بەرواری بڵاوکردنەوە",
+  "fieldCondition": "باری کاڵا",
+  "fieldPaintCondition": "باری بۆیە",
+  "fieldFuel": "سووتەمەنی",
+  "fieldImportCountry": "وڵاتی هێنان",
+  "fieldPlate": "پلاکە",
+  "fieldTransmission": "گێربکس",
+  "fieldSeats": "ژمارەی كورسی",
+  "fieldSeatMaterial": "مادەی كورسی",
+  "fieldColor": "ڕەنگ",
+  "metaDeliveryCost": "تێچووی گەیاندن",
+  "metaPricePerHour": "نرخ/کاتژمێر",
+  "metaSalaryMin": "کەمترین موچە",
+  "metaSalaryMax": "زۆرترین موچە",
+  "metaSector": "بەش",
+  "metaExperienceRequired": "ئەزموونی پێویست",
+  "metaEducationRequired": "پێداویستی خوێندن",
+  "metaGenderPreference": "پەسەندکردنی ڕەگەز",
+  "metaTeachingMethod": "شێوازی فێرکردن",
+  "metaQualifications": "بڕوانامە",
+  "metaStudyStages": "قۆناغی خوێندن",
+  "metaAnimalType": "جۆری ئاژەڵ",
+  "metaHasPapers": "وەثایق هەیە",
+  "metaVaccinated": "کۆکراوەتەوە",
+  "metaTrained": "ڕاهێنراو",
+  "metaDaysPerWeek": "ڕۆژەکانی هەفتە",
+  "metaExpectedSalary": "موچەی چاوەڕوانکراو",
+  "metaWorkHours": "کاتژمێری کار",
+  "metaAgeMonths": "{count} مانگ",
+  "@metaAgeMonths": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metaRam": "RAM",
+  "metaBatteryHealth": "تەندروستی پاتری",
+  "metaWarranty": "گەرەنتی",
+  "metaProcessor": "پرۆسێسەر",
+  "metaScreenSize": "قەبارەی شاشە",
+  "metaResolution": "وردبینی",
+  "metaWithBox": "لەگەڵ سندوق",
+  "metaWithCharger": "لەگەڵ شەحنکەر",
+  "metaSmartTv": "Smart TV",
+  "mainCategory": "پۆلی سەرەکی",
+  "subCategory": "پۆلی لاوەکی",
+  "categoryDetail": "وردەکاری",
+  "termsTitle": "مەرجەکانی بەکارهێنان",
+  "termsSection1Title": "پێشەکی",
+  "termsSection1Body": "بەخێربێی بۆ سووقەک. بە بەکارهێنانی ئەپ یان دروستکردنی ئەکاونت، ڕازی دەبیت بە ئەم مەرجانە. تکایە بە وردی بیخوێنەوە.",
+  "termsSection2Title": "بەکارهێنانی ئەپ",
+  "termsSection2Body": "دەتوانیت سووقەک بەکاربهێنیت بۆ کڕین و فرۆشتنی کاڵا و خزمەتگوزاری لەناو یاساکانی عێراق. بڵاوکردنەوەی ناوەڕۆکی گومڕاکەر، یاساناکراو، یان ناشایستە قەدەغەیە.",
+  "termsSection3Title": "مافەکانی بەکارهێنەر",
+  "termsSection3Body": "خاوەنایەتی ناوەڕۆکی کە بڵاو دەکەیتەوە دەمێنێتەوە بۆ تۆ. مافی دەستکاریکردنی پرۆفایل، ئەعلان و سڕینەوەی ئەکاونتت هەیە.",
+  "termsSection4Title": "بەرپرسیارێتی",
+  "termsSection4Body": "تۆ بەرپرسیاری ڕاستی زانیاری ئەکاونت، ئەعلان و کارلێکەکانتە. سووقەک پلاتفۆرمێکی ناوەڕاستییە و مسۆگەری هەموو ئەعلانێک ناکات.",
+  "termsSection5Title": "کۆتایی خزمەتگوزاری",
+  "termsSection5Body": "ئەگەر ئەم مەرجانە بشکێنیت، دەتوانین ئەکاونتەکەت بەسەربکەین یان کۆتایی پێبهێنین. تۆش دەتوانیت لە هەر کاتێکدا ئەکاونتەکەت بسڕیتەوە.",
+  "privacyTitle": "سیاسەتی تایبەتمەندی",
+  "privacySection1Title": "چ زانیارییەک کۆدەکەینەوە",
+  "privacySection1Body": "زانیارییەکانی کە لە کاتی تۆمارکردندا دەدەیت وەک ناو، ئیمەیڵ، ژمارەی تەلەفۆن و ناوی بەکارهێنەر کۆدەکەینەوە، هەروەها زانیاری ئەعلان و پەیامەکانی ناو ئەپ. لەوانەیە زانیاری تەکنیکی وەک جۆری ئامێر و ناونیشانی IP بۆ ئاسایش کۆبکەینەوە.",
+  "privacySection2Title": "چۆن زانیارییەکانت بەکاردەهێنین",
+  "privacySection2Body": "زانیارییەکانت بەکاردەهێنین بۆ بەڕێوەبردنی ئەکاونت، پیشاندانی ئەعلان، پەیوەندی نێوان بەکارهێنەران و ناردنی ئاگاداری بۆ ئاگاداری زیرەک و پەیام. هەروەها بۆ باشترکردنی ئەزموون، ڕێگریکردن لە فریب و پاراستنی پلاتفۆرم.",
+  "privacySection3Title": "هاوبەشکردنی زانیاری",
+  "privacySection3Body": "زانیاری کەسییەکانت نافرۆشین بە لایەنی سێیەم. لەوانەیە زانیاری سنووردار لەگەڵ دابینکەرانی خزمەتگوزاری هاوبەش بکەین. لە داواکاری یاسایی یان بۆ پاراستنی ماف و ئاسایشدا ئاشکرای دەکەین.",
+  "privacySection4Title": "ئاسایشی زانیاری",
+  "privacySection4Body": "ڕێکارە تەکنیکی و ڕێکخراوەییەکان جێبەجێ دەکەین بۆ پاراستنی زانیارییەکانت. بەڵام ئاسایشی تەواو بۆ گواستنەوە لە ئینتەرنێتدا مسۆگەر ناکرێت؛ پێشنیار دەکەین وشەی نهێنی بەهێز بەکاربهێنیت.",
+  "privacySection5Title": "پەیوەندیمان پێوە بکە",
+  "privacySection5Body": "ئەگەر پرسیارت هەیە دەربارەی سیاسەتی تایبەتمەندی یان دەتەوێت مافەکانی زانیاری بەکاربهێنیت، لە ڕێگەی ئیمەیڵی پشتگیری لە ڕێکخستنەکان پەیوەندیمان پێوە بکە.",
+  "packageDurationDays": "{count} ڕۆژ",
+  "@packageDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkgStandardFeature1Title": "ڕێکلامی بنەڕەتی",
+  "pkgStandardFeature1Desc": "لە ئەنجامی گەڕاندا لە ناو ڕێکلامە ئاساییەکاندا بڵاو دەکرێتەوە",
+  "pkgStandardFeature2Title": "پەیام و پەیوەندی",
+  "pkgStandardFeature2Desc": "کڕیارەکان بەپێی هەڵبژاردنەکانت پەیوەندیت پێوە دەکەن",
+  "pkgProFeature1Title": "نیشانەی پرۆفایلی پشتڕاستکراو",
+  "pkgProFeature1Desc": "متمانەی کڕیار لەسەر کارتی ڕێکلام زیاد دەکات",
+  "pkgProFeature2Title": "دیاربوونی بەرزتر",
+  "pkgProFeature2Desc": "پێش ڕێکلامە ئاساییەکان لە هەمان پۆلدا دەردەکەوێت",
+  "pkgProFeature3Title": "ئامار",
+  "pkgProFeature3Desc": "بینین و کارلێک لەگەڵ ڕێکلام",
+  "pkgPremiumFeature1Title": "کارۆسێلی تایبەت",
+  "pkgPremiumFeature1Desc": "لە بەشی تایبەت لە پەڕەی سەرەکیدا پیشان دەدرێت",
+  "pkgPremiumFeature2Title": "بەرزترین پلە",
+  "pkgPremiumFeature2Desc": "بەرزترین ئەولەویەت لە گەڕان و ئەنجامی پۆل",
+  "pkgPremiumFeature3Title": "بڵاوکردنەوەی زیادکراو",
+  "pkgPremiumFeature3Desc": "شوێنی دیار بۆ زیادکردنی بینین",
+  "pkgProFeature4Title": "نوێکردنەوەی خۆکار هەفتانە",
+  "pkgProFeature4Desc": "ڕێکلامەکەت هەر هەفتەیەک خۆکارانە دەگەڕێتەوە سەرەوەی پۆلەکە",
+  "pkgProFeature5Title": "وێنە و ڤیدیۆی زیاتر",
+  "pkgProFeature5Desc": "تا ١٥ وێنە و یەک ڤیدیۆ بۆ ڕێکلامەکەت زیاد بکە",
+  "pkgProFeature6Title": "دوگمەی واتساپی ڕاستەوخۆ",
+  "pkgProFeature6Desc": "پەیوەندی خێرا بە واتساپ لە کارتی ڕێکلامەوە",
+  "pkgProFeature7Title": "چوارچێوە و نیشانەی پرۆ",
+  "pkgProFeature7Desc": "چوارچێوەیەکی تایبەت و نیشانەی \"پرۆ\" ڕێکلامەکەت دیار دەکات",
+  "pkgPremiumFeature4Title": "نوێکردنەوەی خۆکار ڕۆژانە",
+  "pkgPremiumFeature4Desc": "ڕێکلامەکەت هەر ڕۆژێک خۆکارانە دەگەڕێتەوە سەرەوەی پۆلەکە",
+  "pkgPremiumFeature5Title": "ئاگادارکردنەوەی کڕیارە حەزدارەکان",
+  "pkgPremiumFeature5Desc": "ئەوانەی حەز لە پۆلی ڕێکلامەکەت دەکەن ئاگادار دەکرێنەوە",
+  "pkgPremiumFeature6Title": "ئامارە پێشکەوتووەکان",
+  "pkgPremiumFeature6Desc": "شیکاری ورد: سەرچاوەی بینین و کاتەکانی لووتکە",
+  "loadingMore": "زیاتر بارکردن...",
+  "currentPhotos": "وێنەی ئێستا",
+  "completePayment": "تەواوکردنی پارەدان",
+  "paymentSuccess": "پارەدان سەرکەوتوو بوو ✓",
+  "paymentFailed": "پارەدان سەرنەکەوت، تکایە دووبارە هەوڵ بدەرەوە",
+  "startPayment": "دەستپێکردنی پارەدان"
 }

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:Sello/core/utils/real_estate_listing_utils.dart';
 import 'package:Sello/shared/models/category_model.dart';
 import 'package:Sello/shared/models/listing_model.dart';
 import 'package:Sello/shared/models/real_estate_listing_metadata.dart';

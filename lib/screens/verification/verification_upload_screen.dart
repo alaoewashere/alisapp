@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/verification_constants.dart';
 import '../../core/router/app_router.dart';
@@ -37,6 +38,7 @@ class _VerificationUploadScreenState
       VerificationDocumentType.requiresBackImage(widget.documentType);
 
   Future<void> _pickImage({required bool isBack}) async {
+    final strings = ref.read(appLocalizationsProvider);
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       builder: (context) => Directionality(
@@ -47,12 +49,12 @@ class _VerificationUploadScreenState
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_camera_outlined),
-                title: const Text('التقاط صورة'),
+                title: Text(strings.capturePhoto),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
-                title: const Text('اختيار من المعرض'),
+                title: Text(strings.chooseFromGallery),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
             ],
@@ -85,7 +87,7 @@ class _VerificationUploadScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'يرجى تصوير الوجه الخلفي للوثيقة',
+            ref.read(appLocalizationsProvider).documentBackRequired,
             style: AppFonts.cairo(),
           ),
         ),
@@ -126,7 +128,7 @@ class _VerificationUploadScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'تعذّر إرسال الطلب، حاول مرة أخرى',
+            ref.read(appLocalizationsProvider).verificationSubmitFailed,
             style: AppFonts.cairo(),
           ),
         ),
@@ -138,6 +140,7 @@ class _VerificationUploadScreenState
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final canSubmit =
         _frontImage != null && (!_needsBack || _backImage != null);
 
@@ -146,7 +149,7 @@ class _VerificationUploadScreenState
       appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         title: Text(
-          'صوّر الوثيقة',
+          strings.captureDocumentTitle,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
@@ -156,7 +159,10 @@ class _VerificationUploadScreenState
           padding: const EdgeInsets.all(16),
           children: [
             Text(
-              VerificationDocumentType.labelAr(widget.documentType),
+              VerificationDocumentType.localizedLabel(
+                widget.documentType,
+                strings,
+              ),
               style: AppFonts.cairo(
                 fontSize: 14,
                 color: AppColors.textMuted,
@@ -164,21 +170,23 @@ class _VerificationUploadScreenState
             ),
             const SizedBox(height: 16),
             _UploadFrame(
-              label: 'الوجه الأمامي',
+              label: strings.documentFront,
               image: _frontImage,
+              captureLabel: strings.capturePhoto,
               onCapture: () => _pickImage(isBack: false),
             ),
             if (_needsBack) ...[
               const SizedBox(height: 16),
               _UploadFrame(
-                label: 'الوجه الخلفي',
+                label: strings.documentBack,
                 image: _backImage,
+                captureLabel: strings.capturePhoto,
                 onCapture: () => _pickImage(isBack: true),
               ),
             ],
             const SizedBox(height: 24),
             AuthPrimaryButton(
-              label: 'إرسال للمراجعة',
+              label: strings.submitForReview,
               loading: _submitting,
               loginStyle: true,
               onPressed: canSubmit ? _submit : null,
@@ -196,11 +204,13 @@ class _UploadFrame extends StatelessWidget {
   const _UploadFrame({
     required this.label,
     required this.image,
+    required this.captureLabel,
     required this.onCapture,
   });
 
   final String label;
   final File? image;
+  final String captureLabel;
   final VoidCallback onCapture;
 
   @override
@@ -266,7 +276,7 @@ class _UploadFrame extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'التقاط صورة',
+                          captureLabel,
                           style: AppFonts.cairo(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

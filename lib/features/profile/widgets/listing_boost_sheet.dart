@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_fonts.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/package_badge.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../listings/data/listings_repository.dart';
 import '../data/profile_repository.dart';
+import '../../listings/constants/listing_package_config.dart';
 import '../utils/listing_boost_utils.dart';
 
 Future<void> showListingBoostSheet(
@@ -19,6 +22,12 @@ Future<void> showListingBoostSheet(
   required VoidCallback onSuccess,
 }) {
   final postPackage = listingPackageFor(listing);
+  if (!ListingPackageConfig.proAndPremiumEnabled) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(ref.read(appLocalizationsProvider).comingSoon)),
+    );
+    return Future.value();
+  }
   final options = listingBoostOptions(postPackage: postPackage);
   if (options.isEmpty) return Future.value();
 
@@ -29,6 +38,7 @@ Future<void> showListingBoostSheet(
     builder: (sheetContext) => _ListingBoostSheet(
       listing: listing,
       options: options,
+      strings: ref.read(appLocalizationsProvider),
       onConfirm: (option) async {
         final profile = ref.read(currentProfileProvider).value;
         final userId = ref.read(currentUserIdProvider);
@@ -50,10 +60,11 @@ Future<void> showListingBoostSheet(
         if (sheetContext.mounted) Navigator.pop(sheetContext);
         onSuccess();
         if (context.mounted) {
+          final strings = ref.read(appLocalizationsProvider);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'تم ترقية إعلانك بنجاح',
+                strings.listingBoostedSuccess,
                 style: AppFonts.cairo(fontWeight: FontWeight.w600),
               ),
               backgroundColor: AppColors.approved,
@@ -69,11 +80,13 @@ class _ListingBoostSheet extends StatefulWidget {
   const _ListingBoostSheet({
     required this.listing,
     required this.options,
+    required this.strings,
     required this.onConfirm,
   });
 
   final ListingModel listing;
   final List<ListingBoostOption> options;
+  final AppLocalizations strings;
   final Future<void> Function(ListingBoostOption option) onConfirm;
 
   @override
@@ -137,7 +150,7 @@ class _ListingBoostSheetState extends State<_ListingBoostSheet> {
           ),
           const SizedBox(height: 16),
           Text(
-            'ترقية إعلانك',
+            widget.strings.boostYourListing,
             textAlign: TextAlign.right,
             style: AppFonts.cairo(
               fontSize: 18,
@@ -147,7 +160,7 @@ class _ListingBoostSheetState extends State<_ListingBoostSheet> {
           ),
           const SizedBox(height: 6),
           Text(
-            'اختر الباقة المناسبة لزيادة ظهور إعلانك في أعلى الأقسام',
+            widget.strings.boostListingSubtitle,
             textAlign: TextAlign.right,
             style: AppFonts.cairo(
               fontSize: 13,
@@ -181,7 +194,7 @@ class _ListingBoostSheetState extends State<_ListingBoostSheet> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(
-                    'تأكيد',
+                    widget.strings.confirm,
                     style: AppFonts.cairo(fontWeight: FontWeight.w700),
                   ),
           ),
@@ -204,6 +217,7 @@ class _BoostOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     return Material(
       color: AppColors.fieldCarbon,
       borderRadius: BorderRadius.circular(14),
@@ -230,7 +244,7 @@ class _BoostOptionCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    formatIqd(option.priceIqd),
+                    formatIqdWithL10n(option.priceIqd, strings),
                     style: AppFonts.cairo(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

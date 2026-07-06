@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../constants/app_colors.dart';
+import '../l10n/l10n_provider.dart';
 import 'posting_ban_utils.dart';
 
 /// Which moderation warning to present.
@@ -90,24 +91,25 @@ class ModerationWarningDialog extends StatelessWidget {
     return Icons.warning_amber_rounded;
   }
 
-  String get _title {
-    if (_isPostingBan) return 'أنت محظور';
-    if (_isBlocked) return 'تم الحظر';
-    return 'تنبيه';
+  String _title(BuildContext context) {
+    final strings = context.l10n;
+    if (_isPostingBan) return strings.moderationYouAreBanned;
+    if (_isBlocked) return strings.moderationBannedTitle;
+    return strings.moderationWarningTitle;
   }
 
-  String get _body {
+  String _body(BuildContext context) {
+    final strings = context.l10n;
     if (_isPostingBan) {
       return postingBanMessage?.trim().isNotEmpty == true
           ? postingBanMessage!.trim()
-          : 'أنت محظور من الدردشة والنشر حالياً.';
+          : strings.moderationPostingBanDefault;
     }
     if (_isBlocked) {
-      return banInfo?.blockedDialogBodyAr() ??
-          'لقد تجاوزت الحد المسموح به من المخالفات ولم يتم إرسال رسالتك.';
+      return banInfo?.blockedDialogBody(strings) ??
+          strings.moderationBlockedBody;
     }
-    return 'تم استخدام كلمة غير لائقة في رسالتك وتمت إزالتها. '
-        'يرجى الالتزام بقواعد الاستخدام.';
+    return strings.moderationCensoredBody;
   }
 
   @override
@@ -142,7 +144,7 @@ class ModerationWarningDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    _title,
+                    _title(context),
                     textAlign: TextAlign.center,
                     style: AppFonts.cairo(
                       fontSize: 20,
@@ -152,7 +154,7 @@ class ModerationWarningDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    _body,
+                    _body(context),
                     textAlign: TextAlign.center,
                     style: AppFonts.cairo(
                       fontSize: 15,
@@ -166,7 +168,7 @@ class ModerationWarningDialog extends StatelessWidget {
                     child: FilledButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(
-                        'حسناً',
+                        context.l10n.understood,
                         style: AppFonts.cairo(fontWeight: FontWeight.w700),
                       ),
                     ),

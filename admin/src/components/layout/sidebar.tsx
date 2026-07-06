@@ -13,9 +13,10 @@ interface SidebarProps {
   email: string;
   role: string;
   reportsCount: number;
+  supportCount: number;
 }
 
-export function Sidebar({ email, role, reportsCount }: SidebarProps) {
+export function Sidebar({ email, role, reportsCount, supportCount }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -59,6 +60,16 @@ export function Sidebar({ email, role, reportsCount }: SidebarProps) {
                   )}
                 >
                   {reportsCount}
+                </span>
+              )}
+              {item.badge === "support" && supportCount > 0 && (
+                <span
+                  className={cn(
+                    "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold",
+                    isActive ? "bg-canvas text-volt" : "bg-destructive text-white",
+                  )}
+                >
+                  {supportCount}
                 </span>
               )}
             </Link>

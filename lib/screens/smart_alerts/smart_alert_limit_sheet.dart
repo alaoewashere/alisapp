@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 
 Future<void> showSmartAlertLimitSheet(BuildContext context) {
@@ -9,6 +10,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
     showDragHandle: true,
     backgroundColor: AppColors.fieldCarbon,
     builder: (context) {
+      final strings = context.l10n;
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -23,7 +25,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
               ),
               const SizedBox(height: 12),
               Text(
-                'وصلت للحد الأقصى للمستخدمين المجانيين (3 تنبيهات)',
+                strings.alertLimitFreeReached,
                 textAlign: TextAlign.center,
                 style: AppFonts.cairo(
                   fontSize: 17,
@@ -33,7 +35,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
               ),
               const SizedBox(height: 8),
               Text(
-                'ترقّ إلى Pro للحصول على تنبيهات غير محدودة',
+                strings.upgradeProUnlimitedAlerts,
                 textAlign: TextAlign.center,
                 style: AppFonts.cairo(
                   fontSize: 14,
@@ -44,7 +46,7 @@ Future<void> showSmartAlertLimitSheet(BuildContext context) {
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('حسناً', style: AppFonts.cairo()),
+                child: Text(strings.understood, style: AppFonts.cairo()),
               ),
             ],
           ),

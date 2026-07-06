@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 
 /// Modern 3-column photo grid for listing create/edit flows.
 class ImagePickerGrid extends StatelessWidget {
@@ -130,6 +131,8 @@ class _AddPhotoCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
+
     return SizedBox(
       width: size,
       height: size,
@@ -165,7 +168,7 @@ class _AddPhotoCell extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'إضافة صورة',
+                  strings.addPhotoLabel,
                   style: AppFonts.sans(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -197,6 +200,8 @@ class _PhotoCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
+
     return SizedBox(
       width: size,
       height: size,
@@ -244,7 +249,7 @@ class _PhotoCell extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'الغلاف',
+                  strings.coverPhotoLabel,
                   style: AppFonts.sans(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,

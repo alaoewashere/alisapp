@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../core/l10n/l10n_provider.dart';
 import '../core/constants/app_colors.dart';
 import '../features/auth/widgets/auth_form_styles.dart';
 import '../models/rating.dart';
@@ -58,6 +59,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
   int _selectedStars = 0;
   final _controller = TextEditingController();
   bool _submitting = false;
+  String? _error;
 
   @override
   void dispose() {
@@ -68,7 +70,10 @@ class _RateDialogState extends ConsumerState<RateDialog> {
   Future<void> _submit() async {
     if (_selectedStars < 1 || _submitting) return;
 
-    setState(() => _submitting = true);
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
     try {
       await ref.read(ratingServiceProvider).submitRating(
             listingId: widget.listingId,
@@ -78,16 +83,12 @@ class _RateDialogState extends ConsumerState<RateDialog> {
           );
       if (mounted) Navigator.pop(context, true);
     } on RatingException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
-      }
+      // Show the reason inline — a snackbar is hidden behind this bottom sheet.
+      if (mounted) setState(() => _error = e.message);
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذّر إرسال التقييم، حاول مرة أخرى')),
-        );
+        setState(() =>
+            _error = ref.read(appLocalizationsProvider).ratingSubmitFailed);
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -96,6 +97,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final charCount = _controller.text.length;
 
@@ -123,7 +125,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'كيف كانت تجربتك؟',
+                  strings.rateExperienceTitle,
                   style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -188,7 +190,7 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                     ),
                     onChanged: (_) => setState(() {}),
                     decoration: AuthFormStyles.loginFieldDecoration(
-                      hintText: 'أضف تعليقاً (اختياري)',
+                      hintText: strings.addCommentOptional,
                     ).copyWith(counterText: ''),
                   ),
                 ),
@@ -202,16 +204,42 @@ class _RateDialogState extends ConsumerState<RateDialog> {
                     ),
                   ),
                 ),
+                if (_error != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.rejected.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.rejected.withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: AppFonts.cairo(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.rejected,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 AuthPrimaryButton(
-                  label: 'إرسال التقييم',
+                  label: strings.submitRating,
                   loading: _submitting,
                   loginStyle: true,
                   onPressed: _selectedStars >= 1 ? _submit : null,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'تقييماتك تساعد المجتمع على الثقة بالبائعين',
+                  strings.ratingsHelpCommunity,
                   textAlign: TextAlign.center,
                   style: AppFonts.cairo(
                     fontSize: 12,

@@ -1,3 +1,4 @@
+import '../../../l10n/app_localizations.dart';
 import '../../../widgets/user_avatar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,13 @@ import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../core/constants/display_locale.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/constants/app_governorates.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/listing_display_l10n.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/listing_display_title.dart';
 import '../../../core/utils/listing_publication_date.dart';
 import '../../../core/router/app_router.dart';
@@ -32,6 +38,7 @@ import '../../favorites/providers/favorites_provider.dart';
 import '../../home/widgets/listing_card.dart';
 import '../providers/listing_detail_provider.dart';
 import '../providers/listings_provider.dart';
+import '../widgets/listing_analytics_panel.dart';
 import '../widgets/listing_detail_bottom_bar.dart';
 import '../widgets/listing_detail_gallery.dart';
 import '../widgets/report_sheet.dart';
@@ -59,13 +66,14 @@ class ListingDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final listingAsync = referenceNo != null
         ? ref.watch(listingDetailByReferenceProvider(referenceNo!))
         : ref.watch(listingDetailProvider(listingId!));
 
     return listingAsync.when(
-      loading: () => const Scaffold(
-        body: LoadingWidget(message: 'جاري التحميل...'),
+      loading: () => Scaffold(
+        body: LoadingWidget(message: strings.loading),
       ),
       error: (e, _) => Scaffold(
         appBar: SelloAppBar(),
@@ -85,7 +93,7 @@ class ListingDetailScreen extends ConsumerWidget {
           return Scaffold(
             appBar: SelloAppBar(),
             body: AppErrorWidget(
-              message: 'الإعلان غير موجود',
+              message: strings.listingNotFound,
               onRetry: () {
           if (referenceNo != null) {
             ref.invalidate(listingDetailByReferenceProvider(referenceNo!));
@@ -226,9 +234,9 @@ class _ListingDetailLoadedViewState
       ref: ref,
       listingId: listing.id,
       reviewedId: listing.userId,
-      reviewedName: listing.sellerName ?? 'البائع',
+      reviewedName: listing.sellerName ?? ref.read(appLocalizationsProvider).theSeller,
       reviewedAvatarSeed: listing.sellerAvatarSeed,
-      subtitle: 'قيّم البائع',
+      subtitle: ref.read(appLocalizationsProvider).rateSeller,
     );
   }
 
@@ -258,12 +266,13 @@ class _ListingDetailLoadedViewState
       await ShareService.shareListingToWhatsApp(
         repaintKey: _shareRepaintKey,
         listing: widget.listing,
+        strings: ref.read(appLocalizationsProvider),
       );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تعذّر إنشاء البطاقة، حاول مرة أخرى'),
+          SnackBar(
+            content: Text(ref.read(appLocalizationsProvider).shareCardFailed),
           ),
         );
       }
@@ -306,7 +315,10 @@ class _ListingDetailLoadedViewState
                         onBack: () => context.canPop()
                             ? context.pop()
                             : context.go(AppRoutes.home),
-                        onShare: () => shareListingUrl(listing),
+                        onShare: () => shareListingUrl(
+                          listing,
+                          ref.read(appLocalizationsProvider),
+                        ),
                         onFavorite: widget.onToggleFavorite,
                       );
                     },
@@ -396,6 +408,7 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final theme = Theme.of(context);
     final listing = widget.listing;
     final isOwner = widget.isOwner;
@@ -405,19 +418,22 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
     );
     final otherListingsAsync = ref.watch(sellerOtherListingsProvider(sellerKey));
     final sellerCountAsync = ref.watch(sellerListingsCountProvider(listing.userId));
-    final metadataDisplay = buildListingMetadataDisplay(listing);
+    final metadataDisplay = buildListingMetadataDisplay(listing, strings);
 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Persistent hero — price/title stay visible across all tabs.
+          _ListingHero(listing: listing, strings: strings),
+          const SizedBox(height: 18),
           TabBar(
             controller: _tabController,
-            tabs: const [
-              Tab(text: 'إعلان'),
-              Tab(text: 'الوصف'),
-              Tab(text: 'الموقع'),
+            tabs: [
+              Tab(text: strings.tabListing),
+              Tab(text: strings.tabDescription),
+              Tab(text: strings.tabLocation),
             ],
           ),
           const SizedBox(height: 16),
@@ -426,15 +442,23 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
             builder: (context, _) {
               switch (_tabController.index) {
                 case 1:
-                  return _ListingDescriptionTab(listing: listing);
+                  return _ListingDescriptionTab(
+                    listing: listing,
+                    strings: strings,
+                  );
                 case 2:
-                  return _ListingLocationTab(listing: listing);
+                  return _ListingLocationTab(
+                    listing: listing,
+                    strings: strings,
+                  );
                 case 0:
                 default:
                   return _ListingInfoTab(
                     listing: listing,
                     metadataDisplay: metadataDisplay,
                     isTabActive: _tabController.index == 0,
+                    strings: strings,
+                    localeCode: ref.watch(categoryLocaleCodeProvider),
                   );
               }
             },
@@ -443,6 +467,7 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
           _SellerCard(
             listing: listing,
             listingsCount: sellerCountAsync.value ?? 0,
+            strings: strings,
           ),
           const SizedBox(height: 16),
           otherListingsAsync.when(
@@ -455,7 +480,7 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
                     children: [
                       Expanded(
                         child: Text(
-                          'إعلانات أخرى للبائع',
+                          strings.sellerOtherListings,
                           style: theme.textTheme.titleMedium,
                         ),
                       ),
@@ -463,7 +488,7 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
                         onPressed: () => context.push(
                           '/seller/${listing.userId}',
                         ),
-                        child: const Text('عرض الكل'),
+                        child: Text(strings.viewAll),
                       ),
                     ],
                   ),
@@ -489,8 +514,12 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
             error: (_, _) => const SizedBox.shrink(),
           ),
           const SizedBox(height: 16),
-          const _SafetyTipsSection(),
+          _SafetyTipsSection(strings: strings),
           const SizedBox(height: 8),
+          if (isOwner && listing.isPremiumListing) ...[
+            ListingAnalyticsPanel(listingId: listing.id),
+            const SizedBox(height: 16),
+          ],
           if (!isOwner)
             TextButton(
               onPressed: () => showModalBottomSheet<void>(
@@ -499,7 +528,7 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
                 builder: (_) => ReportSheet(listingId: listing.id),
               ),
               child: Text(
-                'الإبلاغ عن هذا الإعلان',
+                strings.reportThisListing,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.outline,
                 ),
@@ -512,8 +541,116 @@ class _ListingDetailBodyState extends ConsumerState<_ListingDetailBody>
   }
 }
 
+/// Persistent hero header: title + hero volt price + key chips. Sits above the
+/// tabs so price/title stay visible no matter which tab is open.
+class _ListingHero extends StatelessWidget {
+  const _ListingHero({required this.listing, required this.strings});
+
+  final ListingModel listing;
+  final AppLocalizations strings;
+
+  @override
+  Widget build(BuildContext context) {
+    // Condition (used/new) already shows in the "إعلان" details tab below —
+    // showing it again here was redundant. This badge instead says what the
+    // listing itself is for (sale/rent), which isn't shown anywhere else and
+    // matters most for categories like rental cars where it's easy to miss.
+    final listingTypeLabel = listing.listingType.labelAr;
+    // Skip on service-style categories (jobs, tutoring, home help) where
+    // condition was never shown either and "for sale" reads oddly.
+    final showListingTypeBadge = listing.condition != null ||
+        listing.listingType == ListingType.rent;
+    final breadcrumb = listing.categoryBreadcrumbFor(strings);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          listingDisplayTitle(listing),
+          style: AppFonts.cairo(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppColors.pureWhite,
+            height: 1.3,
+          ),
+          textAlign: TextAlign.right,
+          textDirection: TextDirection.rtl,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 10),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    listing.formattedPriceFor(strings),
+                    style: AppFonts.cairo(
+                      fontSize: 27,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.volt,
+                      height: 1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (formatUsdApprox(listing.price).isNotEmpty) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      formatUsdApprox(listing.price),
+                      style: AppFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (listing.isNegotiable) ...[
+              const SizedBox(width: 10),
+              _NegotiablePill(label: strings.negotiable),
+            ],
+          ],
+        ),
+        if (showListingTypeBadge ||
+            breadcrumb.isNotEmpty ||
+            listing.isPremiumListing ||
+            listing.isProListing) ...[
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (showListingTypeBadge)
+                _BadgeChip(
+                  label: listingTypeLabel,
+                  color: listing.listingType == ListingType.rent
+                      ? Colors.blue
+                      : Colors.green,
+                ),
+              if (breadcrumb.isNotEmpty) _BadgeChip(label: breadcrumb),
+              if (listing.isPremiumListing)
+                const PremiumListingChip()
+              else if (listing.isProListing)
+                const ProListingChip(),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 class _NegotiablePill extends StatelessWidget {
-  const _NegotiablePill();
+  const _NegotiablePill({required this.label});
+
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -524,9 +661,9 @@ class _NegotiablePill extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0x20FFFFFF)),
       ),
-      child: const Text(
-        'قابل للتفاوض',
-        style: TextStyle(
+      child: Text(
+        label,
+        style: const TextStyle(
           fontSize: 11,
           color: AppColors.pureWhite,
         ),
@@ -579,11 +716,15 @@ class _ListingInfoTab extends StatelessWidget {
   const _ListingInfoTab({
     required this.listing,
     required this.metadataDisplay,
+    required this.strings,
+    required this.localeCode,
     this.isTabActive = true,
   });
 
   final ListingModel listing;
   final ListingMetadataDisplay metadataDisplay;
+  final AppLocalizations strings;
+  final String localeCode;
   final bool isTabActive;
 
   @override
@@ -595,7 +736,7 @@ class _ListingInfoTab extends StatelessWidget {
       children: [
         if (listing.hasListingVideo) ...[
           Text(
-            '🎥 جولة بالفيديو',
+            strings.videoTour,
             style: AppFonts.cairo(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -611,53 +752,7 @@ class _ListingInfoTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
         ],
-        Text(
-          listingDisplayTitle(listing),
-          style: AppTextStyles.headline.copyWith(fontSize: 18),
-          textAlign: TextAlign.right,
-          textDirection: TextDirection.rtl,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              listing.formattedPrice,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            if (listing.isNegotiable) ...[
-              const SizedBox(width: 8),
-              const _NegotiablePill(),
-            ],
-          ],
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            if (listing.conditionLabelAr != null)
-              _BadgeChip(
-                label: listing.conditionLabelAr!,
-                color: listing.condition == ListingCondition.newItem
-                    ? Colors.green
-                    : Colors.orange,
-              ),
-            if (listing.categoryBreadcrumb.isNotEmpty)
-              _BadgeChip(label: listing.categoryBreadcrumb),
-            if (listing.isPremiumListing)
-              const PremiumListingChip(),
-            if (listing.isProListing && !listing.isPremiumListing)
-              const ProListingChip(),
-          ],
-        ),
-        const SizedBox(height: 12),
-        _ListingReferenceInfoSection(listing: listing),
+        _ListingReferenceInfoSection(listing: listing, strings: strings),
         if (listing.isVehicleListing && listing.vehicleMetadata != null) ...[
           const SizedBox(height: 12),
           VehicleStatsRow(vehicle: listing.vehicleMetadata!),
@@ -671,11 +766,10 @@ class _ListingInfoTab extends StatelessWidget {
         ],
         if (listing.isVehicleListing && listing.vehicleMetadata != null) ...[
           const SizedBox(height: 16),
-          Text('حالة الهيكل والطلاء', style: theme.textTheme.titleMedium),
+          Text(strings.sectionBodyCondition, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           CarPaintSummaryWidget(
             panelConditions: listing.vehicleMetadata!.panelConditions,
-            allOriginalLabelAr: 'جميع الأجزاء أصلية',
           ),
         ],
         if (listing.isVehicleListing || listing.isRealEstateListing) ...[
@@ -687,10 +781,13 @@ class _ListingInfoTab extends StatelessWidget {
           children: [
             _StatItem(
               icon: Icons.visibility_outlined,
-              label: '${listing.viewsCount} مشاهدة',
+              label: strings.viewsCount(listing.viewsCount.toString()),
             ),
             const SizedBox(width: 16),
-            _StatItem(icon: Icons.schedule, label: listing.timeAgo),
+            _StatItem(
+              icon: Icons.schedule,
+              label: listing.timeAgoFor(localeCode),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -710,20 +807,25 @@ class _ListingInfoTab extends StatelessWidget {
   }
 }
 
-class _ListingReferenceInfoSection extends StatelessWidget {
-  const _ListingReferenceInfoSection({required this.listing});
+class _ListingReferenceInfoSection extends ConsumerWidget {
+  const _ListingReferenceInfoSection({
+    required this.listing,
+    required this.strings,
+  });
 
   final ListingModel listing;
+  final AppLocalizations strings;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final locale = ref.watch(localeProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _ListingReferenceRow(
-          label: 'رقم الإعلان',
+          label: strings.listingNumber,
           value: listing.referenceNo?.toString() ?? '—',
           valueStyle: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
@@ -732,8 +834,8 @@ class _ListingReferenceInfoSection extends StatelessWidget {
         ),
         const Divider(height: 1),
         _ListingReferenceRow(
-          label: 'تاريخ الإعلان',
-          value: formatListingPublicationDateAr(listing.createdAt),
+          label: strings.listedOn,
+          value: formatListingPublicationDate(listing.createdAt, locale),
         ),
       ],
     );
@@ -785,9 +887,13 @@ class _ListingReferenceRow extends StatelessWidget {
 }
 
 class _ListingDescriptionTab extends StatelessWidget {
-  const _ListingDescriptionTab({required this.listing});
+  const _ListingDescriptionTab({
+    required this.listing,
+    required this.strings,
+  });
 
   final ListingModel listing;
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -801,7 +907,7 @@ class _ListingDescriptionTab extends StatelessWidget {
             const Icon(Icons.notes_outlined, size: 52, color: Color(0xFFDDDDDD)),
             const SizedBox(height: 14),
             Text(
-              'لم يضف صاحب الإعلان وصفاً',
+              strings.noDescriptionAdded,
               style: AppTextStyles.body.copyWith(color: const Color(0xFFAAAAAA)),
             ),
           ],
@@ -825,9 +931,13 @@ class _ListingDescriptionTab extends StatelessWidget {
 }
 
 class _ListingLocationTab extends StatefulWidget {
-  const _ListingLocationTab({required this.listing});
+  const _ListingLocationTab({
+    required this.listing,
+    required this.strings,
+  });
 
   final ListingModel listing;
+  final AppLocalizations strings;
 
   @override
   State<_ListingLocationTab> createState() => _ListingLocationTabState();
@@ -848,7 +958,7 @@ class _ListingLocationTabState extends State<_ListingLocationTab> {
               Icon(Icons.location_off_outlined, size: 48, color: Colors.grey[300]),
               const SizedBox(height: 12),
               Text(
-                'لم يتم تحديد الموقع',
+                widget.strings.locationNotSet,
                 style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),
             ],
@@ -921,7 +1031,7 @@ class _ListingLocationTabState extends State<_ListingLocationTab> {
                         Text(
                           address?.isNotEmpty == true
                               ? address!
-                              : 'الموقع المحدد',
+                              : widget.strings.selectedLocation,
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -957,10 +1067,12 @@ class _SellerCard extends StatelessWidget {
   const _SellerCard({
     required this.listing,
     required this.listingsCount,
+    required this.strings,
   });
 
   final ListingModel listing;
   final int listingsCount;
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -990,7 +1102,7 @@ class _SellerCard extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              listing.sellerName ?? 'بائع',
+                              listing.sellerName ?? strings.sellerLabel,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
@@ -1012,11 +1124,11 @@ class _SellerCard extends StatelessWidget {
                       ],
                       if (joinYear != null)
                         Text(
-                          'عضو منذ $joinYear',
+                          strings.memberSinceYear(joinYear),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       Text(
-                        '$listingsCount إعلان',
+                        strings.listingsCountLabel(listingsCount.toString()),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -1027,7 +1139,7 @@ class _SellerCard extends StatelessWidget {
             const SizedBox(height: 8),
             OutlinedButton(
               onPressed: () => context.push('/seller/${listing.userId}'),
-              child: const Text('عرض جميع إعلاناته'),
+              child: Text(strings.viewAllSellerListings),
             ),
           ],
         ),
@@ -1037,27 +1149,29 @@ class _SellerCard extends StatelessWidget {
 }
 
 class _SafetyTipsSection extends StatelessWidget {
-  const _SafetyTipsSection();
+  const _SafetyTipsSection({required this.strings});
+
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title: const Text('نصائح الأمان'),
-      children: const [
+      title: Text(strings.safetyTipsTitle),
+      children: [
         ListTile(
           dense: true,
-          leading: Icon(Icons.place_outlined),
-          title: Text('قابل البائع في مكان عام'),
+          leading: const Icon(Icons.place_outlined),
+          title: Text(strings.safetyTipPublicPlace),
         ),
         ListTile(
           dense: true,
-          leading: Icon(Icons.payments_outlined),
-          title: Text('لا تدفع مقدماً قبل معاينة المنتج'),
+          leading: const Icon(Icons.payments_outlined),
+          title: Text(strings.safetyTipNoPrepay),
         ),
         ListTile(
           dense: true,
-          leading: Icon(Icons.verified_user_outlined),
-          title: Text('تحقّق من حالة المنتج قبل الشراء'),
+          leading: const Icon(Icons.verified_user_outlined),
+          title: Text(strings.safetyTipInspect),
         ),
       ],
     );

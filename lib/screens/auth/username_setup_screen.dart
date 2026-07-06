@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/constants/app_assets.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/username_prefs.dart';
 import '../../core/utils/auth_navigation.dart';
@@ -30,12 +30,14 @@ class UsernameSetupScreen extends ConsumerStatefulWidget {
 
 class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
     with SingleTickerProviderStateMixin {
-  static const _textDark = Color(0xFF111111);
-  static const _textMuted = Color(0xFF888888);
-  static const _hintColor = Color(0xFFBBBBBB);
-  static const _rulesColor = Color(0xFFAAAAAA);
-  static const _borderDefault = Color(0xFFE0E0E0);
-  static const _disabledButton = Color(0xFFCCCCCC);
+  static const _background = Color(0xFF131315);
+  static const _fieldBg = Color(0xFF18181A);
+  static const _borderInactive = Color(0x26FFFFFF);
+  static const _hintOpacity = 0.3;
+  static const _subtitleOpacity = 0.55;
+  static const _helperOpacity = 0.4;
+  static const _skipOpacity = 0.5;
+  static const _buttonDisabledOpacity = 0.3;
 
   final _usernameController = TextEditingController();
   final _focusNode = FocusNode();
@@ -88,6 +90,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
 
   void _onUsernameChanged() {
     final text = _usernameController.text;
+    setState(() {});
     _debounce?.cancel();
     if (text.isEmpty) {
       setState(() => _availabilityState = UsernameState.idle);
@@ -135,6 +138,8 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
         !_isSaving;
   }
 
+  bool get _hasUsernameText => _usernameController.text.trim().isNotEmpty;
+
   Future<void> _saveAndContinue() async {
     if (!_canContinue) return;
 
@@ -165,7 +170,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
       if (!mounted) return;
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('حدث خطأ، حاول مجدداً')),
+        SnackBar(content: Text(ref.read(appLocalizationsProvider).genericErrorRetry)),
       );
     }
   }
@@ -188,183 +193,197 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
 
   Color get _borderColor {
     if (_availabilityState == UsernameState.taken) return Colors.red;
-    if (_focused) return AppColors.primary;
-    return _borderDefault;
+    if (_focused) return AppColors.volt;
+    return _borderInactive;
   }
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: _background,
+        resizeToAvoidBottomInset: true,
         body: FadeTransition(
           opacity: _fadeAnimation,
           child: SlideTransition(
             position: _slideAnimation,
             child: SafeArea(
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 32),
-                    Center(
-                      child: GestureDetector(
-                        onTap: _isSaving ? null : _showAvatarPicker,
-                        child: Stack(
-                          clipBehavior: Clip.none,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            UserAvatar(avatarSeed: _avatarSeed, size: 88),
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
+                            const SizedBox(height: 60),
+                            Center(
+                              child: GestureDetector(
+                                onTap: _isSaving ? null : _showAvatarPicker,
+                                child: Container(
+                                  width: 90,
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.volt,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: ClipOval(
+                                    child: UserAvatar(
+                                      avatarSeed: _avatarSeed,
+                                      size: 90,
+                                    ),
                                   ),
                                 ),
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 14,
-                                  color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            Text(
+                              strings.usernameSetupTitle,
+                              textAlign: TextAlign.center,
+                              style: AppFonts.cairo(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              strings.usernameSetupSubtitle,
+                              textAlign: TextAlign.center,
+                              style: AppFonts.cairo(
+                                fontSize: 14,
+                                color: Colors.white
+                                    .withValues(alpha: _subtitleOpacity),
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 36),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 18,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _fieldBg,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: _borderColor,
+                                  width: 1.5,
                                 ),
+                              ),
+                              child: Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: TextField(
+                                  controller: _usernameController,
+                                  focusNode: _focusNode,
+                                  maxLength: 20,
+                                  keyboardType: TextInputType.text,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                      RegExp(r'[a-zA-Z0-9_]'),
+                                    ),
+                                  ],
+                                  style: AppFonts.cairo(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                  decoration: InputDecoration(
+                                    counterText: '',
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                    prefixIcon: Padding(
+                                      padding: const EdgeInsets.only(right: 4),
+                                      child: Text(
+                                        '@',
+                                        style: AppFonts.cairo(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.volt,
+                                        ),
+                                      ),
+                                    ),
+                                    prefixIconConstraints:
+                                        const BoxConstraints(
+                                      minWidth: 0,
+                                      minHeight: 0,
+                                    ),
+                                    hintText: strings.usernameHint,
+                                    hintStyle: AppFonts.cairo(
+                                      fontSize: 16,
+                                      color: Colors.white
+                                          .withValues(alpha: _hintOpacity),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (_availabilityState != UsernameState.idle) ...[
+                              const SizedBox(height: 8),
+                              UsernameAvailabilityIndicator(
+                                state: _availabilityState,
+                              ),
+                            ],
+                            const SizedBox(height: 8),
+                            Text(
+                              strings.usernameFormatRules,
+                              textAlign: TextAlign.center,
+                              style: AppFonts.cairo(
+                                fontSize: 12,
+                                color: Colors.white
+                                    .withValues(alpha: _helperOpacity),
+                                height: 1.4,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Image.asset(
-                        AppAssets.appLogo,
-                        width: 56,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'اختر اسم المستخدم',
-                      textAlign: TextAlign.center,
-                      style: AppFonts.cairo(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: _textDark,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        'سيظهر هذا الاسم في ملفك الشخصي وإعلاناتك',
-                        textAlign: TextAlign.center,
-                        style: AppFonts.cairo(
-                          fontSize: 14,
-                          color: _textMuted,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    Container(
-                      height: 56,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: _borderColor, width: 1.5),
-                      ),
-                      alignment: Alignment.center,
-                      child: Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: TextField(
-                          controller: _usernameController,
-                          focusNode: _focusNode,
-                          maxLength: 20,
-                          keyboardType: TextInputType.text,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z0-9_]'),
-                            ),
-                          ],
-                          style: AppFonts.cairo(
-                            fontSize: 16,
-                            color: _textDark,
-                          ),
-                          decoration: InputDecoration(
-                            counterText: '',
-                            border: InputBorder.none,
-                            isDense: true,
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Text(
-                                '@',
-                                style: AppFonts.cairo(
-                                  fontSize: 16,
-                                  color: _textMuted,
-                                ),
-                              ),
-                            ),
-                            prefixIconConstraints: const BoxConstraints(
-                              minWidth: 0,
-                              minHeight: 0,
-                            ),
-                            hintText: 'اسم_المستخدم',
-                            hintStyle: AppFonts.cairo(
-                              fontSize: 16,
-                              color: _hintColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    UsernameAvailabilityIndicator(state: _availabilityState),
-                    const SizedBox(height: 16),
-                    Text(
-                      'يمكن استخدام الأحرف الإنجليزية والأرقام والشرطة السفلية فقط',
-                      textAlign: TextAlign.center,
-                      style: AppFonts.cairo(
-                        fontSize: 12,
-                        color: _rulesColor,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
-                      height: 54,
+                      height: 52,
                       child: FilledButton(
                         onPressed: _canContinue ? _saveAndContinue : null,
                         style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          disabledBackgroundColor: _disabledButton,
-                          foregroundColor: Colors.white,
-                          disabledForegroundColor: Colors.white,
+                          backgroundColor: _hasUsernameText
+                              ? AppColors.volt
+                              : AppColors.volt
+                                  .withValues(alpha: _buttonDisabledOpacity),
+                          disabledBackgroundColor: _hasUsernameText
+                              ? AppColors.volt
+                              : AppColors.volt
+                                  .withValues(alpha: _buttonDisabledOpacity),
+                          foregroundColor: _background,
+                          disabledForegroundColor: _background,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(14),
                           ),
+                          elevation: 0,
                         ),
                         child: _isSaving
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: _background,
                                 ),
                               )
                             : Text(
-                                'متابعة',
+                                strings.continueAction,
                                 style: AppFonts.cairo(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: _background,
                                 ),
                               ),
                       ),
@@ -373,15 +392,21 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                     Center(
                       child: TextButton(
                         onPressed: _isSaving ? null : _skip,
+                        style: TextButton.styleFrom(
+                          foregroundColor:
+                              Colors.white.withValues(alpha: _skipOpacity),
+                        ),
                         child: Text(
-                          'تخطى الآن',
+                          strings.skipForNow,
                           style: AppFonts.cairo(
-                            fontSize: 13,
-                            color: _textMuted,
+                            fontSize: 14,
+                            color:
+                                Colors.white.withValues(alpha: _skipOpacity),
                           ),
                         ),
                       ),
                     ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),

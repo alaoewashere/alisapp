@@ -1,5 +1,6 @@
+import 'package:intl/intl.dart';
+
 import '../core/constants/notification_constants.dart';
-import '../core/utils/currency_formatter.dart';
 import '../shared/models/category_model.dart';
 import '../shared/models/filter_model.dart';
 import '../core/constants/app_governorates.dart';
@@ -259,7 +260,7 @@ String _compactPriceLabel(int amount) {
         : double.parse(millions.toStringAsFixed(1));
     return '${rounded}M';
   }
-  return formatIqd(amount).replaceAll(' د.ع', '');
+  return NumberFormat('#,###', 'en_US').format(amount);
 }
 
 String formatSmartAlertLastTriggered(DateTime? at) {

@@ -1,6 +1,37 @@
 import 'package:flutter/material.dart';
 
 abstract final class VehicleListingOptions {
+  /// Fallback trim options for brands without a curated list yet.
+  static const genericTrimOptions = [
+    'Base',
+    'LX',
+    'EX',
+    'SE',
+    'LE',
+    'Sport',
+    'Limited',
+    'Premium',
+    'Touring',
+  ];
+
+  /// Fallback engine options for brands without a curated list yet.
+  static const genericEngineOptions = [
+    '1.0L',
+    '1.2L',
+    '1.4L',
+    '1.5L',
+    '1.6L',
+    '1.8L',
+    '2.0L',
+    '2.4L',
+    '2.5L',
+    '3.0L',
+    '3.5L V6',
+    '4.0L V8',
+    'Hybrid',
+    'Electric',
+  ];
+
   static const cylinderOptions = [
     '3',
     '4',

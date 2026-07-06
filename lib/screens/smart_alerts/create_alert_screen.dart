@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/category_locale.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_governorates.dart';
 import '../../core/utils/digit_input_formatter.dart';
@@ -96,12 +98,13 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
   }
 
   Future<void> _pickLocation() async {
+    final localeCode = ref.read(categoryLocaleCodeProvider);
     final options = iraqiGovernorates
-        .map((g) => Step2PickerOption(value: g.slug, label: g.nameAr))
+        .map((g) => Step2PickerOption(value: g.slug, label: g.displayName(localeCode)))
         .toList();
     final pickedSlug = await showStep2PickerSheetForOptions(
       context: context,
-      title: 'الموقع',
+      title: ref.read(appLocalizationsProvider).locationLabel,
       options: options,
       selectedValue: _locationSlug(),
       searchable: true,
@@ -164,7 +167,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'تم حفظ التنبيه ✓ سنخبرك فور نشر إعلان مطابق',
+            ref.read(appLocalizationsProvider).alertSavedSuccess,
             style: AppFonts.cairo(),
           ),
           behavior: SnackBarBehavior.floating,
@@ -183,7 +186,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('تعذّر حفظ التنبيه: $e', style: AppFonts.cairo()),
+            content: Text(ref.read(appLocalizationsProvider).alertSaveFailed('$e'), style: AppFonts.cairo()),
           ),
         );
       }
@@ -194,6 +197,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -201,7 +205,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
         foregroundColor: AppColors.textDark,
         elevation: 0,
         title: Text(
-          'تنبيه ذكي جديد',
+          strings.newSmartAlert,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
         leading: AppBackButton(onPressed: () => context.pop()),
@@ -221,11 +225,11 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                         textDirection: TextDirection.rtl,
                         textAlign: TextAlign.right,
                         decoration: AppFormDecorations.underline(
-                          hintText: 'اسم التنبيه *',
+                          hintText: strings.alertNameHint,
                         ),
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) {
-                            return 'اسم التنبيه مطلوب';
+                            return strings.alertNameRequired;
                           }
                           return null;
                         },
@@ -241,7 +245,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                   _FormCard(
                     children: [
                       Text(
-                        'سنة الصنع',
+                        strings.modelYear,
                         style: AppFonts.cairo(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -258,7 +262,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                               textAlign: TextAlign.center,
                               style: AppTextStyles.input,
                               decoration: AppFormDecorations.underline(
-                                hintText: 'من',
+                                hintText: strings.fromLabel,
                               ),
                             ),
                           ),
@@ -271,7 +275,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                               textAlign: TextAlign.center,
                               style: AppTextStyles.input,
                               decoration: AppFormDecorations.underline(
-                                hintText: 'إلى',
+                                hintText: strings.toLabel,
                               ),
                             ),
                           ),
@@ -283,7 +287,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                   _FormCard(
                     children: [
                       Text(
-                        'السعر',
+                        strings.priceLabel,
                         style: AppFonts.cairo(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -294,14 +298,14 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                         children: [
                           Expanded(
                             child: Step2IqdField(
-                              label: 'من',
+                              label: strings.fromLabel,
                               controller: _priceMinController,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Step2IqdField(
-                              label: 'إلى',
+                              label: strings.toLabel,
                               controller: _priceMaxController,
                             ),
                           ),
@@ -313,8 +317,8 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                   _FormCard(
                     children: [
                       Step2PickerTriggerRow(
-                        label: 'الموقع',
-                        displayValue: _location ?? 'كل العراق',
+                        label: strings.locationLabel,
+                        displayValue: _location ?? strings.allIraq,
                         onTap: _pickLocation,
                       ),
                     ],
@@ -345,7 +349,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                           ),
                         )
                       : Text(
-                          'حفظ التنبيه',
+                          strings.saveAlert,
                           style: AppFonts.cairo(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,

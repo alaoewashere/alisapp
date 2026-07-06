@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n_provider.dart';
+import 'listing_locale_refresh.dart';
 
+const appLocaleKey = 'app_locale';
 const appLanguageKey = 'app_language';
 const languageOnboardingCompleteKey = 'language_onboarding_complete';
 const _legacyLocaleKey = 'locale';
@@ -15,6 +17,9 @@ const supportedAppLocales = [
   Locale('tr'),
 ];
 
+/// Persists and exposes the active app [Locale] (Riverpod: [localeProvider]).
+typedef LanguageNotifier = LocaleNotifier;
+
 class LocaleNotifier extends Notifier<Locale> {
   @override
   Locale build() {
@@ -24,7 +29,8 @@ class LocaleNotifier extends Notifier<Locale> {
 
   Future<void> _loadSaved() async {
     final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(appLanguageKey) ??
+    final code = prefs.getString(appLocaleKey) ??
+        prefs.getString(appLanguageKey) ??
         prefs.getString(_legacyLocaleKey) ??
         'ar';
     state = _localeFromCode(code);
@@ -49,7 +55,14 @@ class LocaleNotifier extends Notifier<Locale> {
   Future<void> setLocale(Locale locale) async {
     final normalized = normalizeAppLocale(locale);
     state = normalized;
+    // Defer so listing providers (which watch localeProvider) are not
+    // invalidated while this notifier is still updating.
+    Future.microtask(() {
+      if (!ref.mounted) return;
+      invalidateListingDataProviders(ref);
+    });
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(appLocaleKey, normalized.languageCode);
     await prefs.setString(appLanguageKey, normalized.languageCode);
   }
 

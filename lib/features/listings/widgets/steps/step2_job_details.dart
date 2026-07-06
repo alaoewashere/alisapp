@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../shared/models/job_listing_metadata.dart';
 import '../../constants/job_listing_options.dart';
 import '../../constants/listing_form_options.dart';
@@ -44,11 +45,12 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
   Widget build(BuildContext context) {
     final details = ref.watch(postListingProvider).jobDetails;
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Step2FormShell(
-      title: 'تفاصيل الوظيفة',
+      title: strings.jobDetailsTitle,
       children: [
-        Text('نوع الدوام *', style: theme.textTheme.titleSmall),
+        Text(strings.jobTypeRequiredLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: JobListingOptions.jobTypes,
@@ -57,12 +59,12 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
         ),
         const SizedBox(height: 12),
         Step2LabeledDropdown(
-          label: 'القطاع *',
+          label: strings.sectorRequiredLabel,
           value: details.sector,
           items: JobListingOptions.sectors,
           onChanged: (v) => _update((d) => d.copyWith(sector: v)),
         ),
-        Text('الخبرة المطلوبة', style: theme.textTheme.titleSmall),
+        Text(strings.experienceRequiredLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: JobListingOptions.experienceLevels,
@@ -70,7 +72,7 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
           onSelected: (v) => _update((d) => d.copyWith(experienceRequired: v)),
         ),
         const SizedBox(height: 12),
-        Text('المؤهل المطلوب', style: theme.textTheme.titleSmall),
+        Text(strings.educationRequiredLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: JobListingOptions.educationLevels,
@@ -78,7 +80,7 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
           onSelected: (v) => _update((d) => d.copyWith(educationRequired: v)),
         ),
         const SizedBox(height: 12),
-        Text('تفضيل الجنس', style: theme.textTheme.titleSmall),
+        Text(strings.genderPreferenceLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: JobListingOptions.genderPreferences,
@@ -86,7 +88,7 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
           onSelected: (v) => _update((d) => d.copyWith(genderPreference: v)),
         ),
         const SizedBox(height: 12),
-        Text('نوع الراتب', style: theme.textTheme.titleSmall),
+        Text(strings.salaryTypeLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: JobListingOptions.salaryTypes,
@@ -95,7 +97,7 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
         ),
         const SizedBox(height: 12),
         Step2IqdField(
-          label: 'الراتب الأدنى *',
+          label: strings.salaryMinRequiredLabel,
           controller: _salaryMinController,
           onChanged: (v) {
             _update(
@@ -107,7 +109,7 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
         ),
         const SizedBox(height: 12),
         Step2IqdField(
-          label: 'الراتب الأعلى',
+          label: strings.salaryMaxLabel,
           controller: _salaryMaxController,
           onChanged: (v) {
             _update(
@@ -118,7 +120,7 @@ class _Step2JobDetailsState extends ConsumerState<Step2JobDetails> {
           },
         ),
         const SizedBox(height: 12),
-        Text('المزايا', style: theme.textTheme.titleSmall),
+        Text(strings.benefitsSectionTitle, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2MultiChipSelector(
           options: JobListingOptions.benefits,

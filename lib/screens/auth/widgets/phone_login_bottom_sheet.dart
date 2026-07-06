@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/result.dart';
 import '../../../core/utils/validators.dart';
@@ -109,6 +110,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final isPhoneFocused = _phoneFocusNode.hasFocus;
 
@@ -137,7 +139,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'متابعة برقم الهاتف',
+                  strings.continueWithPhone,
                   style: AppFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -146,7 +148,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'سنرسل لك رمز تحقق عبر واتساب',
+                  strings.phoneOtpWhatsappHint,
                   style: AppFonts.cairo(
                     fontSize: 13,
                     color: AppColors.textMuted,
@@ -243,7 +245,7 @@ class _PhoneLoginSheetState extends ConsumerState<_PhoneLoginSheet> {
                 ),
                 const SizedBox(height: 24),
                 AuthPrimaryButton(
-                  label: 'إرسال الرمز',
+                  label: strings.sendCode,
                   loading: _loading,
                   loginStyle: true,
                   onPressed: _sendCode,

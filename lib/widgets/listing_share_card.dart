@@ -2,10 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../l10n/app_localizations.dart';
+import '../core/l10n/l10n_provider.dart';
 import '../core/constants/app_colors.dart';
+import '../shared/widgets/app_logo.dart';
 import '../core/constants/app_governorates.dart';
 import '../core/constants/deep_link_constants.dart';
 import '../core/utils/arabic_number.dart';
+import '../core/utils/currency_formatter.dart';
 import '../core/utils/listing_display_title.dart';
 import '../services/share_service.dart';
 import '../shared/models/listing_model.dart';
@@ -35,11 +39,11 @@ class ListingShareCard extends StatelessWidget {
     return governorateNameAr(listing.governorate);
   }
 
-  String get _referenceLabel {
+  String _referenceLabel(AppLocalizations strings) {
     if (listing.referenceNo != null) {
-      return 'رقم الإعلان: #${arabicNumber(listing.referenceNo!)}';
+      return strings.listingNumberWithRef(arabicNumber(listing.referenceNo!));
     }
-    return 'رقم الإعلان: —';
+    return strings.listingNumberDash;
   }
 
   String? get _deepLinkLabel {
@@ -51,6 +55,7 @@ class ListingShareCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     final imageUrl = listingShareImageUrl(listing);
 
     return RepaintBoundary(
@@ -116,7 +121,7 @@ class ListingShareCard extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '${listing.formattedPrice} د.ع',
+                                  formatIQDWithL10n(listing.price, strings),
                                   textAlign: TextAlign.right,
                                   style: AppFonts.inter(
                                     fontSize: 32,
@@ -151,11 +156,7 @@ class ListingShareCard extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Image.asset(
-                                  'assets/app_logo.png',
-                                  width: 40,
-                                  height: 40,
-                                ),
+                                const AppLogo(size: 40),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -183,7 +184,7 @@ class ListingShareCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              _referenceLabel,
+                              _referenceLabel(strings),
                               textAlign: TextAlign.right,
                               style: AppFonts.cairo(
                                 fontSize: 13,
@@ -228,7 +229,7 @@ class ListingShareCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 child: Text(
-                                  'تواصل معنا على سيلو',
+                                  strings.contactUsOnSouqak,
                                   style: AppFonts.cairo(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,

@@ -1,3 +1,5 @@
+import '../../../l10n/app_localizations.dart';
+
 /// Paginated home feed destinations opened from «عرض الكل».
 enum HomeListingsFeedType {
   featured,
@@ -8,9 +10,9 @@ enum HomeListingsFeedType {
         latest => 'latest',
       };
 
-  String get titleAr => switch (this) {
-        featured => 'إعلانات مميزة',
-        latest => 'أحدث الإعلانات',
+  String localizedTitle(AppLocalizations strings) => switch (this) {
+        featured => strings.featuredListingsTitle,
+        latest => strings.homeFeedLatestTitle,
       };
 
   static HomeListingsFeedType? fromSlug(String slug) => switch (slug) {

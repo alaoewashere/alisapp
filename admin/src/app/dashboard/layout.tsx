@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth";
-import { getPendingReportsCount } from "@/lib/data/stats";
+import { getPendingReportsCount, getUnreadSupportMessagesCount } from "@/lib/data/stats";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 
@@ -11,7 +11,10 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await requireAdmin();
-  const reportsCount = await getPendingReportsCount();
+  const [reportsCount, supportCount] = await Promise.all([
+    getPendingReportsCount(),
+    getUnreadSupportMessagesCount(),
+  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -19,6 +22,7 @@ export default async function DashboardLayout({
         email={session.email}
         role={session.admin.role}
         reportsCount={reportsCount}
+        supportCount={supportCount}
       />
       <div className="pr-60">
         <Topbar email={session.email} reportsCount={reportsCount} />

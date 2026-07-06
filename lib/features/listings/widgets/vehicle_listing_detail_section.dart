@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/l10n/listing_attribute_locale.dart';
 import '../../../core/utils/listing_metadata_detail_rows.dart';
 import '../../../core/utils/vehicle_listing_utils.dart';
 import '../../../shared/models/listing_model.dart';
@@ -19,14 +21,17 @@ class VehicleListingDetailSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return ListingMetadataDetailSection(
-      rows: vehicleDetailRows(vehicle, condition),
+      rows: vehicleDetailRows(vehicle, condition, l10n),
       chipGroups: vehicle.selectedSpecs.isEmpty
           ? const []
           : [
               MetadataChipGroup(
-                title: 'المواصفات',
-                chips: vehicle.selectedSpecs,
+                title: l10n.sectionSpecs,
+                chips: vehicle.selectedSpecs
+                    .map((spec) => localizeListingAttribute(spec, l10n))
+                    .toList(),
               ),
             ],
     );

@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/verification_constants.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/models/profile_model.dart';
 
 /// Profile entry banner for seller verification status.
-class VerificationStatusBanner extends StatelessWidget {
+class VerificationStatusBanner extends ConsumerWidget {
   const VerificationStatusBanner({super.key, required this.profile});
 
   final ProfileModel profile;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final status = profile.verificationStatus;
 
     if (status == VerificationStatus.verified) {
@@ -23,7 +26,7 @@ class VerificationStatusBanner extends StatelessWidget {
         borderColor: AppColors.approved.withValues(alpha: 0.35),
         icon: Icons.verified_outlined,
         iconColor: AppColors.approved,
-        text: 'حسابك موثّق ✓',
+        text: strings.accountVerifiedBanner,
         textColor: AppColors.approved,
       );
     }
@@ -34,7 +37,7 @@ class VerificationStatusBanner extends StatelessWidget {
         borderColor: AppColors.borderLight,
         icon: Icons.hourglass_top_rounded,
         iconColor: AppColors.textMuted,
-        text: 'طلب التوثيق قيد المراجعة ⏳',
+        text: strings.verificationPendingBanner,
         textColor: AppColors.textMuted,
       );
     }
@@ -50,8 +53,8 @@ class VerificationStatusBanner extends StatelessWidget {
             icon: Icons.error_outline_rounded,
             iconColor: AppColors.rejected,
             text: reason != null && reason.isNotEmpty
-                ? 'تم رفض طلبك — $reason'
-                : 'تم رفض طلب التوثيق',
+                ? strings.verificationRejectedWithReason(reason)
+                : strings.verificationRejectedBanner,
             textColor: AppColors.rejected,
           ),
           const SizedBox(height: 8),
@@ -60,7 +63,7 @@ class VerificationStatusBanner extends StatelessWidget {
             child: TextButton(
               onPressed: () => context.push(AppRoutes.verificationIntro),
               child: Text(
-                'إعادة المحاولة',
+                strings.retry,
                 style: AppFonts.cairo(
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
@@ -92,7 +95,7 @@ class VerificationStatusBanner extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'وثّق حسابك للحصول على شارة الثقة 🔒',
+                  strings.verifyAccountPrompt,
                   style: AppFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../shared/widgets/feature_tutorial_overlay.dart';
 
 /// One-time coachmark spotlighting the heat-map header icon.
@@ -15,11 +16,12 @@ class HomeHeatmapTutorialOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     return FeatureTutorialOverlay(
       targetKey: targetKey,
       onDismiss: onDismiss,
-      title: 'اكتشف كثافة الإعلانات في منطقتك على الخريطة',
-      subtitle: 'اضغط على أيقونة الخريطة لعرض المناطق الأكثر نشاطاً',
+      title: strings.heatmapTutorialTitle,
+      subtitle: strings.heatmapTutorialSubtitle,
     );
   }
 }

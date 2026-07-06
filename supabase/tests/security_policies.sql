@@ -9,6 +9,27 @@ BEGIN
     RAISE EXCEPTION 'missing public_profiles view';
   END IF;
 
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'public_profiles'
+      AND c.relkind = 'v'
+      AND 'security_invoker=true' = ANY (c.reloptions)
+  ) THEN
+    RAISE EXCEPTION 'public_profiles must use security_invoker=true';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'profiles'
+      AND policyname = 'Public read seller profiles'
+  ) THEN
+    RAISE EXCEPTION 'missing Public read seller profiles policy';
+  END IF;
+
   IF EXISTS (
     SELECT 1 FROM pg_policies
     WHERE schemaname = 'public'
@@ -23,6 +44,17 @@ BEGIN
     WHERE tgname = 'listings_guard_privileged_columns'
   ) THEN
     RAISE EXCEPTION 'missing listings_guard_privileged_columns trigger';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'guard_listing_privileged_columns'
+      AND pg_get_functiondef(p.oid) LIKE '%listing_package%'
+  ) THEN
+    RAISE EXCEPTION 'guard_listing_privileged_columns must strip client listing_package';
   END IF;
 
   IF NOT EXISTS (

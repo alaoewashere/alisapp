@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../shared/widgets/app_back_button.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/loading_widget.dart';
@@ -21,11 +22,12 @@ class HomeFeedScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final feed = ref.watch(homeFeedProvider(feedType));
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(onPressed: () => context.pop()),
-        title: Text(feedType.titleAr),
+        title: Text(feedType.localizedTitle(strings)),
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(homeFeedProvider(feedType).notifier).refresh(),
@@ -55,6 +57,8 @@ class _FeedBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+
     if (feed.isLoading && feed.items.isEmpty) {
       return const ListingGridShimmer();
     }
@@ -65,7 +69,7 @@ class _FeedBody extends ConsumerWidget {
           SizedBox(
             height: MediaQuery.sizeOf(context).height * 0.6,
             child: AppErrorWidget(
-              message: 'فشل تحميل الإعلانات',
+              message: strings.failedLoadListings,
               onRetry: () =>
                   ref.read(homeFeedProvider(feedType).notifier).refresh(),
             ),
@@ -76,10 +80,10 @@ class _FeedBody extends ConsumerWidget {
 
     if (feed.items.isEmpty) {
       return ListView(
-        children: const [
-          SizedBox(height: 120),
+        children: [
+          const SizedBox(height: 120),
           EmptyStateWidget(
-            message: 'لا توجد إعلانات',
+            message: strings.noListings,
             icon: Icons.storefront_outlined,
           ),
         ],

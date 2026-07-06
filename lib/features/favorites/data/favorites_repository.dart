@@ -1,17 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../listings/data/listings_repository.dart';
 
 final favoritesRepositoryProvider = Provider<FavoritesRepository>((ref) {
-  return FavoritesRepository(ref.watch(supabaseClientProvider));
+  return FavoritesRepository(
+    ref.watch(supabaseClientProvider),
+    ref.watch(listingsRepositoryProvider),
+  );
 });
 
 class FavoritesRepository {
-  FavoritesRepository(this._client);
+  FavoritesRepository(this._client, this._listingsRepo);
 
   final dynamic _client;
+  final ListingsRepository _listingsRepo;
 
   Future<List<ListingModel>> getFavorites(String userId) async {
     return fetchFavorites(userId);
@@ -41,9 +46,9 @@ class FavoritesRepository {
       }
     }
 
-    final repo = ListingsRepository(_client);
-    final enriched = await repo.enrichListingMaps(listings);
-    return _mapFavoriteListings(enriched, repo);
+    final enriched = await _listingsRepo.enrichListingMaps(listings);
+    final mapped = await _mapFavoriteListings(enriched, _listingsRepo);
+    return _listingsRepo.localizeListings(mapped);
   }
 
   Future<Set<String>> getFavoriteIds(String userId) async {
@@ -124,6 +129,7 @@ class FavoritesRepository {
 }
 
 final favoritesProvider = FutureProvider<List<ListingModel>>((ref) async {
+  ref.watch(localeProvider);
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return [];
   return ref.watch(favoritesRepositoryProvider).getFavorites(userId);

@@ -1,11 +1,11 @@
 {
-    "name": "my_app",
-    "short_name": "my_app",
+    "name": "SOUQAK",
+    "short_name": "SOUQAK",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#1A1A1A",
-    "theme_color": "#1A1A1A",
-    "description": "A new Flutter project.",
+    "background_color": "#131315",
+    "theme_color": "#131315",
+    "description": "SOUQAK — Iraq Classifieds Marketplace",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

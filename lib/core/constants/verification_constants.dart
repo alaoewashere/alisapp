@@ -1,3 +1,5 @@
+import '../../l10n/app_localizations.dart';
+
 /// Profile verification status values stored in `profiles.verification_status`.
 abstract final class VerificationStatus {
   static const unverified = 'unverified';
@@ -14,10 +16,11 @@ abstract final class VerificationDocumentType {
 
   static const all = [nationalId, driversLicense, passport];
 
-  static String labelAr(String type) => switch (type) {
-        nationalId => 'الهوية الوطنية',
-        driversLicense => 'رخصة القيادة',
-        passport => 'جواز السفر',
+  static String localizedLabel(String type, AppLocalizations l10n) =>
+      switch (type) {
+        nationalId => l10n.nationalId,
+        driversLicense => l10n.drivingLicense,
+        passport => l10n.passport,
         _ => type,
       };
 

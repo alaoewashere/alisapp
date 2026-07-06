@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/theme/app_decorations.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/category_tree.dart';
@@ -13,6 +16,7 @@ class CategoryBentoCard extends StatelessWidget {
   const CategoryBentoCard({
     super.key,
     required this.category,
+    required this.title,
     required this.subtitle,
     required this.onTap,
     this.selected = false,
@@ -21,6 +25,7 @@ class CategoryBentoCard extends StatelessWidget {
   });
 
   final CategoryModel category;
+  final String title;
   final String subtitle;
   final VoidCallback? onTap;
   final bool selected;
@@ -67,7 +72,7 @@ class CategoryBentoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  category.nameAr,
+                  title,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -131,7 +136,7 @@ class _CategoryBentoIcon extends StatelessWidget {
 }
 
 /// Two-column grid of [CategoryBentoCard] widgets with consistent spacing.
-class CategoryBentoGrid extends StatelessWidget {
+class CategoryBentoGrid extends ConsumerWidget {
   const CategoryBentoGrid({
     super.key,
     required this.categories,
@@ -152,11 +157,14 @@ class CategoryBentoGrid extends StatelessWidget {
   final Map<int, int>? listingCounts;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+    final strings = ref.watch(appLocalizationsProvider);
+
     if (categories.isEmpty) {
       return Center(
         child: Text(
-          'لا توجد فئات',
+          strings.noCategories,
           style: AppFonts.cairo(color: AppColors.textMuted),
         ),
       );
@@ -175,7 +183,11 @@ class CategoryBentoGrid extends StatelessWidget {
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final category = categories[index];
-            final subtitle = subtitleForCategory(category, all);
+            final subtitle = subtitleForCategory(
+              category,
+              all,
+              localeCode: localeCode,
+            );
             final selected = selectedId != null && selectedId == category.id;
             final count = showBrandStyle && isVehicleBrand(category)
                 ? subtreeListingCount(category.id, all, listingCounts ?? {})
@@ -183,6 +195,7 @@ class CategoryBentoGrid extends StatelessWidget {
 
             return CategoryBentoCard(
               category: category,
+              title: category.localizedName(localeCode),
               subtitle: subtitle,
               selected: selected,
               showBrandStyle: showBrandStyle,

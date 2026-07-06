@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/config/maps_config.dart';
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../core/utils/map_geocoding_service.dart';
 import '../../providers/edit_listing_form_mode.dart';
 import '../../providers/post_listing_provider.dart';
@@ -19,16 +20,13 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
   Future<void> _openMapPicker() async {
     final state = ref.read(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
+    final strings = ref.read(appLocalizationsProvider);
 
     try {
       if (!MapsConfig.isConfigured) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'الخريطة غير مهيّأة. أضف GOOGLE_MAPS_API_KEY أو اختر المحافظة فقط.',
-            ),
-          ),
+          SnackBar(content: Text(strings.mapNotConfigured)),
         );
         return;
       }
@@ -53,11 +51,7 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'تعذّر فتح الخريطة. يمكنك المتابعة باختيار المحافظة فقط.',
-          ),
-        ),
+        SnackBar(content: Text(strings.mapOpenFailed)),
       );
     }
   }
@@ -67,6 +61,7 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     final isEdit = ref.watch(isEditListingFormProvider);
 
@@ -76,7 +71,7 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'الموقع',
+            strings.locationLabel,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -96,7 +91,7 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => notifier.setAreaNameFromSlug(null),
-                child: const Text('إزالة المنطقة'),
+                child: Text(strings.removeArea),
               ),
             ),
           ],
@@ -106,7 +101,7 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
           OutlinedButton.icon(
             onPressed: _openMapPicker,
             icon: const Icon(Icons.map_outlined),
-            label: const Text('تحديد الموقع على الخريطة'),
+            label: Text(strings.pickLocationOnMap),
           ),
           if (state.latitude != null && state.longitude != null) ...[
             const SizedBox(height: 12),
@@ -119,7 +114,9 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
               )
             else
               Text(
-                'الإحداثيات: ${state.latitude!.toStringAsFixed(5)}, ${state.longitude!.toStringAsFixed(5)}',
+                strings.coordinatesLabel(
+                  '${state.latitude!.toStringAsFixed(5)}, ${state.longitude!.toStringAsFixed(5)}',
+                ),
                 style: theme.textTheme.bodySmall,
                 textDirection: TextDirection.ltr,
               ),
@@ -128,8 +125,8 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   state.areaNameLocked
-                      ? 'المنطقة المختارة: ${state.areaName}'
-                      : 'المنطقة المقترحة: ${state.areaName}',
+                      ? strings.selectedAreaLabel(state.areaName!)
+                      : strings.suggestedAreaLabel(state.areaName!),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: state.areaNameLocked
                         ? theme.colorScheme.onSurface
@@ -140,7 +137,7 @@ class _Step3LocationState extends ConsumerState<Step3Location> {
               ),
             TextButton(
               onPressed: notifier.clearLocation,
-              child: const Text('إزالة الموقع'),
+              child: Text(strings.removeLocation),
             ),
           ],
           if (state.error != null) ...[

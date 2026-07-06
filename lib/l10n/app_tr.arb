@@ -1,6 +1,6 @@
 {
   "@@locale": "tr",
-  "appName": "Sello",
+  "appName": "SOUQAK",
   "home": "Ana sayfa",
   "search": "Ara",
   "favorites": "Favoriler",
@@ -110,7 +110,1544 @@
   "categories": "Kategoriler",
   "featured": "Öne çıkan",
   "sold": "Satıldı",
-  "searchHint": "Sello'da ara...",
+  "searchHint": "SOUQAK'da ara...",
   "otpSent": "Doğrulama kodu gönderildi. Mesajlarınızı kontrol edin.",
-  "newOtpSent": "Yeni kod gönderildi"
+  "newOtpSent": "Yeni kod gönderildi",
+  "homeHeroBuySell": "Al ve sat",
+  "homeHeroEasily": "kolayca.",
+  "homeHeroSubtitle": "En iyi fırsatları avucunuzun içinde bulun",
+  "homeExtendedSearchHint": "Araç, daire, elektronik ara...",
+  "browseCategories": "Kategorilere göz at",
+  "viewAll": "Tümünü gör",
+  "featuredListingsTitle": "Öne çıkan ilanlar",
+  "latestListingsTitle": "En yeni ilanlar",
+  "failedLoadCategories": "Kategoriler yüklenemedi",
+  "failedLoadListings": "İlanlar yüklenemedi",
+  "searchResultsCount": "{count} sonuç",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapTooltip": "İlan yoğunluğu",
+  "favoritesTooltip": "Favoriler",
+  "splashTagline": "Alım satım için birinci uygulamanız",
+  "welcomeToSouqak": "SOUQAK'a hoş geldiniz",
+  "chooseYourLanguage": "Dilinizi seçin",
+  "languageChangeHint": "Dili istediğiniz zaman Ayarlar'dan değiştirebilirsiniz",
+  "skip": "Atla",
+  "createAccount": "Hesap oluştur",
+  "signUpOverline": "Hesabını oluştur",
+  "createAccountTitle": "Hesap oluştur",
+  "firstName": "Ad",
+  "lastName": "Soyad",
+  "emailLabel": "E-posta",
+  "passwordLabel": "Şifre",
+  "confirmPasswordLabel": "Şifreyi onayla",
+  "alreadyHaveAccount": "Zaten hesabın var mı? ",
+  "signInLink": "Giriş yap",
+  "signUpAgreementPrefix": "Kaydolarak şunları kabul etmiş olursunuz: ",
+  "termsLink": "Kullanım Şartları",
+  "andConnector": " ve ",
+  "privacyLink": "Gizlilik Politikası",
+  "welcomeBack": "Tekrar hoş geldin",
+  "forgotPassword": "Şifreni mi unuttun?",
+  "noAccountYet": "Hesabın yok mu? ",
+  "signUpNow": "Hemen kaydol",
+  "firstNameHint": "Mehmet",
+  "lastNameHint": "Ahmet",
+  "understood": "Anladım",
+  "heatmapTutorialTitle": "Bölgenizdeki ilan yoğunluğunu haritada keşfedin",
+  "heatmapTutorialSubtitle": "En aktif bölgeleri görmek için harita simgesine dokunun",
+  "smartAlertsTutorialTitle": "Arama kriterlerinizi bir kez belirleyin; eşleşen ilan yayınlandığında bildirim alın",
+  "smartAlertsTutorialSubtitle": "Akıllı uyarılarınızı yönetmek için zil simgesine dokunun",
+  "agreeToTerms": "Şartları kabul ediyorum",
+  "agreeToPrivacy": "Gizlilik politikasını kabul ediyorum",
+  "continueWithPhone": "Telefonla devam et",
+  "phoneOtpHint": "WhatsApp üzerinden doğrulama kodu göndereceğiz",
+  "sendCode": "Kodu gönder",
+  "otpSentTo": "Kodu şu numaraya gönderdik:\n{phone}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "otpResendIn": "{seconds} sn içinde tekrar gönder",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "otpCanResendNow": "Kodu tekrar gönderebilirsiniz",
+  "otpNotReceived": "Kod gelmedi mi?",
+  "otpHelpText": "• {phone} numarasının doğru olduğundan emin olun\n• Bir dakika bekleyin — SMS gecikebilir\n• Twilio: souqiq-otp için numaranızı Sender Pool'a ekleyin\n• Supabase'de SMS sağlayıcısını (Twilio veya MessageBird) etkinleştirin\n• Geliştirme için: numaranızı Supabase'de Test OTP olarak ekleyin\n• supabase/README.md — Phone OTP bölümüne bakın",
+  "@otpHelpText": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "completeProfileTitle": "Profilinizi tamamlayın",
+  "tapToChooseAvatar": "Avatarınızı seçmek için dokunun",
+  "profileNameReadError": "Hesaptan ad okunamadı. Lütfen tekrar giriş yapın.",
+  "sessionExpiredPleaseLogin": "Oturumunuz sona erdi. Lütfen tekrar giriş yapın.",
+  "back": "Geri",
+  "searchInSouqak": "SOUQAK'ta ara",
+  "mySmartAlertsTooltip": "Akıllı uyarılarım",
+  "filtersTooltip": "Filtreler",
+  "noSuggestions": "Öneri yok",
+  "searchForQuery": "\"{query}\" ara",
+  "@searchForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCardFailed": "Paylaşım kartı oluşturulamadı. Tekrar deneyin.",
+  "followersLabel": "Takipçi",
+  "myListedAds": "İlanlarım",
+  "mySmartAlerts": "Akıllı uyarılarım",
+  "defaultUser": "Kullanıcı",
+  "otherSettings": "Diğer ayarlar",
+  "accountDetails": "Hesap detayları",
+  "passwordSettings": "Şifre",
+  "aboutApp": "Uygulama hakkında",
+  "aboutAppDescription": "SOUQAK — Irak'taki yerel ilan pazarınız. Tek uygulamada kolayca alın ve satın.",
+  "versionLabel": "Sürüm {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "helpFaq": "Yardım / SSS",
+  "logoutAction": "Çıkış",
+  "logoutConfirmBodyExtended": "Çıkış yapmak istediğinize emin misiniz?",
+  "deleteAccountConfirmBody": "Hesabınızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+  "startConversation": "Sohbete başlayın",
+  "conversation": "Sohbet",
+  "viewListing": "İlanı görüntüle",
+  "blockUser": "Kullanıcıyı engelle",
+  "blockFeatureComingSoon": "Engelleme özelliği yakında",
+  "reportConversation": "Sohbeti bildir",
+  "reportReceived": "Bildiriminiz alındı",
+  "onlineNow": "Şu an çevrimiçi",
+  "typeMessage": "Mesaj yazın...",
+  "reconnecting": "Yeniden bağlanılıyor...",
+  "chooseRecoveryMethod": "Hesabınızı kurtarma yöntemini seçin",
+  "continueViaEmail": "E-posta ile devam et",
+  "linkedEmailHint": "Hesabınıza bağlı e-posta",
+  "continueViaPhone": "Telefonla devam et",
+  "linkedPhoneHint": "Hesabınıza bağlı telefon",
+  "sendAction": "Gönder",
+  "emailNotRegistered": "Bu e-posta kayıtlı değil",
+  "phoneNotRegistered": "Bu telefon numarası kayıtlı değil",
+  "listingPostedToday": "Bugün",
+  "listingPostedOneDayAgo": "1 gün önce",
+  "listingPostedDaysAgo": "{count} gün önce",
+  "@listingPostedDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homeFeedLatestTitle": "En yeni ilanlar",
+  "otpSentViaWhatsapp": "Doğrulama kodu WhatsApp ile şuraya gönderildi:",
+  "otpResendCode": "Kodu tekrar gönder",
+  "otpVerifyButton": "Doğrula",
+  "otpInvalidCode": "Hatalı kod",
+  "otpVerifiedSuccess": "Başarıyla doğrulandı!",
+  "otpSigningIn": "Giriş yapılıyor...",
+  "today": "Bugün",
+  "yesterday": "Dün",
+  "now": "Şimdi",
+  "oneMinuteAgo": "1 dakika önce",
+  "twoMinutesAgo": "2 dakika önce",
+  "minutesAgo": "{count} dk önce",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "oneHourAgo": "1 saat önce",
+  "twoHoursAgo": "2 saat önce",
+  "hoursAgo": "{count} sa önce",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoDaysAgo": "2 gün önce",
+  "daysAgo": "{count} gün önce",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "myMessages": "Mesajlarım",
+  "loginToViewMessages": "Mesajları görmek için giriş yap",
+  "noMessagesYet": "Henüz mesaj yok",
+  "contactSellersPrompt": "Satıcılarla iletişime geçin",
+  "deleteConversationTitle": "Sohbeti sil",
+  "deleteConversationBody": "Bu sohbet silinsin mi?",
+  "chatMessagesHeader": "Mesajlar ve sohbetler",
+  "chatDirectContact": "Alıcı ve satıcılarla doğrudan iletişim",
+  "activeUsersCount": "{count} aktif",
+  "@activeUsersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingBadge": "İlan",
+  "startChatDefault": "Sohbete başla",
+  "categoryRealEstate": "Emlak",
+  "categoryVehicles": "Araçlar",
+  "categoryElectronics": "Elektronik",
+  "categoryBuySell": "Pazar",
+  "categoryTutoring": "Özel Ders",
+  "categoryJobs": "İş İlanları",
+  "categoryPets": "Evcil Hayvan",
+  "categoryHomeHelp": "Ev Yardımı",
+  "categorySubtitleRealEstate": "Konut, arsa, ticari...",
+  "categorySubtitleVehicles": "Otomobil, kiralık, motosiklet...",
+  "categorySubtitleElectronics": "Telefon, laptop, TV...",
+  "categorySubtitleBuySell": "Telefon, bilgisayar, giyim, mobilya...",
+  "categorySubtitleTutoring": "Okul, üniversite, dil, Kuran...",
+  "categorySubtitleJobs": "Teknoloji, mühendislik, sağlık, petrol...",
+  "categorySubtitlePets": "Köpek, kedi, kuş, çiftlik...",
+  "categorySubtitleHomeHelp": "Temizlik, yemek, bakıcı, şoför...",
+  "listingNotFound": "İlan bulunamadı",
+  "tabListing": "İlan",
+  "tabDescription": "Açıklama",
+  "tabLocation": "Konum",
+  "sellerOtherListings": "Bu satıcıdan diğer ilanlar",
+  "reportThisListing": "Bu ilanı bildir",
+  "negotiable": "Pazarlık yapılır",
+  "videoTour": "🎥 Video turu",
+  "paintConditionTitle": "Kaporta ve boya durumu",
+  "allPartsOriginal": "Tüm parçalar orijinal",
+  "viewsCount": "{count} görüntülenme",
+  "@viewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumber": "İlan no",
+  "listingDate": "İlan tarihi",
+  "noDescriptionAdded": "Açıklama eklenmemiş",
+  "locationNotSet": "Konum belirtilmemiş",
+  "selectedLocation": "Seçilen konum",
+  "sellerLabel": "Satıcı",
+  "theSeller": "Satıcı",
+  "memberSinceYear": "{year} yılından beri üye",
+  "@memberSinceYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "listingsCountLabel": "{count} ilan",
+  "@listingsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAllSellerListings": "Tüm ilanlarını gör",
+  "safetyTipsTitle": "Güvenlik ipuçları",
+  "safetyTipPublicPlace": "Satıcıyla halka açık yerde buluşun",
+  "safetyTipNoPrepay": "Ürünü görmeden ödeme yapmayın",
+  "safetyTipInspect": "Satın almadan önce ürünü kontrol edin",
+  "rateSeller": "Satıcıyı değerlendir",
+  "priceLabel": "Fiyat",
+  "locationLabel": "Konum",
+  "conditionLabel": "Durum",
+  "packageFree": "Ücretsiz",
+  "packagePro": "Pro",
+  "packagePremium": "Premium",
+  "statusActive": "Aktif",
+  "statusExpired": "Süresi doldu",
+  "statusPending": "Beklemede",
+  "chooseOption": "Seçin",
+  "allCategories": "Tümü",
+  "noCategories": "Kategori yok",
+  "noSubcategories": "Alt kategori yok",
+  "allCategoryListings": "Tüm {name} ilanları",
+  "@allCategoryListings": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "allGovernorates": "Tüm iller",
+  "postListingStep1": "Adım 1",
+  "postListingStep2": "Adım 2",
+  "postListingStep3": "Adım 3",
+  "postListingStep4": "Adım 4",
+  "postListingStep5": "Adım 5",
+  "postListingStep6": "Adım 6",
+  "postListingStep7": "Adım 7",
+  "postListingStep8": "Adım 8",
+  "postListingStepFallback": "Adım {step}",
+  "@postListingStepFallback": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "nextStep": "İleri",
+  "saveAsDraft": "Taslak olarak kaydet",
+  "titleMinLengthError": "Başlık en az 5 karakter olmalı",
+  "addPhotoRequired": "Lütfen en az bir fotoğraf ekleyin",
+  "draftSaved": "Taslak kaydedildi",
+  "confirmListingFeeTitle": "İlan ücretini onayla",
+  "confirmListingFeeBody": "Bu ayki iki ücretsiz ilan hakkınızı kullandınız. Bu ilan için standart ilan ücreti ({price}) alınacaktır.",
+  "@confirmListingFeeBody": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmAndPay": "Onayla ve öde {price}",
+  "@confirmAndPay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "publishingListing": "İlan yayınlanıyor...",
+  "uploadingPhotos": "Fotoğraflar yükleniyor... ({current}/{total})",
+  "@uploadingPhotos": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "searchEllipsis": "Ara...",
+  "specifyValue": "Değer belirtin",
+  "specifyType": "Tür belirtin",
+  "choosePickerTitle": "{label} seçin",
+  "@choosePickerTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "governorateRequired": "İl *",
+  "neighborhoodOptional": "Bölge / mahalle (isteğe bağlı)",
+  "neighborhoodLabel": "Bölge / mahalle",
+  "chooseGovernorateFirst": "Mevcut bölgeleri görmek için önce ili seçin",
+  "currencyIqd": "IQD",
+  "listingDetailsTitle": "İlan detayları",
+  "optionalLabel": "Opsiyonel",
+  "listingTypeLabel": "İlan türü *",
+  "conditionNew": "Sıfır",
+  "conditionUsed": "İkinci el",
+  "listingTitleLabel": "İlan başlığı",
+  "listingTitleHint": "İlan başlığınızı yazın",
+  "listingDescriptionLabel": "İlan açıklaması",
+  "listingDescriptionHint": "Ayrıntılı bir açıklama ekleyin...",
+  "removeArea": "Bölgeyi kaldır",
+  "pickLocationOnMap": "Haritada konum seç",
+  "coordinatesLabel": "Koordinatlar: {coords}",
+  "@coordinatesLabel": {
+    "placeholders": {
+      "coords": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedAreaLabel": "Seçilen bölge: {area}",
+  "@selectedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestedAreaLabel": "Önerilen bölge: {area}",
+  "@suggestedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "removeLocation": "Konumu kaldır",
+  "mapNotConfigured": "Harita yapılandırılmadı. GOOGLE_MAPS_API_KEY ekleyin veya yalnızca ili seçin.",
+  "mapOpenFailed": "Harita açılamadı. Yalnızca ili seçerek devam edebilirsiniz.",
+  "photosTitle": "Fotoğraflar",
+  "photosSubtitle": "En fazla {max} fotoğraf ekleyin — sıralamak için sürükleyin",
+  "@photosSubtitle": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "firstPhotoIsCover": "İlk fotoğraf kapak görselidir",
+  "maxPhotosLimit": "En fazla {max} fotoğraf",
+  "@maxPhotosLimit": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "noPhotosYet": "Henüz fotoğraf eklenmedi",
+  "photosHelpSell": "Fotoğraflar satış şansınızı artırır",
+  "photoTipGoodLight": "İyi aydınlatma",
+  "photoTipClearPhotos": "Net fotoğraflar",
+  "photoTipMultipleAngles": "Farklı açılar",
+  "reviewListingTitle": "İlanı gözden geçir",
+  "detailsSection": "Detaylar",
+  "categorySection": "Kategori",
+  "editAction": "Düzenle",
+  "showMore": "Daha fazla göster",
+  "showLess": "Daha az göster",
+  "retryAction": "Tekrar dene",
+  "selectedSpecsCount": "{count} özellik seçildi",
+  "@selectedSpecsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedFeaturesCount": "{count} özellik seçildi",
+  "@selectedFeaturesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "exchangePossible": "Takasa açık",
+  "deliveryAvailable": "Teslimat mevcut",
+  "smartTvBadge": "Smart TV",
+  "contactTitle": "İletişim",
+  "contactInfoSection": "İletişim bilgileri",
+  "contactPreferencesTitle": "İletişim tercihleri",
+  "contactPreferencesHelp": "Alıcıların bu ilan için size nasıl ulaşacağını seçin.\n\n• Telefon ve mesaj: telefon ve uygulama içi mesajlar\n• Yalnızca telefon: uygulama içi mesaj olmadan telefon\n• Yalnızca mesaj: yalnızca uygulama içi mesajlar",
+  "choosePackage": "Paket seçin",
+  "freePostsRemainingLabel": "0 IQD (2 ücretsiz ilandan {remaining} kaldı)",
+  "@freePostsRemainingLabel": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "freePostsUsedWarning": "Ücretsiz ilan haklarınızı kullandınız. Standart ilan ücreti uygulanacaktır.",
+  "roomsCountBadge": "{count} oda",
+  "@roomsCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLoadFailed": "Profil yüklenemedi",
+  "changesSavedSuccess": "Değişiklikler kaydedildi",
+  "saveError": "Kaydederken hata oluştu",
+  "enterName": "Adınızı girin",
+  "usernameLabel": "Kullanıcı adı",
+  "usernameCannotChange": "Kullanıcı adı değiştirilemez",
+  "changePhoneNumber": "Numarayı değiştir",
+  "verifyPhoneAction": "✓ Telefonu doğrula",
+  "notVerified": "Doğrulanmadı",
+  "changePhoto": "Fotoğrafı değiştir",
+  "verifyPhoneTitle": "Telefon numarasını doğrula",
+  "whatsappSixDigitHint": "WhatsApp ile 6 haneli kod göndereceğiz",
+  "sendWhatsappCode": "WhatsApp kodu gönder",
+  "enterValidPhone": "Geçerli bir telefon numarası girin",
+  "phoneVerifiedSuccess": "Telefon numarası doğrulandı",
+  "ratingsTitle": "Değerlendirmeler",
+  "noRatingsYet": "Henüz değerlendirme yok",
+  "loadMore": "Daha fazla yükle",
+  "noReviewLeft": "Yorum bırakmadı",
+  "ratingSubmitFailed": "Değerlendirme gönderilemedi, tekrar deneyin",
+  "rateExperienceTitle": "Deneyiminiz nasıldı?",
+  "addCommentOptional": "Yorum ekle (isteğe bağlı)",
+  "submitRating": "Değerlendirmeyi gönder",
+  "ratingsHelpCommunity": "Değerlendirmeleriniz topluluğun satıcılara güvenmesine yardımcı olur",
+  "chooseAvatarTitle": "Avatarınızı seçin",
+  "priceHistoryTitle": "Fiyat geçmişi",
+  "priceDroppedSummary": "Fiyat {duration} içinde {from}'den {to}'ye düştü",
+  "@priceDroppedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "priceIncreasedSummary": "Fiyat {from}'den {to}'ye yükseldi",
+  "@priceIncreasedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPriceLabel": "Orijinal fiyat",
+  "currentPriceLabel": "Güncel fiyat",
+  "lessThanOneWeek": "Bir haftadan az",
+  "oneWeek": "Bir hafta",
+  "twoWeeks": "İki hafta",
+  "weeksCount": "{count} hafta",
+  "@weeksCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "moderationYouAreBanned": "Yasaklandınız",
+  "moderationBannedTitle": "Yasaklandı",
+  "moderationWarningTitle": "Uyarı",
+  "moderationPostingBanDefault": "Şu anda sohbet ve ilan vermekten yasaklandınız.",
+  "moderationBlockedBody": "İzin verilen ihlal sınırını aştınız ve mesajınız gönderilmedi.",
+  "moderationCensoredBody": "Mesajınızda uygunsuz bir kelime kullanıldı ve kaldırıldı. Lütfen kullanım kurallarına uyun.",
+  "postingBanPermanent": "Sohbet ve ilan vermekten kalıcı olarak yasaklandınız",
+  "postingBanUntil": "{date} tarihine kadar sohbet ve ilan vermekten yasaklandınız",
+  "@postingBanUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postingBanPermanentReason": "Uygunsuz dilin tekrarlanan kullanımı nedeniyle sohbet ve ilan vermekten kalıcı olarak yasaklandınız.",
+  "postingBanFirstReason": "Uygunsuz dil kullanımı nedeniyle 2 gün sohbet ve ilan vermekten yasaklandınız. Tekrarlarsanız bir ay yasaklanırsınız.",
+  "postingBanRepeatReason": "Uygunsuz dilin tekrarlanan kullanımı nedeniyle bir ay sohbet ve ilan vermekten yasaklandınız.",
+  "usernameSetupTitle": "Kullanıcı adınızı seçin",
+  "usernameSetupSubtitle": "Bu ad profilinizde ve ilanlarınızda görünecek",
+  "usernameHint": "kullanici_adi",
+  "usernameFormatRules": "Yalnızca İngilizce harfler, rakamlar ve alt çizgi kullanılabilir",
+  "skipForNow": "Şimdilik atla",
+  "genericErrorRetry": "Bir hata oluştu, tekrar deneyin",
+  "emailVerifyTitle": "E-postayı doğrula",
+  "otpSentToEmailPrompt": "Gönderdiğimiz kodu girin:",
+  "newPasswordTitle": "Yeni şifre",
+  "newPasswordSubtitle": "Hesabınız için yeni bir şifre girin",
+  "passwordChangedSuccess": "Şifre değiştirildi",
+  "allListings": "Tüm ilanlar",
+  "categoryNotFoundMigration": "\"{name}\" veritabanında bulunamadı. Supabase'de migration'ları uygulayıp uygulamayı yeniden yükleyin.",
+  "@categoryNotFoundMigration": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyAccountTitle": "Hesabı doğrula",
+  "verifyAccountSubtitle": "Devam etmeden önce kimliğinizi doğrulayın",
+  "whyVerification": "Neden doğrulama?",
+  "verificationBenefitsBody": "Hesabınızı doğrulamak mavi güven rozeti verir ve alıcıların ilanlarınıza güvenini artırır. Belgelerinizi gizli inceler ve paylaşmayız.",
+  "verifiedSellerBadge": "Profilinizde ve ilanlarınızda doğrulanmış satıcı rozeti",
+  "reviewWithin24Hours": "24 saat içinde inceleme",
+  "documentsStoredSecurely": "Belgeleriniz güvenle saklanır",
+  "verifyIdentityAction": "Kimliği doğrula →",
+  "chooseDocumentType": "Belge türünü seçin",
+  "nationalId": "Ulusal kimlik",
+  "drivingLicense": "Sürücü belgesi",
+  "passport": "Pasaport",
+  "captureDocumentTitle": "Belgeyi çek",
+  "documentFront": "Ön yüz",
+  "documentBack": "Arka yüz",
+  "submitForReview": "İncelemeye gönder",
+  "capturePhoto": "Fotoğraf çek",
+  "chooseFromGallery": "Galeriden seç",
+  "documentBackRequired": "Lütfen belgenin arka yüzünün fotoğrafını çekin",
+  "verificationSubmitFailed": "İstek gönderilemedi, tekrar deneyin",
+  "verificationSentSuccess": "Başarıyla gönderildi",
+  "verificationReviewNotice": "İsteğiniz 24 saat içinde incelenecek ve onaylandığında bilgilendirileceksiniz",
+  "backToHome": "Ana sayfaya dön",
+  "newSmartAlert": "Yeni akıllı uyarı",
+  "alertNameHint": "Uyarı adı *",
+  "alertNameRequired": "Uyarı adı gerekli",
+  "modelYear": "Model yılı",
+  "fromLabel": "Başlangıç",
+  "toLabel": "Bitiş",
+  "allIraq": "Tüm Irak",
+  "saveAlert": "Uyarıyı kaydet",
+  "alertSavedSuccess": "Uyarı kaydedildi ✓ Eşleşen ilan yayınlandığında bilgilendirileceksiniz",
+  "alertSaveFailed": "Uyarı kaydedilemedi: {error}",
+  "@alertSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newAlert": "Yeni uyarı",
+  "loginToManageAlerts": "Uyarıları yönetmek için giriş yapın",
+  "noAlertsYet": "Henüz uyarı yok",
+  "createAlertNow": "Şimdi uyarı oluştur",
+  "saveSearchAsAlert": "Bu aramayı akıllı uyarı olarak kaydet 🔔",
+  "alertLimitFreeReached": "Ücretsiz kullanıcılar sınıra ulaştı (3 uyarı)",
+  "upgradeProUnlimitedAlerts": "Sınırsız uyarı için Pro'ya yükseltin",
+  "listingBoostedSuccess": "İlanınız başarıyla yükseltildi",
+  "boostYourListing": "İlanınızı yükseltin",
+  "boostListingSubtitle": "İlan görünürlüğünü artırmak için doğru paketi seçin",
+  "markAsSoldAction": "Satıldı",
+  "markAsSoldTitle": "Satıldı olarak işaretle",
+  "markAsSoldBody": "Bu ilan satıldı olarak işaretlensin mi?",
+  "deleteListingTitle": "İlanı sil",
+  "deleteListingBody": "Bu ilan silinsin mi?",
+  "promoteListing": "Tanıt",
+  "republishListing": "Yeniden yayınla",
+  "restoreListing": "Geri yükle",
+  "listingNumberWithRef": "İlan no: #{ref}",
+  "@listingNumberWithRef": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumberDash": "İlan no: —",
+  "contactUsOnSouqak": "SOUQAK'ta bize ulaşın",
+  "pendingApprovalTitle": "Yönetici onayı bekleniyor",
+  "pendingApprovalBody": "Düzenle, sil, satıldı ve WhatsApp onaydan sonra görünür",
+  "messageSeller": "Satıcıya mesaj",
+  "cannotMessageSelf": "Kendinize mesaj gönderemezsiniz",
+  "openChatFailed": "Sohbet açılamadı",
+  "markedAsSoldSuccess": "Satıldı olarak işaretlendi",
+  "rateBuyer": "Alıcıyı değerlendir",
+  "deleteListingConfirmBody": "Emin misiniz? Bu işlem geri alınamaz.",
+  "listingDeletedSuccess": "İlan silindi",
+  "reportChooseReason": "Neden seçin veya bildirim ayrıntılarını yazın",
+  "reportSubmittedThanks": "Bildirim gönderildi. Yardımınız için teşekkürler.",
+  "reportSubmitFailed": "Bildirim gönderilemedi",
+  "reportDetailsLabel": "Bildirim ayrıntıları",
+  "submitReport": "Bildirimi gönder",
+  "reportReasonDuplicate": "Yinelenen ilan",
+  "reportReasonMisleadingPrice": "Yanıltıcı fiyat",
+  "reportReasonFakePhotos": "Sahte fotoğraflar",
+  "reportReasonInappropriate": "Uygunsuz içerik",
+  "reportReasonFraud": "Dolandırıcılık veya sahtekarlık",
+  "reportReasonOther": "Diğer",
+  "filtersTitle": "Filtreler",
+  "clearAll": "Tümünü temizle",
+  "priceRangeLabel": "Fiyat aralığı",
+  "additionalOptions": "Ek seçenekler",
+  "featuredOnlyLabel": "Yalnızca öne çıkan",
+  "negotiableOnlyLabel": "Yalnızca pazarlıklı",
+  "showResultsCount": "{count} sonuç göster",
+  "@showResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "showResultsLoading": "Sonuçlar gösteriliyor...",
+  "showResults": "Sonuçları göster",
+  "editChangesSaved": "Değişiklikler kaydedildi ✓",
+  "editListingTitle": "İlanı düzenle",
+  "saveEdits": "Değişiklikleri kaydet",
+  "heatmapTitle": "İlan haritası",
+  "heatmapLoadFailed": "Yoğunluk verisi yüklenemedi",
+  "heatmapNoActiveListings": "Gösterilen bölgelerde şu anda aktif ilan yok",
+  "heatmapClusterSummary": "{areas} bölge · {total} ilan",
+  "@heatmapClusterSummary": {
+    "placeholders": {
+      "areas": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapSelectArea": "İlanları görmek için bölge seçin",
+  "showListingsAction": "İlanları görüntüle",
+  "heatmapFilterCars": "Otomobiller",
+  "heatmapDensityCars": "{area} bölgesinde şu anda {count} satılık araba",
+  "@heatmapDensityCars": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityRealEstate": "{area} bölgesinde şu anda {count} emlak ilanı",
+  "@heatmapDensityRealEstate": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityElectronics": "{area} bölgesinde şu anda {count} elektronik ilanı",
+  "@heatmapDensityElectronics": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityGeneric": "{area} bölgesinde şu anda {count} aktif ilan",
+  "@heatmapDensityGeneric": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "listingPendingReviewStats": "İlanınız inceleniyor — istatistikler yayınlandıktan sonra otomatik güncellenir",
+  "contactStatLabel": "İletişim",
+  "autoRenewLabel": "Otomatik yenileme",
+  "autoRenewAfterApproval": "Yönetici ilanı onayladıktan sonra etkinleşir",
+  "expiresInDays": "{days} gün içinde sona erer",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "priceChangeTitle": "Fiyatı değiştir",
+  "priceChangeWarning": "Not: fiyat değişiklikleri tüm alıcılara fiyat geçmişinde görünür",
+  "confirmChange": "Değişikliği onayla",
+  "publishSuccessDone": "Tamam ✓",
+  "listingPendingReviewTitle": "İlanınız inceleniyor",
+  "listingVisibleAfterApproval": "Onaydan sonra herkese görünür olacak",
+  "okAction": "Tamam",
+  "closeTooltip": "Kapat",
+  "addPhotoLabel": "Fotoğraf ekle",
+  "coverPhotoLabel": "Kapak",
+  "priceEstimateFailed": "Fiyat tahmin edilemedi, tekrar deneyin",
+  "calculateSuggestedPrice": "✨ Önerilen fiyatı hesapla",
+  "confidenceHigh": "Yüksek",
+  "confidenceMedium": "Orta",
+  "confidenceLow": "Düşük",
+  "aiPriceEstimateTitle": "Yapay zeka fiyat tahmini",
+  "priceEstimateDisclaimer": "Bu yaklaşık bir tahmindir, kesin fiyat değildir",
+  "phoneOtpWhatsappHint": "WhatsApp ile doğrulama kodu göndereceğiz",
+  "passwordResetResent": "Bağlantı tekrar gönderildi",
+  "passwordResetSentTitle": "Bağlantı gönderildi",
+  "passwordResetSentSubtitle": "E-postanıza sıfırlama bağlantısı gönderildi",
+  "passwordResetInstructions": "Yeni şifre oluşturmak için e-postanızdaki bağlantıyı açın. Mesaj birkaç dakika sürebilir.",
+  "resendLink": "Yeniden gönder",
+  "backToLogin": "Girişe dön",
+  "videoLoadFailed": "Video yüklenemedi",
+  "listingsOnSouqakCount": "SOUQAK'ta {count} ilan",
+  "@listingsOnSouqakCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleDetailsTitle": "Araç detayları",
+  "basicInfoTitle": "Temel bilgiler",
+  "vehicleTrimLabel": "Donanım",
+  "trimExampleHint": "örn. SE",
+  "mileageLabel": "Kilometre",
+  "engineLabel": "Motor",
+  "cylindersLabel": "Silindir",
+  "paintStatusLabel": "Boya durumu",
+  "fuelRequiredLabel": "Yakıt *",
+  "importCountryLabel": "İthalat ülkesi",
+  "plateLabel": "Plaka",
+  "transmissionRequiredLabel": "Vites *",
+  "seatCountLabel": "Koltuk sayısı",
+  "seatMaterialLabel": "Koltuk malzemesi",
+  "specsSectionTitle": "Özellikler",
+  "priceRequiredLabel": "Fiyat *",
+  "conditionRequiredLabel": "Durum *",
+  "yearLabel": "Yıl",
+  "chooseColorPlaceholder": "Renk seçin",
+  "chooseCustomColorTitle": "Özel renk seçin",
+  "colorLabel": "Renk",
+  "paintOriginalLabel": "Orijinal",
+  "paintLocalLabel": "Yerel boya",
+  "paintPaintedLabel": "Boyalı",
+  "paintReplacedLabel": "Değiştirilmiş",
+  "vehicleSpecsSelectedCount": "{count} özellik seçildi",
+  "@vehicleSpecsSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "electronicsPhoneDetailsTitle": "Telefon detayları",
+  "electronicsLaptopDetailsTitle": "Laptop detayları",
+  "electronicsTvDetailsTitle": "TV detayları",
+  "electronicsDetailsTitle": "Elektronik detayları",
+  "brandLabel": "Marka",
+  "modelLabel": "Model",
+  "storageLabel": "Depolama",
+  "ramLabel": "RAM",
+  "batteryHealthLabel": "Pil sağlığı",
+  "withBoxLabel": "Kutulu",
+  "withChargerLabel": "Şarj cihazlı",
+  "warrantyLabel": "Garanti",
+  "processorLabel": "İşlemci",
+  "screenSizeInchesLabel": "Ekran boyutu (inç)",
+  "resolutionLabel": "Çözünürlük",
+  "realEstateDetailsTitle": "Emlak detayları",
+  "propertyTypeRequiredLabel": "Mülk türü *",
+  "offerTypeRequiredLabel": "İlan türü *",
+  "areaSqmRequiredLabel": "Alan (m²) *",
+  "sqmUnit": "m²",
+  "floorLabel": "Kat",
+  "roomsCountLabel": "Oda sayısı",
+  "bathroomsCountLabel": "Banyo sayısı",
+  "buildingAgeYearsLabel": "Bina yaşı (yıl)",
+  "finishingLabel": "İç mekan",
+  "deedTypeLabel": "Tapu türü",
+  "featuresSectionTitle": "Özellikler",
+  "brandOptionalLabel": "Marka (isteğe bağlı)",
+  "exchangePossibleQuestion": "Takasa açık mı?",
+  "deliveryAvailableQuestion": "Teslimat mevcut mu?",
+  "deliveryCostRequiredLabel": "Teslimat ücreti *",
+  "jobDetailsTitle": "İş detayları",
+  "jobTypeRequiredLabel": "Çalışma türü *",
+  "sectorRequiredLabel": "Sektör *",
+  "experienceRequiredLabel": "Gerekli deneyim",
+  "educationRequiredLabel": "Gerekli eğitim",
+  "genderPreferenceLabel": "Cinsiyet tercihi",
+  "salaryTypeLabel": "Maaş türü",
+  "salaryMinRequiredLabel": "Asgari maaş *",
+  "salaryMaxLabel": "Azami maaş",
+  "benefitsSectionTitle": "Yan haklar",
+  "serviceDetailsTitle": "Hizmet detayları",
+  "genderLabel": "Cinsiyet",
+  "nationalityLabel": "Uyruk",
+  "workHoursRequiredLabel": "Çalışma saatleri *",
+  "weekDaysLabel": "Haftalık gün sayısı",
+  "yearsExperienceLabel": "Deneyim yılı",
+  "expectedSalaryRequiredLabel": "Beklenen maaş *",
+  "languagesSectionTitle": "Diller",
+  "animalDetailsTitle": "Evcil hayvan detayları",
+  "ageMonthsLabel": "Yaş (ay)",
+  "vaccinatedQuestion": "Aşılı mı?",
+  "hasDocumentsQuestion": "Belgeli mi?",
+  "trainedQuestion": "Eğitimli mi?",
+  "tutoringDetailsTitle": "Ders detayları",
+  "subjectRequiredLabel": "Ders *",
+  "studyStageRequiredLabel": "Eğitim seviyesi *",
+  "curriculumLabel": "Müfredat",
+  "teachingMethodRequiredLabel": "Öğretim yöntemi *",
+  "acceptedGenderLabel": "Kabul edilen cinsiyet",
+  "pricePerHourRequiredLabel": "Saatlik ücret *",
+  "educationQualificationLabel": "Eğitim durumu",
+  "viewOnMapLabel": "Haritada görüntüle",
+  "videoSectionTitle": "Video",
+  "currentVideoReplaceHint": "Mevcut video — aşağıdan yeni bir video ile değiştirebilirsiniz",
+  "addDemoVideoTitle": "Tanıtım videosu ekleyin (60 saniyeye kadar)",
+  "proSubscribersOnly": "Yalnızca Pro ve Premium abonelere açık",
+  "upgradeToProLock": "Pro'ya yükselt 🔒",
+  "processingVideoProgress": "Video işleniyor... {percent}%",
+  "@processingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseVideoLabel": "Video seç",
+  "recordVideoLabel": "Video kaydet",
+  "videoProcessFailed": "Video işlenemedi",
+  "invalidVideoError": "Geçersiz video",
+  "imageProcessFailed": "Görsel işlenemedi",
+  "chooseCategoryError": "Kategori seçin",
+  "chooseContactPreferenceError": "İletişim tercihini seçin",
+  "chooseGovernorateError": "İl seçin",
+  "enterValidPriceError": "Geçerli bir fiyat girin",
+  "chooseProductConditionError": "Ürün durumunu seçin",
+  "chooseConditionError": "Durum seçin",
+  "chooseFuelTypeError": "Yakıt türünü seçin",
+  "chooseTransmissionError": "Vites seçin",
+  "choosePropertyTypeError": "Mülk türünü seçin",
+  "chooseOfferTypeError": "İlan türünü seçin",
+  "enterAreaSqmError": "Metrekare cinsinden alan girin",
+  "chooseDeliveryCostError": "Teslimat ücretini seçin",
+  "chooseSubjectError": "Ders seçin",
+  "chooseStudyStageError": "Eğitim seviyesini seçin",
+  "chooseTeachingMethodError": "Öğretim yöntemini seçin",
+  "enterValidHourlyPriceError": "Geçerli bir saatlik ücret girin",
+  "chooseJobTypeError": "Çalışma türünü seçin",
+  "chooseSectorError": "Sektör seçin",
+  "enterMinSalaryError": "Asgari maaşı girin",
+  "salaryMaxMustExceedMinError": "Azami maaş asgari maaştan büyük olmalı",
+  "chooseAnimalTypeFromCategoriesError": "Kategorilerden hayvan türünü seçin",
+  "chooseServiceTypeFromCategoriesError": "Kategorilerden hizmet türünü seçin",
+  "chooseWorkHoursError": "Çalışma saatlerini seçin",
+  "enterExpectedSalaryError": "Beklenen maaşı girin",
+  "titleTooLongError": "Başlık çok uzun (en fazla 100 karakter)",
+  "descriptionTooLongError": "Açıklama çok uzun (en fazla 2000 karakter)",
+  "uploadingPhotosSimple": "Fotoğraflar yükleniyor...",
+  "uploadingVideoProgress": "Video yükleniyor... {percent}%",
+  "@uploadingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "publishListingFailedError": "İlan yayınlanamadı. Tekrar deneyin.",
+  "chooseCategoryMinimumError": "En az bir kategori seçin",
+  "draftTitleFallback": "Taslak",
+  "saveDraftFailedError": "Taslak kaydedilemedi",
+  "cannotEditListingError": "Bu ilanı düzenleyemezsiniz",
+  "loadListingFailedError": "İlan yüklenemedi",
+  "enterListingTitleError": "İlan başlığını girin",
+  "addAtLeastOnePhotoError": "En az bir fotoğraf ekleyin",
+  "saveEditsFailedError": "Değişiklikler kaydedilemedi",
+  "chatListingIntro": "Merhaba, ilanınızla ilgileniyorum: {title}",
+  "@chatListingIntro": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameChecking": "Kontrol ediliyor...",
+  "usernameAvailable": "Uygun ✓",
+  "usernameTaken": "Alınmış ✗",
+  "usernameRules": "3–20 karakter: yalnızca İngilizce harf, rakam ve _",
+  "ratingsCount": "({count} değerlendirme)",
+  "@ratingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "authSessionFailed": "Giriş başarısız. Tekrar deneyin.",
+  "chooseAvatar": "Fotoğrafını seç",
+  "avatarIconsSection": "Avatar simgeleri",
+  "chooseDefaultAvatar": "Varsayılan avatar seç",
+  "orUploadPhotoHint": "Veya yukarıdan kamera/galeriden yükle",
+  "countryIraq": "Irak",
+  "matchingListingsCount": "{count} eşleşen ilan",
+  "@matchingListingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsTitle": "Arama sonuçları",
+  "searchResultCount": "{count} sonuç",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "filterCategoryLabel": "Kategori",
+  "filterPriceLabel": "Fiyat",
+  "filterFeaturedLabel": "Öne çıkan",
+  "accountVerifiedBanner": "Hesabınız doğrulandı ✓",
+  "verificationPendingBanner": "Doğrulama talebi inceleniyor ⏳",
+  "verificationRejectedWithReason": "Talebiniz reddedildi — {reason}",
+  "@verificationRejectedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "verificationRejectedBanner": "Doğrulama talebi reddedildi",
+  "verifyAccountPrompt": "Güven rozeti için hesabını doğrula 🔒",
+  "vehicleYearLabel": "Yıl",
+  "vehicleTrimShortLabel": "Donanım",
+  "vehicleEngineShortLabel": "Motor",
+  "vehicleCylinderShortLabel": "Silindir",
+  "photosSectionTitle": "Fotoğraflar",
+  "currentPhotosTitle": "Mevcut fotoğraflar",
+  "clearAllFilters": "Tümünü temizle",
+  "noResultsForQuery": "\"{query}\" için sonuç bulunamadı",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "tryChangingSearchOrFilters": "Arama veya filtreleri değiştirmeyi deneyin",
+  "clearFilters": "Filtreleri temizle",
+  "loadingMore": "Daha fazla yükleniyor...",
+  "noResultsFound": "Sonuç bulunamadı",
+  "attr_1aae214b": "8 airbags",
+  "colorOther": "Diğer",
+  "colorWhite": "Beyaz",
+  "attr_1a93e294": "Foreign",
+  "colorRed": "Red",
+  "colorGreen": "Yeşil",
+  "attr_10f56232": "Erbil",
+  "propLand": "Arsa",
+  "attr_60b69dc6": "Rabbit",
+  "colorBlue": "Mavi",
+  "colorBlack": "Siyah",
+  "attr_97418f6f": "German",
+  "attr_dd1fbe22": "American",
+  "genderFemale": "Female",
+  "transAutomatic": "Otomatik",
+  "attr_0d67ce95": "European",
+  "attr_ea410cd6": "Online",
+  "attr_9967c75e": "Annual leave",
+  "attr_fd5a68db": "LED lighting",
+  "attr_cfb972ef": "Adaptive lighting",
+  "attr_0d092cb1": "Automatic high beams",
+  "attr_407ad989": "Laser lighting",
+  "attr_8c495f8e": "Ambient lighting",
+  "attr_367395e4": "IELTS prep",
+  "attr_9f6457d2": "TOEFL prep",
+  "attr_00f135f8": "Secondary",
+  "genderFemales": "Females",
+  "attr_0402b2d3": "English",
+  "offerRent": "Kiralık",
+  "offerDailyRent": "Daily rent",
+  "attr_5c22c7bc": "Primary",
+  "attr_a910430c": "Biology",
+  "attr_b1a8fcf3": "Business & finance",
+  "attr_127a0207": "Safety",
+  "attr_e8ade886": "Security sector",
+  "attr_782faf71": "Economics",
+  "attr_6466c2b3": "Programming",
+  "attr_7b2d355f": "Basra",
+  "attr_3659f4ca": "History & Geography",
+  "attr_3dbbe072": "Tajweed",
+  "attr_5fa7f4ab": "Islamic education",
+  "attr_68b31032": "Design",
+  "attr_595073bb": "Traffic sign recognition",
+  "attr_a8071737": "Education & training",
+  "attr_2f29a34b": "Computer & technology",
+  "attr_b5bf961a": "Hillah",
+  "attr_6f5c12c4": "Exterior",
+  "attr_479c9dd4": "Diwaniyah",
+  "attr_d10c7f46": "Comfort",
+  "attr_a8590e6c": "Ramadi",
+  "attr_ec996beb": "Mathematics",
+  "attr_2ad56620": "Agriculture",
+  "attr_b23b84b6": "Sulaymaniyah",
+  "attr_47499b9d": "Pharmacy",
+  "attr_df03b4c2": "Hospitality & restaurants",
+  "attr_dbdc9141": "Medicine",
+  "attr_2f1f707b": "Medicine & health",
+  "attr_a23d2f98": "General science",
+  "attr_fc2fc74a": "Amarah",
+  "attr_308b4c85": "Fiqh",
+  "attr_057cd7d5": "Physics",
+  "attr_4cfcf3c2": "Law",
+  "attr_1429981f": "Holy Quran",
+  "attr_c8f1808b": "Kut",
+  "attr_569ec1ad": "Chemistry",
+  "attr_4469156a": "German language",
+  "attr_8bcb4c90": "English language",
+  "attr_51a02272": "Turkish language",
+  "attr_b99f79d6": "Arabic language",
+  "attr_37ae3826": "French language",
+  "attr_568f6457": "Kurdish language",
+  "attr_00ea8179": "Sales & marketing",
+  "attr_3f2ef321": "Accounting",
+  "attr_f3a2d580": "Financial accounting",
+  "attr_b4a66258": "Iraqi curriculum",
+  "attr_878d6350": "Mosul",
+  "attr_8f465ea8": "Nasiriyah",
+  "attr_1c675f3a": "Najaf",
+  "attr_1ace1501": "Oil & energy",
+  "attr_d83c25fb": "Transport & logistics",
+  "attr_45fbf259": "Engineering & construction",
+  "attr_4bfb21c0": "Adults",
+  "attr_b7e8e36b": "No experience",
+  "warrantyNo": "No warranty",
+  "attr_1fbfc2a7": "No plate",
+  "colorOrange": "Orange",
+  "attr_f8104802": "British",
+  "attr_40153b66": "Baghdad",
+  "attr_13ac665b": "Bachelor's",
+  "attr_7acac848": "Balcony",
+  "fuelPetrol": "Benzin",
+  "colorPurple": "Mor",
+  "colorBrown": "Brown",
+  "colorBeige": "Beige",
+  "offerSale": "Satılık",
+  "attr_d1c3aa46": "Health insurance",
+  "attr_8fe0629c": "Auto hold",
+  "attr_6ef15709": "Automatic climate control",
+  "attr_36db3f98": "Traction control",
+  "attr_674fb279": "Training",
+  "attr_f730823c": "Heated seats",
+  "attr_2751dcce": "Turkish",
+  "attr_5e98ac49": "Remote start",
+  "attr_0e8965c7": "IT & programming",
+  "attr_39990cf8": "Tikrit",
+  "attr_b3d78ccb": "Driver attention alert",
+  "attr_ece0d086": "Rear cross-traffic alert",
+  "attr_30ad1cb0": "Cleaning",
+  "attr_61ff3500": "Electric power steering",
+  "colorTitanium": "Titanyum",
+  "attr_5dfc333a": "High school",
+  "colorTricolor": "Tricolor",
+  "attr_2b649c53": "University",
+  "attr_3f0a5345": "Leather",
+  "attr_596cc57e": "Generator",
+  "conditionGood": "İyi",
+  "attr_e7873977": "Gardening",
+  "attr_6c532953": "Garden",
+  "attr_57bf3353": "Security",
+  "attr_9e07c1b5": "Accident history",
+  "attr_e4439193": "Water tank",
+  "attr_c6c026c9": "Gulf",
+  "attr_b3371774": "Horse",
+  "attr_bf2575b9": "Diploma",
+  "attr_f7fc7de3": "Keyless entry",
+  "attr_eebeffb8": "Heated steering wheel",
+  "attr_bc432f3e": "PhD",
+  "attr_c114e728": "Dohuk",
+  "attr_166ce8c7": "Part-time",
+  "attr_03e6fabe": "Full-time",
+  "fuelDiesel": "Dizel",
+  "genderMale": "Male",
+  "genderMales": "Males",
+  "colorGold": "Altın",
+  "attr_ed91d68c": "Salary + commission",
+  "attr_4bd160a2": "Fixed salary",
+  "attr_d9033ee1": "Radar",
+  "attr_d021c755": "Childcare",
+  "attr_f730c844": "Elderly care",
+  "attr_20484d19": "Remote parking",
+  "colorGray": "Gray",
+  "attr_9863b154": "Push-button start",
+  "attr_91d7a73d": "Reptile",
+  "attr_603ab93b": "Driver",
+  "attr_fe80509e": "Samarra",
+  "attr_ec4f948f": "Housing",
+  "attr_5ae5476a": "Fish",
+  "attr_48c1891a": "Wireless charger",
+  "attr_5f5265a7": "Display screen",
+  "propApartment": "Daire",
+  "attr_1fcda818": "Morning",
+  "attr_1980be67": "Home maintenance",
+  "attr_a78786af": "Chinese",
+  "attr_adfa037c": "Front fog lights",
+  "warrantyYes": "With warranty",
+  "attr_e579ab86": "Bird",
+  "attr_71c665ee": "Title deed",
+  "attr_7a206f76": "Cooking",
+  "attr_e5dbc387": "Iraqi",
+  "attr_da88eccb": "Arabic",
+  "attr_aa4460d5": "Head-up display (HUD)",
+  "attr_8127bee7": "Contract",
+  "attr_571581cc": "Sale contract",
+  "attr_155ac5cf": "Computer science",
+  "attr_7173aff1": "Commission",
+  "attr_e3668c0d": "Remote",
+  "fuelGas": "Gaz",
+  "attr_a1a423e6": "Laundry & ironing",
+  "furnishedNo": "Mobilyasız",
+  "attr_1a0bd9b9": "Persian",
+  "attr_29519ce6": "Sunroof",
+  "attr_aa282cda": "French",
+  "colorSilver": "Gümüş",
+  "propHotel": "Hotel",
+  "attr_eda90053": "At home",
+  "attr_d2157926": "At my office",
+  "propVilla": "Villa",
+  "attr_a826a507": "Cat",
+  "attr_4b021528": "Child lock",
+  "attr_60cbec0a": "Central locking",
+  "attr_f283f661": "Fabric",
+  "attr_df6d261d": "360° camera",
+  "attr_1f94f275": "Rear camera",
+  "attr_ea2d0f4a": "Cameras",
+  "attr_8d564a08": "Karbala",
+  "attr_aa03d946": "Kurdish",
+  "attr_4e1a505f": "Kirkuk",
+  "genderBoth": "Both",
+  "attr_f6ec7e07": "Dog",
+  "fuelElectric": "Elektrik",
+  "attr_38ad1ced": "Korean",
+  "attr_10da4bc1": "Digital cockpit",
+  "attr_3a1306fc": "Temporary",
+  "attr_0cfe7e2c": "Temporary plate",
+  "attr_9e37b135": "Master's",
+  "attr_14184253": "Intermediate",
+  "attr_5443be84": "Adaptive cruise control",
+  "deliveryFree": "Ücretsiz",
+  "propCommercial": "Commercial shop",
+  "genderMixed": "Mixed",
+  "deliveryPaid": "Ücretli",
+  "attr_463b559b": "Blind spot monitor",
+  "attr_3e6b7c47": "Heated side mirrors",
+  "attr_5e7c67c4": "Power mirrors",
+  "colorSpotted": "Spotted",
+  "propFarm": "Farm",
+  "attr_726ee881": "Mixed",
+  "attr_abbb3685": "Evening",
+  "attr_b1f57e19": "Traffic jam assist",
+  "attr_1c5815dd": "Emergency brake assist",
+  "attr_1d2d9327": "Pool",
+  "attr_908b36c3": "Tire pressure sensors",
+  "propWarehouse": "Warehouse",
+  "attr_f4bcb528": "Armrest",
+  "attr_50eeda55": "Partially repainted",
+  "attr_d7f99058": "Fully repainted",
+  "attr_c29ac455": "Elevator",
+  "furnishedYes": "Mobilyalı",
+  "attr_bc8dd527": "Massage seats",
+  "conditionFair": "Orta",
+  "attr_4827979f": "Live-in",
+  "attr_4a9d2ecf": "Bonuses",
+  "propOffice": "Office",
+  "conditionScreenBroken": "Screen cracked",
+  "conditionExcellent": "Mükemmel",
+  "attr_a274e886": "Other subjects",
+  "attr_8c812969": "Transport",
+  "attr_5830d091": "Parking",
+  "furnishedPartial": "Yarı mobilyalı",
+  "attr_d80ed6a2": "Start-stop system",
+  "attr_3b085d0f": "Harman Kardon sound system",
+  "attr_f6cf560b": "Clean",
+  "attr_301b8203": "Moving",
+  "attr_3edd4576": "Power windows",
+  "fuelHybrid": "Hibrit",
+  "attr_f0f27452": "Software engineering",
+  "attr_d50cbb11": "Hill holder",
+  "attr_a5d7347c": "Meals",
+  "colorPink": "Pembe",
+  "attr_da3d03ec": "Drive mode",
+  "attr_065a7470": "Power of attorney",
+  "attr_f5e2c57f": "Japanese",
+  "transManual": "Manuel",
+  "attr_1111f817": "Full day",
+  "yesLabel": "Evet",
+  "noLabel": "Hayır",
+  "transCvt": "CVT",
+  "resultsCount": "{count} sonuç",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortNewest": "En yeni",
+  "sortCheapest": "En ucuz",
+  "sortExpensive": "En pahalı",
+  "sortMostViewed": "En çok görüntülenen",
+  "statusSold": "Satıldı",
+  "statusDeleted": "Silindi",
+  "statusRejected": "Reddedildi",
+  "listingTypeSale": "Satılık",
+  "listingTypeRent": "Kiralık",
+  "contactPhoneAndMessages": "Telefon ve mesajlar",
+  "contactPhoneOnly": "Yalnızca telefon",
+  "contactMessagesOnly": "Yalnızca mesajlar",
+  "packageStandardFull": "Standart ilan",
+  "packageProFull": "Pro ilan",
+  "packagePremiumFull": "Premium ilan",
+  "chooseCategoryTitle": "Kategori seçin",
+  "categoriesLoadError": "Kategoriler yüklenemedi",
+  "tryDifferentSearchOrFilters": "Arama terimini veya filtreleri değiştirin",
+  "listingFallbackTitle": "İlan",
+  "validationPhoneRequired": "Telefon numaranızı girin",
+  "validationPhoneInvalid": "Geçersiz telefon numarası",
+  "validationPhoneInvalidIq": "Geçersiz Irak telefon numarası",
+  "validationOtpRequired": "6 haneli doğrulama kodunu girin",
+  "validationFieldRequired": "{field} gerekli",
+  "@validationFieldRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationPriceRequired": "Fiyatı girin",
+  "validationPriceInvalid": "Geçersiz fiyat",
+  "validationEmailRequired": "E-postanızı girin",
+  "validationEmailInvalid": "Geçersiz e-posta",
+  "validationPasswordRequired": "Şifrenizi girin",
+  "validationPasswordMinLength": "Şifre en az {count} karakter olmalı",
+  "@validationPasswordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "validationPasswordLowercase": "Küçük harf ekleyin (a-z)",
+  "validationPasswordUppercase": "Büyük harf ekleyin (A-Z)",
+  "validationPasswordDigit": "Rakam ekleyin (0-9)",
+  "validationPasswordSymbol": "Özel karakter ekleyin (!@#...)",
+  "validationConfirmPasswordRequired": "Şifrenizi onaylayın",
+  "validationPasswordMismatch": "Şifreler eşleşmiyor",
+  "validationWeakPassword": "Şifre en az 8 karakter; büyük, küçük harf, rakam ve sembol içermeli",
+  "authNetworkError": "İnternet bağlantınızı kontrol edin",
+  "authRateLimitGeneric": "Çok fazla istek. Bir dakika bekleyin.",
+  "authRateLimitSeconds": "Çok fazla istek. {seconds} saniye bekleyin.",
+  "@authRateLimitSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "authInvalidCredentials": "E-posta veya şifre hatalı.",
+  "authInvalidEmail": "Geçersiz e-posta",
+  "authEmailExists": "Bu e-posta zaten kayıtlı",
+  "authEmailNotConfirmed": "Giriş yapmadan önce e-postanızı onaylayın.",
+  "authSignupDisabled": "Kayıt şu anda kullanılamıyor.",
+  "authSmsFailed": "SMS gönderilemedi.",
+  "authPhoneInvalidFormat": "Geçersiz telefon. +9647XXXXXXXX kullanın.",
+  "authGenericError": "Kimlik doğrulama başarısız.",
+  "authOperationFailed": "İşlem tamamlanamadı.",
+  "loginRequiredFirst": "Önce giriş yapmalısınız",
+  "metaPropertyType": "Mülk tipi",
+  "metaOfferType": "İlan tipi",
+  "metaArea": "Alan",
+  "metaFloor": "Kat",
+  "metaTotalFloors": "Toplam kat",
+  "metaRooms": "Oda sayısı",
+  "metaBathrooms": "Banyo sayısı",
+  "metaBuildingAge": "Bina yaşı",
+  "metaFurnishing": "Eşya durumu",
+  "metaYear": "Yıl",
+  "metaTrim": "Donanım",
+  "metaEngine": "Motor",
+  "metaCylinders": "Silindir",
+  "metaLanguages": "Diller",
+  "metaSalary": "Maaş",
+  "metaExperience": "Deneyim",
+  "metaGender": "Cinsiyet",
+  "metaAge": "Yaş",
+  "metaBreed": "Irk",
+  "metaServiceType": "Hizmet tipi",
+  "metaAvailability": "Müsaitlik",
+  "metaBrand": "Marka",
+  "metaModel": "Model",
+  "metaStorage": "Depolama",
+  "metaCondition": "Durum",
+  "metaItemType": "Ürün tipi",
+  "metaSubject": "Konu",
+  "metaLevel": "Seviye",
+  "metaJobType": "İş tipi",
+  "metaWorkMode": "Çalışma şekli",
+  "metaEducation": "Eğitim",
+  "metaDetailsSection": "Detaylar",
+  "bodyConditionTitle": "Kasa ve Boya Durumu",
+  "bodyPartSelected": "{selected}/{total} parça seçildi",
+  "@bodyPartSelected": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bodyPartOriginal": "Orijinal",
+  "bodyPartLocalPaint": "Yerel Boya",
+  "bodyPartPainted": "Boyalı",
+  "bodyPartReplaced": "Değiştirilmiş",
+  "next": "İleri",
+  "allCarPartsOriginalFull": "Tüm araç parçaları orijinal. Boyalı veya değiştirilmiş parça yok.",
+  "carPaintPanelFrontBumper": "Ön tampon",
+  "carPaintPanelHood": "Kaput",
+  "carPaintPanelFrontLeftFender": "Sol ön çamurluk",
+  "carPaintPanelFrontRightFender": "Sağ ön çamurluk",
+  "carPaintPanelFrontLeftDoor": "Sol ön kapı",
+  "carPaintPanelFrontRightDoor": "Sağ ön kapı",
+  "carPaintPanelRoof": "Tavan",
+  "carPaintPanelRearLeftDoor": "Sol arka kapı",
+  "carPaintPanelRearRightDoor": "Sağ arka kapı",
+  "carPaintPanelTrunk": "Bagaj kapağı",
+  "carPaintPanelRearLeftFender": "Sol arka çamurluk",
+  "carPaintPanelRearRightFender": "Sağ arka çamurluk",
+  "carPaintPanelRearBumper": "Arka tampon",
+  "locationPickerTitle": "Konum Belirle",
+  "locationCoordinates": "Koordinatlar",
+  "locationUseCurrentLocation": "Mevcut Konumumu Kullan",
+  "locationConfirm": "Konumu Onayla",
+  "locationMapUnavailableStatus": "Harita kullanılamıyor. Varsayılan Bağdat konumunu onaylayabilir veya pencereyi kapatabilirsiniz.",
+  "locationMapLoadFailedStatus": "Harita yüklenemedi. Varsayılan Bağdat konumu kullanıldı.",
+  "locationGpsFailedSnack": "Konumunuz belirlenemedi. Varsayılan Bağdat konumu kullanıldı.",
+  "locationFetchFailedSnack": "Konum alınamadı",
+  "locationMapUnavailable": "Harita kullanılamıyor",
+  "locationLoadingMap": "Harita yükleniyor...",
+  "statYear": "Yıl",
+  "statCategory": "Kategori",
+  "statKm": "KM",
+  "statMile": "Mil",
+  "statEngine": "Motor",
+  "statCylinders": "Silindir",
+  "sectionDetails": "Detaylar",
+  "sectionSpecs": "Özellikler",
+  "sectionBodyCondition": "Kasa ve Boya",
+  "listedOn": "Yayın Tarihi",
+  "fieldCondition": "Durum",
+  "fieldPaintCondition": "Boya Durumu",
+  "fieldFuel": "Yakıt",
+  "fieldImportCountry": "İthalat Ülkesi",
+  "fieldPlate": "Plaka",
+  "fieldTransmission": "Şanzıman",
+  "fieldSeats": "Koltuk Sayısı",
+  "fieldSeatMaterial": "Koltuk Malzemesi",
+  "fieldColor": "Renk",
+  "metaDeliveryCost": "Teslimat ücreti",
+  "metaPricePerHour": "Saatlik ücret",
+  "metaSalaryMin": "Minimum maaş",
+  "metaSalaryMax": "Maksimum maaş",
+  "metaSector": "Sektör",
+  "metaExperienceRequired": "Gerekli deneyim",
+  "metaEducationRequired": "Gerekli eğitim",
+  "metaGenderPreference": "Cinsiyet tercihi",
+  "metaTeachingMethod": "Öğretim yöntemi",
+  "metaQualifications": "Nitelikler",
+  "metaStudyStages": "Eğitim kademeleri",
+  "metaAnimalType": "Hayvan türü",
+  "metaHasPapers": "Belgeli",
+  "metaVaccinated": "Aşılı",
+  "metaTrained": "Eğitimli",
+  "metaDaysPerWeek": "Haftalık gün",
+  "metaExpectedSalary": "Beklenen maaş",
+  "metaWorkHours": "Çalışma saatleri",
+  "metaAgeMonths": "{count} ay",
+  "@metaAgeMonths": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metaRam": "RAM",
+  "metaBatteryHealth": "Pil sağlığı",
+  "metaWarranty": "Garanti",
+  "metaProcessor": "İşlemci",
+  "metaScreenSize": "Ekran boyutu",
+  "metaResolution": "Çözünürlük",
+  "metaWithBox": "Kutulu",
+  "metaWithCharger": "Şarj cihazlı",
+  "metaSmartTv": "Smart TV",
+  "mainCategory": "Ana Kategori",
+  "subCategory": "Alt Kategori",
+  "categoryDetail": "Detay",
+  "termsTitle": "Kullanım Şartları",
+  "termsSection1Title": "Giriş",
+  "termsSection1Body": "Souqak'a hoş geldiniz. Uygulamayı kullanarak veya hesap oluşturarak bu şartları kabul etmiş olursunuz. Lütfen dikkatlice okuyun.",
+  "termsSection2Title": "Uygulama Kullanımı",
+  "termsSection2Body": "Souqak'ı Irak yasaları çerçevesinde mal ve hizmet alıp satmak için kullanabilirsiniz. Yanıltıcı, yasa dışı veya rahatsız edici içerik paylaşmak yasaktır.",
+  "termsSection3Title": "Kullanıcı Hakları",
+  "termsSection3Body": "Paylaştığınız içeriğin mülkiyeti size aittir. Profilinizi, ilanlarınızı düzenleme ve hesabınızı silme hakkına sahipsiniz.",
+  "termsSection4Title": "Sorumluluklar",
+  "termsSection4Body": "Hesap bilgilerinizin, ilanlarınızın ve diğer kullanıcılarla etkileşimlerinizin doğruluğundan siz sorumlusunuz. Souqak aracı bir platformdur.",
+  "termsSection5Title": "Hizmetin Sonlandırılması",
+  "termsSection5Body": "Bu şartları ihlal etmeniz veya sahte faaliyet şüphesi durumunda hesabınızı askıya alabilir veya sonlandırabiliriz.",
+  "privacyTitle": "Gizlilik Politikası",
+  "privacySection1Title": "Topladığımız Bilgiler",
+  "privacySection1Body": "Kayıt sırasında sağladığınız ad, e-posta, telefon numarası ve kullanıcı adı gibi bilgileri, yayınladığınız ilan verilerini ve uygulama içi mesajlarınızı topluyoruz. Güvenlik ve hizmet iyileştirme amacıyla cihaz türü ve IP adresi gibi teknik veriler de toplanabilir.",
+  "privacySection2Title": "Verilerinizi Nasıl Kullanıyoruz",
+  "privacySection2Body": "Verilerinizi hesabınızı işletmek, ilanlarınızı göstermek, kullanıcılar arası iletişimi sağlamak ve akıllı uyarılar ile mesajlarla ilgili bildirimler göndermek için kullanıyoruz. Ayrıca deneyimi iyileştirmek, dolandırıcılığı önlemek ve platform güvenliğini sağlamak için toplu veriler kullanılır.",
+  "privacySection3Title": "Veri Paylaşımı",
+  "privacySection3Body": "Kişisel verilerinizi üçüncü taraflara satmıyoruz. Veri barındırma ve bildirim gönderme konusunda yardımcı olan hizmet sağlayıcılarla sınırlı bilgi paylaşabiliriz. Yasal talep veya kullanıcı haklarını ve platform güvenliğini korumak için bilgi açıklanabilir.",
+  "privacySection4Title": "Veri Güvenliği",
+  "privacySection4Body": "Verilerinizi yetkisiz erişim, kayıp veya değişiklikten korumak için teknik ve organizasyonel önlemler uyguluyoruz. Ancak internet üzerinden yapılan aktarımlarda mutlak güvenlik garanti edilemez; güçlü bir şifre kullanmanızı ve giriş bilgilerinizi paylaşmamanızı öneririz.",
+  "privacySection5Title": "Bize Ulaşın",
+  "privacySection5Body": "Gizlilik politikası hakkında sorularınız varsa veya veri haklarınızı kullanmak istiyorsanız, uygulama ayarlarındaki destek e-postası üzerinden bizimle iletişime geçebilirsiniz. Taleplerinize yürürlükteki yasalara uygun şekilde en kısa sürede yanıt vereceğiz.",
+  "packageDurationDays": "{count} gün",
+  "@packageDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkgStandardFeature1Title": "Temel ilan",
+  "pkgStandardFeature1Desc": "Arama sonuçlarında standart ilanlar arasında yayınlanır",
+  "pkgStandardFeature2Title": "Mesaj ve arama",
+  "pkgStandardFeature2Desc": "Alıcılar tercihlerinize göre size ulaşır",
+  "pkgProFeature1Title": "Doğrulanmış profil rozeti",
+  "pkgProFeature1Desc": "İlan kartında alıcı güvenini artırır",
+  "pkgProFeature2Title": "Daha yüksek görünürlük",
+  "pkgProFeature2Desc": "Aynı kategoride standart ilanların üstünde gösterilir",
+  "pkgProFeature3Title": "İstatistikler",
+  "pkgProFeature3Desc": "İlanınız için görüntülenme ve etkileşim",
+  "pkgPremiumFeature1Title": "Öne çıkan carousel",
+  "pkgPremiumFeature1Desc": "Ana sayfadaki öne çıkan bölümde gösterilir",
+  "pkgPremiumFeature2Title": "En üst sıralama",
+  "pkgPremiumFeature2Desc": "Arama ve kategori sonuçlarında en yüksek öncelik",
+  "pkgPremiumFeature3Title": "Artırılmış görünürlük",
+  "pkgPremiumFeature3Desc": "Görüntülenmeleri artırmak için belirgin yerleşim",
+  "pkgProFeature4Title": "Haftalık otomatik yenileme",
+  "pkgProFeature4Desc": "İlanınız her hafta kategorisinin başına döner",
+  "pkgProFeature5Title": "Daha fazla fotoğraf ve video",
+  "pkgProFeature5Desc": "İlanınıza 15 fotoğraf ve bir video ekleyin",
+  "pkgProFeature6Title": "Doğrudan WhatsApp düğmesi",
+  "pkgProFeature6Desc": "İlan kartından anında WhatsApp ile iletişim",
+  "pkgProFeature7Title": "Pro çerçeve ve rozet",
+  "pkgProFeature7Desc": "Ayırt edici çerçeve ve \"Pro\" rozeti ilanınızı öne çıkarır",
+  "pkgPremiumFeature4Title": "Günlük otomatik yenileme",
+  "pkgPremiumFeature4Desc": "İlanınız her gün kategorisinin başına döner",
+  "pkgPremiumFeature5Title": "İlgili alıcıları bilgilendir",
+  "pkgPremiumFeature5Desc": "Kategorinizle ilgilenen alıcılar bildirim alır",
+  "pkgPremiumFeature6Title": "Gelişmiş istatistikler",
+  "pkgPremiumFeature6Desc": "Ayrıntılı analiz: görüntülenme kaynakları ve yoğun saatler",
+  "loadingMore": "Daha fazla yükleniyor...",
+  "currentPhotos": "Mevcut fotoğraflar",
+  "completePayment": "Ödemeyi Tamamla",
+  "paymentSuccess": "Ödeme Başarılı ✓",
+  "paymentFailed": "Ödeme başarısız, lütfen tekrar deneyin",
+  "startPayment": "Ödemeyi başlat"
 }

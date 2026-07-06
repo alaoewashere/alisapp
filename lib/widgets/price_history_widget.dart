@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../core/providers/locale_provider.dart';
+import '../core/l10n/l10n_provider.dart';
+import '../l10n/app_localizations.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/arabic_number.dart';
 import '../core/utils/currency_formatter.dart';
@@ -26,16 +29,17 @@ class PriceHistoryWidget extends ConsumerWidget {
         if (!data.hasChanges || data.timeline.isEmpty) {
           return const SizedBox.shrink();
         }
-        return _PriceHistoryCard(data: data);
+        return _PriceHistoryCard(data: data, strings: ref.watch(appLocalizationsProvider));
       },
     );
   }
 }
 
 class _PriceHistoryCard extends StatelessWidget {
-  const _PriceHistoryCard({required this.data});
+  const _PriceHistoryCard({required this.data, required this.strings});
 
   final PriceHistoryData data;
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +68,7 @@ class _PriceHistoryCard extends StatelessWidget {
               Icon(Icons.show_chart_rounded, size: 20, color: trendColor),
               const SizedBox(width: 8),
               Text(
-                'تاريخ السعر',
+                strings.priceHistoryTitle,
                 style: AppFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -74,7 +78,7 @@ class _PriceHistoryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _SummaryBanner(data: data),
+          _SummaryBanner(data: data, strings: strings),
           const SizedBox(height: 12),
           SizedBox(
             height: 80,
@@ -90,6 +94,7 @@ class _PriceHistoryCard extends StatelessWidget {
             return _TimelineRow(
               point: point,
               showConnector: !isLast,
+              strings: strings,
             );
           }),
         ],
@@ -99,9 +104,18 @@ class _PriceHistoryCard extends StatelessWidget {
 }
 
 class _SummaryBanner extends StatelessWidget {
-  const _SummaryBanner({required this.data});
+  const _SummaryBanner({required this.data, required this.strings});
 
   final PriceHistoryData data;
+  final AppLocalizations strings;
+
+  String _formatDuration(DateTime from, DateTime to) {
+    final weeks = (to.difference(from).inDays / 7).floor();
+    if (weeks <= 0) return strings.lessThanOneWeek;
+    if (weeks == 1) return strings.oneWeek;
+    if (weeks == 2) return strings.twoWeeks;
+    return strings.weeksCount('$weeks');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,15 +125,15 @@ class _SummaryBanner extends StatelessWidget {
         : Colors.amber.withValues(alpha: 0.12);
     final fg = dropped ? AppColors.primary : Colors.amber.shade800;
     final icon = dropped ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded;
-    final from = formatIqd(data.originalPrice);
-    final to = formatIqd(data.currentPrice);
-    final duration = formatPriceHistoryDurationAr(data.listedAt, DateTime.now());
+    final from = formatIqdWithL10n(data.originalPrice, strings);
+    final to = formatIqdWithL10n(data.currentPrice, strings);
+    final duration = _formatDuration(data.listedAt, DateTime.now());
     final pct = data.totalPercentFromOriginal.abs().round();
     final pctLabel = '${dropped ? '↓' : '↑'} $pct%';
 
     final message = dropped
-        ? 'انخفض السعر من $from إلى $to خلال $duration'
-        : 'ارتفع السعر من $from إلى $to';
+        ? strings.priceDroppedSummary(from, to, duration)
+        : strings.priceIncreasedSummary(from, to);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -221,17 +235,20 @@ class _PriceSparkline extends StatelessWidget {
   }
 }
 
-class _TimelineRow extends StatelessWidget {
+class _TimelineRow extends ConsumerWidget {
   const _TimelineRow({
     required this.point,
     required this.showConnector,
+    required this.strings,
   });
 
   final PriceHistoryPoint point;
   final bool showConnector;
+  final AppLocalizations strings;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
     final increased = (point.changeAmount ?? 0) > 0;
     final decreased = (point.changeAmount ?? 0) < 0;
 
@@ -290,7 +307,7 @@ class _TimelineRow extends StatelessWidget {
                 children: [
                   if (point.isOriginal)
                     Text(
-                      'السعر الأصلي',
+                      strings.originalPriceLabel,
                       style: AppFonts.cairo(
                         fontSize: 11,
                         color: AppColors.textMuted,
@@ -298,7 +315,7 @@ class _TimelineRow extends StatelessWidget {
                     ),
                   if (point.isCurrent)
                     Text(
-                      'السعر الحالي',
+                      strings.currentPriceLabel,
                       style: AppFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -308,7 +325,7 @@ class _TimelineRow extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        formatIqd(point.price),
+                        formatIqdWithL10n(point.price, strings),
                         style: AppFonts.cairo(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -325,7 +342,7 @@ class _TimelineRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    formatListingPublicationDateAr(point.at),
+                    formatListingPublicationDate(point.at, locale),
                     style: AppFonts.cairo(
                       fontSize: 12,
                       color: AppColors.textMuted,

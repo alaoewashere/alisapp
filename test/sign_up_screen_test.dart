@@ -33,12 +33,15 @@ void main() {
 
     await tester.pump();
 
-    expect(find.text('أنشئ حسابك'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsNWidgets(2));
+    expect(find.text('أنشئ حسابك'), findsNothing);
     expect(find.text('تخطي'), findsOneWidget);
     expect(find.byType(ClipPath), findsNothing);
     expect(find.text('الاسم الأول'), findsOneWidget);
     expect(find.text('الاسم الأخير'), findsOneWidget);
+    expect(find.text('اسم المستخدم'), findsNothing);
+    expect(find.text('شروط الاستخدام'), findsOneWidget);
+    expect(find.text('سياسة الخصوصية'), findsOneWidget);
     expect(find.text('تأكيد كلمة المرور'), findsOneWidget);
     expect(find.text('رقم الهاتف'), findsNothing);
     expect(find.text('سجّل دخولك'), findsOneWidget);

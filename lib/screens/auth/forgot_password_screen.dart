@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/result.dart';
 import '../../core/utils/validators.dart';
@@ -14,6 +15,10 @@ import '../../shared/widgets/app_back_button.dart';
 import '../../features/auth/widgets/auth_hero_header.dart';
 
 enum _RecoveryMethod { email, phone }
+
+// WhatsApp OTP costs money per message — off until Twilio is funded.
+// Flip to true once TWILIO_* secrets are configured.
+const _phoneRecoveryEnabled = false;
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -66,6 +71,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _onSendPressed() async {
+    final strings = ref.read(appLocalizationsProvider);
     setState(() => _inlineError = null);
 
     if (_selectedMethod == _RecoveryMethod.email) {
@@ -86,7 +92,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           if (!value) {
             setState(() {
               _sending = false;
-              _inlineError = 'هذا البريد غير مسجل لدينا';
+              _inlineError = strings.emailNotRegistered;
             });
             return;
           }
@@ -142,7 +148,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         if (!value) {
           setState(() {
             _sending = false;
-            _inlineError = 'هذا الرقم غير مسجل لدينا';
+            _inlineError = strings.phoneNotRegistered;
           });
           return;
         }
@@ -174,17 +180,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.canvas,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AuthDarkHeader(
-              title: 'نسيت كلمة المرور؟',
-              subtitle: 'اختر طريقة استعادة حسابك',
-              leading: AppBackButton(onPressed: _goBack),
+    final strings = ref.watch(appLocalizationsProvider);
+
+    return Scaffold(
+      backgroundColor: AppColors.canvas,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AuthDarkHeader(
+            title: strings.forgotPassword,
+            subtitle: strings.chooseRecoveryMethod,
+            leading: AppBackButton(onPressed: _goBack),
+              logo: const AuthHeaderLogo(),
               titleStyle: AppFonts.sans(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -201,8 +208,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     _RecoveryOptionCard(
                       selected: _selectedMethod == _RecoveryMethod.email,
                       icon: Icons.email_outlined,
-                      label: 'متابعة عبر البريد الإلكتروني',
-                      sublabel: 'بريدك المرتبط بالحساب',
+                      label: strings.continueViaEmail,
+                      sublabel: strings.linkedEmailHint,
                       onTap: () {
                         setState(() {
                           _selectedMethod = _RecoveryMethod.email;
@@ -210,23 +217,25 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         });
                       },
                     ),
-                    const SizedBox(height: 12),
-                    _RecoveryOptionCard(
-                      selected: _selectedMethod == _RecoveryMethod.phone,
-                      icon: Icons.phone_outlined,
-                      label: 'متابعة عبر الهاتف',
-                      sublabel: 'هاتفك المرتبط بالحساب',
-                      onTap: () {
-                        setState(() {
-                          _selectedMethod = _RecoveryMethod.phone;
-                          _inlineError = null;
-                        });
-                      },
-                    ),
+                    if (_phoneRecoveryEnabled) ...[
+                      const SizedBox(height: 12),
+                      _RecoveryOptionCard(
+                        selected: _selectedMethod == _RecoveryMethod.phone,
+                        icon: Icons.phone_outlined,
+                        label: strings.continueViaPhone,
+                        sublabel: strings.linkedPhoneHint,
+                        onTap: () {
+                          setState(() {
+                            _selectedMethod = _RecoveryMethod.phone;
+                            _inlineError = null;
+                          });
+                        },
+                      ),
+                    ],
                     if (_selectedMethod == _RecoveryMethod.email) ...[
                       const SizedBox(height: 20),
                       AuthPillField(
-                        label: 'البريد الإلكتروني',
+                        label: strings.emailLabel,
                         controller: _emailController,
                         hintText: 'example@email.com',
                         keyboardType: TextInputType.emailAddress,
@@ -242,7 +251,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     if (_selectedMethod == _RecoveryMethod.phone) ...[
                       const SizedBox(height: 20),
                       Text(
-                        'رقم الهاتف',
+                        strings.phoneNumber,
                         style: AppFonts.sans(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -274,7 +283,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     ],
                     const SizedBox(height: 28),
                     AuthPrimaryButton(
-                      label: 'إرسال',
+                      label: strings.sendAction,
                       loading: _sending,
                       loginStyle: true,
                       onPressed: _sending ? null : _onSendPressed,
@@ -285,7 +294,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 }

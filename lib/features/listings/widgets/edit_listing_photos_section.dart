@@ -5,6 +5,7 @@ import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../providers/edit_listing_provider.dart';
 import '../providers/post_listing_provider.dart';
 import 'image_picker_grid.dart';
@@ -21,6 +22,7 @@ class EditListingPhotosSection extends ConsumerWidget {
     final post = ref.watch(postListingProvider);
     final notifier = ref.read(editListingProvider(listingId).notifier);
     final postNotifier = ref.read(postListingProvider.notifier);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -28,7 +30,7 @@ class EditListingPhotosSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'الصور',
+            strings.photosTitle,
             style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,

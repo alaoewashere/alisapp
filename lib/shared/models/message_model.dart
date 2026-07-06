@@ -8,6 +8,10 @@ class MessageModel {
     this.isRead = false,
     required this.createdAt,
     this.isPending = false,
+    this.listingId,
+    this.listingTitle,
+    this.listingImage,
+    this.listingPrice,
   });
 
   final String id;
@@ -18,6 +22,17 @@ class MessageModel {
   final bool isRead;
   final DateTime createdAt;
   final bool isPending;
+
+  /// Set when this message is a "listing share" — a snapshot of the listing
+  /// at the moment it was shared, so it stays accurate even if the seller
+  /// later edits price/title, or the buyer moves on to asking about another
+  /// listing with the same seller in this same thread.
+  final String? listingId;
+  final String? listingTitle;
+  final String? listingImage;
+  final double? listingPrice;
+
+  bool get isListingCard => listingId != null;
 
   bool isMine(String currentUserId) => senderId == currentUserId;
 
@@ -30,6 +45,10 @@ class MessageModel {
     bool? isRead,
     DateTime? createdAt,
     bool? isPending,
+    String? listingId,
+    String? listingTitle,
+    String? listingImage,
+    double? listingPrice,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -40,9 +59,15 @@ class MessageModel {
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
       isPending: isPending ?? this.isPending,
+      listingId: listingId ?? this.listingId,
+      listingTitle: listingTitle ?? this.listingTitle,
+      listingImage: listingImage ?? this.listingImage,
+      listingPrice: listingPrice ?? this.listingPrice,
     );
   }
 
+  /// [json] may carry a resolved `listing_title`/`listing_image`/`listing_price`
+  /// snapshot (injected by the repository) when `listing_id` is set.
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
       id: json['id'] as String,
@@ -52,6 +77,10 @@ class MessageModel {
       imageUrl: json['image_url'] as String?,
       isRead: json['is_read'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
+      listingId: json['listing_id'] as String?,
+      listingTitle: json['listing_title'] as String?,
+      listingImage: json['listing_image'] as String?,
+      listingPrice: (json['listing_price'] as num?)?.toDouble(),
     );
   }
 
@@ -64,6 +93,7 @@ class MessageModel {
       'body': content,
       'is_read': isRead,
       'created_at': createdAt.toIso8601String(),
+      'listing_id': listingId,
     };
   }
 
@@ -73,6 +103,7 @@ class MessageModel {
       'sender_id': senderId,
       'content': content,
       'body': content,
+      if (listingId != null) 'listing_id': listingId,
     };
   }
 }

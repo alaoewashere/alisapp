@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/l10n/listing_attribute_locale.dart';
+import '../../../l10n/app_localizations.dart';
 import '../constants/vehicle_listing_options.dart';
 import 'vehicle_form_field_card.dart';
 
@@ -33,12 +36,12 @@ class VehicleColorPicker extends StatelessWidget {
     ],
   );
 
-  String? get _displayLabel {
+  String? _displayLabel(AppLocalizations strings) {
     if (selectedColor == null || selectedColor!.isEmpty) return null;
     if (VehicleCarColors.isOtherLabel(selectedColor)) {
-      return VehicleCarColors.otherLabel;
+      return localizeListingAttribute(VehicleCarColors.otherLabel, strings);
     }
-    return selectedColor;
+    return localizeListingAttribute(selectedColor, strings);
   }
 
   Color? _parseCustomHex() {
@@ -60,6 +63,7 @@ class VehicleColorPicker extends StatelessWidget {
   }
 
   Future<void> _openCustomPicker(BuildContext context) async {
+    final strings = context.l10n;
     var pickerColor = _parseCustomHex() ?? Colors.deepOrange;
 
     final confirmed = await showModalBottomSheet<bool>(
@@ -97,9 +101,9 @@ class VehicleColorPicker extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'اختر لوناً مخصصاً',
-                          style: TextStyle(
+                        Text(
+                          strings.chooseCustomColorTitle,
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textDark,
@@ -129,7 +133,7 @@ class VehicleColorPicker extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text('تأكيد'),
+                            child: Text(strings.confirm),
                           ),
                         ),
                       ],
@@ -162,7 +166,8 @@ class VehicleColorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayLabel = _displayLabel;
+    final strings = context.l10n;
+    final displayLabel = _displayLabel(strings);
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -172,16 +177,16 @@ class VehicleColorPicker extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text(
-                  'اللون',
-                  style: TextStyle(
+                Text(
+                  strings.colorLabel,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textMuted,
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  displayLabel ?? 'اختر اللون',
+                  displayLabel ?? strings.chooseColorPlaceholder,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: displayLabel != null
@@ -200,7 +205,7 @@ class VehicleColorPicker extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: VehicleCarColors.options.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final option = VehicleCarColors.options[index];
                   return _ColorSwatch(

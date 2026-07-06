@@ -6,19 +6,19 @@ void main() {
     test('resolves all root category packs including home_help', () {
       expect(
         CategoryAssetIcons.assetForSlug('cars'),
-        'assets/car-icons/car-main-category.png',
+        'assets/main_categories_icon/المركبات.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('real_estate'),
-        'assets/real-estate-icons/real-estate.png',
+        'assets/main_categories_icon/العقارات.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('electronics'),
-        'assets/electronics-icons/Main.png',
+        'assets/main_categories_icon/الالكترونيات.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('buy_sell'),
-        'assets/usedandnewmarketicons/main-for-used-and-new-market.png',
+        'assets/main_categories_icon/سوق المستعمل والجديد.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('souq_mobile'),
@@ -26,19 +26,19 @@ void main() {
       );
       expect(
         CategoryAssetIcons.assetForSlug('tutoring'),
-        'assets/special-lesson/main.png',
+        'assets/main_categories_icon/دروس خصوصيه.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('jobs'),
-        'assets/jobs-icons/main.png',
+        'assets/main_categories_icon/فرص عمل.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('pets'),
-        'assets/animals-icons/main.png',
+        'assets/main_categories_icon/الحيوانات.png',
       );
       expect(
         CategoryAssetIcons.assetForSlug('home_help'),
-        'assets/assistant/main.png',
+        'assets/main_categories_icon/مساعده منزليه.png',
       );
     });
 

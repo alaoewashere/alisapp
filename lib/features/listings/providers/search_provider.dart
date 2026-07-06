@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/search_analytics.dart';
 import '../../../shared/models/listing_model.dart';
@@ -229,7 +231,17 @@ class SearchResultsNotifier extends Notifier<SearchResultsState> {
   FilterModel _filter = const FilterModel();
 
   @override
-  SearchResultsState build() => const SearchResultsState();
+  SearchResultsState build() {
+    ref.listen<Locale>(localeProvider, (previous, next) {
+      if (previous != null &&
+          previous != next &&
+          _filter.hasFilters &&
+          !state.isLoading) {
+        unawaited(search(_filter, log: false));
+      }
+    });
+    return const SearchResultsState();
+  }
 
   FilterModel get currentFilter => _filter;
 

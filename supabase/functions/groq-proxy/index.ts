@@ -1,5 +1,5 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 import { corsHeaders, jsonResponse } from '../_shared/security.ts'
 
@@ -7,7 +7,7 @@ const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
 const TIMEOUT_MS = 25_000
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const origin = req.headers.get('Origin')
 
   if (req.method === 'OPTIONS') {
@@ -50,18 +50,23 @@ serve(async (req) => {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
+    // response_format is forwarded only when the caller asks for it (e.g. the
+    // price estimator wants json_object); translation omits it for plain text.
+    const payload: Record<string, unknown> = {
+      model: body.model ?? DEFAULT_MODEL,
+      temperature: body.temperature ?? 0.2,
+      messages,
+    }
+    if (body.response_format) payload.response_format = body.response_format
+    if (body.max_tokens) payload.max_tokens = body.max_tokens
+
     const groqResponse = await fetch(GROQ_ENDPOINT, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${groqKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: body.model ?? DEFAULT_MODEL,
-        temperature: body.temperature ?? 0.2,
-        response_format: body.response_format ?? { type: 'json_object' },
-        messages,
-      }),
+      body: JSON.stringify(payload),
       signal: controller.signal,
     }).finally(() => clearTimeout(timer))
 

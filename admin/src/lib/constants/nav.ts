@@ -5,6 +5,7 @@ import {
   Flag,
   FolderTree,
   LayoutDashboard,
+  MessageCircle,
   Settings,
   Shield,
   ShieldCheck,
@@ -18,8 +19,8 @@ export interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
-  /** When true, the reports unread badge renders on this item. */
-  badge?: "reports";
+  /** When set, the matching unread badge renders on this item. */
+  badge?: "reports" | "support";
 }
 
 export const navItems: NavItem[] = [
@@ -30,6 +31,7 @@ export const navItems: NavItem[] = [
   { href: "/dashboard/verification", label: "التوثيق", icon: ShieldCheck },
   { href: "/dashboard/ratings", label: "التقييمات", icon: Star },
   { href: "/dashboard/reports", label: "البلاغات", icon: Flag, badge: "reports" },
+  { href: "/dashboard/support-messages", label: "الدعم", icon: MessageCircle, badge: "support" },
   { href: "/dashboard/categories", label: "الفئات", icon: FolderTree },
   { href: "/dashboard/blocked-words", label: "كلمات محظورة", icon: Ban },
   { href: "/dashboard/moderation", label: "إدارة المخالفات", icon: Shield },

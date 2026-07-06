@@ -58,45 +58,13 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
     }
   }
 
-  String _continueLabel(AppLocalizations strings) {
-    return switch (_selectedCode) {
-      'en' => strings.continueAction,
-      'tr' => strings.continueAction,
-      'ku' => 'بەردەوامبە',
-      _ => strings.continueAction,
-    };
-  }
-
-  String _welcomeTitle() {
-    return switch (_selectedCode) {
-      'en' => 'Welcome to Sello',
-      'tr' => 'Sello\'ya Hoş Geldiniz',
-      'ku' => 'بەخێربێیت بۆ سێلو',
-      _ => 'مرحباً بك في سيلو',
-    };
-  }
-
-  String _chooseSubtitle() {
-    return switch (_selectedCode) {
-      'en' => 'Choose your language',
-      'tr' => 'Dilinizi seçin',
-      'ku' => 'زمانەکەت هەڵبژێرە',
-      _ => 'اختر لغتك',
-    };
-  }
-
-  String _settingsHint() {
-    return switch (_selectedCode) {
-      'en' => 'You can change the language anytime in Settings',
-      'tr' => 'Dili istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz',
-      'ku' => 'دەتوانیت زمان لە هەر کاتێکدا لە ڕێکخستنەکان بگۆڕیت',
-      _ => 'يمكنك تغيير اللغة في أي وقت من الإعدادات',
-    };
-  }
+  String _continueLabel(AppLocalizations strings) => strings.continueAction;
 
   @override
   Widget build(BuildContext context) {
     final strings = ref.watch(appLocalizationsProvider);
+    final previewStrings =
+        lookupAppLocalizations(normalizeAppLocale(Locale(_selectedCode)));
     final textDirection = _selectedCode == 'en' || _selectedCode == 'tr'
         ? TextDirection.ltr
         : TextDirection.rtl;
@@ -132,19 +100,25 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                       ],
                       Text(
                         widget.isOnboarding
-                            ? _welcomeTitle()
+                            ? previewStrings.welcomeToSouqak
                             : strings.chooseLanguage,
                         textAlign: TextAlign.center,
-                        style: AppFonts.cairo(
-                          fontSize: widget.isOnboarding ? 24 : 20,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.pureWhite,
-                        ),
+                        style: _selectedCode == 'ar' && widget.isOnboarding
+                            ? AppFonts.brandNameArDisplay(
+                                fontSize: 24,
+                                color: AppColors.pureWhite,
+                                height: 1.2,
+                              )
+                            : AppFonts.cairo(
+                                fontSize: widget.isOnboarding ? 24 : 20,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.pureWhite,
+                              ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         widget.isOnboarding
-                            ? _chooseSubtitle()
+                            ? previewStrings.chooseYourLanguage
                             : strings.changeLanguage,
                         textAlign: TextAlign.center,
                         style: AppFonts.cairo(
@@ -171,7 +145,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                   child: Text(
-                    _settingsHint(),
+                    previewStrings.languageChangeHint,
                     textAlign: TextAlign.center,
                     style: AppFonts.cairo(
                       fontSize: 12,
@@ -189,7 +163,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                     onPressed: _continue,
                     child: Text(
                       widget.isOnboarding
-                          ? _continueLabel(strings)
+                          ? _continueLabel(previewStrings)
                           : strings.save,
                       style: AppFonts.cairo(
                         fontSize: 15,

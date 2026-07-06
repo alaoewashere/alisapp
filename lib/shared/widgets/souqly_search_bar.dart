@@ -39,6 +39,7 @@ class SouqlySearchBar extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
+                key: controller != null ? const Key('home_search_field') : null,
                 controller: controller,
                 onChanged: onChanged,
                 onSubmitted: onSubmitted,

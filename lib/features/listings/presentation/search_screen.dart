@@ -7,11 +7,13 @@ import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/browse_categories.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/category_navigation.dart';
 import '../../../core/utils/category_tree.dart';
+import '../../../core/utils/secure_log.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/filter_model.dart';
 import '../data/categories_repository.dart';
@@ -35,26 +37,44 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _focusNode = FocusNode();
   final _smartAlertsButtonKey = GlobalKey();
   bool _showSmartAlertsTutorial = false;
+  bool _smartAlertsTutorialChecked = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: ref.read(searchQueryProvider));
-    _loadSmartAlertsTutorialState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scheduleSmartAlertsTutorialCheck();
+    });
   }
 
-  Future<void> _loadSmartAlertsTutorialState() async {
-    final seen = await hasSeenSmartAlertsTutorial();
-    if (!mounted || seen) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(() => _showSmartAlertsTutorial = true);
+  void _scheduleSmartAlertsTutorialCheck() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _smartAlertsTutorialChecked) return;
+
+      final userId = ref.read(currentUserIdProvider);
+      if (userId == null) {
+        SecureLog.debug('Smart alerts tutorial: waiting for user id');
+        return;
+      }
+
+      _smartAlertsTutorialChecked = true;
+      final seen = await hasSeenSmartAlertsTutorial(userId);
+      if (!mounted || seen) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() => _showSmartAlertsTutorial = true);
+      });
     });
   }
 
   Future<void> _dismissSmartAlertsTutorial() async {
     if (!_showSmartAlertsTutorial) return;
-    await markSmartAlertsTutorialSeen();
+    final userId = ref.read(currentUserIdProvider);
+    if (userId != null) {
+      await markSmartAlertsTutorialSeen(userId);
+    }
     if (!mounted) return;
     setState(() => _showSmartAlertsTutorial = false);
   }
@@ -115,8 +135,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'لم يتم العثور على "${item.style.nameAr}" في قاعدة البيانات. '
-              'طبّق migrations في Supabase ثم أعد تحميل التطبيق.',
+              ref.read(appLocalizationsProvider).categoryNotFoundMigration(item.style.nameAr),
               textAlign: TextAlign.right,
             ),
           ),
@@ -147,6 +166,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     ref.listen(searchQueryProvider, (prev, next) {
       if (_controller.text != next) _controller.text = next;
     });
+    ref.listen(currentUserIdProvider, (prev, next) {
+      if (next != null && !_smartAlertsTutorialChecked) {
+        _scheduleSmartAlertsTutorialCheck();
+      }
+    });
 
     final debounced = ref.watch(debouncedSearchQueryProvider);
     final showSuggestions = query.trim().length >= 2;
@@ -156,6 +180,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final categoriesAsync = ref.watch(allCategoriesProvider);
     final canPop = GoRouter.of(context).canPop();
     final filter = ref.watch(filterProvider);
+    final strings = ref.watch(appLocalizationsProvider);
 
     final baseTheme = Theme.of(context);
     final cairoTheme = baseTheme.copyWith(
@@ -215,10 +240,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 FeatureTutorialOverlay(
                   targetKey: _smartAlertsButtonKey,
                   onDismiss: _dismissSmartAlertsTutorial,
-                  title:
-                      'حدد معايير بحثك مرة واحدة واستلم إشعاراً فورياً عند نشر إعلان جديد يطابقها',
-                  subtitle:
-                      'اضغط على أيقونة الجرس لإدارة تنبيهاتك الذكية',
+                  title: strings.smartAlertsTutorialTitle,
+                  subtitle: strings.smartAlertsTutorialSubtitle,
                   highlightShape: FeatureTutorialHighlightShape.roundedRect,
                 ),
             ],
@@ -267,7 +290,7 @@ class _SearchHeader extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.arrow_forward),
               onPressed: () => context.pop(),
-              tooltip: 'رجوع',
+              tooltip: context.l10n.back,
             ),
           Expanded(
             child: Container(
@@ -277,7 +300,11 @@ class _SearchHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.glassBorder),
               ),
-              child: TextField(
+              child: Semantics(
+                label: context.l10n.searchInSouqak,
+                textField: true,
+                child: TextField(
+                key: const Key('search_query_field'),
                 controller: controller,
                 focusNode: focusNode,
                 textDirection: TextDirection.rtl,
@@ -287,7 +314,7 @@ class _SearchHeader extends StatelessWidget {
                   color: AppColors.pureWhite,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'ابحث في Sello...',
+                  hintText: context.l10n.searchHint,
                   hintStyle: AppFonts.cairo(
                     color: AppColors.textMuted,
                     fontSize: 15,
@@ -311,6 +338,8 @@ class _SearchHeader extends StatelessWidget {
                 ),
                 onChanged: onQueryChanged,
                 onSubmitted: onSubmit,
+                textInputAction: TextInputAction.search,
+              ),
               ),
             ),
           ),
@@ -318,7 +347,7 @@ class _SearchHeader extends StatelessWidget {
           IconButton(
             key: alertsButtonKey,
             icon: const Icon(Icons.notifications_none_outlined),
-            tooltip: 'تنبيهاتي الذكية',
+            tooltip: context.l10n.mySmartAlertsTooltip,
             onPressed: onAlertsTap,
           ),
           Stack(
@@ -326,7 +355,7 @@ class _SearchHeader extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.tune),
-                tooltip: 'الفلاتر',
+                tooltip: context.l10n.filtersTooltip,
                 onPressed: onFilterTap,
               ),
               if (filterCount > 0)
@@ -390,11 +419,15 @@ class _SuggestionsBody extends StatelessWidget {
                 children: [
                   Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
                   const SizedBox(height: 12),
-                  Text('لا توجد اقتراحات', style: AppFonts.cairo()),
+                  Text(context.l10n.noSuggestions, style: AppFonts.cairo()),
                   const SizedBox(height: 16),
                   FilledButton(
+                    key: const Key('search_suggestions_submit'),
                     onPressed: () => onSubmit(query),
-                    child: Text('بحث عن "$query"', style: AppFonts.cairo()),
+                    child: Text(
+                      context.l10n.searchForQuery(query),
+                      style: AppFonts.cairo(),
+                    ),
                   ),
                 ],
               ),

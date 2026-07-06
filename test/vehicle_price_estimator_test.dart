@@ -10,16 +10,13 @@ import 'package:Sello/shared/models/listing_model.dart';
 import 'package:Sello/shared/models/vehicle_listing_metadata.dart';
 
 class _FakeGroqService extends GroqService {
-  _FakeGroqService({this.result, this.error});
+  _FakeGroqService({this.result});
 
   final PriceEstimate? result;
-  final Object? error;
 
   @override
-  Future<PriceEstimate> estimatePrice(CarPriceEstimateInput input) async {
-    if (error != null) throw error!;
-    return result!;
-  }
+  Future<PriceEstimate> estimatePrice(CarPriceEstimateInput input) async =>
+      result!;
 }
 
 void main() {

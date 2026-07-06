@@ -1,0 +1,927 @@
+{
+  "souq_mobile_item_01": [
+    "Smartphones",
+    "Smartphones",
+    "Akıllı Telefonlar"
+  ],
+  "souq_mobile_item_02": [
+    "iPhone",
+    "iPhone",
+    "iPhone"
+  ],
+  "souq_mobile_item_03": [
+    "Samsung",
+    "Samsung",
+    "Samsung"
+  ],
+  "souq_mobile_item_04": [
+    "Huawei",
+    "Huawei",
+    "Huawei"
+  ],
+  "souq_mobile_item_05": [
+    "Xiaomi & Redmi",
+    "Xiaomi & Redmi",
+    "Xiaomi ve Redmi"
+  ],
+  "souq_mobile_item_06": [
+    "Oppo & Vivo",
+    "Oppo & Vivo",
+    "Oppo ve Vivo"
+  ],
+  "souq_mobile_item_07": [
+    "Basic Phones",
+    "Basic Phones",
+    "Basit Telefonlar"
+  ],
+  "souq_mobile_item_08": [
+    "Chargers & Cables",
+    "Chargers & Cables",
+    "Şarj Aletleri ve Kablolar"
+  ],
+  "souq_mobile_item_09": [
+    "Power Banks",
+    "Power Banks",
+    "Powerbank"
+  ],
+  "souq_mobile_item_10": [
+    "Cases & Protection",
+    "Cases & Protection",
+    "Kılıf ve Koruma"
+  ],
+  "souq_mobile_item_11": [
+    "Bluetooth Headsets",
+    "Bluetooth Headsets",
+    "Bluetooth Kulaklık"
+  ],
+  "souq_mobile_item_12": [
+    "Smartwatches",
+    "Smartwatches",
+    "Akıllı Saatler"
+  ],
+  "souq_mobile_item_13": [
+    "Phone Spare Parts",
+    "Phone Spare Parts",
+    "Telefon Yedek Parça"
+  ],
+  "souq_mobile_item_14": [
+    "Phone Batteries",
+    "Phone Batteries",
+    "Telefon Bataryası"
+  ],
+  "souq_computer_item_01": [
+    "Laptops",
+    "Laptops",
+    "Laptop"
+  ],
+  "souq_computer_item_02": [
+    "Mac Laptops",
+    "Mac Laptops",
+    "Mac Laptop"
+  ],
+  "souq_computer_item_03": [
+    "Desktop Computers",
+    "Desktop Computers",
+    "Masaüstü Bilgisayar"
+  ],
+  "souq_computer_item_04": [
+    "Monitors",
+    "Monitors",
+    "Monitörler"
+  ],
+  "souq_computer_item_05": [
+    "Keyboard & Mouse",
+    "Keyboard & Mouse",
+    "Klavye ve Fare"
+  ],
+  "souq_computer_item_06": [
+    "Printers & Scanners",
+    "Printers & Scanners",
+    "Yazıcı ve Tarayıcı"
+  ],
+  "souq_computer_item_07": [
+    "Hard Drives",
+    "Hard Drives",
+    "Hard Disk"
+  ],
+  "souq_computer_item_08": [
+    "RAM & Internal Parts",
+    "RAM & Internal Parts",
+    "RAM ve Dahili Parçalar"
+  ],
+  "souq_computer_gpu": [
+    "Graphics Cards (GPU)",
+    "Graphics Cards (GPU)",
+    "Ekran Kartı (GPU)"
+  ],
+  "souq_computer_item_10": [
+    "Routers & Networking",
+    "Routers & Networking",
+    "Router ve Ağ"
+  ],
+  "souq_computer_ups": [
+    "UPS & Batteries",
+    "UPS & Batteries",
+    "UPS ve Batarya"
+  ],
+  "souq_computer_item_12": [
+    "USB Drives & Memory",
+    "USB Drives & Memory",
+    "Flash Bellek"
+  ],
+  "souq_tv_audio_item_01": [
+    "Smart TV",
+    "Smart TV",
+    "Smart TV"
+  ],
+  "souq_tv_audio_oled": [
+    "OLED TV",
+    "OLED TV",
+    "OLED TV"
+  ],
+  "souq_tv_audio_qled": [
+    "QLED TV",
+    "QLED TV",
+    "QLED TV"
+  ],
+  "souq_tv_audio_item_04": [
+    "Standard TV",
+    "Standard TV",
+    "Normal TV"
+  ],
+  "souq_tv_audio_item_05": [
+    "Receivers & Satellite",
+    "Receivers & Satellite",
+    "Uydu Alıcı"
+  ],
+  "souq_tv_audio_item_06": [
+    "Home Theater",
+    "Home Theater",
+    "Ev Sineması"
+  ],
+  "souq_tv_audio_item_07": [
+    "Speakers",
+    "Speakers",
+    "Hoparlör"
+  ],
+  "souq_tv_audio_item_08": [
+    "Home Audio",
+    "Home Audio",
+    "Ev Ses Sistemi"
+  ],
+  "souq_tv_audio_item_09": [
+    "Projectors",
+    "Projectors",
+    "Projektör"
+  ],
+  "souq_tv_audio_item_10": [
+    "Remotes & Accessories",
+    "Remotes & Accessories",
+    "Kumanda ve Aksesuar"
+  ],
+  "souq_appliances_item_01": [
+    "Washing Machines",
+    "Washing Machines",
+    "Çamaşır Makinesi"
+  ],
+  "souq_appliances_item_02": [
+    "Dishwashers",
+    "Dishwashers",
+    "Bulaşık Makinesi"
+  ],
+  "souq_appliances_item_03": [
+    "Refrigerators",
+    "Refrigerators",
+    "Buzdolabı"
+  ],
+  "souq_appliances_item_04": [
+    "Freezers",
+    "Freezers",
+    "Derin Dondurucu"
+  ],
+  "souq_appliances_item_05": [
+    "Split AC",
+    "Split AC",
+    "Split Klima"
+  ],
+  "souq_appliances_item_06": [
+    "Window AC",
+    "Window AC",
+    "Pencere Kliması"
+  ],
+  "souq_appliances_item_07": [
+    "Portable AC",
+    "Portable AC",
+    "Taşınabilir Klima"
+  ],
+  "souq_appliances_item_08": [
+    "Fans",
+    "Fans",
+    "Vantilatör"
+  ],
+  "souq_appliances_item_09": [
+    "Electric Heaters",
+    "Electric Heaters",
+    "Elektrikli Isıtıcı"
+  ],
+  "souq_appliances_item_10": [
+    "Vacuum Cleaners",
+    "Vacuum Cleaners",
+    "Elektrikli Süpürge"
+  ],
+  "souq_appliances_item_11": [
+    "Irons",
+    "Irons",
+    "Ütü"
+  ],
+  "souq_appliances_item_12": [
+    "Sterilizers",
+    "Sterilizers",
+    "Sterilizatör"
+  ],
+  "souq_kitchen_item_01": [
+    "Gas Stoves",
+    "Gas Stoves",
+    "Gaz Ocağı"
+  ],
+  "souq_kitchen_item_02": [
+    "Electric Ovens",
+    "Electric Ovens",
+    "Elektrikli Fırın"
+  ],
+  "souq_kitchen_item_03": [
+    "Microwaves",
+    "Microwaves",
+    "Mikrodalga"
+  ],
+  "souq_kitchen_item_04": [
+    "Air Fryers",
+    "Air Fryers",
+    "Air Fryer"
+  ],
+  "souq_kitchen_item_05": [
+    "Blenders & Juicers",
+    "Blenders & Juicers",
+    "Blender ve Sıkacağı"
+  ],
+  "souq_kitchen_item_06": [
+    "Coffee & Tea Makers",
+    "Coffee & Tea Makers",
+    "Kahve ve Çay Makinesi"
+  ],
+  "souq_kitchen_item_07": [
+    "Sandwich & Toaster",
+    "Sandwich & Toaster",
+    "Tost Makinesi"
+  ],
+  "souq_kitchen_item_08": [
+    "Electric Pressure Cooker",
+    "Electric Pressure Cooker",
+    "Elektrikli Düdüklü"
+  ],
+  "souq_kitchen_item_09": [
+    "Bread Makers",
+    "Bread Makers",
+    "Ekmek Yapma Makinesi"
+  ],
+  "souq_kitchen_item_10": [
+    "Kitchenware & Accessories",
+    "Kitchenware & Accessories",
+    "Mutfak Gereçleri"
+  ],
+  "souq_gaming_5": [
+    "PlayStation 5",
+    "PlayStation 5",
+    "PlayStation 5"
+  ],
+  "souq_gaming_4": [
+    "PlayStation 4",
+    "PlayStation 4",
+    "PlayStation 4"
+  ],
+  "souq_gaming_xbox_series_x_s": [
+    "Xbox Series X/S",
+    "Xbox Series X/S",
+    "Xbox Series X/S"
+  ],
+  "souq_gaming_nintendo_switch": [
+    "Nintendo Switch",
+    "Nintendo Switch",
+    "Nintendo Switch"
+  ],
+  "souq_gaming_cd": [
+    "Game Discs & Cards",
+    "Game Discs & Cards",
+    "Oyun CD ve Kartları"
+  ],
+  "souq_gaming_item_06": [
+    "Controllers & Accessories",
+    "Controllers & Accessories",
+    "Kol ve Aksesuar"
+  ],
+  "souq_gaming_vr_headset": [
+    "VR Headsets",
+    "VR Headsets",
+    "VR Headset"
+  ],
+  "souq_gaming_item_08": [
+    "Electronic Kids Toys",
+    "Electronic Kids Toys",
+    "Elektronik Çocuk Oyuncakları"
+  ],
+  "souq_fashion_item_01": [
+    "Men's Clothing",
+    "Men's Clothing",
+    "Erkek Giyim"
+  ],
+  "souq_fashion_item_02": [
+    "Women's Clothing",
+    "Women's Clothing",
+    "Kadın Giyim"
+  ],
+  "souq_fashion_item_03": [
+    "Kids' Clothing",
+    "Kids' Clothing",
+    "Çocuk Giyim"
+  ],
+  "souq_fashion_item_04": [
+    "Abayas & Dishdashas",
+    "Abayas & Dishdashas",
+    "Abaya ve Dış Giyim"
+  ],
+  "souq_fashion_item_05": [
+    "Men's Shoes",
+    "Men's Shoes",
+    "Erkek Ayakkabı"
+  ],
+  "souq_fashion_item_06": [
+    "Women's Shoes",
+    "Women's Shoes",
+    "Kadın Ayakkabı"
+  ],
+  "souq_fashion_item_07": [
+    "Kids' Shoes",
+    "Kids' Shoes",
+    "Çocuk Ayakkabı"
+  ],
+  "souq_fashion_item_08": [
+    "Handbags",
+    "Handbags",
+    "El Çantası"
+  ],
+  "souq_fashion_item_09": [
+    "Travel Bags & Luggage",
+    "Travel Bags & Luggage",
+    "Valiz ve Çanta"
+  ],
+  "souq_fashion_item_10": [
+    "Wristwatches",
+    "Wristwatches",
+    "Kol Saati"
+  ],
+  "souq_fashion_item_11": [
+    "Glasses",
+    "Glasses",
+    "Gözlük"
+  ],
+  "souq_fashion_item_12": [
+    "Fashion Accessories",
+    "Fashion Accessories",
+    "Moda Aksesuarları"
+  ],
+  "souq_beauty_item_01": [
+    "Men's Perfumes",
+    "Men's Perfumes",
+    "Erkek Parfüm"
+  ],
+  "souq_beauty_item_02": [
+    "Women's Perfumes",
+    "Women's Perfumes",
+    "Kadın Parfüm"
+  ],
+  "souq_beauty_item_03": [
+    "Skincare Products",
+    "Skincare Products",
+    "Cilt Bakım Ürünleri"
+  ],
+  "souq_beauty_item_04": [
+    "Makeup & Beauty",
+    "Makeup & Beauty",
+    "Makyaj ve Güzellik"
+  ],
+  "souq_beauty_item_05": [
+    "Beauty Devices",
+    "Beauty Devices",
+    "Güzellik Cihazları"
+  ],
+  "souq_beauty_item_06": [
+    "Health Monitors",
+    "Health Monitors",
+    "Sağlık Ölçüm Cihazları"
+  ],
+  "souq_beauty_item_07": [
+    "Vitamins & Supplements",
+    "Vitamins & Supplements",
+    "Vitamin ve Takviye"
+  ],
+  "souq_beauty_item_08": [
+    "Massage Chairs",
+    "Massage Chairs",
+    "Masaj Koltuğu"
+  ],
+  "souq_beauty_item_09": [
+    "Prescription Glasses",
+    "Prescription Glasses",
+    "Numaralı Gözlük"
+  ],
+  "souq_beauty_item_10": [
+    "Shaving Tools",
+    "Shaving Tools",
+    "Tıraş Aletleri"
+  ],
+  "souq_furniture_item_01": [
+    "Bedroom Furniture",
+    "Bedroom Furniture",
+    "Yatak Odası"
+  ],
+  "souq_furniture_item_02": [
+    "Living Room Furniture",
+    "Living Room Furniture",
+    "Oturma Odası"
+  ],
+  "souq_furniture_item_03": [
+    "Dining Tables & Sets",
+    "Dining Tables & Sets",
+    "Yemek Masası"
+  ],
+  "souq_furniture_item_04": [
+    "Office & Study",
+    "Office & Study",
+    "Ofis ve Çalışma"
+  ],
+  "souq_furniture_item_05": [
+    "Curtains & Carpets",
+    "Curtains & Carpets",
+    "Perde ve Halı"
+  ],
+  "souq_furniture_item_06": [
+    "Kitchen & Cabinets",
+    "Kitchen & Cabinets",
+    "Mutfak ve Dolap"
+  ],
+  "souq_furniture_item_07": [
+    "Lighting & Chandeliers",
+    "Lighting & Chandeliers",
+    "Aydınlatma ve Avize"
+  ],
+  "souq_furniture_item_08": [
+    "Decor & Art",
+    "Decor & Art",
+    "Dekor ve Tablo"
+  ],
+  "souq_furniture_item_09": [
+    "Linens & Bedding",
+    "Linens & Bedding",
+    "Nevresim ve Yatak"
+  ],
+  "souq_furniture_item_10": [
+    "Misc Home Items",
+    "Misc Home Items",
+    "Ev Eşyaları"
+  ],
+  "souq_sports_item_01": [
+    "Home Gym Equipment",
+    "Home Gym Equipment",
+    "Ev Spor Aletleri"
+  ],
+  "souq_sports_item_02": [
+    "Treadmills & Exercise Bikes",
+    "Treadmills & Exercise Bikes",
+    "Koşu Bandı ve Bisiklet"
+  ],
+  "souq_sports_item_03": [
+    "Weights & Dumbbells",
+    "Weights & Dumbbells",
+    "Ağırlık ve Dambıl"
+  ],
+  "souq_sports_item_04": [
+    "Sportswear",
+    "Sportswear",
+    "Spor Giyim"
+  ],
+  "souq_sports_item_05": [
+    "Sports Shoes",
+    "Sports Shoes",
+    "Spor Ayakkabı"
+  ],
+  "souq_sports_item_06": [
+    "Football & Gear",
+    "Football & Gear",
+    "Futbol ve Malzemeleri"
+  ],
+  "souq_sports_item_07": [
+    "Basketball & Volleyball",
+    "Basketball & Volleyball",
+    "Basketbol ve Voleybol"
+  ],
+  "souq_sports_item_08": [
+    "Swimming & Diving",
+    "Swimming & Diving",
+    "Yüzme ve Dalış"
+  ],
+  "souq_sports_item_09": [
+    "Bicycles",
+    "Bicycles",
+    "Bisiklet"
+  ],
+  "souq_sports_item_10": [
+    "Boxing & Martial Arts",
+    "Boxing & Martial Arts",
+    "Boks ve Dövüş Sanatları"
+  ],
+  "souq_sports_item_11": [
+    "Camping & Outdoors",
+    "Camping & Outdoors",
+    "Kamp ve Outdoor"
+  ],
+  "souq_sports_item_12": [
+    "Fishing",
+    "Fishing",
+    "Balık Tutma"
+  ],
+  "souq_baby_item_01": [
+    "Strollers",
+    "Strollers",
+    "Bebek Arabası"
+  ],
+  "souq_baby_item_02": [
+    "Car Seats",
+    "Car Seats",
+    "Oto Koltuğu"
+  ],
+  "souq_baby_item_03": [
+    "Cribs & Beds",
+    "Cribs & Beds",
+    "Bebek Yatağı"
+  ],
+  "souq_baby_item_04": [
+    "Baby & Infant Clothing",
+    "Baby & Infant Clothing",
+    "Bebek Giyim"
+  ],
+  "souq_baby_item_05": [
+    "Kids Toys",
+    "Kids Toys",
+    "Çocuk Oyuncakları"
+  ],
+  "souq_baby_item_06": [
+    "Feeding Supplies",
+    "Feeding Supplies",
+    "Beslenme Gereçleri"
+  ],
+  "souq_baby_item_07": [
+    "Baby Monitors",
+    "Baby Monitors",
+    "Bebek Telsizi"
+  ],
+  "souq_baby_item_08": [
+    "Baby Formula & Food",
+    "Baby Formula & Food",
+    "Bebek Maması"
+  ],
+  "souq_baby_item_09": [
+    "School Bags & Supplies",
+    "School Bags & Supplies",
+    "Okul Çantası"
+  ],
+  "souq_baby_item_10": [
+    "Kids Bikes & Ride-ons",
+    "Kids Bikes & Ride-ons",
+    "Çocuk Bisikleti"
+  ],
+  "souq_books_item_01": [
+    "Arabic Books",
+    "Arabic Books",
+    "Arapça Kitaplar"
+  ],
+  "souq_books_item_02": [
+    "English Books",
+    "English Books",
+    "İngilizce Kitaplar"
+  ],
+  "souq_books_item_03": [
+    "Textbooks & Curricula",
+    "Textbooks & Curricula",
+    "Ders Kitapları"
+  ],
+  "souq_books_item_04": [
+    "Religious Books",
+    "Religious Books",
+    "Dini Kitaplar"
+  ],
+  "souq_books_item_05": [
+    "Novels & Stories",
+    "Novels & Stories",
+    "Roman ve Hikaye"
+  ],
+  "souq_books_item_06": [
+    "Magazines & Newspapers",
+    "Magazines & Newspapers",
+    "Dergi ve Gazete"
+  ],
+  "souq_books_item_07": [
+    "Stationery & Office Supplies",
+    "Stationery & Office Supplies",
+    "Kırtasiye"
+  ],
+  "souq_books_item_08": [
+    "Art & Drawing Supplies",
+    "Art & Drawing Supplies",
+    "Sanat Malzemeleri"
+  ],
+  "souq_music_item_01": [
+    "Guitar",
+    "Guitar",
+    "Gitar"
+  ],
+  "souq_music_item_02": [
+    "Oud & Qanun",
+    "Oud & Qanun",
+    "Ud ve Kanun"
+  ],
+  "souq_music_item_03": [
+    "Piano & Organ",
+    "Piano & Organ",
+    "Piyano ve Org"
+  ],
+  "souq_music_item_04": [
+    "Drums & Percussion",
+    "Drums & Percussion",
+    "Davul ve Perküsyon"
+  ],
+  "souq_music_dj": [
+    "DJ Mixers",
+    "DJ Mixers",
+    "DJ Mikser"
+  ],
+  "souq_music_item_06": [
+    "Microphones & Recording",
+    "Microphones & Recording",
+    "Mikrofon ve Kayıt"
+  ],
+  "souq_music_item_07": [
+    "Flutes & Wind Instruments",
+    "Flutes & Wind Instruments",
+    "Nefesli Enstrüman"
+  ],
+  "souq_music_item_08": [
+    "Karaoke Machine",
+    "Karaoke Machine",
+    "Karaoke Makinesi"
+  ],
+  "souq_hobbies_item_01": [
+    "Antiques & Collectibles",
+    "Antiques & Collectibles",
+    "Antika"
+  ],
+  "souq_hobbies_item_02": [
+    "Stamps & Old Coins",
+    "Stamps & Old Coins",
+    "Pul ve Eski Para"
+  ],
+  "souq_hobbies_item_03": [
+    "Art Paintings",
+    "Art Paintings",
+    "Tablo"
+  ],
+  "souq_hobbies_item_04": [
+    "Board & Card Games",
+    "Board & Card Games",
+    "Kutu Oyunları"
+  ],
+  "souq_hobbies_item_05": [
+    "Models & Miniatures",
+    "Models & Miniatures",
+    "Maket ve Model"
+  ],
+  "souq_hobbies_item_06": [
+    "Drones & RC",
+    "Drones & RC",
+    "Drone ve RC"
+  ],
+  "souq_hobbies_item_07": [
+    "Statues & Figurines",
+    "Statues & Figurines",
+    "Heykel ve Figür"
+  ],
+  "souq_hobbies_item_08": [
+    "Sports Collectibles",
+    "Sports Collectibles",
+    "Spor Koleksiyon"
+  ],
+  "souq_jewelry_21": [
+    "21K Gold",
+    "21K Gold",
+    "21 Ayar Altın"
+  ],
+  "souq_jewelry_18": [
+    "18K Gold",
+    "18K Gold",
+    "18 Ayar Altın"
+  ],
+  "souq_jewelry_item_03": [
+    "Silver",
+    "Silver",
+    "Gümüş"
+  ],
+  "souq_jewelry_item_04": [
+    "Diamonds & Gemstones",
+    "Diamonds & Gemstones",
+    "Elmas ve Taş"
+  ],
+  "souq_jewelry_item_05": [
+    "Rings & Bracelets",
+    "Rings & Bracelets",
+    "Yüzük ve Bilezik"
+  ],
+  "souq_jewelry_item_06": [
+    "Necklaces",
+    "Necklaces",
+    "Kolye"
+  ],
+  "souq_jewelry_item_07": [
+    "Luxury Watches",
+    "Luxury Watches",
+    "Lüks Saat"
+  ],
+  "souq_jewelry_item_08": [
+    "Prayer Beads",
+    "Prayer Beads",
+    "Tesbih"
+  ],
+  "souq_building_item_01": [
+    "Iron & Steel",
+    "Iron & Steel",
+    "Demir ve Çelik"
+  ],
+  "souq_building_item_02": [
+    "Cement & Blocks",
+    "Cement & Blocks",
+    "Çimento ve Blok"
+  ],
+  "souq_building_item_03": [
+    "Bricks & Stone",
+    "Bricks & Stone",
+    "Tuğla ve Taş"
+  ],
+  "souq_building_item_04": [
+    "Tiles & Ceramics",
+    "Tiles & Ceramics",
+    "Fayans ve Seramik"
+  ],
+  "souq_building_item_05": [
+    "Paint & Wallpaper",
+    "Paint & Wallpaper",
+    "Boya ve Duvar Kağıdı"
+  ],
+  "souq_building_item_06": [
+    "Doors & Windows",
+    "Doors & Windows",
+    "Kapı ve Pencere"
+  ],
+  "souq_building_item_07": [
+    "Plumbing & Sanitary",
+    "Plumbing & Sanitary",
+    "Tesisat ve Banyo"
+  ],
+  "souq_building_item_08": [
+    "Electrical & Lighting",
+    "Electrical & Lighting",
+    "Elektrik ve Aydınlatma"
+  ],
+  "souq_building_item_09": [
+    "Hand & Power Tools",
+    "Hand & Power Tools",
+    "El ve Elektrikli Alet"
+  ],
+  "souq_building_item_10": [
+    "Generators & Solar",
+    "Generators & Solar",
+    "Jeneratör ve Güneş"
+  ],
+  "souq_garden_item_01": [
+    "Plants & Trees",
+    "Plants & Trees",
+    "Bitki ve Ağaç"
+  ],
+  "souq_garden_item_02": [
+    "Seeds & Fertilizer",
+    "Seeds & Fertilizer",
+    "Tohum ve Gübre"
+  ],
+  "souq_garden_item_03": [
+    "Garden Tools",
+    "Garden Tools",
+    "Bahçe Aletleri"
+  ],
+  "souq_garden_item_04": [
+    "Water Pumps",
+    "Water Pumps",
+    "Su Pompası"
+  ],
+  "souq_garden_item_05": [
+    "Artificial Plants",
+    "Artificial Plants",
+    "Yapay Bitki"
+  ],
+  "souq_garden_item_06": [
+    "Pots & Soil",
+    "Pots & Soil",
+    "Saksı ve Toprak"
+  ],
+  "souq_garden_item_07": [
+    "Garden Fountains",
+    "Garden Fountains",
+    "Bahçe Fıskiyesi"
+  ],
+  "souq_food_item_01": [
+    "Dates & Iraqi Sweets",
+    "Dates & Iraqi Sweets",
+    "Hurma ve Irak Tatlıları"
+  ],
+  "souq_food_item_02": [
+    "Natural Honey",
+    "Natural Honey",
+    "Doğal Bal"
+  ],
+  "souq_food_item_03": [
+    "Olive Oil & Oils",
+    "Olive Oil & Oils",
+    "Zeytinyağı ve Yağlar"
+  ],
+  "souq_food_item_04": [
+    "Dairy Products",
+    "Dairy Products",
+    "Süt Ürünleri"
+  ],
+  "souq_food_item_05": [
+    "Jam & Canned Food",
+    "Jam & Canned Food",
+    "Reçel ve Konserve"
+  ],
+  "souq_food_item_06": [
+    "Energy Drinks & Water",
+    "Energy Drinks & Water",
+    "Enerji İçeceği ve Su"
+  ],
+  "souq_food_item_07": [
+    "Spices & Herbs",
+    "Spices & Herbs",
+    "Baharat ve Otlar"
+  ],
+  "souq_food_item_08": [
+    "Organic Food",
+    "Organic Food",
+    "Organik Gıda"
+  ],
+  "souq_misc_item_01": [
+    "Gifts & Occasions",
+    "Gifts & Occasions",
+    "Hediye ve Özel Günler"
+  ],
+  "souq_misc_item_02": [
+    "Religious Supplies",
+    "Religious Supplies",
+    "Dini Malzemeler"
+  ],
+  "souq_misc_item_03": [
+    "Office Supplies",
+    "Office Supplies",
+    "Ofis Malzemeleri"
+  ],
+  "souq_misc_item_04": [
+    "Travel Bags",
+    "Travel Bags",
+    "Seyahat Çantası"
+  ],
+  "souq_misc_item_05": [
+    "Photography Supplies",
+    "Photography Supplies",
+    "Fotoğraf Malzemeleri"
+  ],
+  "souq_misc_item_06": [
+    "Pro Photography Gear",
+    "Pro Photography Gear",
+    "Profesyonel Fotoğraf"
+  ],
+  "souq_misc_item_07": [
+    "Wholesale Goods",
+    "Wholesale Goods",
+    "Toptan Ürün"
+  ],
+  "souq_misc_other": [
+    "Other",
+    "Other",
+    "Diğer"
+  ]
+}

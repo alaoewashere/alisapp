@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../features/auth/widgets/auth_form_styles.dart';
 
 /// Screen 4 — submission success.
-class VerificationSuccessScreen extends StatefulWidget {
+class VerificationSuccessScreen extends ConsumerStatefulWidget {
   const VerificationSuccessScreen({super.key});
 
   @override
-  State<VerificationSuccessScreen> createState() =>
+  ConsumerState<VerificationSuccessScreen> createState() =>
       _VerificationSuccessScreenState();
 }
 
-class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
+class _VerificationSuccessScreenState extends ConsumerState<VerificationSuccessScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
@@ -39,6 +41,7 @@ class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Directionality(
@@ -67,7 +70,7 @@ class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'تم الإرسال بنجاح',
+                  strings.verificationSentSuccess,
                   style: AppFonts.cairo(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -76,7 +79,7 @@ class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'سيتم مراجعة طلبك خلال 24 ساعة وسيصلك إشعار عند الموافقة',
+                  strings.verificationReviewNotice,
                   textAlign: TextAlign.center,
                   style: AppFonts.cairo(
                     fontSize: 14,
@@ -86,7 +89,7 @@ class _VerificationSuccessScreenState extends State<VerificationSuccessScreen>
                 ),
                 const Spacer(),
                 AuthPrimaryButton(
-                  label: 'العودة للرئيسية',
+                  label: strings.backToHome,
                   onPressed: () => context.go(AppRoutes.home),
                 ),
               ],

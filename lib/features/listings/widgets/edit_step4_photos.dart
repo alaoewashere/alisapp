@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../providers/edit_listing_provider.dart';
 import '../providers/post_listing_provider.dart';
 import 'image_picker_grid.dart';
@@ -26,14 +27,14 @@ class EditStep4Photos extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'الصور',
+            ref.read(appLocalizationsProvider).photosTitle,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
           ),
           if (edit.existingImages.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('الصور الحالية', style: Theme.of(context).textTheme.titleSmall),
+            Text(ref.read(appLocalizationsProvider).currentPhotosTitle, style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,

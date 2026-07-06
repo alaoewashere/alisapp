@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../services/rating_service.dart';
@@ -11,6 +12,7 @@ typedef SellerListingsKey = ({String sellerId, String excludeListingId});
 
 final listingDetailProvider =
     FutureProvider.family<ListingModel?, String>((ref, listingId) async {
+  ref.watch(localeProvider);
   final userId = ref.watch(currentUserIdProvider);
   final repo = ref.watch(listingsRepositoryProvider);
   return repo.getListingById(
@@ -21,6 +23,7 @@ final listingDetailProvider =
 
 final listingDetailByReferenceProvider =
     FutureProvider.family<ListingModel?, int>((ref, referenceNo) async {
+  ref.watch(localeProvider);
   final userId = ref.watch(currentUserIdProvider);
   final repo = ref.watch(listingsRepositoryProvider);
   return repo.getListingByReferenceNo(
@@ -32,6 +35,7 @@ final listingDetailByReferenceProvider =
 final sellerOtherListingsProvider =
     FutureProvider.family<List<ListingModel>, SellerListingsKey>(
   (ref, key) async {
+    ref.watch(localeProvider);
     return ref.watch(listingsRepositoryProvider).getSellerListings(
           key.sellerId,
           excludeId: key.excludeListingId,

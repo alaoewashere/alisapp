@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/listing_display_l10n.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/listing_display_title.dart';
 import '../../../core/utils/listing_location_label.dart';
 import '../../../shared/models/listing_model.dart';
@@ -21,11 +24,18 @@ class ListingListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final isFavorite = ref.watch(
           toggleFavoriteProvider.select((ids) => ids.contains(listing.id)),
         ) ||
         listing.isFavorite;
     final isGuest = ref.watch(isGuestProvider);
+    final conditionLabel = switch (listing.condition) {
+      ListingCondition.newItem => strings.conditionNew,
+      ListingCondition.used => strings.conditionUsed,
+      _ => null,
+    };
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -94,7 +104,7 @@ class ListingListTile extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      listing.formattedPrice,
+                      listing.formattedPriceFor(strings),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -108,12 +118,12 @@ class ListingListTile extends ConsumerWidget {
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     Text(
-                      listing.timeAgo,
+                      listing.timeAgoFor(localeCode),
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
-                    if (listing.conditionLabelAr != null) ...[
+                    if (conditionLabel != null) ...[
                       const SizedBox(height: 4),
-                      _ConditionChip(label: listing.conditionLabelAr!),
+                      _ConditionChip(label: conditionLabel),
                     ],
                   ],
                 ),

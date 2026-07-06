@@ -1,13 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/core/utils/listing_metadata_detail_rows.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 import 'package:Sello/shared/models/job_listing_metadata.dart';
 import 'package:Sello/shared/models/listing_model.dart';
 import 'package:Sello/shared/models/tutoring_listing_metadata.dart';
 
 void main() {
   group('buildListingMetadataDisplay', () {
-    test('builds tutoring rows and stage chips', () {
+    test('builds tutoring rows and localized stage chips in English', () {
+      final en = lookupAppLocalizations(const Locale('en'));
       final display = buildListingMetadataDisplay(
         ListingModel(
           id: '1',
@@ -28,14 +31,18 @@ void main() {
             pricePerHour: 15000,
           ).toJson(),
         ),
+        en,
       );
 
-      expect(display.rows.any((r) => r.key == 'المادة' && r.value == 'رياضيات'),
-          isTrue);
-      expect(display.chipGroups.single.chips, ['إعدادي', 'جامعي']);
+      expect(
+        display.rows.any((r) => r.key == 'المنهج' && r.value == 'Iraqi curriculum'),
+        isTrue,
+      );
+      expect(display.chipGroups.single.chips, ['Secondary', 'University']);
     });
 
-    test('builds job rows and benefit chips', () {
+    test('builds job rows and localized benefit chips', () {
+      final en = lookupAppLocalizations(const Locale('en'));
       final display = buildListingMetadataDisplay(
         ListingModel(
           id: '1',
@@ -55,10 +62,14 @@ void main() {
             benefits: ['سكن'],
           ).toJson(),
         ),
+        en,
       );
 
-      expect(display.rows.any((r) => r.key == 'نوع الدوام'), isTrue);
-      expect(display.chipGroups.single.chips, ['سكن']);
+      expect(
+        display.rows.any((r) => r.key == 'نوع الدوام' && r.value == 'Full-time'),
+        isTrue,
+      );
+      expect(display.chipGroups.single.chips, ['Housing']);
     });
   });
 }

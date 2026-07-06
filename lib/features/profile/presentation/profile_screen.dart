@@ -10,6 +10,7 @@ import '../../../core/router/app_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/arabic_number.dart';
+import '../../../core/utils/validators.dart';
 import '../../../services/share_service.dart';
 import '../../../shared/models/profile_model.dart';
 import '../../../shared/models/profile_stats_model.dart';
@@ -242,8 +243,8 @@ class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تعذّر إنشاء البطاقة، حاول مرة أخرى'),
+          SnackBar(
+            content: Text(widget.strings.shareCardFailed),
           ),
         );
       }
@@ -464,6 +465,21 @@ class _ProfileHeaderCard extends StatelessWidget {
               ),
             ),
           ],
+          if (isOwnProfile && profile.hasDisplayPhone) ...[
+            const SizedBox(height: 4),
+            Directionality(
+              textDirection: TextDirection.ltr,
+              child: Text(
+                Validators.normalizeE164(profile.phone!),
+                textAlign: TextAlign.center,
+                style: AppFonts.cairo(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           statsAsync.when(
             loading: () => const SizedBox(
@@ -471,7 +487,11 @@ class _ProfileHeaderCard extends StatelessWidget {
               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
             error: (_, _) => const SizedBox.shrink(),
-            data: (stats) => _ProfileStatsRow(stats: stats),
+            data: (stats) => _ProfileStatsRow(
+              stats: stats,
+              avgRating: profile.avgRating,
+              ratingCount: profile.ratingCount,
+            ),
           ),
         ],
       ),
@@ -480,12 +500,19 @@ class _ProfileHeaderCard extends StatelessWidget {
 }
 
 class _ProfileStatsRow extends StatelessWidget {
-  const _ProfileStatsRow({required this.stats});
+  const _ProfileStatsRow({
+    required this.stats,
+    required this.avgRating,
+    required this.ratingCount,
+  });
 
   final ProfileStats stats;
+  final double avgRating;
+  final int ratingCount;
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     return Container(
       padding: const EdgeInsets.only(top: 16),
       decoration: const BoxDecoration(
@@ -496,21 +523,23 @@ class _ProfileStatsRow extends StatelessWidget {
           Expanded(
             child: _StatColumn(
               value: arabicNumber(stats.activeListings),
-              label: 'إعلان',
+              label: strings.listingsLabel,
             ),
           ),
           Container(width: 1, height: 32, color: AppColors.borderLight),
           Expanded(
             child: _StatColumn(
               value: formatCompactArabic(stats.totalViews),
-              label: 'مشاهدة',
+              label: strings.viewsLabel,
             ),
           ),
           Container(width: 1, height: 32, color: AppColors.borderLight),
           Expanded(
             child: _StatColumn(
-              value: '0',
-              label: 'متابع',
+              // Real seller rating instead of a placeholder followers count.
+              value: ratingCount > 0 ? '${avgRating.toStringAsFixed(1)} ★' : '—',
+              label: strings.ratingsTitle,
+              highlight: ratingCount > 0,
             ),
           ),
         ],
@@ -520,10 +549,15 @@ class _ProfileStatsRow extends StatelessWidget {
 }
 
 class _StatColumn extends StatelessWidget {
-  const _StatColumn({required this.value, required this.label});
+  const _StatColumn({
+    required this.value,
+    required this.label,
+    this.highlight = false,
+  });
 
   final String value;
   final String label;
+  final bool highlight;
 
   @override
   Widget build(BuildContext context) {
@@ -534,7 +568,7 @@ class _StatColumn extends StatelessWidget {
           style: AppFonts.cairo(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: AppColors.textDark,
+            color: highlight ? AppColors.volt : AppColors.textDark,
           ),
         ),
         const SizedBox(height: 2),
@@ -563,6 +597,7 @@ class _OwnProfileMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = context.l10n;
     final adsBadge = statsAsync.maybeWhen(
       data: (s) => arabicNumber(s.activeListings),
       orElse: () => null,
@@ -573,14 +608,14 @@ class _OwnProfileMenu extends StatelessWidget {
       child: Column(
         children: [
           ProfileMenuEmojiTile(
-            title: 'إعلاناتي المعروضة',
+            title: strings.myListedAds,
             emoji: '📋',
             badge: adsBadge,
             onTap: onMyListings,
           ),
           const SizedBox(height: 10),
           ProfileMenuTile(
-            title: 'تنبيهاتي الذكية',
+            title: strings.mySmartAlerts,
             icon: Icons.notifications_none_outlined,
             onTap: onSmartAlerts,
           ),

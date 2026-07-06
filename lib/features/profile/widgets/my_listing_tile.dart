@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
+import '../../../core/l10n/enum_localizations.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/theme/app_fonts.dart';
@@ -15,6 +17,7 @@ import '../../listings/data/listings_repository.dart';
 import '../../home/providers/home_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/user_subscription_tier_provider.dart';
+import '../../listings/constants/listing_package_config.dart';
 import '../utils/listing_boost_utils.dart';
 import 'listing_boost_sheet.dart';
 
@@ -33,6 +36,7 @@ class MyListingTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final imageUrl = listing.coverImageUrl ??
         (listing.images.isNotEmpty
             ? (listing.images.first.url ?? listing.images.first.storagePath)
@@ -99,7 +103,7 @@ class MyListingTile extends ConsumerWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        formatIqd(listing.priceIqd),
+                        formatIqdWithL10n(listing.priceIqd, strings),
                         style: AppFonts.cairo(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -125,6 +129,12 @@ class MyListingTile extends ConsumerWidget {
                   statusKey: statusKey,
                   showBoost: showBoost,
                   onBoost: () {
+                    if (!ListingPackageConfig.proAndPremiumEnabled) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(strings.comingSoon)),
+                      );
+                      return;
+                    }
                     final tier = userTierAsync.value;
                     if (tier == null) return;
                     showListingBoostSheet(
@@ -167,13 +177,15 @@ class _ThumbPlaceholder extends StatelessWidget {
   }
 }
 
-class _StatusPill extends StatelessWidget {
+class _StatusPill extends ConsumerWidget {
   const _StatusPill({required this.status});
 
   final ListingDisplayStatus status;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final label = status.localizedLabel(strings);
     final isActive = status == ListingDisplayStatus.active;
 
     if (isActive) {
@@ -184,7 +196,7 @@ class _StatusPill extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
-          status.labelAr,
+          label,
           style: AppFonts.cairo(
             fontSize: 11,
             fontWeight: FontWeight.w700,
@@ -208,7 +220,7 @@ class _StatusPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        status.labelAr,
+        label,
         style: AppFonts.cairo(
           fontSize: 11,
           fontWeight: FontWeight.w600,
@@ -234,28 +246,28 @@ class _ActionsRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final actions = <_ActionSpec>[];
 
     if (statusKey == 'active') {
+      // Published listings cannot be edited (prevents bait-and-switch after
+      // approval). Owners can mark sold, delete, or boost only.
       actions.addAll([
-        _ActionSpec(Icons.edit_outlined, 'تعديل', () {
-          context.push(AppRoutes.editListingPath(listing.id));
-        }),
-        _ActionSpec(Icons.check_rounded, 'مباع', () async {
+        _ActionSpec(Icons.check_rounded, strings.markAsSoldAction, () async {
           final ok = await _confirm(
             context,
-            'تعليم كمباع',
-            'هل تريد تعليم هذا الإعلان كمباع؟',
+            strings.markAsSoldTitle,
+            strings.markAsSoldBody,
           );
           if (ok != true) return;
           await ref.read(listingsRepositoryProvider).markAsSold(listing.id);
           _refresh(ref);
         }),
-        _ActionSpec(Icons.delete_outline, 'حذف', () async {
+        _ActionSpec(Icons.delete_outline, strings.delete, () async {
           final ok = await _confirm(
             context,
-            'حذف الإعلان',
-            'هل تريد حذف هذا الإعلان؟',
+            strings.deleteListingTitle,
+            strings.deleteListingBody,
           );
           if (ok != true) return;
           await ref
@@ -266,12 +278,12 @@ class _ActionsRow extends ConsumerWidget {
       ]);
       if (showBoost) {
         actions.add(
-          _ActionSpec(Icons.rocket_launch_outlined, 'ترويج', onBoost),
+          _ActionSpec(Icons.rocket_launch_outlined, strings.promoteListing, onBoost),
         );
       }
     } else if (statusKey == 'sold') {
       actions.add(
-        _ActionSpec(Icons.replay, 'إعادة نشر', () async {
+        _ActionSpec(Icons.replay, strings.republishListing, () async {
           final userId = ref.read(currentUserIdProvider);
           if (userId == null) return;
           try {
@@ -293,7 +305,7 @@ class _ActionsRow extends ConsumerWidget {
       );
     } else if (statusKey == 'deleted') {
       actions.add(
-        _ActionSpec(Icons.restore, 'استعادة', () async {
+        _ActionSpec(Icons.restore, strings.restoreListing, () async {
           await ref
               .read(listingsRepositoryProvider)
               .restoreListing(listing.id);
@@ -323,6 +335,7 @@ class _ActionsRow extends ConsumerWidget {
   }
 
   Future<bool?> _confirm(BuildContext context, String title, String body) {
+    final strings = context.l10n;
     return showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -331,11 +344,11 @@ class _ActionsRow extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('إلغاء'),
+            child: Text(strings.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('تأكيد'),
+            child: Text(strings.confirm),
           ),
         ],
       ),

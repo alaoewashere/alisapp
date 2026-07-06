@@ -52,13 +52,7 @@ class AuthHeroHeader extends StatelessWidget {
         : greenBackground;
 
     Widget buildLogo() {
-      final logo = ColorFiltered(
-        colorFilter: const ColorFilter.mode(
-          Colors.white,
-          BlendMode.srcIn,
-        ),
-        child: const AppLogo(size: 80),
-      );
+      final logo = const AppLogo(size: 80);
 
       if (logoFadeAnimation == null && logoScaleAnimation == null) {
         return logo;
@@ -216,6 +210,14 @@ class AuthHeroHeader extends StatelessWidget {
   }
 }
 
+/// Transparent logo for auth headers (login, forgot password).
+class AuthHeaderLogo extends StatelessWidget {
+  const AuthHeaderLogo({super.key});
+
+  @override
+  Widget build(BuildContext context) => const AppLogo(size: 90);
+}
+
 class _AuthHeroWaveClipper extends CustomClipper<Path> {
   const _AuthHeroWaveClipper();
 
@@ -260,8 +262,10 @@ class AuthDarkHeader extends StatelessWidget {
     this.subtitle = '',
     this.overline,
     this.leading,
+    this.trailing,
     this.logoSize = 72,
     this.showLogo = true,
+    this.logo,
     this.titleStyle,
   });
 
@@ -269,8 +273,12 @@ class AuthDarkHeader extends StatelessWidget {
   final String subtitle;
   final String? overline;
   final Widget? leading;
+  /// Widget placed at the top-left corner (opposite side from [leading]).
+  final Widget? trailing;
   final double logoSize;
   final bool showLogo;
+  /// When set, replaces the default white-tinted [AppLogo] (e.g. transparent PNG).
+  final Widget? logo;
   final TextStyle? titleStyle;
 
   @override
@@ -290,6 +298,14 @@ class AuthDarkHeader extends StatelessWidget {
                   child: leading,
                 ),
               ),
+            if (trailing != null)
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 8),
+                  child: trailing,
+                ),
+              ),
             Padding(
               padding: EdgeInsets.fromLTRB(
                 24,
@@ -302,13 +318,7 @@ class AuthDarkHeader extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (showLogo) ...[
-                      ColorFiltered(
-                        colorFilter: const ColorFilter.mode(
-                          AppColors.pureWhite,
-                          BlendMode.srcIn,
-                        ),
-                        child: AppLogo(size: logoSize),
-                      ),
+                      logo ?? AppLogo(size: logoSize),
                       const SizedBox(height: 16),
                     ],
                     if (overline != null && overline!.isNotEmpty) ...[

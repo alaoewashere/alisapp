@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/providers/locale_provider.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/providers/session_reset.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/result.dart';
@@ -28,6 +30,7 @@ final profileStatsProvider =
 
 final sellerListingsPreviewProvider =
     FutureProvider.family<List<ListingModel>, String>((ref, userId) async {
+  ref.watch(localeProvider);
   return ref.watch(listingsRepositoryProvider).getSellerListings(
         userId,
         limit: 6,
@@ -36,6 +39,7 @@ final sellerListingsPreviewProvider =
 
 final myListingsProvider =
     FutureProvider.family<List<ListingModel>, String>((ref, status) async {
+  ref.watch(localeProvider);
   final userId = ref.watch(currentUserIdProvider);
   if (userId == null) return [];
   return ref
@@ -92,7 +96,7 @@ class ProfileNotifier extends Notifier<AsyncValue<void>> {
   Future<Result<String>> updateAvatar(File image) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {
-      return const Failure('يجب تسجيل الدخول أولاً');
+      return Failure(ref.read(appLocalizationsProvider).loginRequiredFirst);
     }
     state = const AsyncLoading();
     try {
@@ -112,7 +116,7 @@ class ProfileNotifier extends Notifier<AsyncValue<void>> {
   Future<Result<ProfileModel>> updateAvatarSeed(String seed) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {
-      return const Failure('يجب تسجيل الدخول أولاً');
+      return Failure(ref.read(appLocalizationsProvider).loginRequiredFirst);
     }
     state = const AsyncLoading();
     try {
@@ -129,10 +133,30 @@ class ProfileNotifier extends Notifier<AsyncValue<void>> {
     }
   }
 
+  Future<Result<ProfileModel>> updateProfilePhone(String phoneE164) async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) {
+      return Failure(ref.read(appLocalizationsProvider).loginRequiredFirst);
+    }
+    state = const AsyncLoading();
+    try {
+      final saved = await ref
+          .read(profileRepositoryProvider)
+          .updateProfilePhone(userId, phoneE164);
+      ref.invalidate(currentProfileProvider);
+      ref.invalidate(myProfileProvider);
+      state = const AsyncData(null);
+      return Success(saved);
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return Failure('$e');
+    }
+  }
+
   Future<Result<void>> removeAvatar() async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {
-      return const Failure('يجب تسجيل الدخول أولاً');
+      return Failure(ref.read(appLocalizationsProvider).loginRequiredFirst);
     }
     try {
       await ref.read(profileRepositoryProvider).removeAvatar(userId);
@@ -146,11 +170,11 @@ class ProfileNotifier extends Notifier<AsyncValue<void>> {
   Future<Result<void>> deleteAccount() async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {
-      return const Failure('يجب تسجيل الدخول أولاً');
+      return Failure(ref.read(appLocalizationsProvider).loginRequiredFirst);
     }
     try {
       await ref.read(profileRepositoryProvider).deleteAccount(userId);
-      invalidateSessionProviders(ref);
+      invalidateSessionProviders(ref.container);
       ref.read(authNotifierProvider.notifier).enterGuestMode();
       return const Success(null);
     } catch (e) {
@@ -161,7 +185,7 @@ class ProfileNotifier extends Notifier<AsyncValue<void>> {
   Future<Result<bool>> signOut() async {
     final result = await ref.read(authNotifierProvider.notifier).signOut();
     if (result is Success) {
-      invalidateSessionProviders(ref);
+      invalidateSessionProviders(ref.container);
     }
     return result;
   }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../providers/post_listing_provider.dart';
 import 'listing_video_upload_section.dart';
 
@@ -22,6 +23,7 @@ class EditListingVideoSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final post = ref.watch(postListingProvider);
+    final strings = ref.watch(appLocalizationsProvider);
     final hasExisting = existingVideoUrl != null && existingVideoUrl!.isNotEmpty;
     final showPending = post.pendingVideoFile != null;
 
@@ -35,7 +37,7 @@ class EditListingVideoSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'الفيديو',
+            strings.videoSectionTitle,
             style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -75,7 +77,7 @@ class EditListingVideoSection extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'الفيديو الحالي — يمكنك استبداله بفيديو جديد أدناه',
+              strings.currentVideoReplaceHint,
               style: AppFonts.cairo(
                 fontSize: 13,
                 color: AppColors.textMuted,

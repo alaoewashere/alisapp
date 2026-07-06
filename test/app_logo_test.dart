@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/core/constants/app_assets.dart';
+import 'package:Sello/core/constants/app_constants.dart';
 import 'package:Sello/shared/widgets/app_logo.dart';
 
 void main() {
@@ -18,7 +19,7 @@ void main() {
     expect((image.image as AssetImage).assetName, AppAssets.appLogo);
   });
 
-  testWidgets('AppBrandHeader shows Sello', (tester) async {
+  testWidgets('AppBrandHeader shows Arabic brand name', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Directionality(
@@ -28,7 +29,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Sello'), findsOneWidget);
+    expect(find.text(AppConstants.appNameAr), findsOneWidget);
     expect(find.text('العراق'), findsOneWidget);
   });
 }

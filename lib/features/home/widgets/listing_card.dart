@@ -1,16 +1,18 @@
 import '../../../core/utils/cached_network_image_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../../../shared/widgets/pressable_scale.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/constants/app_colors.dart';
-import '../../../core/utils/arabic_number.dart';
+import '../../../core/utils/currency_formatter.dart';
+import '../../../core/l10n/listing_display_l10n.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/utils/listing_display_title.dart';
 import '../../../core/utils/listing_location_label.dart';
-import '../../../core/supabase/supabase_client.dart';
 import '../../../models/rating.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/widgets/listing_card_favorite_button.dart';
@@ -21,27 +23,51 @@ import '../../../widgets/star_display.dart';
 const _cardRadius = 16.0;
 const _imageHeight = 130.0;
 
-BoxDecoration listingCardDecoration() => BoxDecoration(
-      color: AppColors.fieldCarbon,
-      borderRadius: BorderRadius.circular(_cardRadius),
-      border: Border.all(
-        color: AppColors.glassBorder,
-        width: 1,
+BoxDecoration listingCardDecoration([ListingPackage? package]) {
+  final (borderColor, borderWidth, shadow) = switch (package) {
+    ListingPackage.pro => (
+        const Color(0xFF999F54),
+        1.5,
+        [
+          BoxShadow(
+            color: const Color(0xFF999F54).withValues(alpha: 0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-    );
-
-String listingDaysAgoLabel(DateTime createdAt) {
-  final days = DateTime.now().difference(createdAt).inDays;
-  if (days <= 0) return 'اليوم';
-  if (days == 1) return 'يوم واحد';
-  return '${arabicNumber(days)} يوم';
+    ListingPackage.premium => (
+        AppColors.premiumGold,
+        1.5,
+        [
+          BoxShadow(
+            color: AppColors.premiumGold.withValues(alpha: 0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+    _ => (AppColors.glassBorder, 1.0, <BoxShadow>[]),
+  };
+  return BoxDecoration(
+    color: AppColors.fieldCarbon,
+    borderRadius: BorderRadius.circular(_cardRadius),
+    border: Border.all(color: borderColor, width: borderWidth),
+    boxShadow: shadow,
+  );
 }
 
-String? listingCategoryLabel(ListingModel listing) {
-  if (listing.categoryNameAr != null && listing.categoryNameAr!.isNotEmpty) {
-    return listing.categoryNameAr;
-  }
-  return listing.conditionLabelAr;
+String listingDaysAgoLabel(DateTime createdAt, AppLocalizations strings) {
+  final days = DateTime.now().difference(createdAt).inDays;
+  if (days <= 0) return strings.listingPostedToday;
+  if (days == 1) return strings.listingPostedOneDayAgo;
+  return strings.listingPostedDaysAgo('$days');
+}
+
+String? listingCategoryLabel(ListingModel listing, AppLocalizations strings) {
+  final breadcrumb = listing.categoryBreadcrumbFor(strings);
+  if (breadcrumb.isNotEmpty) return breadcrumb;
+  return listing.conditionLabelFor(strings);
 }
 
 /// Home grid listing card — white surface, image overlays, compact metadata.
@@ -51,23 +77,29 @@ class ListingCard extends ConsumerWidget {
   final ListingModel listing;
 
   void _openDetail(BuildContext context) {
-    HapticFeedback.selectionClick();
     context.push('/listing/${listing.id}');
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final isSold = listing.displayStatus == ListingDisplayStatus.sold;
-    final category = listingCategoryLabel(listing);
+    final category = listingCategoryLabel(listing, strings);
     final location = listingLocationLabel(listing);
-    final daysLabel = listingDaysAgoLabel(listing.createdAt);
+    final daysLabel = listingDaysAgoLabel(listing.createdAt, strings);
 
-    return GestureDetector(
+    return PressableScale(
       onTap: () => _openDetail(context),
       onLongPress: () => _openDetail(context),
       child: RepaintBoundary(
         child: DecoratedBox(
-        decoration: listingCardDecoration(),
+        decoration: listingCardDecoration(
+          listing.isPremiumListing
+              ? ListingPackage.premium
+              : listing.isProListing
+                  ? ListingPackage.pro
+                  : null,
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(_cardRadius),
           child: Column(
@@ -78,7 +110,10 @@ class ListingCard extends ConsumerWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    _ListingImage(url: listing.coverImageUrl),
+                    Hero(
+                      tag: 'listing-image-${listing.id}',
+                      child: _ListingImage(url: listing.coverImageUrl),
+                    ),
                     Positioned(
                       top: 8,
                       left: 8,
@@ -141,7 +176,7 @@ class ListingCard extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'مباع',
+                            strings.sold,
                             style: AppFonts.cairo(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -181,18 +216,32 @@ class ListingCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        listing.formattedPrice,
+                        listing.formattedPriceFor(strings),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
                         style: AppFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.volt,
                           height: 1.2,
                         ),
                       ),
+                      if (formatUsdApprox(listing.price).isNotEmpty)
+                        Text(
+                          formatUsdApprox(listing.price),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.ltr,
+                          style: AppFonts.inter(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textMuted,
+                            height: 1.2,
+                          ),
+                        ),
                       const Spacer(),
                       Row(
                         textDirection: TextDirection.rtl,

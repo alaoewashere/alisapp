@@ -6,12 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/auth_navigation.dart';
 import '../../core/utils/result.dart';
 import '../../features/auth/providers/auth_provider.dart';
-import '../../shared/widgets/app_back_button.dart';
 import 'widgets/otp_four_box_input.dart';
+import 'widgets/otp_success_dialog.dart';
 
 class PhoneVerifyScreen extends ConsumerStatefulWidget {
   const PhoneVerifyScreen({
@@ -31,53 +32,63 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
   final _otpController = TextEditingController();
   final _otpKey = GlobalKey<OtpFourBoxInputState>();
   Timer? _timer;
-  int _secondsLeft = 60;
+  int _secondsLeft = 45;
   bool _verifying = false;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _otpController.addListener(() => setState(() {}));
+    _otpController.addListener(_onOtpChanged);
     _startTimer();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _otpController.removeListener(_onOtpChanged);
     _otpController.dispose();
     super.dispose();
   }
 
+  void _onOtpChanged() {
+    if (_errorMessage != null) {
+      setState(() => _errorMessage = null);
+    } else {
+      setState(() {});
+    }
+  }
+
   void _startTimer() {
     _timer?.cancel();
-    setState(() => _secondsLeft = 60);
+    setState(() => _secondsLeft = 45);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsLeft <= 1) {
         timer.cancel();
-        setState(() => _secondsLeft = 0);
-      } else {
+        if (mounted) setState(() => _secondsLeft = 0);
+      } else if (mounted) {
         setState(() => _secondsLeft -= 1);
       }
     });
   }
 
   Future<void> _resend() async {
+    if (_secondsLeft > 0 || _verifying) return;
+
+    final strings = ref.read(appLocalizationsProvider);
     final result = await ref.read(authRepositoryProvider).resendWhatsAppOtp(
           widget.phone,
           purpose: widget.purpose,
         );
     if (!mounted) return;
+
     switch (result) {
       case Success():
         _otpKey.currentState?.clear();
+        setState(() => _errorMessage = null);
         _startTimer();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'تم إرسال رمز جديد',
-              style: AppFonts.cairo(fontWeight: FontWeight.w600),
-            ),
-          ),
+          SnackBar(content: Text(strings.newOtpSent)),
         );
       case Failure(:final message):
         ScaffoldMessenger.of(context).showSnackBar(
@@ -86,172 +97,205 @@ class _PhoneVerifyScreenState extends ConsumerState<PhoneVerifyScreen> {
     }
   }
 
+  Future<void> _navigateAfterSuccess() async {
+    if (widget.purpose == 'password_reset') {
+      if (mounted) context.go(AppRoutes.resetPassword);
+      return;
+    }
+    final route = await resolvePostAuthRoute(ref);
+    if (mounted) context.go(route);
+  }
+
   Future<void> _verify() async {
     final code = _otpController.text;
-    if (code.length != OtpFourBoxInputState.length) return;
+    if (code.length != 4 || _verifying) return;
 
-    setState(() => _verifying = true);
+    setState(() {
+      _verifying = true;
+      _errorMessage = null;
+    });
+
     final result =
         await ref.read(authNotifierProvider.notifier).verifyWhatsAppOtp(
               phone: widget.phone,
               otp: code,
               purpose: widget.purpose,
             );
+
     if (!mounted) return;
-    setState(() => _verifying = false);
 
     switch (result) {
       case Success():
-        if (widget.purpose == 'password_reset') {
-          if (mounted) context.go(AppRoutes.resetPassword);
-          return;
-        }
-        final route = await resolvePostAuthRoute(ref);
-        if (mounted) context.go(route);
+        await showOtpSuccessThenContinue(context);
+        if (!mounted) return;
+        setState(() => _verifying = false);
+        await _navigateAfterSuccess();
       case Failure():
+        setState(() {
+          _verifying = false;
+          _errorMessage = ref.read(appLocalizationsProvider).otpInvalidCode;
+        });
         await _otpKey.currentState?.shake();
         _otpKey.currentState?.clear();
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'رمز غير صحيح',
-              style: AppFonts.cairo(fontWeight: FontWeight.w600),
-            ),
-          ),
-        );
     }
+  }
+
+  String get _timerLabel {
+    final minutes = (_secondsLeft ~/ 60).toString().padLeft(2, '0');
+    final seconds = (_secondsLeft % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final canVerify =
-        _otpController.text.length == OtpFourBoxInputState.length && !_verifying;
+        _otpController.text.length == 4 && !_verifying;
+    final resendActive = _secondsLeft == 0 && !_verifying;
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: true,
-          leading: AppBackButton(
-            onPressed: _verifying ? null : () => context.pop(),
-          ),
-          title: Text(
-            'التحقق من الرقم',
-            style: AppFonts.cairo(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF111111),
-            ),
-          ),
+    return Scaffold(
+      backgroundColor: AppColors.canvas,
+      appBar: AppBar(
+        backgroundColor: AppColors.canvas,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: _verifying ? null : () => context.pop(),
+          icon: const Icon(Icons.arrow_back, color: AppColors.pureWhite),
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 32),
-              Text(
-                'أدخل الرمز الذي أرسلناه إلى',
-                style: AppFonts.cairo(
-                  fontSize: 14,
-                  color: const Color(0xFF888888),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.phone,
-                style: AppFonts.cairo(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF111111),
-                ),
-              ),
-              const SizedBox(height: 32),
-              OtpFourBoxInput(
-                key: _otpKey,
-                controller: _otpController,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.message_rounded,
-                    size: 16,
-                    color: Color(0xFF25D366),
-                  ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      'تم إرسال الرمز عبر واتساب إلى ${widget.phone}',
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.lock_outline,
+                      size: 56,
+                      color: AppColors.volt,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      strings.verifyOtp,
                       textAlign: TextAlign.center,
-                      style: AppFonts.cairo(
-                        fontSize: 12,
-                        color: const Color(0xFF888888),
+                      style: AppFonts.sans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.pureWhite,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              if (_secondsLeft > 0)
-                Text(
-                  '00:${_secondsLeft.toString().padLeft(2, '0')}',
-                  style: AppFonts.cairo(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFFF5A623),
-                  ),
-                )
-              else
-                TextButton(
-                  onPressed: _verifying ? null : _resend,
-                  child: Text(
-                    'إعادة الإرسال',
-                    style: AppFonts.cairo(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                    const SizedBox(height: 8),
+                    Text(
+                      strings.otpSentViaWhatsapp,
+                      textAlign: TextAlign.center,
+                      style: AppFonts.sans(
+                        fontSize: 14,
+                        color: AppColors.pureWhite.withValues(alpha: 0.55),
+                      ),
                     ),
-                  ),
-                ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: FilledButton(
-                  onPressed: canVerify ? _verify : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.phone,
+                      textAlign: TextAlign.center,
+                      textDirection: TextDirection.ltr,
+                      style: AppFonts.sans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.volt,
+                      ),
                     ),
-                  ),
-                  child: _verifying
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          'التحقق',
-                          style: AppFonts.cairo(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    const SizedBox(height: 36),
+                    OtpFourBoxInput(
+                      key: _otpKey,
+                      controller: _otpController,
+                      enabled: !_verifying,
+                    ),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: AppFonts.sans(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.error,
                         ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    if (_secondsLeft > 0)
+                      Text(
+                        _timerLabel,
+                        textDirection: TextDirection.ltr,
+                        style: AppFonts.sans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.volt,
+                        ),
+                      ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: resendActive ? _resend : null,
+                      child: Text(
+                        strings.otpResendCode,
+                        textAlign: TextAlign.center,
+                        style: AppFonts.sans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: resendActive
+                              ? AppColors.volt
+                              : AppColors.pureWhite.withValues(alpha: 0.35),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 36),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: FilledButton(
+                        onPressed: canVerify ? _verify : null,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: canVerify
+                              ? AppColors.volt
+                              : AppColors.volt.withValues(alpha: 0.3),
+                          disabledBackgroundColor:
+                              AppColors.volt.withValues(alpha: 0.3),
+                          foregroundColor: AppColors.canvas,
+                          disabledForegroundColor: AppColors.canvas,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: _verifying
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.canvas,
+                                ),
+                              )
+                            : Text(
+                                strings.otpVerifyButton,
+                                style: AppFonts.sans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.canvas,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

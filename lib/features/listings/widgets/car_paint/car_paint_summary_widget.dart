@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/car_paint_panels.dart';
+import '../../../../core/l10n/car_paint_locale.dart';
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../core/utils/car_paint_utils.dart';
 import 'car_paint_widget.dart';
 
 /// Read-only Sahibinden-style paint summary for listing detail and review.
-class CarPaintSummaryWidget extends StatelessWidget {
+class CarPaintSummaryWidget extends ConsumerWidget {
   const CarPaintSummaryWidget({
     super.key,
     required this.panelConditions,
@@ -15,7 +18,6 @@ class CarPaintSummaryWidget extends StatelessWidget {
     this.showWhenAllOriginal = true,
     this.requireMarkedPanels = false,
     this.markedPanelCount = 0,
-    this.allOriginalLabelAr = 'جميع أجزاء السيارة أصلية',
   });
 
   final Map<String, String> panelConditions;
@@ -24,10 +26,10 @@ class CarPaintSummaryWidget extends StatelessWidget {
   final bool showWhenAllOriginal;
   final bool requireMarkedPanels;
   final int markedPanelCount;
-  final String allOriginalLabelAr;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final theme = Theme.of(context);
     final groups = buildCarPaintSummaryGroups(panelConditions);
     final allOriginal = carPaintAllOriginal(panelConditions);
@@ -57,7 +59,7 @@ class CarPaintSummaryWidget extends StatelessWidget {
               Icon(Icons.check_circle, color: Colors.green.shade700, size: 20),
               const SizedBox(width: 8),
               Text(
-                allOriginalLabelAr,
+                strings.allCarPartsOriginalFull,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.green.shade700,
                   fontWeight: FontWeight.w600,
@@ -72,17 +74,18 @@ class CarPaintSummaryWidget extends StatelessWidget {
   }
 }
 
-class CarPaintLegendRow extends StatelessWidget {
+class CarPaintLegendRow extends ConsumerWidget {
   const CarPaintLegendRow({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final theme = Theme.of(context);
-    const items = [
-      (CarPaintColors.original, 'أصلي'),
-      (CarPaintColors.localPaint, 'صبغ محلي'),
-      (CarPaintColors.painted, 'مصبوغه'),
-      (CarPaintColors.replaced, 'مستبدلة'),
+    final items = [
+      (CarPaintColors.original, strings.bodyPartOriginal),
+      (CarPaintColors.localPaint, strings.bodyPartLocalPaint),
+      (CarPaintColors.painted, strings.bodyPartPainted),
+      (CarPaintColors.replaced, strings.bodyPartReplaced),
     ];
 
     return Container(
@@ -127,13 +130,14 @@ class CarPaintLegendRow extends StatelessWidget {
   }
 }
 
-class _SummaryGroup extends StatelessWidget {
+class _SummaryGroup extends ConsumerWidget {
   const _SummaryGroup({required this.group});
 
   final CarPaintSummaryGroup group;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -152,7 +156,7 @@ class _SummaryGroup extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                group.labelAr,
+                carPaintConditionLabel(strings, group.condition),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -160,10 +164,13 @@ class _SummaryGroup extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          ...group.panelNamesAr.map(
-            (name) => Padding(
+          ...group.panelKeys.map(
+            (panelKey) => Padding(
               padding: const EdgeInsetsDirectional.only(start: 18, bottom: 2),
-              child: Text('• $name', style: theme.textTheme.bodySmall),
+              child: Text(
+                '• ${carPaintPanelLabel(strings, panelKey)}',
+                style: theme.textTheme.bodySmall,
+              ),
             ),
           ),
         ],

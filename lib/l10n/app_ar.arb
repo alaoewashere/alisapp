@@ -1,6 +1,6 @@
 {
   "@@locale": "ar",
-  "appName": "Sello",
+  "appName": "سـوقك",
   "home": "الرئيسية",
   "search": "بحث",
   "favorites": "المفضلة",
@@ -90,13 +90,17 @@
   "memberSince": "عضو منذ {date}",
   "@memberSince": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "listingsOf": "إعلانات {name}",
   "@listingsOf": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "profileNotFound": "الملف غير موجود",
@@ -120,7 +124,1546 @@
   "categories": "الفئات",
   "featured": "مميز",
   "sold": "مباع",
-  "searchHint": "ابحث في Sello...",
+  "searchHint": "ابحث في سـوقك...",
   "otpSent": "تم إرسال رمز التحقق. تحقق من رسائلك.",
-  "newOtpSent": "تم إرسال رمز جديد"
+  "newOtpSent": "تم إرسال رمز جديد",
+  "homeHeroBuySell": "اشتري و بيع",
+  "homeHeroEasily": "بسهولة.",
+  "homeHeroSubtitle": "اعثر على أفضل العروض بين يديك",
+  "homeExtendedSearchHint": "ابحث عن سيارات، شقق، إلكترونيات...",
+  "browseCategories": "تصفح الفئات",
+  "viewAll": "عرض الكل",
+  "featuredListingsTitle": "إعلانات مميزة",
+  "latestListingsTitle": "أحدث النشرات والمعروضات",
+  "failedLoadCategories": "فشل تحميل التصنيفات",
+  "failedLoadListings": "فشل تحميل الإعلانات",
+  "searchResultsCount": "{count} نتائج",
+  "@searchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapTooltip": "كثافة الإعلانات",
+  "favoritesTooltip": "المفضلة",
+  "splashTagline": "تطبيقك الأول للبيع والشراء",
+  "welcomeToSouqak": "مرحباً بك في سـوقك",
+  "chooseYourLanguage": "اختر لغتك",
+  "languageChangeHint": "يمكنك تغيير اللغة في أي وقت من الإعدادات",
+  "skip": "تخطي",
+  "createAccount": "إنشاء حساب",
+  "signUpOverline": "أنشئ حسابك",
+  "createAccountTitle": "إنشاء حساب",
+  "firstName": "الاسم الأول",
+  "lastName": "الاسم الأخير",
+  "emailLabel": "البريد الإلكتروني",
+  "passwordLabel": "كلمة المرور",
+  "confirmPasswordLabel": "تأكيد كلمة المرور",
+  "alreadyHaveAccount": "لديك حساب بالفعل؟ ",
+  "signInLink": "سجّل دخولك",
+  "signUpAgreementPrefix": "بالتسجيل، أنت توافق على ",
+  "termsLink": "شروط الاستخدام",
+  "andConnector": " و",
+  "privacyLink": "سياسة الخصوصية",
+  "welcomeBack": "مرحباً بك",
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "noAccountYet": "ليس لديك حساب؟ ",
+  "signUpNow": "سجّل الآن",
+  "firstNameHint": "محمد",
+  "lastNameHint": "أحمد",
+  "understood": "فهمت",
+  "heatmapTutorialTitle": "اكتشف كثافة الإعلانات في منطقتك على الخريطة",
+  "heatmapTutorialSubtitle": "اضغط على أيقونة الخريطة لعرض المناطق الأكثر نشاطاً",
+  "smartAlertsTutorialTitle": "حدد معايير بحثك مرة واحدة واستلم إشعاراً فورياً عند نشر إعلان جديد يطابقها",
+  "smartAlertsTutorialSubtitle": "اضغط على أيقونة الجرس لإدارة تنبيهاتك الذكية",
+  "agreeToTerms": "أوافق على الشروط",
+  "agreeToPrivacy": "أوافق على سياسة الخصوصية",
+  "continueWithPhone": "متابعة برقم الهاتف",
+  "phoneOtpHint": "سنرسل لك رمز تحقق عبر واتساب",
+  "sendCode": "إرسال الرمز",
+  "otpSentTo": "أرسلنا رمزاً إلى\n{phone}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "otpResendIn": "إعادة الإرسال خلال {seconds} ث",
+  "@otpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "otpCanResendNow": "يمكنك إعادة إرسال الرمز",
+  "otpNotReceived": "لم يصلك الرمز؟",
+  "otpHelpText": "• تأكد أن الرقم {phone} صحيح\n• انتظر حتى دقيقة — قد يتأخر SMS\n• Twilio: أضف رقمك في Sender Pool لخدمة souqiq-otp\n• يجب تفعيل مزود SMS (Twilio أو MessageBird) في Supabase\n• للتطوير: أضف رقمك كـ Test OTP في لوحة Supabase\n• راجع supabase/README.md — قسم Phone OTP",
+  "@otpHelpText": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "completeProfileTitle": "أكمل ملفك الشخصي",
+  "tapToChooseAvatar": "اضغط لاختيار صورتك الرمزية",
+  "profileNameReadError": "تعذّر قراءة الاسم من الحساب. سجّل الدخول مجدداً.",
+  "sessionExpiredPleaseLogin": "انتهت جلستك، يرجى تسجيل الدخول مجدداً",
+  "back": "رجوع",
+  "searchInSouqak": "ابحث في سـوقك",
+  "mySmartAlertsTooltip": "تنبيهاتي الذكية",
+  "filtersTooltip": "الفلاتر",
+  "noSuggestions": "لا توجد اقتراحات",
+  "searchForQuery": "بحث عن \"{query}\"",
+  "@searchForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCardFailed": "تعذّر إنشاء البطاقة، حاول مرة أخرى",
+  "followersLabel": "متابع",
+  "myListedAds": "إعلاناتي المعروضة",
+  "mySmartAlerts": "تنبيهاتي الذكية",
+  "defaultUser": "مستخدم",
+  "otherSettings": "إعدادات أخرى",
+  "accountDetails": "تفاصيل الحساب",
+  "passwordSettings": "كلمة المرور",
+  "aboutApp": "عن التطبيق",
+  "aboutAppDescription": "SOUQAK — سـوقك المحلي للإعلانات المبوبة في العراق. اشترِ وبيع بسهولة عبر تطبيق واحد.",
+  "versionLabel": "الإصدار {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "helpFaq": "المساعدة / الأسئلة الشائعة",
+  "contactSupport": "تواصل مع الدعم",
+  "supportChatIntro": "هل تحتاج مساعدة؟ راسل فريق الدعم وسنرد عليك في أقرب وقت.",
+  "logoutAction": "خروج",
+  "logoutConfirmBodyExtended": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+  "deleteAccountConfirmBody": "هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.",
+  "startConversation": "ابدأ المحادثة",
+  "conversation": "محادثة",
+  "viewListing": "عرض الإعلان",
+  "blockUser": "حظر المستخدم",
+  "blockFeatureComingSoon": "ميزة الحظر قريباً",
+  "reportConversation": "الإبلاغ عن المحادثة",
+  "reportReceived": "تم استلام بلاغك",
+  "onlineNow": "متصل الآن",
+  "typeMessage": "اكتب رسالة...",
+  "reconnecting": "جاري إعادة الاتصال...",
+  "chooseRecoveryMethod": "اختر طريقة استعادة حسابك",
+  "continueViaEmail": "متابعة عبر البريد الإلكتروني",
+  "linkedEmailHint": "بريدك المرتبط بالحساب",
+  "continueViaPhone": "متابعة عبر الهاتف",
+  "linkedPhoneHint": "هاتفك المرتبط بالحساب",
+  "sendAction": "إرسال",
+  "emailNotRegistered": "هذا البريد غير مسجل لدينا",
+  "phoneNotRegistered": "هذا الرقم غير مسجل لدينا",
+  "listingPostedToday": "اليوم",
+  "listingPostedOneDayAgo": "يوم واحد",
+  "listingPostedDaysAgo": "{count} يوم",
+  "@listingPostedDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "homeFeedLatestTitle": "أحدث الإعلانات",
+  "otpSentViaWhatsapp": "تم إرسال الرمز عبر واتساب إلى",
+  "otpResendCode": "إعادة إرسال الرمز",
+  "otpVerifyButton": "التحقق",
+  "otpInvalidCode": "رمز غير صحيح",
+  "otpVerifiedSuccess": "تم التحقق بنجاح!",
+  "otpSigningIn": "جارٍ تسجيل الدخول...",
+  "today": "اليوم",
+  "yesterday": "أمس",
+  "now": "الآن",
+  "oneMinuteAgo": "دقيقة واحدة",
+  "twoMinutesAgo": "دقيقتان",
+  "minutesAgo": "{count} دقيقة",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "oneHourAgo": "ساعة واحدة",
+  "twoHoursAgo": "ساعتان",
+  "hoursAgo": "{count} ساعة",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoDaysAgo": "يومان",
+  "daysAgo": "{count} أيام",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "myMessages": "رسائلي",
+  "loginToViewMessages": "سجّل الدخول لعرض الرسائل",
+  "noMessagesYet": "لا توجد رسائل بعد",
+  "contactSellersPrompt": "ابدأ بالتواصل مع البائعين",
+  "deleteConversationTitle": "حذف المحادثة",
+  "deleteConversationBody": "هل تريد حذف هذه المحادثة؟",
+  "chatMessagesHeader": "الرسائل والمحادثات",
+  "chatDirectContact": "تواصل مباشرة مع المشترين والبائعين",
+  "activeUsersCount": "{count} نشط",
+  "@activeUsersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingBadge": "إعلان",
+  "startChatDefault": "ابدأ المحادثة",
+  "categoryRealEstate": "العقارات",
+  "categoryVehicles": "المركبات",
+  "categoryElectronics": "الإلكترونيات",
+  "categoryBuySell": "سوق المستعمل والجديد",
+  "categoryTutoring": "دروس خصوصية",
+  "categoryJobs": "فرص العمل",
+  "categoryPets": "الحيوانات",
+  "categoryHomeHelp": "مساعدة منزلية",
+  "categorySubtitleRealEstate": "سكني ، أراضi ، محلات تجارية...",
+  "categorySubtitleVehicles": "سيارات ، سيارات للإيجار ، دراجات...",
+  "categorySubtitleElectronics": "جوالات ، لابتوب ، تلفزيونات...",
+  "categorySubtitleBuySell": "موبايلات ، كمبيوتر ، ملابس ، أثاث...",
+  "categorySubtitleTutoring": "مدرسة ، جامعة ، لغات ، قرآن...",
+  "categorySubtitleJobs": "تقنية ، هندسة ، طب ، نفط...",
+  "categorySubtitlePets": "كلاب ، قطط ، طيور ، مزرعة...",
+  "categorySubtitleHomeHelp": "تنظيف ، طبخ ، مربيات ، سائق...",
+  "listingNotFound": "الإعلان غير موجود",
+  "tabListing": "إعلان",
+  "tabDescription": "الوصف",
+  "tabLocation": "الموقع",
+  "sellerOtherListings": "إعلانات أخرى للبائع",
+  "reportThisListing": "الإبلاغ عن هذا الإعلان",
+  "negotiable": "قابل للتفاوض",
+  "videoTour": "🎥 جولة بالفيديو",
+  "paintConditionTitle": "حالة الهيكل والطلاء",
+  "allPartsOriginal": "جميع الأجزاء أصلية",
+  "viewsCount": "{count} مشاهدة",
+  "@viewsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumber": "رقم الإعلان",
+  "listingDate": "تاريخ الإعلان",
+  "noDescriptionAdded": "لم يضف صاحب الإعلان وصفاً",
+  "locationNotSet": "لم يتم تحديد الموقع",
+  "selectedLocation": "الموقع المحدد",
+  "sellerLabel": "بائع",
+  "theSeller": "البائع",
+  "memberSinceYear": "عضو منذ {year}",
+  "@memberSinceYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "listingsCountLabel": "{count} إعلان",
+  "@listingsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAllSellerListings": "عرض جميع إعلاناته",
+  "safetyTipsTitle": "نصائح الأمان",
+  "safetyTipPublicPlace": "قابل البائع في مكان عام",
+  "safetyTipNoPrepay": "لا تدفع مقدماً قبل معاينة المنتج",
+  "safetyTipInspect": "تحقّق من حالة المنتج قبل الشراء",
+  "rateSeller": "قيّم البائع",
+  "priceLabel": "السعر",
+  "locationLabel": "الموقع",
+  "conditionLabel": "الحالة",
+  "packageFree": "مجاني",
+  "packagePro": "برو",
+  "packagePremium": "مميز",
+  "statusActive": "نشط",
+  "statusExpired": "منتهي",
+  "statusPending": "معلق",
+  "chooseOption": "اختر",
+  "allCategories": "الكل",
+  "noCategories": "لا توجد فئات",
+  "noSubcategories": "لا توجد فئات فرعية",
+  "allCategoryListings": "كل إعلانات {name}",
+  "@allCategoryListings": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "allGovernorates": "جميع المحافظات",
+  "postListingStep1": "الخطوة الأولى",
+  "postListingStep2": "الخطوة الثانية",
+  "postListingStep3": "الخطوة الثالثة",
+  "postListingStep4": "الخطوة الرابعة",
+  "postListingStep5": "الخطوة الخامسة",
+  "postListingStep6": "الخطوة السادسة",
+  "postListingStep7": "الخطوة السابعة",
+  "postListingStep8": "الخطوة الثامنة",
+  "postListingStepFallback": "الخطوة {step}",
+  "@postListingStepFallback": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "nextStep": "التالي",
+  "saveAsDraft": "حفظ كمسودة",
+  "titleMinLengthError": "العنوان يجب أن يكون 5 أحرف على الأقل",
+  "addPhotoRequired": "يرجى إضافة صورة واحدة على الأقل",
+  "draftSaved": "تم حفظ المسودة",
+  "confirmListingFeeTitle": "تأكيد رسوم الإعلان",
+  "confirmListingFeeBody": "لقد استخدمت إعلانيك المجانيين هذا الشهر. سيتم تحصيل رسوم الإعلان العادي ({price}) لهذا الإعلان.",
+  "@confirmListingFeeBody": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmAndPay": "تأكيد ودفع {price}",
+  "@confirmAndPay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "publishingListing": "جاري نشر الإعلان...",
+  "uploadingPhotos": "جاري رفع الصور... ({current}/{total})",
+  "@uploadingPhotos": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "searchEllipsis": "بحث...",
+  "specifyValue": "حدد القيمة",
+  "specifyType": "حدد النوع",
+  "choosePickerTitle": "اختر {label}",
+  "@choosePickerTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "governorateRequired": "المحافظة *",
+  "neighborhoodOptional": "المنطقة / الحي (اختياري)",
+  "neighborhoodLabel": "المنطقة / الحي",
+  "chooseGovernorateFirst": "اختر المحافظة أولاً لعرض المناطق المتاحة",
+  "currencyIqd": "د.ع",
+  "listingDetailsTitle": "تفاصيل الإعلان",
+  "optionalLabel": "اختياري",
+  "listingTypeLabel": "نوع الإعلان *",
+  "conditionNew": "جديد",
+  "conditionUsed": "مستعمل",
+  "listingTitleLabel": "عنوان الإعلان",
+  "listingTitleHint": "اكتب عنوان إعلانك هنا",
+  "listingDescriptionLabel": "وصف الإعلان",
+  "listingDescriptionHint": "أضف وصفاً تفصيلياً لإعلانك...",
+  "removeArea": "إزالة المنطقة",
+  "pickLocationOnMap": "تحديد الموقع على الخريطة",
+  "coordinatesLabel": "الإحداثيات: {coords}",
+  "@coordinatesLabel": {
+    "placeholders": {
+      "coords": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedAreaLabel": "المنطقة المختارة: {area}",
+  "@selectedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestedAreaLabel": "المنطقة المقترحة: {area}",
+  "@suggestedAreaLabel": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "removeLocation": "إزالة الموقع",
+  "mapNotConfigured": "الخريطة غير مهيّأة. أضف GOOGLE_MAPS_API_KEY أو اختر المحافظة فقط.",
+  "mapOpenFailed": "تعذّر فتح الخريطة. يمكنك المتابعة باختيار المحافظة فقط.",
+  "photosTitle": "الصور",
+  "photosSubtitle": "أضف حتى {max} صور — اسحب لإعادة الترتيب",
+  "@photosSubtitle": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "firstPhotoIsCover": "الصورة الأولى هي الغلاف",
+  "maxPhotosLimit": "الحد الأقصى {max} صور",
+  "@maxPhotosLimit": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "noPhotosYet": "لم تضف أي صور بعد",
+  "photosHelpSell": "الصور تزيد من فرصة بيع إعلانك",
+  "photoTipGoodLight": "إضاءة جيدة",
+  "photoTipClearPhotos": "صور واضحة",
+  "photoTipMultipleAngles": "زوايا متعددة",
+  "reviewListingTitle": "مراجعة الإعلان",
+  "detailsSection": "التفاصيل",
+  "categorySection": "الفئة",
+  "editAction": "تعديل",
+  "showMore": "عرض المزيد",
+  "showLess": "عرض أقل",
+  "retryAction": "إعادة المحاولة",
+  "selectedSpecsCount": "{count} مواصفة مختارة",
+  "@selectedSpecsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedFeaturesCount": "{count} ميزة مختارة",
+  "@selectedFeaturesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "exchangePossible": "قابل للتبادل",
+  "deliveryAvailable": "توصيل متاح",
+  "smartTvBadge": "سمارت TV",
+  "contactTitle": "التواصل",
+  "contactInfoSection": "معلومات التواصل",
+  "contactPreferencesTitle": "تفضيلات التواصل",
+  "contactPreferencesHelp": "اختر الطريقة التي يمكن للمشترين التواصل معك من خلالها على هذا الإعلان.\n\n• هاتف ورسائل: يمكن التواصل عبر الهاتف والرسائل داخل التطبيق\n• هاتف فقط: يظهر رقم الهاتف دون رسائل داخل التطبيق\n• رسائل فقط: التواصل عبر الرسائل داخل التطبيق فقط",
+  "choosePackage": "اختر الباقة",
+  "freePostsRemainingLabel": "0 د.ع (متبقي {remaining} إعلان مجاني هذا الأسبوع)",
+  "@freePostsRemainingLabel": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "freePostsUsedWarning": "تم استخدام إعلانيك المجانيين. سيتم تحصيل رسوم الإعلان العادي.",
+  "roomsCountBadge": "{count} غرف",
+  "@roomsCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLoadFailed": "تعذّر تحميل الملف الشخصي",
+  "changesSavedSuccess": "تم حفظ التغييرات بنجاح",
+  "saveError": "حدث خطأ أثناء الحفظ",
+  "enterName": "أدخل الاسم",
+  "usernameLabel": "اسم المستخدم",
+  "usernameCannotChange": "لا يمكن تغيير اسم المستخدم",
+  "changePhoneNumber": "تغيير الرقم",
+  "verifyPhoneAction": "✓ تحقق من الرقم",
+  "notVerified": "لم يتم التحقق",
+  "changePhoto": "تغيير الصورة",
+  "verifyPhoneTitle": "التحقق من رقم الهاتف",
+  "whatsappSixDigitHint": "سنرسل رمزاً مكوناً من 6 أرقام عبر واتساب",
+  "sendWhatsappCode": "إرسال رمز واتساب",
+  "enterValidPhone": "أدخل رقم هاتف صحيح",
+  "phoneVerifiedSuccess": "تم التحقق من رقم الهاتف بنجاح",
+  "ratingsTitle": "التقييمات",
+  "noRatingsYet": "لا توجد تقييمات بعد",
+  "loadMore": "تحميل المزيد",
+  "noReviewLeft": "لم يترك تعليقاً",
+  "ratingSubmitFailed": "تعذّر إرسال التقييم، حاول مرة أخرى",
+  "rateExperienceTitle": "كيف كانت تجربتك؟",
+  "addCommentOptional": "أضف تعليقاً (اختياري)",
+  "submitRating": "إرسال التقييم",
+  "ratingsHelpCommunity": "تقييماتك تساعد المجتمع على الثقة بالبائعين",
+  "chooseAvatarTitle": "اختر صورتك الرمزية",
+  "priceHistoryTitle": "تاريخ السعر",
+  "priceDroppedSummary": "انخفض السعر من {from} إلى {to} خلال {duration}",
+  "@priceDroppedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "priceIncreasedSummary": "ارتفع السعر من {from} إلى {to}",
+  "@priceIncreasedSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPriceLabel": "السعر الأصلي",
+  "currentPriceLabel": "السعر الحالي",
+  "lessThanOneWeek": "أقل من أسبوع",
+  "oneWeek": "أسبوع واحد",
+  "twoWeeks": "أسبوعين",
+  "weeksCount": "{count} أسابيع",
+  "@weeksCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "moderationYouAreBanned": "أنت محظور",
+  "moderationBannedTitle": "تم الحظر",
+  "moderationWarningTitle": "تنبيه",
+  "moderationPostingBanDefault": "أنت محظور من الدردشة والنشر حالياً.",
+  "moderationBlockedBody": "لقد تجاوزت الحد المسموح به من المخالفات ولم يتم إرسال رسالتك.",
+  "moderationCensoredBody": "تم استخدام كلمة غير لائقة في رسالتك وتمت إزالتها. يرجى الالتزام بقواعد الاستخدام.",
+  "postingBanPermanent": "أنت محظور بشكل دائم من الدردشة والنشر",
+  "postingBanUntil": "أنت محظور من الدردشة والنشر حتى {date}",
+  "@postingBanUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postingBanPermanentReason": "تم حظرك بشكل دائم من الدردشة والنشر بسبب تكرار استخدام لغة غير لائقة.",
+  "postingBanFirstReason": "تم حظرك من الدردشة والنشر لمدة يومين بسبب استخدام لغة غير لائقة. في حال التكرار ستُحظر لمدة شهر كامل.",
+  "postingBanRepeatReason": "تم حظرك من الدردشة والنشر لمدة شهر كامل بسبب تكرار استخدام لغة غير لائقة.",
+  "usernameSetupTitle": "اختر اسم مستخدمك",
+  "usernameSetupSubtitle": "سيظهر هذا الاسم في ملفك الشخصي وإعلاناتك",
+  "usernameHint": "اسم_المستخدم",
+  "usernameFormatRules": "يمكن استخدام الأحرف الإنجليزية والأرقام والشرطة السفلية فقط",
+  "skipForNow": "تخطى الآن",
+  "genericErrorRetry": "حدث خطأ، حاول مجدداً",
+  "emailVerifyTitle": "التحقق من البريد",
+  "otpSentToEmailPrompt": "أدخل الرمز الذي أرسلناه إلى",
+  "newPasswordTitle": "كلمة المرور الجديدة",
+  "newPasswordSubtitle": "أدخل كلمة مرور جديدة لحسابك",
+  "passwordChangedSuccess": "تم تغيير كلمة المرور",
+  "allListings": "جميع الإعلانات",
+  "categoryNotFoundMigration": "لم يتم العثور على \"{name}\" في قاعدة البيانات. طبّق migrations في Supabase ثم أعد تحميل التطبيق.",
+  "@categoryNotFoundMigration": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyAccountTitle": "توثيق الحساب",
+  "verifyAccountSubtitle": "قبل المتابعة، يرجى توثيق هويتك",
+  "whyVerification": "لماذا التوثيق؟",
+  "verificationBenefitsBody": "توثيق حسابك يمنحك شارة الثقة الزرقاء ويزيد من ثقة المشترين في إعلاناتك. نراجع وثائقك بسرية تامة ولا نشاركها مع أي طرف.",
+  "verifiedSellerBadge": "شارة «بائع موثّق» على ملفك وإعلاناتك",
+  "reviewWithin24Hours": "مراجعة خلال 24 ساعة",
+  "documentsStoredSecurely": "وثائقك محفوظة بشكل آمن",
+  "verifyIdentityAction": "توثيق الهوية ←",
+  "chooseDocumentType": "اختر نوع الوثيقة",
+  "nationalId": "الهوية الوطنية",
+  "drivingLicense": "رخصة القيادة",
+  "passport": "جواز السفر",
+  "captureDocumentTitle": "صوّر الوثيقة",
+  "documentFront": "الوجه الأمامي",
+  "documentBack": "الوجه الخلفي",
+  "submitForReview": "إرسال للمراجعة",
+  "capturePhoto": "التقاط صورة",
+  "chooseFromGallery": "اختيار من المعرض",
+  "documentBackRequired": "يرجى تصوير الوجه الخلفي للوثيقة",
+  "verificationSubmitFailed": "تعذّر إرسال الطلب، حاول مرة أخرى",
+  "verificationSentSuccess": "تم الإرسال بنجاح",
+  "verificationReviewNotice": "سيتم مراجعة طلبك خلال 24 ساعة وسيصلك إشعار عند الموافقة",
+  "backToHome": "العودة للرئيسية",
+  "newSmartAlert": "تنبيه ذكي جديد",
+  "alertNameHint": "اسم التنبيه *",
+  "alertNameRequired": "اسم التنبيه مطلوب",
+  "modelYear": "سنة الصنع",
+  "fromLabel": "من",
+  "toLabel": "إلى",
+  "allIraq": "كل العراق",
+  "saveAlert": "حفظ التنبيه",
+  "alertSavedSuccess": "تم حفظ التنبيه ✓ سنخبرك فور نشر إعلان مطابق",
+  "alertSaveFailed": "تعذّر حفظ التنبيه: {error}",
+  "@alertSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newAlert": "تنبيه جديد",
+  "loginToManageAlerts": "سجّل الدخول لإدارة التنبيهات",
+  "noAlertsYet": "لا توجد تنبيهات بعد",
+  "createAlertNow": "أنشئ تنبيهاً الآن",
+  "saveSearchAsAlert": "احفظ هذا البحث كتنبيه ذكي 🔔",
+  "alertLimitFreeReached": "وصلت للحد الأقصى للمستخدمين المجانيين (3 تنبيهات)",
+  "upgradeProUnlimitedAlerts": "ترقّ إلى Pro للحصول على تنبيهات غير محدودة",
+  "listingBoostedSuccess": "تم ترقية إعلانك بنجاح",
+  "boostYourListing": "ترقية إعلانك",
+  "boostListingSubtitle": "اختر الباقة المناسبة لزيادة ظهور إعلانك في أعلى الأقسام",
+  "markAsSoldAction": "مباع",
+  "markAsSoldTitle": "تعليم كمباع",
+  "markAsSoldBody": "هل تريد تعليم هذا الإعلان كمباع؟",
+  "deleteListingTitle": "حذف الإعلان",
+  "deleteListingBody": "هل تريد حذف هذا الإعلان؟",
+  "promoteListing": "ترويج",
+  "republishListing": "إعادة نشر",
+  "restoreListing": "استعادة",
+  "listingNumberWithRef": "رقم الإعلان: #{ref}",
+  "@listingNumberWithRef": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "listingNumberDash": "رقم الإعلان: —",
+  "contactUsOnSouqak": "تواصل معنا على سـوقك",
+  "pendingApprovalTitle": "بانتظار موافقة الإدارة",
+  "pendingApprovalBody": "تعديل، حذف، تم البيع، وواتساب ستظهر بعد الموافقة",
+  "messageSeller": "راسل البائع",
+  "cannotMessageSelf": "لا يمكنك مراسلة نفسك",
+  "openChatFailed": "تعذّر فتح المحادثة",
+  "markedAsSoldSuccess": "تم وضع علامة مباع",
+  "rateBuyer": "قيّم المشتري",
+  "deleteListingConfirmBody": "هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.",
+  "listingDeletedSuccess": "تم حذف الإعلان",
+  "reportChooseReason": "اختر سبباً أو اكتب تفاصيل البلاغ",
+  "reportSubmittedThanks": "تم إرسال البلاغ. شكراً لمساعدتك.",
+  "reportSubmitFailed": "تعذّر إرسال البلاغ",
+  "reportDetailsLabel": "تفاصيل البلاغ",
+  "submitReport": "إرسال البلاغ",
+  "reportReasonDuplicate": "إعلان مكرر",
+  "reportReasonMisleadingPrice": "سعر مضلل",
+  "reportReasonFakePhotos": "صور مزيفة",
+  "reportReasonInappropriate": "محتوى غير لائق",
+  "reportReasonFraud": "احتيال أو نصب",
+  "reportReasonOther": "أخرى",
+  "filtersTitle": "الفلاتر",
+  "clearAll": "مسح الكل",
+  "priceRangeLabel": "نطاق السعر",
+  "additionalOptions": "خيارات إضافية",
+  "featuredOnlyLabel": "إعلانات مميزة فقط",
+  "negotiableOnlyLabel": "قابل للتفاوض فقط",
+  "showResultsCount": "عرض {count} نتيجة",
+  "@showResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "showResultsLoading": "عرض النتائج...",
+  "showResults": "عرض النتائج",
+  "editChangesSaved": "تم حفظ التعديلات ✓",
+  "editListingTitle": "تعديل الإعلان",
+  "saveEdits": "حفظ التعديلات",
+  "heatmapTitle": "خريطة الإعلانات",
+  "heatmapLoadFailed": "تعذّر تحميل بيانات الكثافة",
+  "heatmapNoActiveListings": "لا توجد إعلانات نشطة في المناطق المعروضة حالياً",
+  "heatmapClusterSummary": "{areas} مناطق · {total} إعلان",
+  "@heatmapClusterSummary": {
+    "placeholders": {
+      "areas": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapSelectArea": "اختر منطقة لعرض الإعلانات",
+  "showListingsAction": "عرض الإعلانات",
+  "heatmapFilterCars": "سيارات",
+  "heatmapDensityCars": "يوجد {count} سيارة للبيع الآن في {area}",
+  "@heatmapDensityCars": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityRealEstate": "يوجد {count} إعلان عقاري الآن في {area}",
+  "@heatmapDensityRealEstate": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityElectronics": "يوجد {count} إعلان إلكترونيات الآن في {area}",
+  "@heatmapDensityElectronics": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "heatmapDensityGeneric": "يوجد {count} إعلان نشط حالياً في {area}",
+  "@heatmapDensityGeneric": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "listingPendingReviewStats": "إعلانك قيد المراجعة — الإحصائيات تُحدَّث تلقائياً بعد النشر",
+  "contactStatLabel": "تواصل",
+  "autoRenewLabel": "التجديد التلقائي",
+  "autoRenewAfterApproval": "يُفعَّل بعد موافقة الإدارة على الإعلان",
+  "expiresInDays": "ينتهي بعد {days} يوم",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "priceChangeTitle": "تغيير السعر",
+  "priceChangeWarning": "تنبيه: تغيير السعر سيظهر لجميع المشترين في تاريخ السعر",
+  "confirmChange": "تأكيد التغيير",
+  "publishSuccessDone": "تم ✓",
+  "listingPendingReviewTitle": "إعلانك قيد المراجعة",
+  "listingVisibleAfterApproval": "سيظهر للجميع بعد الموافقة",
+  "okAction": "موافق",
+  "closeTooltip": "إغلاق",
+  "addPhotoLabel": "إضافة صورة",
+  "coverPhotoLabel": "الغلاف",
+  "priceEstimateFailed": "تعذّر تقدير السعر، حاول مرة أخرى",
+  "calculateSuggestedPrice": "✨ احسب السعر المقترح",
+  "confidenceHigh": "عالية",
+  "confidenceMedium": "متوسطة",
+  "confidenceLow": "منخفضة",
+  "aiPriceEstimateTitle": "تقدير الذكاء الاصطناعي",
+  "priceEstimateDisclaimer": "هذا تقدير تقريبي وليس سعراً نهائياً",
+  "phoneOtpWhatsappHint": "سنرسل لك رمز تحقق عبر واتساب",
+  "passwordResetResent": "تم إرسال الرابط مرة أخرى",
+  "passwordResetSentTitle": "تم إرسال الرابط",
+  "passwordResetSentSubtitle": "تم إرسال رابط إعادة التعيين إلى بريدك",
+  "passwordResetInstructions": "افتح الرابط في بريدك لإنشاء كلمة مرور جديدة. قد يستغرق وصول الرسالة بضع دقائق.",
+  "resendLink": "إعادة الإرسال",
+  "backToLogin": "العودة لتسجيل الدخول",
+  "videoLoadFailed": "تعذّر تحميل الفيديو",
+  "listingsOnSouqakCount": "{count} إعلاناً على سـوقك",
+  "@listingsOnSouqakCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleDetailsTitle": "تفاصيل المركبة",
+  "basicInfoTitle": "المعلومات الأساسية",
+  "vehicleTrimLabel": "الفئة",
+  "trimExampleHint": "مثال: SE",
+  "mileageLabel": "المسافة",
+  "engineLabel": "المحرك",
+  "cylindersLabel": "الأسطوانات",
+  "paintStatusLabel": "وضع الطلاء",
+  "fuelRequiredLabel": "الوقود *",
+  "importCountryLabel": "بلد الاستيراد",
+  "plateLabel": "اللوحة",
+  "transmissionRequiredLabel": "ناقل الحركة *",
+  "seatCountLabel": "عدد المقاعد",
+  "seatMaterialLabel": "مادة المقاعد",
+  "specsSectionTitle": "المواصفات",
+  "priceRequiredLabel": "السعر *",
+  "conditionRequiredLabel": "الحالة *",
+  "yearLabel": "السنة",
+  "chooseColorPlaceholder": "اختر اللون",
+  "chooseCustomColorTitle": "اختر لوناً مخصصاً",
+  "colorLabel": "اللون",
+  "paintOriginalLabel": "أصلي",
+  "paintLocalLabel": "بوية محلية",
+  "paintPaintedLabel": "مصبوغة",
+  "paintReplacedLabel": "مستبدلة",
+  "vehicleSpecsSelectedCount": "تم اختيار {count} مواصفة",
+  "@vehicleSpecsSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "electronicsPhoneDetailsTitle": "تفاصيل الهاتف",
+  "electronicsLaptopDetailsTitle": "تفاصيل اللابتوب",
+  "electronicsTvDetailsTitle": "تفاصيل التلفزيون",
+  "electronicsDetailsTitle": "تفاصيل الإلكترونيات",
+  "brandLabel": "الماركة",
+  "modelLabel": "الموديل",
+  "storageLabel": "التخزين",
+  "ramLabel": "الرام",
+  "batteryHealthLabel": "صحة البطارية",
+  "withBoxLabel": "مع العلبة",
+  "withChargerLabel": "مع الشاحن",
+  "warrantyLabel": "الضمان",
+  "processorLabel": "المعالج",
+  "screenSizeInchesLabel": "حجم الشاشة (بوصة)",
+  "resolutionLabel": "الدقة",
+  "realEstateDetailsTitle": "تفاصيل العقار",
+  "propertyTypeRequiredLabel": "نوع العقار *",
+  "offerTypeRequiredLabel": "نوع العرض *",
+  "areaSqmRequiredLabel": "المساحة (م²) *",
+  "sqmUnit": "م²",
+  "floorLabel": "الطابق",
+  "roomsCountLabel": "عدد الغرف",
+  "bathroomsCountLabel": "عدد الحمامات",
+  "buildingAgeYearsLabel": "عمر البناء (سنة)",
+  "finishingLabel": "التشطيب",
+  "deedTypeLabel": "نوع الصك",
+  "featuresSectionTitle": "المميزات",
+  "brandOptionalLabel": "الماركة (اختياري)",
+  "exchangePossibleQuestion": "قابل للتبادل؟",
+  "deliveryAvailableQuestion": "توصيل متاح؟",
+  "deliveryCostRequiredLabel": "تكلفة التوصيل *",
+  "jobDetailsTitle": "تفاصيل الوظيفة",
+  "jobTypeRequiredLabel": "نوع الدوام *",
+  "sectorRequiredLabel": "القطاع *",
+  "experienceRequiredLabel": "الخبرة المطلوبة",
+  "educationRequiredLabel": "المؤهل المطلوب",
+  "genderPreferenceLabel": "تفضيل الجنس",
+  "salaryTypeLabel": "نوع الراتب",
+  "salaryMinRequiredLabel": "الراتب الأدنى *",
+  "salaryMaxLabel": "الراتب الأعلى",
+  "benefitsSectionTitle": "المزايا",
+  "serviceDetailsTitle": "تفاصيل الخدمة",
+  "genderLabel": "الجنس",
+  "nationalityLabel": "الجنسية",
+  "workHoursRequiredLabel": "أوقات العمل *",
+  "weekDaysLabel": "أيام الأسبوع",
+  "yearsExperienceLabel": "سنوات الخبرة",
+  "expectedSalaryRequiredLabel": "الراتب المتوقع *",
+  "languagesSectionTitle": "اللغات",
+  "animalDetailsTitle": "تفاصيل الحيوان",
+  "ageMonthsLabel": "العمر (بالأشهر)",
+  "vaccinatedQuestion": "ملقح؟",
+  "hasDocumentsQuestion": "يمتلك وثائق؟",
+  "trainedQuestion": "مدرب؟",
+  "tutoringDetailsTitle": "تفاصيل الدرس",
+  "subjectRequiredLabel": "المادة *",
+  "studyStageRequiredLabel": "المرحلة الدراسية *",
+  "curriculumLabel": "المنهج",
+  "teachingMethodRequiredLabel": "طريقة التدريس *",
+  "acceptedGenderLabel": "الجنس المقبول",
+  "pricePerHourRequiredLabel": "السعر/ساعة *",
+  "educationQualificationLabel": "المؤهل العلمي",
+  "viewOnMapLabel": "عرض على الخريطة",
+  "videoSectionTitle": "الفيديو",
+  "currentVideoReplaceHint": "الفيديو الحالي — يمكنك استبداله بفيديو جديد أدناه",
+  "addDemoVideoTitle": "أضف فيديو توضيحي (حتى 60 ثانية)",
+  "proSubscribersOnly": "متاح لمشتركي Pro و Premium فقط",
+  "upgradeToProLock": "ترقّ إلى Pro 🔒",
+  "processingVideoProgress": "جاري معالجة الفيديو... {percent}%",
+  "@processingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseVideoLabel": "اختر فيديو",
+  "recordVideoLabel": "تسجيل فيديو",
+  "videoProcessFailed": "تعذّر معالجة الفيديو",
+  "invalidVideoError": "فيديو غير صالح",
+  "imageProcessFailed": "تعذّر معالجة الصورة",
+  "chooseCategoryError": "اختر الفئة",
+  "chooseContactPreferenceError": "اختر تفضيل التواصل",
+  "chooseGovernorateError": "اختر المحافظة",
+  "enterValidPriceError": "أدخل سعراً صالحاً",
+  "chooseProductConditionError": "اختر حالة المنتج",
+  "chooseConditionError": "اختر الحالة",
+  "chooseFuelTypeError": "اختر نوع الوقود",
+  "chooseTransmissionError": "اختر ناقل الحركة",
+  "choosePropertyTypeError": "اختر نوع العقار",
+  "chooseOfferTypeError": "اختر نوع العرض",
+  "enterAreaSqmError": "أدخل المساحة بالمتر المربع",
+  "chooseDeliveryCostError": "اختر تكلفة التوصيل",
+  "chooseSubjectError": "اختر المادة",
+  "chooseStudyStageError": "اختر المرحلة الدراسية",
+  "chooseTeachingMethodError": "اختر طريقة التدريس",
+  "enterValidHourlyPriceError": "أدخل سعراً صالحاً للساعة",
+  "chooseJobTypeError": "اختر نوع الدوام",
+  "chooseSectorError": "اختر القطاع",
+  "enterMinSalaryError": "أدخل الراتب الأدنى",
+  "salaryMaxMustExceedMinError": "الراتب الأعلى يجب أن يكون أكبر من الأدنى",
+  "chooseAnimalTypeFromCategoriesError": "اختر نوع الحيوان من الفئات",
+  "chooseServiceTypeFromCategoriesError": "اختر نوع الخدمة من الفئات",
+  "chooseWorkHoursError": "اختر أوقات العمل",
+  "enterExpectedSalaryError": "أدخل الراتب المتوقع",
+  "titleTooLongError": "العنوان طويل جداً (100 حرف كحد أقصى)",
+  "descriptionTooLongError": "الوصف طويل جداً (2000 حرف كحد أقصى)",
+  "uploadingPhotosSimple": "جاري رفع الصور...",
+  "uploadingVideoProgress": "جاري رفع الفيديو... {percent}%",
+  "@uploadingVideoProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "publishListingFailedError": "تعذّر نشر الإعلان. حاول مرة أخرى.",
+  "chooseCategoryMinimumError": "اختر الفئة على الأقل",
+  "draftTitleFallback": "مسودة",
+  "saveDraftFailedError": "تعذّر حفظ المسودة",
+  "cannotEditListingError": "لا يمكنك تعديل هذا الإعلان",
+  "loadListingFailedError": "تعذّر تحميل الإعلان",
+  "enterListingTitleError": "أدخل عنوان الإعلان",
+  "addAtLeastOnePhotoError": "أضف صورة واحدة على الأقل",
+  "saveEditsFailedError": "تعذّر حفظ التعديلات",
+  "chatListingIntro": "مرحباً، أنا مهتم بإعلانك: {title}",
+  "@chatListingIntro": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "usernameChecking": "جاري التحقق...",
+  "usernameAvailable": "متاح ✓",
+  "usernameTaken": "مستخدم بالفعل ✗",
+  "usernameRules": "3–20 حرفاً: أحرف إنجليزية وأرقام و _ فقط",
+  "ratingsCount": "({count} تقييم)",
+  "@ratingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "authSessionFailed": "تعذّر تسجيل الدخول. حاول مرة أخرى.",
+  "chooseAvatar": "اختر صورتك",
+  "avatarIconsSection": "الصور الرمزية",
+  "chooseDefaultAvatar": "اختر صورة افتراضية",
+  "orUploadPhotoHint": "أو ارفع صورتك من الكاميرا / المعرض أعلاه",
+  "countryIraq": "العراق",
+  "matchingListingsCount": "{count} إعلان مطابق",
+  "@matchingListingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchResultsTitle": "نتائج البحث",
+  "searchResultCount": "{count} نتيجة",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "filterCategoryLabel": "فئة",
+  "filterPriceLabel": "السعر",
+  "filterFeaturedLabel": "مميز",
+  "accountVerifiedBanner": "حسابك موثّق ✓",
+  "verificationPendingBanner": "طلب التوثيق قيد المراجعة ⏳",
+  "verificationRejectedWithReason": "تم رفض طلبك — {reason}",
+  "@verificationRejectedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "verificationRejectedBanner": "تم رفض طلب التوثيق",
+  "verifyAccountPrompt": "وثّق حسابك للحصول على شارة الثقة 🔒",
+  "vehicleYearLabel": "السنة",
+  "vehicleTrimShortLabel": "الفئة",
+  "vehicleEngineShortLabel": "محرك",
+  "vehicleCylinderShortLabel": "أسطوانة",
+  "photosSectionTitle": "الصور",
+  "currentPhotosTitle": "الصور الحالية",
+  "clearAllFilters": "مسح الكل",
+  "noResultsForQuery": "لم يتم العثور على نتائج لـ «{query}»",
+  "@noResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "tryChangingSearchOrFilters": "حاول تغيير كلمة البحث أو الفلاتر",
+  "clearFilters": "مسح الفلاتر",
+  "loadingMore": "جاري تحميل المزيد...",
+  "noResultsFound": "لم يتم العثور على نتائج",
+  "attr_1aae214b": "8 وسائد هوائية",
+  "colorOther": "أخرى",
+  "colorWhite": "أبيض",
+  "attr_1a93e294": "أجنبي",
+  "colorRed": "أحمر",
+  "colorGreen": "أخضر",
+  "attr_10f56232": "أربيل",
+  "propLand": "أرض",
+  "attr_60b69dc6": "أرنب",
+  "colorBlue": "أزرق",
+  "colorBlack": "أسود",
+  "attr_97418f6f": "ألماني",
+  "attr_dd1fbe22": "أمريكي",
+  "genderFemale": "أنثى",
+  "transAutomatic": "أوتوماتيك",
+  "attr_0d67ce95": "أوروبي",
+  "attr_ea410cd6": "أونلاين",
+  "attr_9967c75e": "إجازة سنوية",
+  "attr_fd5a68db": "إضاءة LED",
+  "attr_cfb972ef": "إضاءة تكيفية",
+  "attr_0d092cb1": "إضاءة عالية تلقائية",
+  "attr_407ad989": "إضاءة ليزر",
+  "attr_8c495f8e": "إضاءة محيطية",
+  "attr_367395e4": "إعداد IELTS",
+  "attr_9f6457d2": "إعداد TOEFL",
+  "attr_00f135f8": "إعدادي",
+  "genderFemales": "إناث",
+  "attr_0402b2d3": "إنجليزي",
+  "offerRent": "إيجار",
+  "offerDailyRent": "إيجار يومي",
+  "attr_5c22c7bc": "ابتدائي",
+  "attr_a910430c": "الأحياء",
+  "attr_b1a8fcf3": "الأعمال والإدارة والمال",
+  "attr_127a0207": "الأمان",
+  "attr_e8ade886": "الأمن والحراسة",
+  "attr_782faf71": "الاقتصاد",
+  "attr_6466c2b3": "البرمجة",
+  "attr_7b2d355f": "البصرة",
+  "attr_3659f4ca": "التاريخ والجغرافية",
+  "attr_3dbbe072": "التجويد",
+  "attr_5fa7f4ab": "التربية الإسلامية",
+  "attr_68b31032": "التصميم",
+  "attr_595073bb": "التعرف على إشارات المرور",
+  "attr_a8071737": "التعليم والتدريب",
+  "attr_2f29a34b": "الحاسوب والتقنية",
+  "attr_b5bf961a": "الحلة",
+  "attr_6f5c12c4": "الخارج",
+  "attr_479c9dd4": "الديوانية",
+  "attr_d10c7f46": "الراحة",
+  "attr_a8590e6c": "الرمادي",
+  "attr_ec996beb": "الرياضيات",
+  "attr_2ad56620": "الزراعة",
+  "attr_b23b84b6": "السليمانية",
+  "attr_47499b9d": "الصيدلة",
+  "attr_df03b4c2": "الضيافة والمطاعم",
+  "attr_dbdc9141": "الطب",
+  "attr_2f1f707b": "الطب والصحة",
+  "attr_a23d2f98": "العلوم العامة",
+  "attr_fc2fc74a": "العمارة",
+  "attr_308b4c85": "الفقه",
+  "attr_057cd7d5": "الفيزياء",
+  "attr_4cfcf3c2": "القانون",
+  "attr_1429981f": "القرآن الكريم",
+  "attr_c8f1808b": "الكوت",
+  "attr_569ec1ad": "الكيمياء",
+  "attr_4469156a": "اللغة الألمانية",
+  "attr_8bcb4c90": "اللغة الإنجليزية",
+  "attr_51a02272": "اللغة التركية",
+  "attr_b99f79d6": "اللغة العربية",
+  "attr_37ae3826": "اللغة الفرنسية",
+  "attr_568f6457": "اللغة الكردية",
+  "attr_00ea8179": "المبيعات والتسويق",
+  "attr_3f2ef321": "المحاسبة",
+  "attr_f3a2d580": "المحاسبة المالية",
+  "attr_b4a66258": "المنهج العراقي",
+  "attr_878d6350": "الموصل",
+  "attr_8f465ea8": "الناصرية",
+  "attr_1c675f3a": "النجف",
+  "attr_1ace1501": "النفط والطاقة",
+  "attr_d83c25fb": "النقل واللوجستيات",
+  "attr_45fbf259": "الهندسة والبناء",
+  "attr_4bfb21c0": "بالغين",
+  "attr_b7e8e36b": "بدون خبرة",
+  "warrantyNo": "بدون ضمان",
+  "attr_1fbfc2a7": "بدون لوحة",
+  "colorOrange": "برتقالي",
+  "attr_f8104802": "بريطاني",
+  "attr_40153b66": "بغداد",
+  "attr_13ac665b": "بكالوريوس",
+  "attr_7acac848": "بلكون",
+  "fuelPetrol": "بنزين",
+  "colorPurple": "بنفسجي",
+  "colorBrown": "بني",
+  "colorBeige": "بيج",
+  "offerSale": "بيع",
+  "attr_d1c3aa46": "تأمين صحي",
+  "attr_8fe0629c": "تثبيت تلقائي",
+  "attr_6ef15709": "تحكم تلقائي بالحرارة",
+  "attr_36db3f98": "تحكم في الجر",
+  "attr_674fb279": "تدريب",
+  "attr_f730823c": "تدفئة المقاعد",
+  "attr_2751dcce": "تركي",
+  "attr_5e98ac49": "تشغيل عن بعد",
+  "attr_0e8965c7": "تقنية المعلومات والبرمجة",
+  "attr_39990cf8": "تكريت",
+  "attr_b3d78ccb": "تنبيه انتباه السائق",
+  "attr_ece0d086": "تنبيه حركة المرور الخلفية",
+  "attr_30ad1cb0": "تنظيف",
+  "attr_61ff3500": "توجيه كهربائي",
+  "colorTitanium": "تيتانيوم",
+  "attr_5dfc333a": "ثانوية",
+  "colorTricolor": "ثلاثي الألوان",
+  "attr_2b649c53": "جامعي",
+  "attr_3f0a5345": "جلد",
+  "attr_596cc57e": "جنريتر",
+  "conditionGood": "جيد",
+  "attr_e7873977": "حدائق",
+  "attr_6c532953": "حديقة",
+  "attr_57bf3353": "حراسة",
+  "attr_9e07c1b5": "حوادث",
+  "attr_e4439193": "خزان ماء",
+  "attr_c6c026c9": "خليجي",
+  "attr_b3371774": "خيل",
+  "attr_bf2575b9": "دبلوم",
+  "attr_f7fc7de3": "دخول بدون مفتاح",
+  "attr_eebeffb8": "دفة مدفأة",
+  "attr_bc432f3e": "دكتوراه",
+  "attr_c114e728": "دهوك",
+  "attr_166ce8c7": "دوام جزئي",
+  "attr_03e6fabe": "دوام كامل",
+  "fuelDiesel": "ديزل",
+  "genderMale": "ذكر",
+  "genderMales": "ذكور",
+  "colorGold": "ذهبي",
+  "attr_ed91d68c": "راتب + عمولة",
+  "attr_4bd160a2": "راتب ثابت",
+  "attr_d9033ee1": "رادار",
+  "attr_d021c755": "رعاية أطفال",
+  "attr_f730c844": "رعاية مسنين",
+  "attr_20484d19": "ركن عن بعد",
+  "colorGray": "رمادي",
+  "attr_9863b154": "زر تشغيل",
+  "attr_91d7a73d": "زواحف",
+  "attr_603ab93b": "سائق",
+  "attr_fe80509e": "سامراء",
+  "attr_ec4f948f": "سكن",
+  "attr_5ae5476a": "سمك",
+  "attr_48c1891a": "شاحن لاسلكي",
+  "attr_5f5265a7": "شاشة",
+  "propApartment": "شقة",
+  "attr_1fcda818": "صباحي",
+  "attr_1980be67": "صيانة منزلية",
+  "attr_a78786af": "صيني",
+  "attr_adfa037c": "ضباب أمامي",
+  "warrantyYes": "ضمان",
+  "attr_e579ab86": "طائر",
+  "attr_71c665ee": "طابو",
+  "attr_7a206f76": "طبخ",
+  "attr_e5dbc387": "عراقي",
+  "attr_da88eccb": "عربي",
+  "attr_aa4460d5": "عرض رأسي HUD",
+  "attr_8127bee7": "عقد",
+  "attr_571581cc": "عقد بيع",
+  "attr_155ac5cf": "علوم الحاسوب",
+  "attr_7173aff1": "عمولة",
+  "attr_e3668c0d": "عن بُعد",
+  "fuelGas": "غاز",
+  "attr_a1a423e6": "غسيل وكي",
+  "furnishedNo": "غير مفروش",
+  "attr_1a0bd9b9": "فارسي",
+  "attr_29519ce6": "فتحة سقف",
+  "attr_aa282cda": "فرنسي",
+  "colorSilver": "فضي",
+  "propHotel": "فندق",
+  "attr_eda90053": "في المنزل",
+  "attr_d2157926": "في مكتبي",
+  "propVilla": "فيلا",
+  "attr_a826a507": "قطة",
+  "attr_4b021528": "قفل أطفال",
+  "attr_60cbec0a": "قفل مركزي",
+  "attr_f283f661": "قماش",
+  "attr_df6d261d": "كاميرا 360",
+  "attr_1f94f275": "كاميرا خلفية",
+  "attr_ea2d0f4a": "كاميرات",
+  "attr_8d564a08": "كربلاء",
+  "attr_aa03d946": "كردي",
+  "attr_4e1a505f": "كركوك",
+  "genderBoth": "كلاهما",
+  "attr_f6ec7e07": "كلب",
+  "fuelElectric": "كهربائي",
+  "attr_38ad1ced": "كوري",
+  "attr_10da4bc1": "كوكبيت رقمي",
+  "attr_3a1306fc": "مؤقت",
+  "attr_0cfe7e2c": "مؤقتة",
+  "attr_9e37b135": "ماجستير",
+  "attr_14184253": "متوسط",
+  "attr_5443be84": "مثبت سرعة تكيفي",
+  "deliveryFree": "مجاني",
+  "propCommercial": "محل تجاري",
+  "genderMixed": "مختلط",
+  "deliveryPaid": "مدفوع",
+  "attr_463b559b": "مراقب النقطة العمياء",
+  "attr_3e6b7c47": "مرايا جانبية مدفأة",
+  "attr_5e7c67c4": "مرايا كهربائية",
+  "colorSpotted": "مرقط",
+  "propFarm": "مزرعة",
+  "attr_726ee881": "مزيج",
+  "attr_abbb3685": "مسائي",
+  "attr_b1f57e19": "مساعد الازدحام",
+  "attr_1c5815dd": "مساعد الفرملة الطارئة",
+  "attr_1d2d9327": "مسبح",
+  "attr_908b36c3": "مستشعرات ضغط الإطارات",
+  "propWarehouse": "مستودع",
+  "attr_f4bcb528": "مسند ذراع",
+  "attr_50eeda55": "مصبوغ جزئي",
+  "attr_d7f99058": "مصبوغ كلي",
+  "attr_c29ac455": "مصعد",
+  "furnishedYes": "مفروش",
+  "attr_bc8dd527": "مقاعد مساج",
+  "conditionFair": "مقبول",
+  "attr_4827979f": "مقيم",
+  "attr_4a9d2ecf": "مكافآت",
+  "propOffice": "مكتب",
+  "conditionScreenBroken": "مكسور الشاشة",
+  "conditionExcellent": "ممتاز",
+  "attr_a274e886": "مواد أخرى",
+  "attr_8c812969": "مواصلات",
+  "attr_5830d091": "موقف سيارة",
+  "furnishedPartial": "نصف مفروش",
+  "attr_d80ed6a2": "نظام ستارت ستوب",
+  "attr_3b085d0f": "نظام صوتي Harman Kardon",
+  "attr_f6cf560b": "نظيف",
+  "attr_301b8203": "نقل أثاث",
+  "attr_3edd4576": "نوافذ كهربائية",
+  "fuelHybrid": "هايبرد",
+  "attr_f0f27452": "هندسة البرمجيات",
+  "attr_d50cbb11": "هيل هولدر",
+  "attr_a5d7347c": "وجبات",
+  "colorPink": "وردي",
+  "attr_da3d03ec": "وضع القيادة",
+  "attr_065a7470": "وكالة",
+  "attr_f5e2c57f": "ياباني",
+  "transManual": "يدوي",
+  "attr_1111f817": "يومي كامل",
+  "yesLabel": "نعم",
+  "noLabel": "لا",
+  "transCvt": "CVT",
+  "resultsCount": "{count} نتيجة",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortNewest": "الأحدث",
+  "sortCheapest": "الأرخص",
+  "sortExpensive": "الأغلى",
+  "sortMostViewed": "الأكثر مشاهدة",
+  "statusSold": "مباع",
+  "statusDeleted": "محذوف",
+  "statusRejected": "مرفوض",
+  "listingTypeSale": "للبيع",
+  "listingTypeRent": "للإيجار",
+  "contactPhoneAndMessages": "هاتف ورسائل",
+  "contactPhoneOnly": "هاتف فقط",
+  "contactMessagesOnly": "رسائل فقط",
+  "packageStandardFull": "إعلان عادي",
+  "packageProFull": "إعلان برو",
+  "packagePremiumFull": "إعلان مميز",
+  "chooseCategoryTitle": "اختر الفئة",
+  "categoriesLoadError": "تعذّر تحميل الفئات",
+  "tryDifferentSearchOrFilters": "حاول تغيير كلمة البحث أو الفلاتر",
+  "listingFallbackTitle": "إعلان",
+  "validationPhoneRequired": "أدخل رقم الهاتف",
+  "validationPhoneInvalid": "رقم الهاتف غير صالح",
+  "validationPhoneInvalidIq": "رقم هاتف عراقي غير صالح",
+  "validationOtpRequired": "أدخل رمز التحقق المكون من 6 أرقام",
+  "validationFieldRequired": "{field} مطلوب",
+  "@validationFieldRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationPriceRequired": "أدخل السعر",
+  "validationPriceInvalid": "سعر غير صالح",
+  "validationEmailRequired": "أدخل البريد الإلكتروني",
+  "validationEmailInvalid": "بريد إلكتروني غير صالح",
+  "validationPasswordRequired": "أدخل كلمة المرور",
+  "validationPasswordMinLength": "كلمة المرور يجب أن تكون {count} أحرف على الأقل",
+  "@validationPasswordMinLength": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "validationPasswordLowercase": "أضف حرفاً صغيراً (a-z) إلى كلمة المرور",
+  "validationPasswordUppercase": "أضف حرفاً كبيراً (A-Z) إلى كلمة المرور",
+  "validationPasswordDigit": "أضف رقماً (0-9) إلى كلمة المرور",
+  "validationPasswordSymbol": "أضف رمزاً خاصاً (!@#...) إلى كلمة المرور",
+  "validationConfirmPasswordRequired": "أكّد كلمة المرور",
+  "validationPasswordMismatch": "كلمتا المرور غير متطابقتين",
+  "validationWeakPassword": "كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، حرفاً كبيراً وصغيراً، رقماً، ورمزاً خاصاً",
+  "authNetworkError": "تحقق من الاتصال بالإنترنت",
+  "authRateLimitGeneric": "طلبات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.",
+  "authRateLimitSeconds": "طلبات كثيرة. انتظر {seconds} ثانية ثم حاول مرة أخرى.",
+  "@authRateLimitSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "authInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+  "authInvalidEmail": "البريد الإلكتروني غير صالح",
+  "authEmailExists": "هذا البريد مسجل مسبقاً",
+  "authEmailNotConfirmed": "يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول.",
+  "authSignupDisabled": "التسجيل غير متاح حالياً.",
+  "authSmsFailed": "تعذّر إرسال الرسالة. تحقق من إعدادات SMS في Supabase.",
+  "authPhoneInvalidFormat": "رقم الهاتف غير صالح. استخدم الصيغة +9647XXXXXXXX.",
+  "authGenericError": "حدث خطأ أثناء المصادقة. حاول مرة أخرى.",
+  "authOperationFailed": "تعذّر إكمال العملية. حاول مرة أخرى.",
+  "loginRequiredFirst": "يجب تسجيل الدخول أولاً",
+  "metaPropertyType": "نوع العقار",
+  "metaOfferType": "نوع العرض",
+  "metaArea": "المساحة",
+  "metaFloor": "الطابق",
+  "metaTotalFloors": "عدد الطوابق",
+  "metaRooms": "عدد الغرف",
+  "metaBathrooms": "عدد الحمامات",
+  "metaBuildingAge": "عمر البناء",
+  "metaFurnishing": "التشطيب",
+  "metaYear": "السنة",
+  "metaTrim": "الفئة",
+  "metaEngine": "محرك",
+  "metaCylinders": "أسطوانة",
+  "metaLanguages": "اللغات",
+  "metaSalary": "الراتب",
+  "metaExperience": "الخبرة",
+  "metaGender": "الجنس",
+  "metaAge": "العمر",
+  "metaBreed": "السلالة",
+  "metaServiceType": "نوع الخدمة",
+  "metaAvailability": "التوفر",
+  "metaBrand": "العلامة",
+  "metaModel": "الموديل",
+  "metaStorage": "التخزين",
+  "metaCondition": "الحالة",
+  "metaItemType": "نوع السلعة",
+  "metaSubject": "المادة",
+  "metaLevel": "المستوى",
+  "metaJobType": "نوع الوظيفة",
+  "metaWorkMode": "نمط العمل",
+  "metaEducation": "التعليم",
+  "metaDetailsSection": "التفاصيل",
+  "bodyConditionTitle": "حالة الهيكل والطلاء",
+  "bodyPartSelected": "تم الاختيار لـ {selected}/{total} قطعة",
+  "@bodyPartSelected": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "bodyPartOriginal": "أصلي",
+  "bodyPartLocalPaint": "صبغ محلي",
+  "bodyPartPainted": "مصبوغه",
+  "bodyPartReplaced": "مستبدلة",
+  "next": "التالي",
+  "allCarPartsOriginalFull": "جميع أجزاء السيارة أصلية. لا توجد قطع مصبوغة أو مستبدلة.",
+  "carPaintPanelFrontBumper": "الرقم الأمامي",
+  "carPaintPanelHood": "الغطاء الأمامي",
+  "carPaintPanelFrontLeftFender": "الجناح الأمامي أيسر",
+  "carPaintPanelFrontRightFender": "الجناح الأمامي أيمن",
+  "carPaintPanelFrontLeftDoor": "الباب الأمامي أيسر",
+  "carPaintPanelFrontRightDoor": "الباب الأمامي أيمن",
+  "carPaintPanelRoof": "السقف",
+  "carPaintPanelRearLeftDoor": "الباب الخلفي أيسر",
+  "carPaintPanelRearRightDoor": "الباب الخلفي أيمن",
+  "carPaintPanelTrunk": "غطاء الصندوق",
+  "carPaintPanelRearLeftFender": "الجناح الخلفي أيسر",
+  "carPaintPanelRearRightFender": "الجناح الخلفي أيمن",
+  "carPaintPanelRearBumper": "الرقم الخلفي",
+  "locationPickerTitle": "تحديد الموقع",
+  "locationCoordinates": "الإحداثيات",
+  "locationUseCurrentLocation": "استخدام موقعي الحالي",
+  "locationConfirm": "تأكيد الموقع",
+  "locationMapUnavailableStatus": "الخريطة غير متاحة حالياً. يمكنك تأكيد موقع بغداد الافتراضي أو إغلاق النافذة.",
+  "locationMapLoadFailedStatus": "تعذّر تحميل الخريطة. تم استخدام موقع بغداد الافتراضي.",
+  "locationGpsFailedSnack": "تعذّر تحديد موقعك. تم استخدام موقع بغداد الافتراضي.",
+  "locationFetchFailedSnack": "تعذّر الحصول على الموقع",
+  "locationMapUnavailable": "الخريطة غير متاحة",
+  "locationLoadingMap": "جاري تحميل الخريطة...",
+  "statYear": "السنة",
+  "statCategory": "الفئة",
+  "statKm": "كم",
+  "statMile": "ميل",
+  "statEngine": "محرك",
+  "statCylinders": "أسطوانة",
+  "sectionDetails": "التفاصيل",
+  "sectionSpecs": "المواصفات",
+  "sectionBodyCondition": "وضع الهيكل والطلاء",
+  "listedOn": "تاريخ النشر",
+  "fieldCondition": "الحالة",
+  "fieldPaintCondition": "وضع الطلاء",
+  "fieldFuel": "الوقود",
+  "fieldImportCountry": "بلد الاستيراد",
+  "fieldPlate": "اللوحة",
+  "fieldTransmission": "ناقل الحركة",
+  "fieldSeats": "عدد المقاعد",
+  "fieldSeatMaterial": "مادة المقاعد",
+  "fieldColor": "اللون",
+  "metaDeliveryCost": "تكلفة التوصيل",
+  "metaPricePerHour": "السعر/ساعة",
+  "metaSalaryMin": "الراتب الأدنى",
+  "metaSalaryMax": "الراتب الأعلى",
+  "metaSector": "القطاع",
+  "metaExperienceRequired": "الخبرة المطلوبة",
+  "metaEducationRequired": "المؤهل المطلوب",
+  "metaGenderPreference": "تفضيل الجنس",
+  "metaTeachingMethod": "طريقة التدريس",
+  "metaQualifications": "المؤهل العلمي",
+  "metaStudyStages": "المراحل الدراسية",
+  "metaAnimalType": "نوع الحيوان",
+  "metaHasPapers": "يمتلك وثائق",
+  "metaVaccinated": "ملقح",
+  "metaTrained": "مدرب",
+  "metaDaysPerWeek": "أيام الأسبوع",
+  "metaExpectedSalary": "الراتب المتوقع",
+  "metaWorkHours": "أوقات العمل",
+  "metaAgeMonths": "{count} شهر",
+  "@metaAgeMonths": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metaRam": "الرام",
+  "metaBatteryHealth": "صحة البطارية",
+  "metaWarranty": "الضمان",
+  "metaProcessor": "المعالج",
+  "metaScreenSize": "حجم الشاشة",
+  "metaResolution": "الدقة",
+  "metaWithBox": "مع العلبة",
+  "metaWithCharger": "مع الشاحن",
+  "metaSmartTv": "سمارت TV",
+  "mainCategory": "الفئة الرئيسية",
+  "subCategory": "الفئة الفرعية",
+  "categoryDetail": "التفصيل",
+  "termsTitle": "شروط الاستخدام",
+  "termsSection1Title": "مقدمة",
+  "termsSection1Body": "مرحباً بك في تطبيق سوقك. باستخدامك للتطبيق أو إنشاء حساب، فأنك توافق على الالتزام بهذه الشروط. يرجى قراءتها بعناية قبل المتابعة. إذا لم توافق على أي بند، يرجى عدم استخدام الخدمة.",
+  "termsSection2Title": "استخدام التطبيق",
+  "termsSection2Body": "يسمح لك باستخدام سوقك لعرض وشراء السلع والخدمات ضمن القوانين المعمول بها في جمهورية العراق. يُحظر نشر إعلانات مضللة أو مخالفة للقانون أو تحتوي على محتوى مسيء أو احتيالي. نحتفظ بالحق في إزالة أي محتوى يخالف هذه الشروط دون إشعار مسبق.",
+  "termsSection3Title": "حقوق المستخدم",
+  "termsSection3Body": "تحتفظ بملكية المحتوى الذي تنشره. وتمنح سوقك ترخيصاً غير حصري لعرضه داخل التطبيق لأغراض تشغيل الخدمة. لك الحق في تعديل ملفك الشخصي وإعلاناتك وحذف حسابك وفق الإجراءات المتاحة في التطبيق.",
+  "termsSection4Title": "المسؤوليات",
+  "termsSection4Body": "أنت مسؤول عن دقة معلومات حسابك وإعلاناتك وعن أي تفاعل مع مستخدمين آخرين. سوقك منصة وسيطة ولا تضمن صحة كل إعلان أو اكتمال الصفقات بين الأطراف. ننصح بالتحقق من المنتجات والبائعين قبل إتمام أي عملية شراء.",
+  "termsSection5Title": "إنهاء الخدمة",
+  "termsSection5Body": "يجوز لنا تعليق أو إنهاء حسابك في حال مخالفة هذه الشروط أو الاشتباه في أي نشاط احتيالي. يمكنك أنت أيضاً حذف حسابك في أي وقت من إعدادات التطبيق.",
+  "privacyTitle": "سياسة الخصوصية",
+  "privacySection1Title": "ما المعلومات التي نجمعها",
+  "privacySection1Body": "نجمع المعلومات التي تقدمها عند التسجيل مثل الاسم والبريد الإلكتروني ورقم الهاتف واسم المستخدم، بالإضافة إلى بيانات الإعلانات التي تنشرها ورسائلك داخل التطبيق. قد نجمع أيضاً بيانات تقنية مثل نوع الجهاز وعنوان IP لأغراض الأمان وتحسين الخدمة.",
+  "privacySection2Title": "كيف نستخدم بياناتك",
+  "privacySection2Body": "نستخدم بياناتك لتشغيل حسابك وعرض إعلاناتك وتمكين التواصل بين المستخدمين وإرسال الإشعارات المتعلقة بالتنبيهات الذكية والرسائل. كما نستخدم البيانات المجمّعة لتحسين تجربة الاستخدام ومنع الاحتيال وضمان أمان المنصة.",
+  "privacySection3Title": "مشاركة البيانات",
+  "privacySection3Body": "لا نبيع بياناتك الشخصية لأطراف ثالثة. قد نشارك معلومات محدودة مع مزودي الخدمات الذين يساعدوننا في استضافة البيانات وإرسال الإشعارات، مع الالتزام بسرية هذه البيانات. قد نفصح عن معلومات عند طلب قانوني أو لحماية حقوق المستخدمين وسلامة المنصة.",
+  "privacySection4Title": "أمان البيانات",
+  "privacySection4Body": "نطبّق إجراءات تقنية وتنظيمية لحماية بياناتك من الوصول غير المصرح به أو الفقدان أو التعديل. رغم ذلك، لا يمكن ضمان أمان مطلق لأي نقل عبر الإنترنت، لذا ننصحك باستخدام كلمة مرور قوية وعدم مشاركة بيانات الدخول مع الآخرين.",
+  "privacySection5Title": "التواصل معنا",
+  "privacySection5Body": "إذا كانت لديك أسئلة حول سياسة الخصوصية أو ترغب في ممارسة حقوقك المتعلقة ببياناتك، يمكنك التواصل معنا عبر البريد الإلكتروني للدعم المذكور في إعدادات التطبيق. سنرد على طلباتك في أقرب وقت ممكن وفقاً للقوانين المعمول بها.",
+  "packageDurationDays": "{count} يوم",
+  "@packageDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkgStandardFeature1Title": "إعلان أساسي",
+  "pkgStandardFeature1Desc": "ينشر ضمن نتائج البحث العادية",
+  "pkgStandardFeature2Title": "تواصل مباشر",
+  "pkgStandardFeature2Desc": "يتواصل معك المهتمون حسب تفضيلاتك",
+  "pkgProFeature1Title": "ظهور أعلى في نتائج البحث",
+  "pkgProFeature1Desc": "يتصدّر إعلانك على العاديين في نفس الفئة",
+  "pkgProFeature2Title": "شارة \"برو\" الموثوقة",
+  "pkgProFeature2Desc": "تمنح المشترين ثقة أكبر وتضاعف فرص البيع",
+  "pkgProFeature3Title": "إحصائيات",
+  "pkgProFeature3Desc": "مشاهدات وتواصل مع الإعلان",
+  "pkgPremiumFeature1Title": "الظهور الأول للجميع",
+  "pkgPremiumFeature1Desc": "يُعرض في الكاروسيل المميز بأعلى الصفحة الرئيسية",
+  "pkgPremiumFeature2Title": "الترتيب الأعلى دائماً",
+  "pkgPremiumFeature2Desc": "يسبق حتى إعلانات برو في نتائج البحث والفئة",
+  "pkgPremiumFeature3Title": "تعزيز دفع",
+  "pkgPremiumFeature3Desc": "ظهور مميز لزيادة المشاهدات",
+  "pkgProFeature4Title": "تجديد تلقائي أسبوعي",
+  "pkgProFeature4Desc": "يعود إعلانك لأعلى القائمة كل أسبوع دون أي مجهود",
+  "pkgProFeature5Title": "صور أكثر وواتساب فوري",
+  "pkgProFeature5Desc": "أضف حتى 15 صورة، وزر تواصل واتساب مباشر على البطاقة",
+  "pkgProFeature6Title": "زر واتساب مباشر",
+  "pkgProFeature6Desc": "تواصل فوري عبر واتساب من بطاقة الإعلان",
+  "pkgProFeature7Title": "إطار وشارة برو",
+  "pkgProFeature7Desc": "إطار مميّز وشارة \"برو\" تبرز إعلانك في البحث",
+  "pkgPremiumFeature4Title": "تجديد تلقائي يومي",
+  "pkgPremiumFeature4Desc": "يبقى إعلانك في القمة كل يوم بدون أي تدخل منك",
+  "pkgPremiumFeature5Title": "إشعار فوري لكل مهتم",
+  "pkgPremiumFeature5Desc": "يصل إشعار مباشر لكل من يبحث عن هذه الفئة",
+  "pkgPremiumFeature6Title": "إحصائيات متقدمة",
+  "pkgPremiumFeature6Desc": "تحليل شامل: مصادر المشاهدات وأوقات الذروة",
+  "loadingMore": "جاري تحميل المزيد...",
+  "currentPhotos": "الصور الحالية",
+  "completePayment": "إتمام الدفع",
+  "paymentSuccess": "تم الدفع بنجاح ✓",
+  "paymentFailed": "فشل الدفع، يرجى المحاولة مرة أخرى",
+  "startPayment": "بدء الدفع"
 }

@@ -21,3 +21,8 @@ export const REPORT_SELECT = `
   reporter:profiles!reports_reporter_id_fkey(id, display_name, full_name),
   listing:listings!reports_listing_id_fkey(id, title, status, availability, user_id)
 ` as const;
+
+export const SUPPORT_MESSAGE_SELECT = `
+  id, user_id, sender_role, body, is_read, created_at,
+  user:profiles!support_messages_user_id_fkey(id, display_name, full_name, phone)
+` as const;

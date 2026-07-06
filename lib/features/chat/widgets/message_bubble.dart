@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/chat_date_utils.dart';
 import '../../../shared/models/message_model.dart';
 import '../../../widgets/user_avatar.dart';
@@ -10,7 +13,7 @@ import '../../../widgets/user_avatar.dart';
 const _largeRadius = 20.0;
 const _smallRadius = 6.0;
 
-class MessageBubble extends StatelessWidget {
+class MessageBubble extends ConsumerWidget {
   const MessageBubble({
     super.key,
     required this.message,
@@ -29,12 +32,14 @@ class MessageBubble extends StatelessWidget {
   bool get _isMine => message.isMine(currentUserId);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     if (_isMine) {
       return _SentBubble(
         message: message,
         isFirstInGroup: isFirstInGroup,
         isLastInGroup: isLastInGroup,
+        languageCode: localeCode,
       );
     }
     return _ReceivedBubble(
@@ -42,6 +47,7 @@ class MessageBubble extends StatelessWidget {
       isFirstInGroup: isFirstInGroup,
       isLastInGroup: isLastInGroup,
       otherUserAvatarSeed: otherUserAvatarSeed,
+      languageCode: localeCode,
     );
   }
 }
@@ -102,11 +108,13 @@ class _SentBubble extends StatelessWidget {
     required this.message,
     required this.isFirstInGroup,
     required this.isLastInGroup,
+    required this.languageCode,
   });
 
   final MessageModel message;
   final bool isFirstInGroup;
   final bool isLastInGroup;
+  final String languageCode;
 
   bool get _hasImage =>
       message.imageUrl != null && message.imageUrl!.isNotEmpty;
@@ -115,7 +123,8 @@ class _SentBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeString = formatMessageTime(message.createdAt);
+    final timeString =
+        formatMessageTime(message.createdAt, languageCode: languageCode);
     final opacity = message.isPending ? 0.75 : 1.0;
     final imageOnly = _hasImage && !_hasText;
 
@@ -205,12 +214,14 @@ class _ReceivedBubble extends StatelessWidget {
     required this.message,
     required this.isFirstInGroup,
     required this.isLastInGroup,
+    required this.languageCode,
     this.otherUserAvatarSeed,
   });
 
   final MessageModel message;
   final bool isFirstInGroup;
   final bool isLastInGroup;
+  final String languageCode;
   final String? otherUserAvatarSeed;
 
   bool get _hasImage =>
@@ -220,7 +231,8 @@ class _ReceivedBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeString = formatMessageTime(message.createdAt);
+    final timeString =
+        formatMessageTime(message.createdAt, languageCode: languageCode);
     final imageOnly = _hasImage && !_hasText;
     final showAvatar = isLastInGroup;
 
@@ -327,13 +339,16 @@ class _MessageImage extends StatelessWidget {
   }
 }
 
-class ChatDateSeparator extends StatelessWidget {
+class ChatDateSeparator extends ConsumerWidget {
   const ChatDateSeparator({super.key, required this.date});
 
   final DateTime date;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 12),
@@ -343,7 +358,11 @@ class ChatDateSeparator extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          formatChatDateSeparator(date),
+          formatChatDateSeparator(
+            date,
+            strings,
+            languageCode: localeCode,
+          ),
           style: AppFonts.tajawal(
             fontSize: 11,
             color: AppColors.textMuted,

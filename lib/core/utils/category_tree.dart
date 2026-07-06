@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/category_fallback_subtitles.dart';
+import '../l10n/category_locale.dart';
 import '../../shared/models/category_model.dart';
 import '../../shared/models/listing_model.dart';
 
@@ -184,40 +186,24 @@ Color parseCategoryColor(String? hex, {Color fallback = const Color(0xFF757575)}
   return Color(0xFF000000 | parsed);
 }
 
-/// Static subtitles for categories (overrides auto-generated child names).
-const categoryFallbackSubtitles = <String, String>{
-  'veh_motorcycle': 'دراجات نارية ، دراجات هوائية ، سكوتر',
-  'veh_rental': 'Chevorlet , Audi , Tesla , BMW',
-  'veh_damaged': 'Toyota , Mercedes-Benz , BMW , Kia',
-  'veh_accessible': 'Toyota , Mercedes-Benz , BMW , Kia',
-  'veh_electric': 'Tesla , BMW , Mercedes-Benz , Audi',
-  'veh_minivan': 'Toyota , Kia , Hyundai , Nissan',
-  'veh_commercial': 'Toyota , Hino , Isuzu , IVECO',
-  'veh_suv_pickup': 'Toyota , Land Rover , Jeep , Lexus',
-  'veh_marine': 'Yamaha , Sea-Doo , Honda Marine , Mercury',
-  'veh_caravan': 'Coachmen , Airstream , Jayco , Winnebago',
-  'veh_classic': 'Mercedes-Benz , BMW , Toyota , Ford',
-  'veh_aircraft': 'طائرات ، مروحيات',
-  'veh_aircraft_planes': 'Cessna , Piper , Gulfstream , Embraer',
-  'veh_aircraft_helicopters': 'Robinson , Bell , Airbus Helicopters , Sikorsky',
-  'electronics': 'هواتف ذكية ، أجهزة لوحية ، لابتوب وكمبيوتر ، مكيفات',
-  'elec_smartphones': 'Apple , Samsung , Huawei , Xiaomi',
-  'buy_sell': 'موبايلات ، كمبيوتر ، ملابس ، أثاث',
-  'tutoring': 'مدرسة ، جامعة ، لغات ، قرآن',
-  'jobs': 'تقنية ، هندسة ، طب ، نفط',
-  'pets': 'كلاب ، قطط ، طيور ، مزرعة',
-  'home_help': 'تنظيف ، طبخ ، مربيات ، سائق',
-};
+String subtitleForCategory(
+  CategoryModel category,
+  List<CategoryModel> all, {
+  String localeCode = 'ar',
+}) {
+  final code = CategoryModel.normalizeAppLocaleCode(localeCode);
 
-String subtitleForCategory(CategoryModel category, List<CategoryModel> all) {
-  final override = categoryFallbackSubtitles[category.slug];
-  if (override != null) return override;
+  final dbDesc = category.displayDescription(code);
+  if (dbDesc.isNotEmpty) return dbDesc;
+
+  final override = categoryFallbackSubtitle(category.slug, code);
+  if (override.isNotEmpty) return override;
 
   final subs = childrenOf(category.id, all);
-  if (subs.isEmpty) {
-    return categoryFallbackSubtitles[category.slug] ?? '';
-  }
-  return subs.take(4).map((c) => c.nameAr).join(' ، ');
+  if (subs.isEmpty) return '';
+
+  final sep = categorySubtitleSeparator(code);
+  return subs.take(4).map((c) => c.localizedName(code)).join(sep);
 }
 
 /// All descendant category IDs (excluding [rootId] itself).

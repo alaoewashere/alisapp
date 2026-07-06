@@ -1,23 +1,22 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../config/env_reader.dart';
 
 /// Supabase credentials from `.env` (dev) or `--dart-define` (CI/release).
 class SupabaseConfig {
   SupabaseConfig._();
 
-  static String get url {
-    const fromDefine = String.fromEnvironment('SUPABASE_URL');
-    if (fromDefine.isNotEmpty) return fromDefine;
-    return dotenv.env['SUPABASE_URL']?.trim() ?? '';
-  }
+  static String get url => EnvReader.optional(
+        'SUPABASE_URL',
+        fromDefine: const String.fromEnvironment('SUPABASE_URL'),
+      );
 
-  static String get anonKey {
-    const fromDefine = String.fromEnvironment('SUPABASE_ANON_KEY');
-    if (fromDefine.isNotEmpty) return fromDefine;
-    return dotenv.env['SUPABASE_ANON_KEY']?.trim() ?? '';
-  }
+  static String get anonKey => EnvReader.optional(
+        'SUPABASE_ANON_KEY',
+        fromDefine: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+      );
 
   static bool get isConfigured => url.isNotEmpty && anonKey.isNotEmpty;
 }

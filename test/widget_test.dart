@@ -1,14 +1,22 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/core/constants/app_constants.dart';
 import 'package:Sello/core/utils/currency_formatter.dart';
 import 'package:Sello/core/utils/digit_input_formatter.dart';
 import 'package:Sello/core/utils/validators.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 
 void main() {
-  test('formatIqd formats without decimals', () {
+  test('formatIqd uses Arabic suffix by default', () {
     expect(formatIqd(1500000), contains('د.ع'));
     expect(formatIqd(0), isNotEmpty);
+  });
+
+  test('formatIqdWithL10n uses IQD for English', () {
+    final l10n = lookupAppLocalizations(const Locale('en'));
+    expect(formatIqdWithL10n(1500000, l10n), contains('IQD'));
+    expect(formatIqdWithL10n(1500000, l10n), isNot(contains('د.ع')));
   });
 
   test('Validators.iraqiPhone accepts local format', () {
@@ -60,7 +68,8 @@ void main() {
   });
 
   test('AppConstants has Arabic name', () {
-    expect(AppConstants.appNameAr, 'Sello');
+    expect(AppConstants.appNameAr, 'سـوقك');
+    expect(AppConstants.appNameEn, 'SOUQAK');
     expect(AppConstants.bundleId, 'com.iraq.marketplace.souqiq');
   });
 }

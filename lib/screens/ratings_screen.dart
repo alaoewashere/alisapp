@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
+import '../core/l10n/l10n_provider.dart';
 import '../core/constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
 import '../core/constants/display_locale.dart';
 import '../core/utils/arabic_number.dart';
 import '../models/rating.dart';
@@ -89,6 +91,7 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final profileAsync = ref.watch(sellerProfileProvider(widget.profileId));
 
     return Scaffold(
@@ -96,7 +99,7 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
       appBar: SelloAppBar(
         backgroundColor: AppColors.background,
         title: Text(
-          'التقييمات',
+          strings.ratingsTitle,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
@@ -105,7 +108,7 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
         error: (e, _) => Center(child: Text('$e')),
         data: (profile) {
           if (profile == null) {
-            return const Center(child: Text('الملف غير موجود'));
+            return Center(child: Text(strings.profileNotFound));
           }
 
           if (_loading) {
@@ -121,7 +124,7 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
                   const SizedBox(height: 12),
                   FilledButton(
                     onPressed: _loadInitial,
-                    child: const Text('إعادة المحاولة'),
+                    child: Text(strings.retryAction),
                   ),
                 ],
               ),
@@ -146,13 +149,13 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     child: Text(
-                      'لا توجد تقييمات بعد',
+                      strings.noRatingsYet,
                       style: AppFonts.cairo(color: AppColors.textMuted),
                     ),
                   ),
                 )
               else
-                ..._ratings.map((r) => _ReviewTile(rating: r)),
+                ..._ratings.map((r) => _ReviewTile(rating: r, strings: strings)),
               if (_hasMore)
                 Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 24),
@@ -164,7 +167,7 @@ class _RatingsScreenState extends ConsumerState<RatingsScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('تحميل المزيد'),
+                        : Text(strings.loadMore),
                   ),
                 ),
             ],
@@ -269,9 +272,10 @@ class _StarBreakdownChart extends StatelessWidget {
 }
 
 class _ReviewTile extends StatelessWidget {
-  const _ReviewTile({required this.rating});
+  const _ReviewTile({required this.rating, required this.strings});
 
   final Rating rating;
+  final AppLocalizations strings;
 
   String get _dateLabel {
     return DateFormat('d MMM yyyy', DisplayLocale.intlWesternArabic)
@@ -305,7 +309,7 @@ class _ReviewTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      rating.reviewerName ?? 'مستخدم',
+                      rating.reviewerName ?? strings.defaultUser,
                       style: AppFonts.cairo(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -333,7 +337,7 @@ class _ReviewTile extends StatelessWidget {
           Text(
             reviewText != null && reviewText.isNotEmpty
                 ? reviewText
-                : 'لم يترك تعليقاً',
+                : strings.noReviewLeft,
             style: AppFonts.cairo(
               fontSize: 13,
               height: 1.5,

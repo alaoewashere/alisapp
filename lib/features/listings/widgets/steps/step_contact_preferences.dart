@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/l10n/enum_localizations.dart';
+import '../../../../core/l10n/l10n_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../shared/models/listing_model.dart';
 import '../../../profile/data/profile_repository.dart';
@@ -16,7 +21,7 @@ class StepContactPreferences extends ConsumerWidget {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
     final profileAsync = ref.watch(currentProfileProvider);
-    final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     final isEdit = ref.watch(isEditListingFormProvider);
 
@@ -26,14 +31,16 @@ class StepContactPreferences extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'التواصل',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+            strings.contactTitle,
+            style: AppFonts.cairo(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textDark,
             ),
           ),
-          const SizedBox(height: 16),
-          const _SectionHeader(label: 'معلومات التواصل'),
-          const SizedBox(height: 4),
+          const SizedBox(height: 18),
+          _SectionLabel(label: strings.contactInfoSection),
+          const SizedBox(height: 8),
           profileAsync.when(
             loading: () => const Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
@@ -41,7 +48,8 @@ class StepContactPreferences extends ConsumerWidget {
             ),
             error: (e, _) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text('$e', style: TextStyle(color: theme.colorScheme.error)),
+              child: Text('$e',
+                  style: const TextStyle(color: AppColors.rejected)),
             ),
             data: (profile) {
               final name = profile?.fullName.trim().isNotEmpty == true
@@ -51,53 +59,64 @@ class StepContactPreferences extends ConsumerWidget {
                   ? profile!.phone!
                   : '—';
 
-              return Column(
-                children: [
-                  _ContactInfoRow(
-                    value: name,
-                    onEdit: () => _openEditProfile(context, ref),
-                  ),
-                  const Divider(height: 1),
-                  _ContactInfoRow(
-                    value: phone,
-                    onEdit: () => _openEditProfile(context, ref),
-                  ),
-                ],
+              return _Card(
+                child: Column(
+                  children: [
+                    _ContactInfoRow(
+                      value: name,
+                      onEdit: () => _openEditProfile(context, ref),
+                    ),
+                    const Divider(height: 1, color: AppColors.glassBorder),
+                    _ContactInfoRow(
+                      value: phone,
+                      isPhone: true,
+                      onEdit: () => _openEditProfile(context, ref),
+                    ),
+                  ],
+                ),
               );
             },
           ),
           const SizedBox(height: 24),
-          _SectionHeader(
-            label: 'تفضيلات التواصل',
-            trailing: IconButton(
-              icon: Icon(
+          _SectionLabel(
+            label: strings.contactPreferencesTitle,
+            trailing: GestureDetector(
+              onTap: () => _showContactPreferenceHelp(context, strings),
+              child: const Icon(
                 Icons.help_outline,
-                size: 20,
-                color: theme.colorScheme.onSurfaceVariant,
+                size: 18,
+                color: AppColors.textMuted,
               ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-              onPressed: () => _showContactPreferenceHelp(context),
             ),
           ),
           const SizedBox(height: 8),
-          ...ListingContactPreference.values.map(
-            (option) => RadioListTile<ListingContactPreference>(
-              value: option,
-              groupValue: state.contactPreference,
-              onChanged: (value) {
-                if (value != null) notifier.setContactPreference(value);
-              },
-              title: Text(option.labelAr),
-              contentPadding: EdgeInsets.zero,
-              visualDensity: VisualDensity.compact,
+          _Card(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                for (var i = 0;
+                    i < ListingContactPreference.values.length;
+                    i++) ...[
+                  if (i > 0)
+                    const Divider(height: 1, color: AppColors.glassBorder),
+                  _PrefOption(
+                    label: ListingContactPreference.values[i]
+                        .localizedLabel(strings),
+                    selected: state.contactPreference ==
+                        ListingContactPreference.values[i],
+                    onTap: () => notifier.setContactPreference(
+                      ListingContactPreference.values[i],
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           if (state.error != null) ...[
             const SizedBox(height: 12),
             Text(
               state.error!,
-              style: TextStyle(color: theme.colorScheme.error),
+              style: const TextStyle(color: AppColors.rejected),
             ),
           ],
         ],
@@ -122,21 +141,19 @@ class StepContactPreferences extends ConsumerWidget {
     ref.invalidate(currentProfileProvider);
   }
 
-  void _showContactPreferenceHelp(BuildContext context) {
+  void _showContactPreferenceHelp(
+    BuildContext context,
+    AppLocalizations strings,
+  ) {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تفضيلات التواصل'),
-        content: const Text(
-          'اختر الطريقة التي يمكن للمشترين التواصل معك من خلالها على هذا الإعلان.\n\n'
-          '• هاتف ورسائل: يمكن التواصل عبر الهاتف والرسائل داخل التطبيق\n'
-          '• هاتف فقط: يظهر رقم الهاتف دون رسائل داخل التطبيق\n'
-          '• رسائل فقط: التواصل عبر الرسائل داخل التطبيق فقط',
-        ),
+        title: Text(strings.contactPreferencesTitle),
+        content: Text(strings.contactPreferencesHelp),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('حسناً'),
+            child: Text(strings.understood),
           ),
         ],
       ),
@@ -144,40 +161,50 @@ class StepContactPreferences extends ConsumerWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.label,
-    this.trailing,
-  });
+class _Card extends StatelessWidget {
+  const _Card({required this.child, this.padding});
+
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.glassBorder),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.label, this.trailing});
 
   final String label;
   final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+    return Row(
+      children: [
+        Text(
+          label,
+          style: AppFonts.cairo(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textMuted,
           ),
-          ?trailing,
+        ),
+        if (trailing != null) ...[
+          const SizedBox(width: 8),
+          trailing!,
         ],
-      ),
+      ],
     );
   }
 }
@@ -186,31 +213,98 @@ class _ContactInfoRow extends StatelessWidget {
   const _ContactInfoRow({
     required this.value,
     required this.onEdit,
+    this.isPhone = false,
   });
 
   final String value;
   final VoidCallback onEdit;
+  final bool isPhone;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
       child: Row(
         children: [
           Expanded(
             child: Text(
               value,
-              style: theme.textTheme.bodyLarge,
+              textDirection: isPhone ? TextDirection.ltr : null,
+              textAlign: isPhone ? TextAlign.right : TextAlign.start,
+              style: AppFonts.cairo(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            tooltip: 'تعديل',
+            icon: const Icon(Icons.edit_outlined, size: 20, color: AppColors.volt),
             onPressed: onEdit,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PrefOption extends StatelessWidget {
+  const _PrefOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                    color: selected ? AppColors.volt : AppColors.textDark,
+                  ),
+                ),
+              ),
+              // Custom radio dot.
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected ? AppColors.volt : AppColors.textMuted,
+                    width: 2,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: selected
+                    ? Container(
+                        width: 11,
+                        height: 11,
+                        decoration: const BoxDecoration(
+                          color: AppColors.volt,
+                          shape: BoxShape.circle,
+                        ),
+                      )
+                    : null,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

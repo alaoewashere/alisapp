@@ -1,16 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'env_reader.dart';
+
 /// Google Maps API key from `.env` or `--dart-define=GOOGLE_MAPS_API_KEY=...`
 abstract final class MapsConfig {
   static String get apiKey {
-    const fromDefine = String.fromEnvironment('GOOGLE_MAPS_API_KEY');
+    final fromDefine = EnvReader.optional(
+      'GOOGLE_MAPS_API_KEY',
+      fromDefine: const String.fromEnvironment('GOOGLE_MAPS_API_KEY'),
+    );
     if (fromDefine.isNotEmpty) return _clean(fromDefine);
 
-    final fromEnv = dotenv.env['GOOGLE_MAPS_API_KEY'];
-    if (fromEnv != null && fromEnv.trim().isNotEmpty) {
-      return _clean(fromEnv);
-    }
+    if (!dotenv.isInitialized) return '';
 
     // flutter_dotenv may miss keys if .env was updated without a full restart.
     for (final entry in dotenv.env.entries) {

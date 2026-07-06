@@ -126,7 +126,7 @@ class _SvgBrandLogoState extends State<_SvgBrandLogo> {
         Uri.parse(url),
         headers: const {
           'Accept': 'image/svg+xml,*/*',
-          'User-Agent': 'Sello/1.0',
+          'User-Agent': 'SOUQAK/1.0',
         },
       );
       if (response.statusCode != 200) return null;

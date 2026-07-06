@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/core/utils/vehicle_listing_utils.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 import 'package:Sello/shared/models/category_model.dart';
-import 'package:Sello/shared/models/listing_model.dart';
 import 'package:Sello/shared/models/vehicle_listing_metadata.dart';
 
 void main() {
@@ -153,9 +154,10 @@ void main() {
 
   group('vehicle display formatting', () {
     test('formatVehicleMileageDisplay adds thousands separator', () {
+      final l10n = lookupAppLocalizations(const Locale('en'));
       expect(
-        formatVehicleMileageDisplay(22000, MileageUnit.km),
-        '22,000 كم',
+        formatVehicleMileageDisplay(22000, MileageUnit.km, l10n),
+        '22,000 KM',
       );
     });
 

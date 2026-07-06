@@ -25,7 +25,7 @@ class FavoriteToggleNotifier extends Notifier<Set<String>> {
       data: (ids) => Set<String>.from(ids),
       loading: () =>
           asyncIds.hasValue ? Set<String>.from(asyncIds.requireValue) : {},
-      error: (_, __) =>
+      error: (_, _) =>
           asyncIds.hasValue ? Set<String>.from(asyncIds.requireValue) : {},
     );
   }

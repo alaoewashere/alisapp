@@ -4,9 +4,11 @@ import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/l10n/l10n_provider.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/listing_model.dart';
 import '../../providers/post_listing_provider.dart';
 import '../image_picker_grid.dart';
-import '../listing_video_upload_section.dart';
 
 class Step4Photos extends ConsumerWidget {
   const Step4Photos({super.key});
@@ -15,7 +17,12 @@ class Step4Photos extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
+    final strings = ref.watch(appLocalizationsProvider);
     final hasPhotos = state.images.isNotEmpty;
+    final isProOrPremium = state.listingPackage == ListingPackage.pro ||
+        state.listingPackage == ListingPackage.premium;
+    final effectiveMax = isProOrPremium ? 15 : AppConstants.maxListingPhotos;
+    final maxPhotos = effectiveMax.toString();
 
     return ColoredBox(
       color: AppColors.canvas,
@@ -29,7 +36,7 @@ class Step4Photos extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'الصور',
+                    strings.photosTitle,
                     style: AppFonts.sans(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -38,7 +45,7 @@ class Step4Photos extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'أضف حتى ${AppConstants.maxListingPhotos} صور — اسحب لإعادة الترتيب',
+                    strings.photosSubtitle(maxPhotos),
                     style: AppFonts.sans(
                       fontSize: 13,
                       color: AppColors.pureWhite.withValues(alpha: 0.6),
@@ -56,7 +63,7 @@ class Step4Photos extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'الصورة الأولى هي الغلاف',
+                      strings.firstPhotoIsCover,
                       style: AppFonts.sans(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -70,16 +77,20 @@ class Step4Photos extends ConsumerWidget {
             const SizedBox(height: 20),
             ImagePickerGrid(
               images: state.images,
-              maxImages: AppConstants.maxListingPhotos,
+              maxImages: effectiveMax,
               onAdd: notifier.addImage,
               onAddBatch: notifier.addImages,
               onRemove: notifier.removeImage,
               onReorder: notifier.reorderImages,
               onLimitReached: () {
+                final limitMsg = strings.maxPhotosLimit(maxPhotos);
+                final upgradeHint = isProOrPremium
+                    ? limitMsg
+                    : '$limitMsg — اختر باقة برو للحصول على 15 صورة';
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'الحد الأقصى ${AppConstants.maxListingPhotos} صور',
+                      upgradeHint,
                       style: AppFonts.sans(fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -95,7 +106,7 @@ class Step4Photos extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'لم تضف أي صور بعد',
+                strings.noPhotosYet,
                 textAlign: TextAlign.center,
                 style: AppFonts.sans(
                   fontSize: 15,
@@ -104,7 +115,7 @@ class Step4Photos extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'الصور تزيد من فرصة بيع إعلانك',
+                strings.photosHelpSell,
                 textAlign: TextAlign.center,
                 style: AppFonts.sans(
                   fontSize: 12,
@@ -113,11 +124,9 @@ class Step4Photos extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 20),
-            const ListingVideoUploadSection(),
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: _PhotoTipsCard(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _PhotoTipsCard(strings: strings),
             ),
             if (state.error != null) ...[
               const SizedBox(height: 12),
@@ -142,7 +151,9 @@ class Step4Photos extends ConsumerWidget {
 }
 
 class _PhotoTipsCard extends StatelessWidget {
-  const _PhotoTipsCard();
+  const _PhotoTipsCard({required this.strings});
+
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -153,14 +164,21 @@ class _PhotoTipsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.borderLight),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Expanded(child: _PhotoTip(Icons.wb_sunny_outlined, 'إضاءة جيدة')),
-          _TipDivider(),
-          Expanded(child: _PhotoTip(Icons.crop_free, 'صور واضحة')),
-          _TipDivider(),
           Expanded(
-            child: _PhotoTip(Icons.photo_size_select_large, 'زوايا متعددة'),
+            child: _PhotoTip(Icons.wb_sunny_outlined, strings.photoTipGoodLight),
+          ),
+          const _TipDivider(),
+          Expanded(
+            child: _PhotoTip(Icons.crop_free, strings.photoTipClearPhotos),
+          ),
+          const _TipDivider(),
+          Expanded(
+            child: _PhotoTip(
+              Icons.photo_size_select_large,
+              strings.photoTipMultipleAngles,
+            ),
           ),
         ],
       ),

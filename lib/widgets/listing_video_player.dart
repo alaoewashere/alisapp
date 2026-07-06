@@ -4,6 +4,7 @@ import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:video_player/video_player.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/l10n/l10n_provider.dart';
 
 /// Inline listing walkthrough player with thumbnail preview and Chewie controls.
 class ListingVideoPlayer extends StatefulWidget {
@@ -111,6 +112,8 @@ class _ListingVideoPlayerState extends State<ListingVideoPlayer> {
   }
 
   Widget _buildPreview() {
+    final strings = context.l10n;
+
     if (_hasError) {
       return ColoredBox(
         color: AppColors.borderLight,
@@ -118,7 +121,7 @@ class _ListingVideoPlayerState extends State<ListingVideoPlayer> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'تعذّر تحميل الفيديو',
+              strings.videoLoadFailed,
               style: AppFonts.cairo(
                 color: AppColors.textMuted,
                 fontSize: 14,
@@ -130,7 +133,7 @@ class _ListingVideoPlayerState extends State<ListingVideoPlayer> {
                 setState(() => _hasError = false);
                 _startPlayback();
               },
-              child: const Text('إعادة المحاولة'),
+              child: Text(strings.retryAction),
             ),
           ],
         ),

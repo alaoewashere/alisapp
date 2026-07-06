@@ -1,13 +1,21 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-const smartAlertsTutorialSeenKey = 'smart_alerts_tutorial_seen';
+import '../../../core/utils/secure_log.dart';
 
-Future<bool> hasSeenSmartAlertsTutorial() async {
+String smartAlertsTutorialSeenKeyFor(String userId) =>
+    'smart_alerts_tutorial_seen_$userId';
+
+Future<bool> hasSeenSmartAlertsTutorial(String userId) async {
   final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(smartAlertsTutorialSeenKey) ?? false;
+  final key = smartAlertsTutorialSeenKeyFor(userId);
+  final seen = prefs.getBool(key) ?? false;
+  SecureLog.debug('Tutorial flag value ($key): $seen');
+  return seen;
 }
 
-Future<void> markSmartAlertsTutorialSeen() async {
+Future<void> markSmartAlertsTutorialSeen(String userId) async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setBool(smartAlertsTutorialSeenKey, true);
+  final key = smartAlertsTutorialSeenKeyFor(userId);
+  await prefs.setBool(key, true);
+  SecureLog.debug('Tutorial flag set ($key): true');
 }

@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/theme/app_fonts.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/moderation/moderation_provider.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../theme/app_text_styles.dart';
@@ -28,13 +31,14 @@ class PostListingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        title: Text(postListingStepAppBarTitle(state.currentStep)),
+        title: Text(postListingStepAppBarTitle(strings, state.currentStep)),
         leading: AppBackButton(
           onPressed: state.isLoading
               ? null
@@ -61,29 +65,34 @@ class PostListingScreen extends ConsumerWidget {
                 totalSteps: state.maxStep,
               ),
               Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(-0.15, 0),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    ));
-                    return SlideTransition(
-                      position: offsetAnimation,
-                      child: FadeTransition(opacity: animation, child: child),
-                    );
-                  },
-                  child: KeyedSubtree(
-                    key: ValueKey(state.currentStep),
-                    child: _buildStep(context, ref, state),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () => FocusScope.of(context).unfocus(),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      final offsetAnimation = Tween<Offset>(
+                        begin: const Offset(-0.15, 0),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutCubic,
+                      ));
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: FadeTransition(opacity: animation, child: child),
+                      );
+                    },
+                    child: KeyedSubtree(
+                      key: ValueKey(state.currentStep),
+                      child: _buildStep(context, ref, state),
+                    ),
                   ),
                 ),
               ),
               _BottomActions(
                 state: state,
+                strings: strings,
                 onNext: () async {
                   final userId = ref.read(currentUserIdProvider);
                   if (userId == null) {
@@ -99,7 +108,7 @@ class PostListingScreen extends ConsumerWidget {
               ),
             ],
           ),
-          if (state.isLoading) _PublishOverlay(state: state),
+          if (state.isLoading) _PublishOverlay(state: state, strings: strings),
         ],
       ),
     );
@@ -146,24 +155,24 @@ class PostListingScreen extends ConsumerWidget {
     }
 
     final state = ref.read(postListingProvider);
+    final strings = ref.read(appLocalizationsProvider);
     if (state.standardRequiresPaidPublish) {
       final price = ListingPackageConfig.paidStandardPriceIqd;
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('تأكيد رسوم الإعلان'),
+          title: Text(strings.confirmListingFeeTitle),
           content: Text(
-            'لقد استخدمت إعلانيك المجانيين هذا الشهر. سيتم تحصيل رسوم الإعلان العادي '
-            '(${formatIqd(price)}) لهذا الإعلان.',
+            strings.confirmListingFeeBody(formatIqdWithL10n(price, strings)),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('إلغاء'),
+              child: Text(strings.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text('تأكيد ودفع ${formatIqd(price)}'),
+              child: Text(strings.confirmAndPay(formatIqdWithL10n(price, strings))),
             ),
           ],
         ),
@@ -210,7 +219,7 @@ class PostListingScreen extends ConsumerWidget {
     if (id != null) {
       ref.read(postListingProvider.notifier).reset();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم حفظ المسودة')),
+        SnackBar(content: Text(ref.read(appLocalizationsProvider).draftSaved)),
       );
       context.go(AppRoutes.myListings);
     }
@@ -228,36 +237,64 @@ class _StepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final progress = (currentStep / totalSteps).clamp(0.0, 1.0);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(totalSteps, (i) {
-          final step = i + 1;
-          final active = step == currentStep;
-          final done = step < currentStep;
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: active ? 12 : 8,
-            height: active ? 12 : 8,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: active || done
-                  ? colorScheme.primary
-                  : colorScheme.outlineVariant,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text(
+                '$currentStep / $totalSteps',
+                textDirection: TextDirection.ltr,
+                style: AppFonts.cairo(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.pureWhite,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${(progress * 100).round()}%',
+                style: AppFonts.cairo(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.volt,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              height: 6,
+              color: AppColors.surfaceMuted,
+              child: AnimatedFractionallySizedBox(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+                alignment: AlignmentDirectional.centerStart,
+                widthFactor: progress,
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: AppColors.premiumGradient,
+                  ),
+                ),
+              ),
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }
 }
 
 class _PublishOverlay extends StatelessWidget {
-  const _PublishOverlay({required this.state});
+  const _PublishOverlay({required this.state, required this.strings});
 
   final PostListingState state;
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -276,8 +313,11 @@ class _PublishOverlay extends StatelessWidget {
                 Text(
                   state.statusMessage ??
                       (state.uploadTotal > 0
-                          ? 'جاري رفع الصور... (${state.uploadIndex}/${state.uploadTotal})'
-                          : 'جاري نشر الإعلان...'),
+                          ? strings.uploadingPhotos(
+                              state.uploadIndex.toString(),
+                              state.uploadTotal.toString(),
+                            )
+                          : strings.publishingListing),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -292,12 +332,14 @@ class _PublishOverlay extends StatelessWidget {
 class _BottomActions extends StatelessWidget {
   const _BottomActions({
     required this.state,
+    required this.strings,
     required this.onNext,
     required this.onPublish,
     required this.onSaveDraft,
   });
 
   final PostListingState state;
+  final AppLocalizations strings;
   final VoidCallback onNext;
   final VoidCallback onPublish;
   final VoidCallback onSaveDraft;
@@ -330,8 +372,8 @@ class _BottomActions extends StatelessWidget {
                       : () {
                           if (!canProceed) {
                             final message = isDetailsStep
-                                ? 'العنوان يجب أن يكون 5 أحرف على الأقل'
-                                : 'يرجى إضافة صورة واحدة على الأقل';
+                                ? strings.titleMinLengthError
+                                : strings.addPhotoRequired;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -367,21 +409,21 @@ class _BottomActions extends StatelessWidget {
                           ),
                         )
                       : Text(
-                          'التالي',
+                          strings.nextStep,
                           style: AppTextStyles.button,
                         ),
                 ),
               )
             else ...[
               CustomButton(
-                label: 'نشر الإعلان',
+                label: strings.postListing,
                 loading: state.isLoading,
                 onPressed: state.isLoading ? null : onPublish,
               ),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: state.isLoading ? null : onSaveDraft,
-                child: const Text('حفظ كمسودة'),
+                child: Text(strings.saveAsDraft),
               ),
             ],
           ],

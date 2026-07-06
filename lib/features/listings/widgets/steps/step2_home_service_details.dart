@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../shared/models/home_service_listing_metadata.dart';
 import '../../constants/home_service_listing_options.dart';
 import '../../constants/listing_form_options.dart';
@@ -47,11 +48,12 @@ class _Step2HomeServiceDetailsState
   Widget build(BuildContext context) {
     final details = ref.watch(postListingProvider).homeServiceDetails;
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Step2FormShell(
-      title: 'تفاصيل الخدمة',
+      title: strings.serviceDetailsTitle,
       children: [
-        Text('الجنس', style: theme.textTheme.titleSmall),
+        Text(strings.genderLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: HomeServiceListingOptions.genders,
@@ -59,7 +61,7 @@ class _Step2HomeServiceDetailsState
           onSelected: (v) => _update((d) => d.copyWith(gender: v)),
         ),
         const SizedBox(height: 12),
-        Text('الجنسية', style: theme.textTheme.titleSmall),
+        Text(strings.nationalityLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: HomeServiceListingOptions.nationalities,
@@ -67,7 +69,7 @@ class _Step2HomeServiceDetailsState
           onSelected: (v) => _update((d) => d.copyWith(nationality: v)),
         ),
         const SizedBox(height: 12),
-        Text('أوقات العمل *', style: theme.textTheme.titleSmall),
+        Text(strings.workHoursRequiredLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: HomeServiceListingOptions.availabilityOptions,
@@ -76,7 +78,7 @@ class _Step2HomeServiceDetailsState
         ),
         const SizedBox(height: 12),
         Step2IntDropdown(
-          label: 'أيام الأسبوع',
+          label: strings.weekDaysLabel,
           value: details.daysPerWeek,
           min: 1,
           max: 7,
@@ -87,7 +89,7 @@ class _Step2HomeServiceDetailsState
           ),
         ),
         Step2IntDropdown(
-          label: 'سنوات الخبرة',
+          label: strings.yearsExperienceLabel,
           value: details.experienceYears,
           min: 0,
           max: 40,
@@ -98,7 +100,7 @@ class _Step2HomeServiceDetailsState
           ),
         ),
         Step2IqdField(
-          label: 'الراتب المتوقع *',
+          label: strings.expectedSalaryRequiredLabel,
           controller: _salaryController,
           onChanged: (v) {
             _update(
@@ -109,7 +111,7 @@ class _Step2HomeServiceDetailsState
           },
         ),
         const SizedBox(height: 12),
-        Text('اللغات', style: theme.textTheme.titleSmall),
+        Text(strings.languagesSectionTitle, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2MultiChipSelector(
           options: HomeServiceListingOptions.languages,

@@ -81,8 +81,5 @@ bool shouldShowSellerRatingBadge({
   return ratingCount >= 10 && avgRating >= 4.0;
 }
 
-/// Minimum account age before leaving a rating.
-const ratingMinAccountAgeDays = 7;
-
 /// Max ratings a user may submit per calendar day.
 const ratingDailyLimit = 10;

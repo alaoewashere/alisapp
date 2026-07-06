@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/deep_links/deep_link_service.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../profile/data/profile_repository.dart';
@@ -126,7 +127,7 @@ class _AuthSessionHandlerState extends ConsumerState<AuthSessionHandler> {
       }
       if (kDebugMode) debugPrint('OAuth callback failed: $e');
       ref.read(authNotifierProvider.notifier).onOAuthFailed(
-            'تعذّر تسجيل الدخول. حاول مرة أخرى.',
+            ref.read(appLocalizationsProvider).authSessionFailed,
           );
     } catch (e) {
       if (kDebugMode) debugPrint('OAuth callback error: $e');

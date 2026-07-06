@@ -52,9 +52,12 @@ void main() {
     expect(find.text('فهمت'), findsOneWidget);
   });
 
-  test('markSmartAlertsTutorialSeen persists separate flag', () async {
-    expect(await hasSeenSmartAlertsTutorial(), isFalse);
-    await markSmartAlertsTutorialSeen();
-    expect(await hasSeenSmartAlertsTutorial(), isTrue);
+  test('markSmartAlertsTutorialSeen persists per-user flag', () async {
+    const userA = 'user-a';
+    const userB = 'user-b';
+    expect(await hasSeenSmartAlertsTutorial(userA), isFalse);
+    await markSmartAlertsTutorialSeen(userA);
+    expect(await hasSeenSmartAlertsTutorial(userA), isTrue);
+    expect(await hasSeenSmartAlertsTutorial(userB), isFalse);
   });
 }

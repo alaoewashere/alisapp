@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/dicebear_avatars.dart';
-import '../../core/router/app_router.dart';
 import '../../shared/widgets/app_back_button.dart';
 import '../../theme/app_form_fields.dart';
 import '../../theme/app_text_styles.dart';
@@ -69,7 +69,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (profile == null) {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('الملف غير موجود')),
+          SnackBar(content: Text(ref.read(appLocalizationsProvider).profileNotFound)),
         );
         return;
       }
@@ -90,30 +90,35 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (mounted) {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذّر تحميل الملف الشخصي')),
+          SnackBar(content: Text(ref.read(appLocalizationsProvider).profileLoadFailed)),
         );
       }
     }
   }
 
-  Future<void> _openPhoneVerification() async {
+  Future<void> _openPhoneEditor() async {
     final profile = _profile;
     if (profile == null || _isSaving) return;
 
     final phoneE164 = await showEditProfilePhoneSheet(
       context,
       ref,
-      initialPhoneE164: profile.phoneVerified ? profile.phone : null,
+      initialPhoneE164: profile.phone,
     );
 
     if (!mounted || phoneE164 == null || phoneE164.isEmpty) return;
 
-    await context.push(
-      '${AppRoutes.profilePhoneVerify}?phone=${Uri.encodeComponent(phoneE164)}',
-    );
-
-    if (!mounted) return;
     await _loadProfile();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ref.read(appLocalizationsProvider).changesSavedSuccess,
+          style: AppFonts.cairo(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   Future<void> _showAvatarPicker() async {
@@ -200,7 +205,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'تم حفظ التغييرات بنجاح',
+                ref.read(appLocalizationsProvider).changesSavedSuccess,
                 style: AppFonts.cairo(fontWeight: FontWeight.w600),
               ),
               backgroundColor: Colors.green,
@@ -213,7 +218,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             await handlePostingBanOrBlockError(ref, context, err);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('حدث خطأ أثناء الحفظ')),
+              SnackBar(content: Text(ref.read(appLocalizationsProvider).saveError)),
             );
           }
       }
@@ -221,13 +226,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       if (!mounted) return;
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('حدث خطأ أثناء الحفظ')),
+        SnackBar(content: Text(ref.read(appLocalizationsProvider).saveError)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final profile = _profile;
     final emailDisplay = _emailController.text.trim();
 
@@ -244,7 +250,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             onPressed: _isSaving ? null : () => context.pop(),
           ),
           title: Text(
-            'تعديل الملف الشخصي',
+            strings.editProfile,
             style: AppTextStyles.subheading.copyWith(fontSize: 18),
           ),
           actions: [
@@ -257,7 +263,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : Text(
-                      'حفظ',
+                      strings.save,
                       style: AppFonts.cairo(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -278,11 +284,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     children: [
                       _AvatarSection(
                         avatarSeed: _avatarSeed,
+                        changePhotoLabel: strings.changePhoto,
                         onTap: _isSaving ? null : _showAvatarPicker,
                       ),
                       const SizedBox(height: 20),
                       _EditField(
-                        label: 'الاسم الكامل',
+                        label: strings.fullName,
                         labelGap: _labelGap,
                         spacing: _groupSpacing,
                         child: TextFormField(
@@ -290,16 +297,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           style: AppTextStyles.input,
                           textInputAction: TextInputAction.next,
                           validator: (v) => v == null || v.trim().isEmpty
-                              ? 'أدخل الاسم'
+                              ? strings.enterName
                               : null,
                           decoration: AppFormDecorations.underline(
-                            hintText: 'الاسم الكامل',
+                            hintText: strings.fullName,
                           ),
                         ),
                       ),
                       if (profile != null)
                         _EditField(
-                          label: 'اسم المستخدم',
+                          label: strings.usernameLabel,
                           labelGap: _labelGap,
                           spacing: _groupSpacing,
                           hintGap: _hintGap,
@@ -312,7 +319,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'لا يمكن تغيير اسم المستخدم',
+                                strings.usernameCannotChange,
                                 style: AppFonts.cairo(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
@@ -338,7 +345,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           ),
                         ),
                       _EditField(
-                        label: 'البريد الإلكتروني',
+                        label: strings.emailLabel,
                         labelGap: _labelGap,
                         spacing: _groupSpacing,
                         child: _ReadOnlyFieldBox(
@@ -363,16 +370,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                       if (profile != null)
                         _EditField(
-                          label: 'رقم الهاتف',
+                          label: strings.phoneNumber,
                           labelGap: _labelGap,
                           spacing: _groupSpacing,
                           hintGap: _hintGap,
                           hint: GestureDetector(
-                            onTap: _isSaving ? null : _openPhoneVerification,
+                            onTap: _isSaving ? null : _openPhoneEditor,
                             child: Text(
-                              profile.phoneVerified
-                                  ? 'تغيير الرقم'
-                                  : '✓ تحقق من الرقم',
+                              strings.changePhoneNumber,
                               style: AppFonts.cairo(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -386,15 +391,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  profile.phoneVerified &&
-                                          profile.phone != null &&
-                                          profile.phone!.trim().isNotEmpty
-                                      ? Validators.normalizeE164(
-                                          profile.phone!,
-                                        )
-                                      : 'لم يتم التحقق',
+                                  profile.hasDisplayPhone
+                                      ? Validators.normalizeE164(profile.phone!)
+                                      : '—',
                                   style: AppTextStyles.input.copyWith(
-                                    color: profile.phoneVerified
+                                    color: profile.hasDisplayPhone
                                         ? AppColors.textDark
                                         : AppColors.textMuted
                                             .withValues(alpha: 0.55),
@@ -434,9 +435,14 @@ class _ReadOnlyFieldBox extends StatelessWidget {
 }
 
 class _AvatarSection extends StatelessWidget {
-  const _AvatarSection({required this.avatarSeed, required this.onTap});
+  const _AvatarSection({
+    required this.avatarSeed,
+    required this.changePhotoLabel,
+    required this.onTap,
+  });
 
   final String avatarSeed;
+  final String changePhotoLabel;
   final VoidCallback? onTap;
 
   @override
@@ -482,7 +488,7 @@ class _AvatarSection extends StatelessWidget {
         GestureDetector(
           onTap: onTap,
           child: Text(
-            'تغيير الصورة',
+            changePhotoLabel,
             style: AppFonts.cairo(
               fontSize: 13,
               color: AppColors.primary,

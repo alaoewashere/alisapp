@@ -72,6 +72,8 @@ class ProfileModel {
   bool get hasUsername =>
       username != null && username!.trim().isNotEmpty;
 
+  bool get hasDisplayPhone => phone != null && phone!.trim().isNotEmpty;
+
   /// DiceBear seed used for illustrated avatar (defaults to Felix).
   String get effectiveAvatarSeed =>
       avatarSeed != null && avatarSeed!.trim().isNotEmpty

@@ -1,6 +1,6 @@
 abstract final class AppStrings {
-  static const appNameAr = 'Sello';
-  static const appNameEn = 'Sello';
+  static const appNameAr = 'سـوقك';
+  static const appNameEn = 'SOUQAK';
 
   static const home = 'الرئيسية';
   static const search = 'بحث';

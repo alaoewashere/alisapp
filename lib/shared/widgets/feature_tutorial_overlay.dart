@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/theme/app_fonts.dart';
 
 enum FeatureTutorialBubblePosition { below, above }
@@ -49,8 +50,14 @@ class _FeatureTutorialOverlayState extends State<FeatureTutorialOverlay> {
     final box =
         widget.targetKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) return null;
-    final topLeft = box.localToGlobal(Offset.zero);
-    return topLeft & box.size;
+    final globalTopLeft = box.localToGlobal(Offset.zero);
+    // Convert to local coords of this overlay (which fills the Stack)
+    final overlayBox = context.findRenderObject();
+    if (overlayBox is RenderBox) {
+      final localTopLeft = overlayBox.globalToLocal(globalTopLeft);
+      return localTopLeft & box.size;
+    }
+    return globalTopLeft & box.size;
   }
 
   @override
@@ -228,7 +235,7 @@ class _TutorialBubble extends StatelessWidget {
               child: FilledButton(
                 onPressed: onDismiss,
                 child: Text(
-                  'فهمت',
+                  context.l10n.understood,
                   style: AppFonts.cairo(fontWeight: FontWeight.w700),
                 ),
               ),

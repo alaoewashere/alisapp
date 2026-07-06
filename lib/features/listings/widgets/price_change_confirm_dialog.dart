@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 
 Future<bool> showPriceChangeConfirmDialog(BuildContext context) async {
+  final strings = context.l10n;
   final result = await showDialog<bool>(
     context: context,
     useRootNavigator: true,
@@ -11,23 +13,23 @@ Future<bool> showPriceChangeConfirmDialog(BuildContext context) async {
     builder: (context) {
       return AlertDialog(
         title: Text(
-          'تغيير السعر',
+          strings.priceChangeTitle,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'تنبيه: تغيير السعر سيظهر لجميع المشترين في تاريخ السعر',
+          strings.priceChangeWarning,
           style: AppFonts.cairo(height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('إلغاء', style: AppFonts.cairo()),
+            child: Text(strings.cancel, style: AppFonts.cairo()),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             child: Text(
-              'تأكيد التغيير',
+              strings.confirmChange,
               style: AppFonts.cairo(fontWeight: FontWeight.bold),
             ),
           ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
+
 /// «عرض الكل» link — matches the Home categories section header style.
 class HomeSectionViewAllLink extends StatelessWidget {
   const HomeSectionViewAllLink({
@@ -21,9 +23,9 @@ class HomeSectionViewAllLink extends StatelessWidget {
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
-      child: const Text(
-        'عرض الكل',
-        style: TextStyle(
+      child: Text(
+        context.l10n.viewAll,
+        style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),

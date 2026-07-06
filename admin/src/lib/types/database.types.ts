@@ -213,6 +213,17 @@ export type VerificationRequestRow = {
   rejection_reason: string | null;
 }
 
+export type SupportSenderRole = "user" | "admin";
+
+export type SupportMessageRow = {
+  id: string;
+  user_id: string;
+  sender_role: SupportSenderRole;
+  body: string;
+  is_read: boolean;
+  created_at: string;
+}
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
@@ -239,6 +250,7 @@ export type Database = {
       blocked_words: Table<BlockedWordRow>;
       ratings: Table<RatingRow>;
       verification_requests: Table<VerificationRequestRow>;
+      support_messages: Table<SupportMessageRow>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

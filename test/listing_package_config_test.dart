@@ -35,4 +35,11 @@ void main() {
       16000,
     );
   });
+
+  test('pro and premium are not selectable while disabled', () {
+    expect(ListingPackageConfig.isSelectable(ListingPackage.standard), isTrue);
+    expect(ListingPackageConfig.isSelectable(ListingPackage.pro), isFalse);
+    expect(ListingPackageConfig.isSelectable(ListingPackage.premium), isFalse);
+    expect(ListingPackageConfig.proAndPremiumEnabled, isFalse);
+  });
 }

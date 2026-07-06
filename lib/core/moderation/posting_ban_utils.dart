@@ -1,3 +1,4 @@
+import '../../l10n/app_localizations.dart';
 import '../../shared/models/profile_model.dart';
 
 /// Rolling 30-day violation window — mirrors [effective_moderation_violation_count].
@@ -41,40 +42,42 @@ class PostingBanInfo {
     );
   }
 
-  factory PostingBanInfo.fromProfile(ProfileModel profile) {
+  factory PostingBanInfo.fromProfile(
+    ProfileModel profile, {
+    required AppLocalizations strings,
+  }) {
     final permanent = profile.isBanned && profile.bannedUntil == null;
     return PostingBanInfo(
       isFirstBan: profile.banCount <= 1,
       bannedUntil: profile.bannedUntil,
       isPermanent: permanent,
-      message: postingBanMessageAr(profile),
+      message: postingBanMessage(strings, profile),
     );
   }
 
-  String blockedDialogBodyAr() {
+  String blockedDialogBody(AppLocalizations strings) {
     if (isPermanent) {
-      return 'تم حظرك بشكل دائم من الدردشة والنشر بسبب تكرار استخدام لغة غير لائقة.';
+      return strings.postingBanPermanentReason;
     }
     if (isFirstBan) {
-      return 'تم حظرك من الدردشة والنشر لمدة يومين بسبب استخدام لغة غير لائقة. '
-          'في حال التكرار ستُحظر لمدة شهر كامل.';
+      return strings.postingBanFirstReason;
     }
-    return 'تم حظرك من الدردشة والنشر لمدة شهر كامل بسبب تكرار استخدام لغة غير لائقة.';
+    return strings.postingBanRepeatReason;
   }
 }
 
-String postingBanMessageAr(ProfileModel profile) {
+String postingBanMessage(AppLocalizations strings, ProfileModel profile) {
   if (!isUserPostingBanned(profile)) return '';
 
   if (profile.bannedUntil == null) {
-    return 'أنت محظور بشكل دائم من الدردشة والنشر';
+    return strings.postingBanPermanent;
   }
 
   final until = profile.bannedUntil!.toLocal();
   final formatted =
       '${until.year}-${until.month.toString().padLeft(2, '0')}-${until.day.toString().padLeft(2, '0')} '
       '${until.hour.toString().padLeft(2, '0')}:${until.minute.toString().padLeft(2, '0')}';
-  return 'أنت محظور من الدردشة والنشر حتى $formatted';
+  return strings.postingBanUntil(formatted);
 }
 
 bool isUserPostingBannedError(Object error) {

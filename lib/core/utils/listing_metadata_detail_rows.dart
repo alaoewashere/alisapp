@@ -1,3 +1,5 @@
+import '../../l10n/app_localizations.dart';
+import '../../core/l10n/listing_attribute_locale.dart';
 import '../../shared/models/animal_listing_metadata.dart';
 import '../../shared/models/electronics_listing_metadata.dart';
 import '../../shared/models/general_listing_metadata.dart';
@@ -9,30 +11,33 @@ import '../../shared/models/tutoring_listing_metadata.dart';
 import '../../shared/models/vehicle_listing_metadata.dart';
 import 'vehicle_listing_utils.dart';
 
-ListingMetadataDisplay buildListingMetadataDisplay(ListingModel listing) {
+ListingMetadataDisplay buildListingMetadataDisplay(
+  ListingModel listing,
+  AppLocalizations l10n,
+) {
   if (listing.vehicleMetadata != null) {
-    return _vehicleDisplay(listing.vehicleMetadata!, listing.condition);
+    return _vehicleDisplay(listing.vehicleMetadata!, listing.condition, l10n);
   }
   if (listing.realEstateMetadata != null) {
-    return _realEstateDisplay(listing.realEstateMetadata!);
+    return _realEstateDisplay(listing.realEstateMetadata!, l10n);
   }
   if (listing.electronicsMetadata != null) {
-    return _electronicsDisplay(listing.electronicsMetadata!);
+    return _electronicsDisplay(listing.electronicsMetadata!, l10n);
   }
   if (listing.generalMetadata != null) {
-    return _generalDisplay(listing.generalMetadata!);
+    return _generalDisplay(listing.generalMetadata!, l10n);
   }
   if (listing.tutoringMetadata != null) {
-    return _tutoringDisplay(listing.tutoringMetadata!);
+    return _tutoringDisplay(listing.tutoringMetadata!, l10n);
   }
   if (listing.jobMetadata != null) {
-    return _jobDisplay(listing.jobMetadata!);
+    return _jobDisplay(listing.jobMetadata!, l10n);
   }
   if (listing.animalMetadata != null) {
-    return _animalDisplay(listing.animalMetadata!);
+    return _animalDisplay(listing.animalMetadata!, l10n);
   }
   if (listing.homeServiceMetadata != null) {
-    return _homeServiceDisplay(listing.homeServiceMetadata!);
+    return _homeServiceDisplay(listing.homeServiceMetadata!, l10n);
   }
   return const ListingMetadataDisplay();
 }
@@ -40,113 +45,145 @@ ListingMetadataDisplay buildListingMetadataDisplay(ListingModel listing) {
 ListingMetadataDisplay _vehicleDisplay(
   VehicleListingMetadata vehicle,
   ListingCondition? condition,
+  AppLocalizations l10n,
 ) {
   return ListingMetadataDisplay(
-    rows: vehicleDetailRows(vehicle, condition),
+    rows: vehicleDetailRows(vehicle, condition, l10n),
     chipGroups: vehicle.selectedSpecs.isEmpty
         ? const []
         : [
             MetadataChipGroup(
-              title: 'المواصفات',
-              chips: vehicle.selectedSpecs,
+              title: l10n.sectionSpecs,
+              chips: vehicle.selectedSpecs
+                  .map((spec) => localizeListingAttribute(spec, l10n))
+                  .toList(),
             ),
           ],
   );
 }
 
-ListingMetadataDisplay _realEstateDisplay(RealEstateListingMetadata details) {
-  final rows = _rows((add) {
-    add('نوع العقار', details.propertyType);
-    add('نوع العرض', details.offerType);
-    if (details.areaSqm != null) add('المساحة', '${details.areaSqm} م²');
-    if (details.floor != null) add('الطابق', details.floor.toString());
+ListingMetadataDisplay _realEstateDisplay(
+  RealEstateListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.metaPropertyType, details.propertyType);
+    add(l10n.metaOfferType, details.offerType);
+    if (details.areaSqm != null) add(l10n.metaArea, '${details.areaSqm} m²');
+    if (details.floor != null) add(l10n.metaFloor, details.floor.toString());
     if (details.totalFloors != null) {
-      add('عدد الطوابق', details.totalFloors.toString());
+      add(l10n.metaTotalFloors, details.totalFloors.toString());
     }
-    add('عدد الغرف', details.rooms);
-    add('عدد الحمامات', details.bathrooms);
-    add('عمر البناء', details.ageYears);
-    add('التشطيب', details.furnished);
-    add('نوع الصك', details.deedType);
+    add(l10n.metaRooms, details.rooms);
+    add(l10n.metaBathrooms, details.bathrooms);
+    add(l10n.metaBuildingAge, details.ageYears);
+    add(l10n.metaFurnishing, details.furnished);
+    add(l10n.deedTypeLabel, details.deedType);
   });
 
   return ListingMetadataDisplay(
     rows: rows,
     chipGroups: details.features.isEmpty
         ? const []
-        : [MetadataChipGroup(title: 'المميزات', chips: details.features)],
+        : [
+            MetadataChipGroup(
+              title: l10n.featuresSectionTitle,
+              chips: details.features
+                  .map((feature) => localizeListingAttribute(feature, l10n))
+                  .toList(),
+            ),
+          ],
   );
 }
 
-ListingMetadataDisplay _electronicsDisplay(ElectronicsListingMetadata details) {
-  final rows = _rows((add) {
-    add('الماركة', details.brand);
-    add('الموديل', details.model);
-    add('التخزين', details.storage);
-    add('الرام', details.ram);
-    add('اللون', details.color);
-    add('الحالة', details.condition);
-    add('صحة البطارية', details.batteryHealth);
-    add('الضمان', details.warranty);
-    add('المعالج', details.processor);
+ListingMetadataDisplay _electronicsDisplay(
+  ElectronicsListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.metaBrand, details.brand);
+    add(l10n.metaModel, details.model);
+    add(l10n.metaStorage, details.storage);
+    add(l10n.metaRam, details.ram);
+    add(l10n.fieldColor, details.color);
+    add(l10n.fieldCondition, details.condition);
+    add(l10n.metaBatteryHealth, details.batteryHealth);
+    add(l10n.metaWarranty, details.warranty);
+    add(l10n.metaProcessor, details.processor);
     if (details.screenSize != null) {
-      add('حجم الشاشة', '${details.screenSize}"');
+      add(l10n.metaScreenSize, '${details.screenSize}"');
     }
-    add('الدقة', details.resolution);
-    add('مع العلبة', _boolLabel(details.hasBox));
-    add('مع الشاحن', _boolLabel(details.hasCharger));
-    add('سمارت TV', _boolLabel(details.smart));
+    add(l10n.metaResolution, details.resolution);
+    add(l10n.metaWithBox, _boolLabel(details.hasBox, l10n));
+    add(l10n.metaWithCharger, _boolLabel(details.hasCharger, l10n));
+    add(l10n.metaSmartTv, _boolLabel(details.smart, l10n));
   });
   return ListingMetadataDisplay(rows: rows);
 }
 
-ListingMetadataDisplay _generalDisplay(GeneralListingMetadata details) {
-  final rows = _rows((add) {
-    add('الحالة', details.itemCondition);
-    add('الماركة', details.brand);
-    add('قابل للتبادل', _boolLabel(details.exchangePossible));
-    add('توصيل متاح', _boolLabel(details.deliveryAvailable));
-    add('تكلفة التوصيل', details.deliveryCost);
+ListingMetadataDisplay _generalDisplay(
+  GeneralListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.fieldCondition, details.itemCondition);
+    add(l10n.metaBrand, details.brand);
+    add(l10n.exchangePossible, _boolLabel(details.exchangePossible, l10n));
+    add(l10n.deliveryAvailable, _boolLabel(details.deliveryAvailable, l10n));
+    add(l10n.metaDeliveryCost, details.deliveryCost);
   });
   return ListingMetadataDisplay(rows: rows);
 }
 
-ListingMetadataDisplay _tutoringDisplay(TutoringListingMetadata details) {
-  final rows = _rows((add) {
-    add('المادة', details.subject);
-    add('المنهج', details.curriculum);
-    add('طريقة التدريس', details.sessionType);
-    add('الجنس المقبول', details.gender);
+ListingMetadataDisplay _tutoringDisplay(
+  TutoringListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.metaSubject, details.subject);
+    add(l10n.curriculumLabel, details.curriculum);
+    add(l10n.metaTeachingMethod, details.sessionType);
+    add(l10n.acceptedGenderLabel, details.gender);
     if (details.pricePerHour != null) {
-      add('السعر/ساعة', '${details.pricePerHour} د.ع');
+      add(l10n.metaPricePerHour, '${details.pricePerHour} ${l10n.currencyIqd}');
     }
     if (details.experienceYears != null) {
-      add('سنوات الخبرة', details.experienceYears.toString());
+      add(l10n.metaExperience, details.experienceYears.toString());
     }
-    add('المؤهل العلمي', details.qualifications);
+    add(l10n.metaQualifications, details.qualifications);
   });
 
   return ListingMetadataDisplay(
     rows: rows,
     chipGroups: details.stages.isEmpty
         ? const []
-        : [MetadataChipGroup(title: 'المراحل الدراسية', chips: details.stages)],
+        : [
+            MetadataChipGroup(
+              title: l10n.metaStudyStages,
+              chips: details.stages
+                  .map((stage) => localizeListingAttribute(stage, l10n))
+                  .toList(),
+            ),
+          ],
   );
 }
 
-ListingMetadataDisplay _jobDisplay(JobListingMetadata details) {
-  final rows = _rows((add) {
-    add('نوع الدوام', details.jobType);
-    add('القطاع', details.sector);
-    add('الخبرة المطلوبة', details.experienceRequired);
-    add('المؤهل المطلوب', details.educationRequired);
-    add('تفضيل الجنس', details.genderPreference);
-    add('نوع الراتب', details.salaryType);
+ListingMetadataDisplay _jobDisplay(
+  JobListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.metaJobType, details.jobType);
+    add(l10n.metaSector, details.sector);
+    add(l10n.metaExperienceRequired, details.experienceRequired);
+    add(l10n.metaEducationRequired, details.educationRequired);
+    add(l10n.metaGenderPreference, details.genderPreference);
+    add(l10n.salaryTypeLabel, details.salaryType);
     if (details.salaryMin != null) {
-      add('الراتب الأدنى', '${details.salaryMin} د.ع');
+      add(l10n.metaSalaryMin, '${details.salaryMin} ${l10n.currencyIqd}');
     }
     if (details.salaryMax != null) {
-      add('الراتب الأعلى', '${details.salaryMax} د.ع');
+      add(l10n.metaSalaryMax, '${details.salaryMax} ${l10n.currencyIqd}');
     }
   });
 
@@ -154,40 +191,53 @@ ListingMetadataDisplay _jobDisplay(JobListingMetadata details) {
     rows: rows,
     chipGroups: details.benefits.isEmpty
         ? const []
-        : [MetadataChipGroup(title: 'المزايا', chips: details.benefits)],
+        : [
+            MetadataChipGroup(
+              title: l10n.benefitsSectionTitle,
+              chips: details.benefits
+                  .map((benefit) => localizeListingAttribute(benefit, l10n))
+                  .toList(),
+            ),
+          ],
   );
 }
 
-ListingMetadataDisplay _animalDisplay(AnimalListingMetadata details) {
-  final rows = _rows((add) {
-    add('نوع الحيوان', details.animalType);
-    add('السلالة', details.breed);
+ListingMetadataDisplay _animalDisplay(
+  AnimalListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.metaAnimalType, details.animalType);
+    add(l10n.metaBreed, details.breed);
     if (details.ageMonths != null) {
-      add('العمر', '${details.ageMonths} شهر');
+      add(l10n.metaAge, l10n.metaAgeMonths(details.ageMonths!));
     }
-    add('الجنس', details.gender);
-    add('ملقح', _boolLabel(details.vaccinated));
-    add('يمتلك وثائق', _boolLabel(details.hasPapers));
-    add('مدرب', _boolLabel(details.trained));
-    add('اللون', details.color);
+    add(l10n.metaGender, details.gender);
+    add(l10n.metaVaccinated, _boolLabel(details.vaccinated, l10n));
+    add(l10n.metaHasPapers, _boolLabel(details.hasPapers, l10n));
+    add(l10n.metaTrained, _boolLabel(details.trained, l10n));
+    add(l10n.fieldColor, details.color);
   });
   return ListingMetadataDisplay(rows: rows);
 }
 
-ListingMetadataDisplay _homeServiceDisplay(HomeServiceListingMetadata details) {
-  final rows = _rows((add) {
-    add('نوع الخدمة', details.serviceType);
-    add('الجنس', details.gender);
-    add('الجنسية', details.nationality);
-    add('أوقات العمل', details.availability);
+ListingMetadataDisplay _homeServiceDisplay(
+  HomeServiceListingMetadata details,
+  AppLocalizations l10n,
+) {
+  final rows = _rows(l10n, (add) {
+    add(l10n.metaServiceType, details.serviceType);
+    add(l10n.metaGender, details.gender);
+    add(l10n.nationalityLabel, details.nationality);
+    add(l10n.metaWorkHours, details.availability);
     if (details.daysPerWeek != null) {
-      add('أيام الأسبوع', details.daysPerWeek.toString());
+      add(l10n.metaDaysPerWeek, details.daysPerWeek.toString());
     }
     if (details.experienceYears != null) {
-      add('سنوات الخبرة', details.experienceYears.toString());
+      add(l10n.metaExperience, details.experienceYears.toString());
     }
     if (details.salaryExpected != null) {
-      add('الراتب المتوقع', '${details.salaryExpected} د.ع');
+      add(l10n.metaExpectedSalary, '${details.salaryExpected} ${l10n.currencyIqd}');
     }
   });
 
@@ -195,24 +245,36 @@ ListingMetadataDisplay _homeServiceDisplay(HomeServiceListingMetadata details) {
     rows: rows,
     chipGroups: details.languages.isEmpty
         ? const []
-        : [MetadataChipGroup(title: 'اللغات', chips: details.languages)],
+        : [
+            MetadataChipGroup(
+              title: l10n.languagesSectionTitle,
+              chips: details.languages
+                  .map((language) => localizeListingAttribute(language, l10n))
+                  .toList(),
+            ),
+          ],
   );
 }
 
 typedef _RowAdder = void Function(String label, String? value);
 
-List<MapEntry<String, String>> _rows(void Function(_RowAdder add) build) {
+List<MapEntry<String, String>> _rows(
+  AppLocalizations l10n,
+  void Function(_RowAdder add) build,
+) {
   final rows = <MapEntry<String, String>>[];
   build((label, value) {
     if (value == null || value.trim().isEmpty) return;
-    rows.add(MapEntry(label, value.trim()));
+    rows.add(
+      MapEntry(label, localizeListingAttribute(value.trim(), l10n)),
+    );
   });
   return rows;
 }
 
-String? _boolLabel(bool? value) {
+String? _boolLabel(bool? value, AppLocalizations l10n) {
   if (value == null) return null;
-  return value ? 'نعم' : 'لا';
+  return value ? l10n.yesLabel : l10n.noLabel;
 }
 
 class MetadataChipGroup {

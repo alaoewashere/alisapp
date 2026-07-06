@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/l10n/l10n_provider.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/dicebear_avatars.dart';
 import '../shared/widgets/dicebear_avatar_cell.dart';
@@ -21,7 +24,7 @@ Future<void> showAvatarPickerSheet(
   );
 }
 
-class AvatarPickerSheet extends StatefulWidget {
+class AvatarPickerSheet extends ConsumerStatefulWidget {
   const AvatarPickerSheet({
     super.key,
     required this.currentSeed,
@@ -32,10 +35,10 @@ class AvatarPickerSheet extends StatefulWidget {
   final ValueChanged<String> onSelected;
 
   @override
-  State<AvatarPickerSheet> createState() => _AvatarPickerSheetState();
+  ConsumerState<AvatarPickerSheet> createState() => _AvatarPickerSheetState();
 }
 
-class _AvatarPickerSheetState extends State<AvatarPickerSheet> {
+class _AvatarPickerSheetState extends ConsumerState<AvatarPickerSheet> {
   late String _selected;
 
   @override
@@ -52,6 +55,7 @@ class _AvatarPickerSheetState extends State<AvatarPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final sheetHeight = MediaQuery.sizeOf(context).height * 0.6;
 
     return Container(
@@ -74,7 +78,7 @@ class _AvatarPickerSheetState extends State<AvatarPickerSheet> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
-              'اختر صورتك الرمزية',
+              strings.chooseAvatarTitle,
               style: AppFonts.cairo(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,

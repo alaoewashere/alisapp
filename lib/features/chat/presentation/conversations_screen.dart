@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/widgets/error_widget.dart';
@@ -18,6 +20,7 @@ class ConversationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final userId = ref.watch(currentUserIdProvider);
 
     if (userId == null) {
@@ -26,17 +29,17 @@ class ConversationsScreen extends ConsumerWidget {
         appBar: SelloAppBar(
           backgroundColor: AppColors.background,
           automaticallyImplyLeading: false,
-          title: const Text('رسائلي'),
+          title: Text(strings.myMessages),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('سجّل الدخول لعرض الرسائل'),
+              Text(strings.loginToViewMessages),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () => context.push(AppRoutes.phone),
-                child: const Text('تسجيل الدخول'),
+                child: Text(strings.signInLink),
               ),
             ],
           ),
@@ -55,17 +58,17 @@ class ConversationsScreen extends ConsumerWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: const Text('رسائلي'),
+        title: Text(strings.myMessages),
       ),
       body: conversationsAsync.when(
-        loading: () => const LoadingWidget(message: 'جاري التحميل...'),
+        loading: () => LoadingWidget(message: strings.loading),
         error: (e, _) => AppErrorWidget(
           message: '$e',
           onRetry: () => ref.invalidate(conversationsStreamProvider),
         ),
         data: (conversations) {
           if (conversations.isEmpty) {
-            return const _EmptyInbox();
+            return _EmptyInbox(strings: strings);
           }
 
           final activeUsers = extractActiveChatUsers(conversations, userId);
@@ -116,20 +119,21 @@ class ConversationsScreen extends ConsumerWidget {
     WidgetRef ref,
     String conversationId,
   ) async {
+    final strings = ref.read(appLocalizationsProvider);
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('حذف المحادثة'),
-        content: const Text('هل تريد حذف هذه المحادثة؟'),
+        title: Text(strings.deleteConversationTitle),
+        content: Text(strings.deleteConversationBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(strings.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف'),
+            child: Text(strings.delete),
           ),
         ],
       ),
@@ -141,7 +145,9 @@ class ConversationsScreen extends ConsumerWidget {
 }
 
 class _EmptyInbox extends StatelessWidget {
-  const _EmptyInbox();
+  const _EmptyInbox({required this.strings});
+
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context) {
@@ -158,14 +164,14 @@ class _EmptyInbox extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'لا توجد رسائل بعد',
+              strings.noMessagesYet,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: AppColors.textDark,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              'ابدأ بالتواصل مع البائعين',
+              strings.contactSellersPrompt,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.textMuted,
                   ),

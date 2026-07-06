@@ -7,11 +7,13 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/iraq_neighborhoods.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/listing_heatmap_utils.dart';
 import '../../../features/auth/widgets/auth_form_styles.dart';
+import '../../../l10n/app_localizations.dart';
 import '../utils/heatmap_map_markers.dart';
 import '../widgets/heatmap_density_badge.dart';
 import '../../../shared/models/category_model.dart';
@@ -22,6 +24,31 @@ import '../providers/listing_heatmap_provider.dart';
 import '../providers/post_listing_provider.dart';
 import '../providers/search_provider.dart';
 
+String _heatmapFilterLabel(AppLocalizations strings, HeatmapCategoryFilter filter) {
+  if (filter.slug == null) return strings.allCategories;
+  return switch (filter.slug) {
+    'cars' => strings.heatmapFilterCars,
+    'real_estate' => strings.categoryRealEstate,
+    'electronics' => strings.categoryElectronics,
+    _ => filter.labelAr,
+  };
+}
+
+String _localizedHeatmapDensitySubtitle(
+  AppLocalizations strings, {
+  required String areaName,
+  required int listingCount,
+  String? categorySlug,
+}) {
+  final count = arabicNumber(listingCount);
+  return switch (categorySlug) {
+    'cars' => strings.heatmapDensityCars(count, areaName),
+    'real_estate' => strings.heatmapDensityRealEstate(count, areaName),
+    'electronics' => strings.heatmapDensityElectronics(count, areaName),
+    _ => strings.heatmapDensityGeneric(count, areaName),
+  };
+}
+
 class ListingHeatmapScreen extends ConsumerWidget {
   const ListingHeatmapScreen({super.key});
 
@@ -30,6 +57,7 @@ class ListingHeatmapScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final selectedSlug = ref.watch(heatmapCategorySlugProvider);
     final densityAsync = ref.watch(listingDensityProvider);
 
@@ -38,7 +66,7 @@ class ListingHeatmapScreen extends ConsumerWidget {
       appBar: SelloAppBar(
         backgroundColor: AppColors.canvas,
         title: Text(
-          'خريطة الإعلانات',
+          strings.heatmapTitle,
           style: AppFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
@@ -57,7 +85,7 @@ class ListingHeatmapScreen extends ConsumerWidget {
                 ),
                 error: (_, _) => Center(
                   child: Text(
-                    'تعذّر تحميل بيانات الكثافة',
+                    strings.heatmapLoadFailed,
                     style: AppFonts.cairo(color: AppColors.textMuted),
                   ),
                 ),
@@ -81,6 +109,8 @@ class _CategoryFilterRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -95,7 +125,7 @@ class _CategoryFilterRow extends ConsumerWidget {
 
           return FilterChip(
             label: Text(
-              filter.labelAr,
+              _heatmapFilterLabel(strings, filter),
               style: AppFonts.cairo(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -143,6 +173,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final areaMarkers = buildHeatmapMarkers(
       areaCounts: {
         for (final row in widget.densities) row.areaName: row.listingCount,
@@ -156,7 +187,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'لا توجد إعلانات نشطة في المناطق المعروضة حالياً',
+            strings.heatmapNoActiveListings,
             textAlign: TextAlign.center,
             style: AppFonts.cairo(
               fontSize: 14,
@@ -246,6 +277,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
     required List<HeatmapAreaMarkerData> areas,
     required String? categorySlug,
   }) {
+    final strings = ref.read(appLocalizationsProvider);
     final total = areas.fold<int>(0, (sum, area) => sum + area.listingCount);
 
     return showModalBottomSheet<void>(
@@ -278,7 +310,10 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '${arabicNumber(areas.length)} مناطق · ${arabicNumber(total)} إعلان',
+                    strings.heatmapClusterSummary(
+                      arabicNumber(areas.length),
+                      arabicNumber(total),
+                    ),
                     textAlign: TextAlign.center,
                     style: AppFonts.cairo(
                       fontSize: 18,
@@ -288,7 +323,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'اختر منطقة لعرض الإعلانات',
+                    strings.heatmapSelectArea,
                     textAlign: TextAlign.center,
                     style: AppFonts.cairo(
                       fontSize: 14,
@@ -316,7 +351,8 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
                             ),
                           ),
                           subtitle: Text(
-                            heatmapDensitySubtitle(
+                            _localizedHeatmapDensitySubtitle(
+                              strings,
                               areaName: area.neighborhood.nameAr,
                               listingCount: area.listingCount,
                               categorySlug: categorySlug,
@@ -356,6 +392,8 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
     required HeatmapAreaMarkerData marker,
     required String? categorySlug,
   }) {
+    final strings = ref.read(appLocalizationsProvider);
+
     return showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -386,7 +424,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    heatmapSheetTitle(marker.neighborhood.nameAr),
+                    marker.neighborhood.nameAr,
                     textAlign: TextAlign.center,
                     style: AppFonts.cairo(
                       fontSize: 18,
@@ -396,7 +434,8 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    heatmapDensitySubtitle(
+                    _localizedHeatmapDensitySubtitle(
+                      strings,
                       areaName: marker.neighborhood.nameAr,
                       listingCount: marker.listingCount,
                       categorySlug: categorySlug,
@@ -410,7 +449,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
                   ),
                   const SizedBox(height: 20),
                   AuthPrimaryButton(
-                    label: 'عرض الإعلانات',
+                    label: strings.showListingsAction,
                     loginStyle: true,
                     onPressed: () async {
                       Navigator.pop(sheetContext);

@@ -1,0 +1,94 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js 14
+  - React 18
+  - Tailwind CSS
+  - Supabase
+routes:
+  - path: /login
+    file: admin/src/app/login/page.tsx
+    auth_required: false
+    description: Admin login page
+  - path: /dashboard
+    file: admin/src/app/dashboard/page.tsx
+    auth_required: true
+    description: Admin overview dashboard
+  - path: /dashboard/listings
+    file: admin/src/app/dashboard/listings/page.tsx
+    auth_required: true
+    description: Listings moderation table with status filters
+  - path: /dashboard/listings/[id]
+    file: admin/src/app/dashboard/listings/[id]/page.tsx
+    auth_required: true
+    description: Listing detail with approval controls and package tier
+  - path: /dashboard/moderation
+    file: admin/src/app/dashboard/moderation/page.tsx
+    auth_required: true
+    description: User moderation violations and bans
+  - path: /dashboard/users
+    file: admin/src/app/dashboard/users/page.tsx
+    auth_required: true
+    description: User management
+  - path: /dashboard/verification
+    file: admin/src/app/dashboard/verification/page.tsx
+    auth_required: true
+    description: Seller verification queue
+  - path: /dashboard/reports
+    file: admin/src/app/dashboard/reports/page.tsx
+    auth_required: true
+    description: User reports inbox
+features:
+  - name: Admin Login
+    description: Admin signs in with email and password to access dashboard
+    files:
+      - admin/src/app/login/page.tsx
+    entry_route: /login
+    user_interactions:
+      - Fill email input
+      - Fill password input
+      - Click login button
+      - Redirect to dashboard on success
+    api_calls:
+      - method: POST
+        endpoint: /auth/v1/token
+    auth_required: false
+  - name: Listings Moderation
+    description: Review pending listings, approve or reject, filter by status
+    files:
+      - admin/src/app/dashboard/listings/page.tsx
+      - admin/src/app/dashboard/listings/[id]/page.tsx
+    entry_route: /dashboard/listings
+    user_interactions:
+      - Open listings table
+      - Filter by status pill
+      - Open listing detail
+      - Change moderation status
+      - Set package tier radio group
+    api_calls:
+      - method: GET
+        endpoint: /rest/v1/listings
+      - method: PATCH
+        endpoint: /rest/v1/listings
+    auth_required: true
+  - name: Moderation Violations
+    description: View and manage user posting bans and profanity violations
+    files:
+      - admin/src/app/dashboard/moderation/page.tsx
+    entry_route: /dashboard/moderation
+    user_interactions:
+      - View violations table
+      - Filter by ban status
+      - Review ban details
+    api_calls:
+      - method: GET
+        endpoint: /rest/v1/profiles
+    auth_required: true
+known_limitations:
+  - issue: Flutter mobile app runs on device/emulator, not covered by this frontend summary
+    location: lib/
+    impact: Mobile UI flows require separate mobile/Appium testing
+  - issue: Supabase edge functions tested indirectly via admin and REST only
+    location: supabase/functions/
+    impact: OTP and purchase webhooks need backend test plan separately

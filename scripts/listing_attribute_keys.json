@@ -1,0 +1,1484 @@
+{
+  "8 وسائد هوائية": {
+    "key": "attr_1aae214b",
+    "en": "8 وسائد هوائية",
+    "ku": "8 وسائد هوائية",
+    "tr": "8 وسائد هوائية"
+  },
+  "آخر": {
+    "key": "colorOther",
+    "en": "Other",
+    "ku": "Other",
+    "tr": "Other"
+  },
+  "أبيض": {
+    "key": "colorWhite",
+    "en": "White",
+    "ku": "سپی",
+    "tr": "Beyaz"
+  },
+  "أجنبي": {
+    "key": "attr_1a93e294",
+    "en": "Foreign",
+    "ku": "Foreign",
+    "tr": "Foreign"
+  },
+  "أحمر": {
+    "key": "colorRed",
+    "en": "Red",
+    "ku": "Red",
+    "tr": "Red"
+  },
+  "أخرى": {
+    "key": "colorOther",
+    "en": "Other",
+    "ku": "تر",
+    "tr": "Diğer"
+  },
+  "أخضر": {
+    "key": "colorGreen",
+    "en": "Green",
+    "ku": "سەوز",
+    "tr": "Yeşil"
+  },
+  "أربيل": {
+    "key": "attr_10f56232",
+    "en": "Erbil",
+    "ku": "Erbil",
+    "tr": "Erbil"
+  },
+  "أرض": {
+    "key": "propLand",
+    "en": "Land",
+    "ku": "زەوی",
+    "tr": "Arsa"
+  },
+  "أرنب": {
+    "key": "attr_60b69dc6",
+    "en": "Rabbit",
+    "ku": "Rabbit",
+    "tr": "Rabbit"
+  },
+  "أزرق": {
+    "key": "colorBlue",
+    "en": "Blue",
+    "ku": "شین",
+    "tr": "Mavi"
+  },
+  "أسود": {
+    "key": "colorBlack",
+    "en": "Black",
+    "ku": "ڕەش",
+    "tr": "Siyah"
+  },
+  "ألماني": {
+    "key": "attr_97418f6f",
+    "en": "German",
+    "ku": "German",
+    "tr": "German"
+  },
+  "أمريكي": {
+    "key": "attr_dd1fbe22",
+    "en": "American",
+    "ku": "American",
+    "tr": "American"
+  },
+  "أنثى": {
+    "key": "genderFemale",
+    "en": "Female",
+    "ku": "Female",
+    "tr": "Female"
+  },
+  "أوتوماتيك": {
+    "key": "transAutomatic",
+    "en": "Automatic",
+    "ku": "Automatic",
+    "tr": "Otomatik"
+  },
+  "أوروبي": {
+    "key": "attr_0d67ce95",
+    "en": "European",
+    "ku": "European",
+    "tr": "European"
+  },
+  "أونلاين": {
+    "key": "attr_ea410cd6",
+    "en": "Online",
+    "ku": "Online",
+    "tr": "Online"
+  },
+  "إجازة سنوية": {
+    "key": "attr_9967c75e",
+    "en": "Annual leave",
+    "ku": "Annual leave",
+    "tr": "Annual leave"
+  },
+  "إضاءة LED": {
+    "key": "attr_fd5a68db",
+    "en": "إضاءة LED",
+    "ku": "إضاءة LED",
+    "tr": "إضاءة LED"
+  },
+  "إضاءة تكيفية": {
+    "key": "attr_cfb972ef",
+    "en": "إضاءة تكيفية",
+    "ku": "إضاءة تكيفية",
+    "tr": "إضاءة تكيفية"
+  },
+  "إضاءة عالية تلقائية": {
+    "key": "attr_0d092cb1",
+    "en": "إضاءة عالية تلقائية",
+    "ku": "إضاءة عالية تلقائية",
+    "tr": "إضاءة عالية تلقائية"
+  },
+  "إضاءة ليزر": {
+    "key": "attr_407ad989",
+    "en": "إضاءة ليزر",
+    "ku": "إضاءة ليزر",
+    "tr": "إضاءة ليزر"
+  },
+  "إضاءة محيطية": {
+    "key": "attr_8c495f8e",
+    "en": "إضاءة محيطية",
+    "ku": "إضاءة محيطية",
+    "tr": "إضاءة محيطية"
+  },
+  "إعداد IELTS": {
+    "key": "attr_367395e4",
+    "en": "IELTS prep",
+    "ku": "IELTS prep",
+    "tr": "IELTS prep"
+  },
+  "إعداد TOEFL": {
+    "key": "attr_9f6457d2",
+    "en": "TOEFL prep",
+    "ku": "TOEFL prep",
+    "tr": "TOEFL prep"
+  },
+  "إعدادي": {
+    "key": "attr_00f135f8",
+    "en": "Secondary",
+    "ku": "Secondary",
+    "tr": "Secondary"
+  },
+  "إناث": {
+    "key": "genderFemales",
+    "en": "Females",
+    "ku": "Females",
+    "tr": "Females"
+  },
+  "إنجليزي": {
+    "key": "attr_0402b2d3",
+    "en": "English",
+    "ku": "English",
+    "tr": "English"
+  },
+  "إيجار": {
+    "key": "offerRent",
+    "en": "Rent",
+    "ku": "کرێ",
+    "tr": "Kiralık"
+  },
+  "إيجار يومي": {
+    "key": "offerDailyRent",
+    "en": "Daily rent",
+    "ku": "Daily rent",
+    "tr": "Daily rent"
+  },
+  "ابتدائي": {
+    "key": "attr_5c22c7bc",
+    "en": "Primary",
+    "ku": "Primary",
+    "tr": "Primary"
+  },
+  "الأحياء": {
+    "key": "attr_a910430c",
+    "en": "Biology",
+    "ku": "Biology",
+    "tr": "Biology"
+  },
+  "الأعمال والإدارة والمال": {
+    "key": "attr_b1a8fcf3",
+    "en": "Business & finance",
+    "ku": "Business & finance",
+    "tr": "Business & finance"
+  },
+  "الأمان": {
+    "key": "attr_127a0207",
+    "en": "الأمان",
+    "ku": "الأمان",
+    "tr": "الأمان"
+  },
+  "الأمن والحراسة": {
+    "key": "attr_e8ade886",
+    "en": "Security",
+    "ku": "Security",
+    "tr": "Security"
+  },
+  "الاقتصاد": {
+    "key": "attr_782faf71",
+    "en": "Economics",
+    "ku": "Economics",
+    "tr": "Economics"
+  },
+  "البرمجة": {
+    "key": "attr_6466c2b3",
+    "en": "Programming",
+    "ku": "Programming",
+    "tr": "Programming"
+  },
+  "البصرة": {
+    "key": "attr_7b2d355f",
+    "en": "Basra",
+    "ku": "Basra",
+    "tr": "Basra"
+  },
+  "التاريخ والجغرافية": {
+    "key": "attr_3659f4ca",
+    "en": "History & Geography",
+    "ku": "History & Geography",
+    "tr": "History & Geography"
+  },
+  "التجويد": {
+    "key": "attr_3dbbe072",
+    "en": "Tajweed",
+    "ku": "Tajweed",
+    "tr": "Tajweed"
+  },
+  "التربية الإسلامية": {
+    "key": "attr_5fa7f4ab",
+    "en": "Islamic education",
+    "ku": "Islamic education",
+    "tr": "Islamic education"
+  },
+  "التصميم": {
+    "key": "attr_68b31032",
+    "en": "Design",
+    "ku": "Design",
+    "tr": "Design"
+  },
+  "التعرف على إشارات المرور": {
+    "key": "attr_595073bb",
+    "en": "التعرف على إشارات المرور",
+    "ku": "التعرف على إشارات المرور",
+    "tr": "التعرف على إشارات المرور"
+  },
+  "التعليم والتدريب": {
+    "key": "attr_a8071737",
+    "en": "Education & training",
+    "ku": "Education & training",
+    "tr": "Education & training"
+  },
+  "الحاسوب والتقنية": {
+    "key": "attr_2f29a34b",
+    "en": "Computer & technology",
+    "ku": "Computer & technology",
+    "tr": "Computer & technology"
+  },
+  "الحلة": {
+    "key": "attr_b5bf961a",
+    "en": "Hillah",
+    "ku": "Hillah",
+    "tr": "Hillah"
+  },
+  "الخارج": {
+    "key": "attr_6f5c12c4",
+    "en": "الخارج",
+    "ku": "الخارج",
+    "tr": "الخارج"
+  },
+  "الديوانية": {
+    "key": "attr_479c9dd4",
+    "en": "Diwaniyah",
+    "ku": "Diwaniyah",
+    "tr": "Diwaniyah"
+  },
+  "الراحة": {
+    "key": "attr_d10c7f46",
+    "en": "الراحة",
+    "ku": "الراحة",
+    "tr": "الراحة"
+  },
+  "الرمادي": {
+    "key": "attr_a8590e6c",
+    "en": "Ramadi",
+    "ku": "Ramadi",
+    "tr": "Ramadi"
+  },
+  "الرياضيات": {
+    "key": "attr_ec996beb",
+    "en": "Mathematics",
+    "ku": "Mathematics",
+    "tr": "Mathematics"
+  },
+  "الزراعة": {
+    "key": "attr_2ad56620",
+    "en": "Agriculture",
+    "ku": "Agriculture",
+    "tr": "Agriculture"
+  },
+  "السليمانية": {
+    "key": "attr_b23b84b6",
+    "en": "Sulaymaniyah",
+    "ku": "Sulaymaniyah",
+    "tr": "Sulaymaniyah"
+  },
+  "الصيدلة": {
+    "key": "attr_47499b9d",
+    "en": "Pharmacy",
+    "ku": "Pharmacy",
+    "tr": "Pharmacy"
+  },
+  "الضيافة والمطاعم": {
+    "key": "attr_df03b4c2",
+    "en": "Hospitality & restaurants",
+    "ku": "Hospitality & restaurants",
+    "tr": "Hospitality & restaurants"
+  },
+  "الطب": {
+    "key": "attr_dbdc9141",
+    "en": "Medicine",
+    "ku": "Medicine",
+    "tr": "Medicine"
+  },
+  "الطب والصحة": {
+    "key": "attr_2f1f707b",
+    "en": "Medicine & health",
+    "ku": "Medicine & health",
+    "tr": "Medicine & health"
+  },
+  "العلوم العامة": {
+    "key": "attr_a23d2f98",
+    "en": "General science",
+    "ku": "General science",
+    "tr": "General science"
+  },
+  "العمارة": {
+    "key": "attr_fc2fc74a",
+    "en": "Amarah",
+    "ku": "Amarah",
+    "tr": "Amarah"
+  },
+  "الفقه": {
+    "key": "attr_308b4c85",
+    "en": "Fiqh",
+    "ku": "Fiqh",
+    "tr": "Fiqh"
+  },
+  "الفيزياء": {
+    "key": "attr_057cd7d5",
+    "en": "Physics",
+    "ku": "Physics",
+    "tr": "Physics"
+  },
+  "القانون": {
+    "key": "attr_4cfcf3c2",
+    "en": "Law",
+    "ku": "Law",
+    "tr": "Law"
+  },
+  "القرآن الكريم": {
+    "key": "attr_1429981f",
+    "en": "Holy Quran",
+    "ku": "Holy Quran",
+    "tr": "Holy Quran"
+  },
+  "الكوت": {
+    "key": "attr_c8f1808b",
+    "en": "Kut",
+    "ku": "Kut",
+    "tr": "Kut"
+  },
+  "الكيمياء": {
+    "key": "attr_569ec1ad",
+    "en": "Chemistry",
+    "ku": "Chemistry",
+    "tr": "Chemistry"
+  },
+  "اللغة الألمانية": {
+    "key": "attr_4469156a",
+    "en": "German",
+    "ku": "German",
+    "tr": "German"
+  },
+  "اللغة الإنجليزية": {
+    "key": "attr_8bcb4c90",
+    "en": "English",
+    "ku": "English",
+    "tr": "English"
+  },
+  "اللغة التركية": {
+    "key": "attr_51a02272",
+    "en": "Turkish",
+    "ku": "Turkish",
+    "tr": "Turkish"
+  },
+  "اللغة العربية": {
+    "key": "attr_b99f79d6",
+    "en": "Arabic",
+    "ku": "Arabic",
+    "tr": "Arabic"
+  },
+  "اللغة الفرنسية": {
+    "key": "attr_37ae3826",
+    "en": "French",
+    "ku": "French",
+    "tr": "French"
+  },
+  "اللغة الكردية": {
+    "key": "attr_568f6457",
+    "en": "Kurdish",
+    "ku": "Kurdish",
+    "tr": "Kurdish"
+  },
+  "المبيعات والتسويق": {
+    "key": "attr_00ea8179",
+    "en": "Sales & marketing",
+    "ku": "Sales & marketing",
+    "tr": "Sales & marketing"
+  },
+  "المحاسبة": {
+    "key": "attr_3f2ef321",
+    "en": "Accounting",
+    "ku": "Accounting",
+    "tr": "Accounting"
+  },
+  "المحاسبة المالية": {
+    "key": "attr_f3a2d580",
+    "en": "Financial accounting",
+    "ku": "Financial accounting",
+    "tr": "Financial accounting"
+  },
+  "المنهج العراقي": {
+    "key": "attr_b4a66258",
+    "en": "Iraqi curriculum",
+    "ku": "Iraqi curriculum",
+    "tr": "Iraqi curriculum"
+  },
+  "الموصل": {
+    "key": "attr_878d6350",
+    "en": "Mosul",
+    "ku": "Mosul",
+    "tr": "Mosul"
+  },
+  "الناصرية": {
+    "key": "attr_8f465ea8",
+    "en": "Nasiriyah",
+    "ku": "Nasiriyah",
+    "tr": "Nasiriyah"
+  },
+  "النجف": {
+    "key": "attr_1c675f3a",
+    "en": "Najaf",
+    "ku": "Najaf",
+    "tr": "Najaf"
+  },
+  "النفط والطاقة": {
+    "key": "attr_1ace1501",
+    "en": "Oil & energy",
+    "ku": "Oil & energy",
+    "tr": "Oil & energy"
+  },
+  "النقل واللوجستيات": {
+    "key": "attr_d83c25fb",
+    "en": "Transport & logistics",
+    "ku": "Transport & logistics",
+    "tr": "Transport & logistics"
+  },
+  "الهندسة والبناء": {
+    "key": "attr_45fbf259",
+    "en": "Engineering & construction",
+    "ku": "Engineering & construction",
+    "tr": "Engineering & construction"
+  },
+  "بالغين": {
+    "key": "attr_4bfb21c0",
+    "en": "Adults",
+    "ku": "Adults",
+    "tr": "Adults"
+  },
+  "بدون خبرة": {
+    "key": "attr_b7e8e36b",
+    "en": "No experience",
+    "ku": "No experience",
+    "tr": "No experience"
+  },
+  "بدون ضمان": {
+    "key": "warrantyNo",
+    "en": "No warranty",
+    "ku": "No warranty",
+    "tr": "No warranty"
+  },
+  "بدون لوحة": {
+    "key": "attr_1fbfc2a7",
+    "en": "No plate",
+    "ku": "No plate",
+    "tr": "No plate"
+  },
+  "برتقالي": {
+    "key": "colorOrange",
+    "en": "Orange",
+    "ku": "Orange",
+    "tr": "Orange"
+  },
+  "بريطاني": {
+    "key": "attr_f8104802",
+    "en": "British",
+    "ku": "British",
+    "tr": "British"
+  },
+  "بغداد": {
+    "key": "attr_40153b66",
+    "en": "Baghdad",
+    "ku": "Baghdad",
+    "tr": "Baghdad"
+  },
+  "بكالوريوس": {
+    "key": "attr_13ac665b",
+    "en": "Bachelor's",
+    "ku": "Bachelor's",
+    "tr": "Bachelor's"
+  },
+  "بلكون": {
+    "key": "attr_7acac848",
+    "en": "Balcony",
+    "ku": "Balcony",
+    "tr": "Balcony"
+  },
+  "بنزين": {
+    "key": "fuelPetrol",
+    "en": "Petrol",
+    "ku": "بenzin",
+    "tr": "Benzin"
+  },
+  "بنفسجي": {
+    "key": "colorPurple",
+    "en": "Purple",
+    "ku": "مۆر",
+    "tr": "Mor"
+  },
+  "بني": {
+    "key": "colorBrown",
+    "en": "Brown",
+    "ku": "Brown",
+    "tr": "Brown"
+  },
+  "بيج": {
+    "key": "colorBeige",
+    "en": "Beige",
+    "ku": "Beige",
+    "tr": "Beige"
+  },
+  "بيع": {
+    "key": "offerSale",
+    "en": "Sale",
+    "ku": "فرۆشتن",
+    "tr": "Satılık"
+  },
+  "تأمين صحي": {
+    "key": "attr_d1c3aa46",
+    "en": "Health insurance",
+    "ku": "Health insurance",
+    "tr": "Health insurance"
+  },
+  "تثبيت تلقائي": {
+    "key": "attr_8fe0629c",
+    "en": "تثبيت تلقائي",
+    "ku": "تثبيت تلقائي",
+    "tr": "تثبيت تلقائي"
+  },
+  "تحكم تلقائي بالحرارة": {
+    "key": "attr_6ef15709",
+    "en": "تحكم تلقائي بالحرارة",
+    "ku": "تحكم تلقائي بالحرارة",
+    "tr": "تحكم تلقائي بالحرارة"
+  },
+  "تحكم في الجر": {
+    "key": "attr_36db3f98",
+    "en": "تحكم في الجر",
+    "ku": "تحكم في الجر",
+    "tr": "تحكم في الجر"
+  },
+  "تدريب": {
+    "key": "attr_674fb279",
+    "en": "Training",
+    "ku": "Training",
+    "tr": "Training"
+  },
+  "تدفئة المقاعد": {
+    "key": "attr_f730823c",
+    "en": "تدفئة المقاعد",
+    "ku": "تدفئة المقاعد",
+    "tr": "تدفئة المقاعد"
+  },
+  "تركي": {
+    "key": "attr_2751dcce",
+    "en": "Turkish",
+    "ku": "Turkish",
+    "tr": "Turkish"
+  },
+  "تشغيل عن بعد": {
+    "key": "attr_5e98ac49",
+    "en": "تشغيل عن بعد",
+    "ku": "تشغيل عن بعد",
+    "tr": "تشغيل عن بعد"
+  },
+  "تقنية المعلومات والبرمجة": {
+    "key": "attr_0e8965c7",
+    "en": "IT & programming",
+    "ku": "IT & programming",
+    "tr": "IT & programming"
+  },
+  "تكريت": {
+    "key": "attr_39990cf8",
+    "en": "Tikrit",
+    "ku": "Tikrit",
+    "tr": "Tikrit"
+  },
+  "تنبيه انتباه السائق": {
+    "key": "attr_b3d78ccb",
+    "en": "تنبيه انتباه السائق",
+    "ku": "تنبيه انتباه السائق",
+    "tr": "تنبيه انتباه السائق"
+  },
+  "تنبيه حركة المرور الخلفية": {
+    "key": "attr_ece0d086",
+    "en": "تنبيه حركة المرور الخلفية",
+    "ku": "تنبيه حركة المرور الخلفية",
+    "tr": "تنبيه حركة المرور الخلفية"
+  },
+  "تنظيف": {
+    "key": "attr_30ad1cb0",
+    "en": "Cleaning",
+    "ku": "Cleaning",
+    "tr": "Cleaning"
+  },
+  "توجيه كهربائي": {
+    "key": "attr_61ff3500",
+    "en": "توجيه كهربائي",
+    "ku": "توجيه كهربائي",
+    "tr": "توجيه كهربائي"
+  },
+  "تيتانيوم": {
+    "key": "colorTitanium",
+    "en": "Titanium",
+    "ku": "تایتانیۆم",
+    "tr": "Titanyum"
+  },
+  "ثانوية": {
+    "key": "attr_5dfc333a",
+    "en": "High school",
+    "ku": "High school",
+    "tr": "High school"
+  },
+  "ثلاثي الألوان": {
+    "key": "colorTricolor",
+    "en": "Tricolor",
+    "ku": "Tricolor",
+    "tr": "Tricolor"
+  },
+  "جامعي": {
+    "key": "attr_2b649c53",
+    "en": "University",
+    "ku": "University",
+    "tr": "University"
+  },
+  "جديد": {
+    "key": "conditionNew",
+    "en": "New",
+    "ku": "نوێ",
+    "tr": "Sıfır"
+  },
+  "جلد": {
+    "key": "attr_3f0a5345",
+    "en": "Leather",
+    "ku": "Leather",
+    "tr": "Leather"
+  },
+  "جنريتر": {
+    "key": "attr_596cc57e",
+    "en": "Generator",
+    "ku": "Generator",
+    "tr": "Generator"
+  },
+  "جيد": {
+    "key": "conditionGood",
+    "en": "Good",
+    "ku": "باش",
+    "tr": "İyi"
+  },
+  "حدائق": {
+    "key": "attr_e7873977",
+    "en": "Gardening",
+    "ku": "Gardening",
+    "tr": "Gardening"
+  },
+  "حديقة": {
+    "key": "attr_6c532953",
+    "en": "Garden",
+    "ku": "Garden",
+    "tr": "Garden"
+  },
+  "حراسة": {
+    "key": "attr_57bf3353",
+    "en": "Security",
+    "ku": "Security",
+    "tr": "Security"
+  },
+  "حوادث": {
+    "key": "attr_9e07c1b5",
+    "en": "Accident history",
+    "ku": "Accident history",
+    "tr": "Accident history"
+  },
+  "خزان ماء": {
+    "key": "attr_e4439193",
+    "en": "Water tank",
+    "ku": "Water tank",
+    "tr": "Water tank"
+  },
+  "خليجي": {
+    "key": "attr_c6c026c9",
+    "en": "Gulf",
+    "ku": "Gulf",
+    "tr": "Gulf"
+  },
+  "خيل": {
+    "key": "attr_b3371774",
+    "en": "Horse",
+    "ku": "Horse",
+    "tr": "Horse"
+  },
+  "دبلوم": {
+    "key": "attr_bf2575b9",
+    "en": "Diploma",
+    "ku": "Diploma",
+    "tr": "Diploma"
+  },
+  "دخول بدون مفتاح": {
+    "key": "attr_f7fc7de3",
+    "en": "دخول بدون مفتاح",
+    "ku": "دخول بدون مفتاح",
+    "tr": "دخول بدون مفتاح"
+  },
+  "دفة مدفأة": {
+    "key": "attr_eebeffb8",
+    "en": "دفة مدفأة",
+    "ku": "دفة مدفأة",
+    "tr": "دفة مدفأة"
+  },
+  "دكتوراه": {
+    "key": "attr_bc432f3e",
+    "en": "PhD",
+    "ku": "PhD",
+    "tr": "PhD"
+  },
+  "دهوك": {
+    "key": "attr_c114e728",
+    "en": "Dohuk",
+    "ku": "Dohuk",
+    "tr": "Dohuk"
+  },
+  "دوام جزئي": {
+    "key": "attr_166ce8c7",
+    "en": "Part-time",
+    "ku": "Part-time",
+    "tr": "Part-time"
+  },
+  "دوام كامل": {
+    "key": "attr_03e6fabe",
+    "en": "Full-time",
+    "ku": "Full-time",
+    "tr": "Full-time"
+  },
+  "ديزل": {
+    "key": "fuelDiesel",
+    "en": "Diesel",
+    "ku": "dizel",
+    "tr": "Dizel"
+  },
+  "ذكر": {
+    "key": "genderMale",
+    "en": "Male",
+    "ku": "Male",
+    "tr": "Male"
+  },
+  "ذكور": {
+    "key": "genderMales",
+    "en": "Males",
+    "ku": "Males",
+    "tr": "Males"
+  },
+  "ذهبي": {
+    "key": "colorGold",
+    "en": "Gold",
+    "ku": "زێڕین",
+    "tr": "Altın"
+  },
+  "راتب + عمولة": {
+    "key": "attr_ed91d68c",
+    "en": "Salary + commission",
+    "ku": "Salary + commission",
+    "tr": "Salary + commission"
+  },
+  "راتب ثابت": {
+    "key": "attr_4bd160a2",
+    "en": "Fixed salary",
+    "ku": "Fixed salary",
+    "tr": "Fixed salary"
+  },
+  "رادار": {
+    "key": "attr_d9033ee1",
+    "en": "رادار",
+    "ku": "رادار",
+    "tr": "رادار"
+  },
+  "رعاية أطفال": {
+    "key": "attr_d021c755",
+    "en": "Childcare",
+    "ku": "Childcare",
+    "tr": "Childcare"
+  },
+  "رعاية مسنين": {
+    "key": "attr_f730c844",
+    "en": "Elderly care",
+    "ku": "Elderly care",
+    "tr": "Elderly care"
+  },
+  "ركن عن بعد": {
+    "key": "attr_20484d19",
+    "en": "ركن عن بعد",
+    "ku": "ركن عن بعد",
+    "tr": "ركن عن بعد"
+  },
+  "رمادي": {
+    "key": "colorGray",
+    "en": "Gray",
+    "ku": "Gray",
+    "tr": "Gray"
+  },
+  "زر تشغيل": {
+    "key": "attr_9863b154",
+    "en": "زر تشغيل",
+    "ku": "زر تشغيل",
+    "tr": "زر تشغيل"
+  },
+  "زواحف": {
+    "key": "attr_91d7a73d",
+    "en": "Reptile",
+    "ku": "Reptile",
+    "tr": "Reptile"
+  },
+  "سائق": {
+    "key": "attr_603ab93b",
+    "en": "Driver",
+    "ku": "Driver",
+    "tr": "Driver"
+  },
+  "سامراء": {
+    "key": "attr_fe80509e",
+    "en": "Samarra",
+    "ku": "Samarra",
+    "tr": "Samarra"
+  },
+  "سكن": {
+    "key": "attr_ec4f948f",
+    "en": "Housing",
+    "ku": "Housing",
+    "tr": "Housing"
+  },
+  "سمك": {
+    "key": "attr_5ae5476a",
+    "en": "Fish",
+    "ku": "Fish",
+    "tr": "Fish"
+  },
+  "شاحن لاسلكي": {
+    "key": "attr_48c1891a",
+    "en": "شاحن لاسلكي",
+    "ku": "شاحن لاسلكي",
+    "tr": "شاحن لاسلكي"
+  },
+  "شاشة": {
+    "key": "attr_5f5265a7",
+    "en": "شاشة",
+    "ku": "شاشة",
+    "tr": "شاشة"
+  },
+  "شقة": {
+    "key": "propApartment",
+    "en": "Apartment",
+    "ku": "شوقە",
+    "tr": "Daire"
+  },
+  "صباحي": {
+    "key": "attr_1fcda818",
+    "en": "Morning",
+    "ku": "Morning",
+    "tr": "Morning"
+  },
+  "صيانة منزلية": {
+    "key": "attr_1980be67",
+    "en": "Home maintenance",
+    "ku": "Home maintenance",
+    "tr": "Home maintenance"
+  },
+  "صيني": {
+    "key": "attr_a78786af",
+    "en": "Chinese",
+    "ku": "Chinese",
+    "tr": "Chinese"
+  },
+  "ضباب أمامي": {
+    "key": "attr_adfa037c",
+    "en": "ضباب أمامي",
+    "ku": "ضباب أمامي",
+    "tr": "ضباب أمامي"
+  },
+  "ضمان": {
+    "key": "warrantyYes",
+    "en": "With warranty",
+    "ku": "With warranty",
+    "tr": "With warranty"
+  },
+  "طائر": {
+    "key": "attr_e579ab86",
+    "en": "Bird",
+    "ku": "Bird",
+    "tr": "Bird"
+  },
+  "طابو": {
+    "key": "attr_71c665ee",
+    "en": "Title deed",
+    "ku": "Title deed",
+    "tr": "Title deed"
+  },
+  "طبخ": {
+    "key": "attr_7a206f76",
+    "en": "Cooking",
+    "ku": "Cooking",
+    "tr": "Cooking"
+  },
+  "عراقي": {
+    "key": "attr_e5dbc387",
+    "en": "Iraqi",
+    "ku": "Iraqi",
+    "tr": "Iraqi"
+  },
+  "عربي": {
+    "key": "attr_da88eccb",
+    "en": "Arabic",
+    "ku": "Arabic",
+    "tr": "Arabic"
+  },
+  "عرض رأسي HUD": {
+    "key": "attr_aa4460d5",
+    "en": "عرض رأسي HUD",
+    "ku": "عرض رأسي HUD",
+    "tr": "عرض رأسي HUD"
+  },
+  "عقد": {
+    "key": "attr_8127bee7",
+    "en": "Contract",
+    "ku": "Contract",
+    "tr": "Contract"
+  },
+  "عقد بيع": {
+    "key": "attr_571581cc",
+    "en": "Sale contract",
+    "ku": "Sale contract",
+    "tr": "Sale contract"
+  },
+  "علوم الحاسوب": {
+    "key": "attr_155ac5cf",
+    "en": "Computer science",
+    "ku": "Computer science",
+    "tr": "Computer science"
+  },
+  "عمولة": {
+    "key": "attr_7173aff1",
+    "en": "Commission",
+    "ku": "Commission",
+    "tr": "Commission"
+  },
+  "عن بُعد": {
+    "key": "attr_e3668c0d",
+    "en": "Remote",
+    "ku": "Remote",
+    "tr": "Remote"
+  },
+  "غاز": {
+    "key": "fuelGas",
+    "en": "Gas",
+    "ku": "Gas",
+    "tr": "Gaz"
+  },
+  "غسيل وكي": {
+    "key": "attr_a1a423e6",
+    "en": "Laundry & ironing",
+    "ku": "Laundry & ironing",
+    "tr": "Laundry & ironing"
+  },
+  "غير مفروش": {
+    "key": "furnishedNo",
+    "en": "Unfurnished",
+    "ku": "بێ دامەزران",
+    "tr": "Mobilyasız"
+  },
+  "فارسي": {
+    "key": "attr_1a0bd9b9",
+    "en": "Persian",
+    "ku": "Persian",
+    "tr": "Persian"
+  },
+  "فتحة سقف": {
+    "key": "attr_29519ce6",
+    "en": "فتحة سقف",
+    "ku": "فتحة سقف",
+    "tr": "فتحة سقف"
+  },
+  "فرنسي": {
+    "key": "attr_aa282cda",
+    "en": "French",
+    "ku": "French",
+    "tr": "French"
+  },
+  "فضي": {
+    "key": "colorSilver",
+    "en": "Silver",
+    "ku": "زیو",
+    "tr": "Gümüş"
+  },
+  "فندق": {
+    "key": "propHotel",
+    "en": "Hotel",
+    "ku": "Hotel",
+    "tr": "Hotel"
+  },
+  "في المنزل": {
+    "key": "attr_eda90053",
+    "en": "At home",
+    "ku": "At home",
+    "tr": "At home"
+  },
+  "في مكتبي": {
+    "key": "attr_d2157926",
+    "en": "At my office",
+    "ku": "At my office",
+    "tr": "At my office"
+  },
+  "فيلا": {
+    "key": "propVilla",
+    "en": "Villa",
+    "ku": "ڤیلا",
+    "tr": "Villa"
+  },
+  "قطة": {
+    "key": "attr_a826a507",
+    "en": "Cat",
+    "ku": "Cat",
+    "tr": "Cat"
+  },
+  "قفل أطفال": {
+    "key": "attr_4b021528",
+    "en": "قفل أطفال",
+    "ku": "قفل أطفال",
+    "tr": "قفل أطفال"
+  },
+  "قفل مركزي": {
+    "key": "attr_60cbec0a",
+    "en": "قفل مركزي",
+    "ku": "قفل مركزي",
+    "tr": "قفل مركزي"
+  },
+  "قماش": {
+    "key": "attr_f283f661",
+    "en": "Fabric",
+    "ku": "Fabric",
+    "tr": "Fabric"
+  },
+  "كاميرا 360": {
+    "key": "attr_df6d261d",
+    "en": "كاميرا 360",
+    "ku": "كاميرا 360",
+    "tr": "كاميرا 360"
+  },
+  "كاميرا خلفية": {
+    "key": "attr_1f94f275",
+    "en": "كاميرا خلفية",
+    "ku": "كاميرا خلفية",
+    "tr": "كاميرا خلفية"
+  },
+  "كاميرات": {
+    "key": "attr_ea2d0f4a",
+    "en": "Cameras",
+    "ku": "Cameras",
+    "tr": "Cameras"
+  },
+  "كربلاء": {
+    "key": "attr_8d564a08",
+    "en": "Karbala",
+    "ku": "Karbala",
+    "tr": "Karbala"
+  },
+  "كردي": {
+    "key": "attr_aa03d946",
+    "en": "Kurdish",
+    "ku": "Kurdish",
+    "tr": "Kurdish"
+  },
+  "كركوك": {
+    "key": "attr_4e1a505f",
+    "en": "Kirkuk",
+    "ku": "Kirkuk",
+    "tr": "Kirkuk"
+  },
+  "كلاهما": {
+    "key": "genderBoth",
+    "en": "Both",
+    "ku": "Both",
+    "tr": "Both"
+  },
+  "كلب": {
+    "key": "attr_f6ec7e07",
+    "en": "Dog",
+    "ku": "Dog",
+    "tr": "Dog"
+  },
+  "كهربائي": {
+    "key": "fuelElectric",
+    "en": "Electric",
+    "ku": "Electric",
+    "tr": "Elektrik"
+  },
+  "كوري": {
+    "key": "attr_38ad1ced",
+    "en": "Korean",
+    "ku": "Korean",
+    "tr": "Korean"
+  },
+  "كوكبيت رقمي": {
+    "key": "attr_10da4bc1",
+    "en": "كوكبيت رقمي",
+    "ku": "كوكبيت رقمي",
+    "tr": "كوكبيت رقمي"
+  },
+  "مؤقت": {
+    "key": "attr_3a1306fc",
+    "en": "Temporary",
+    "ku": "Temporary",
+    "tr": "Temporary"
+  },
+  "مؤقتة": {
+    "key": "attr_0cfe7e2c",
+    "en": "Temporary plate",
+    "ku": "Temporary plate",
+    "tr": "Temporary plate"
+  },
+  "ماجستير": {
+    "key": "attr_9e37b135",
+    "en": "Master's",
+    "ku": "Master's",
+    "tr": "Master's"
+  },
+  "متوسط": {
+    "key": "attr_14184253",
+    "en": "Intermediate",
+    "ku": "Intermediate",
+    "tr": "Intermediate"
+  },
+  "مثبت سرعة تكيفي": {
+    "key": "attr_5443be84",
+    "en": "مثبت سرعة تكيفي",
+    "ku": "مثبت سرعة تكيفي",
+    "tr": "مثبت سرعة تكيفي"
+  },
+  "مجاني": {
+    "key": "deliveryFree",
+    "en": "Free",
+    "ku": "بەخۆڕایی",
+    "tr": "Ücretsiz"
+  },
+  "محل تجاري": {
+    "key": "propCommercial",
+    "en": "Commercial shop",
+    "ku": "Commercial shop",
+    "tr": "Commercial shop"
+  },
+  "مختلط": {
+    "key": "genderMixed",
+    "en": "Mixed",
+    "ku": "Mixed",
+    "tr": "Mixed"
+  },
+  "مدفوع": {
+    "key": "deliveryPaid",
+    "en": "Paid",
+    "ku": "Paid",
+    "tr": "Ücretli"
+  },
+  "مراقب النقطة العمياء": {
+    "key": "attr_463b559b",
+    "en": "مراقب النقطة العمياء",
+    "ku": "مراقب النقطة العمياء",
+    "tr": "مراقب النقطة العمياء"
+  },
+  "مرايا جانبية مدفأة": {
+    "key": "attr_3e6b7c47",
+    "en": "مرايا جانبية مدفأة",
+    "ku": "مرايا جانبية مدفأة",
+    "tr": "مرايا جانبية مدفأة"
+  },
+  "مرايا كهربائية": {
+    "key": "attr_5e7c67c4",
+    "en": "مرايا كهربائية",
+    "ku": "مرايا كهربائية",
+    "tr": "مرايا كهربائية"
+  },
+  "مرقط": {
+    "key": "colorSpotted",
+    "en": "Spotted",
+    "ku": "Spotted",
+    "tr": "Spotted"
+  },
+  "مزرعة": {
+    "key": "propFarm",
+    "en": "Farm animal",
+    "ku": "Farm animal",
+    "tr": "Farm animal"
+  },
+  "مزيج": {
+    "key": "attr_726ee881",
+    "en": "Mixed",
+    "ku": "Mixed",
+    "tr": "Mixed"
+  },
+  "مسائي": {
+    "key": "attr_abbb3685",
+    "en": "Evening",
+    "ku": "Evening",
+    "tr": "Evening"
+  },
+  "مساعد الازدحام": {
+    "key": "attr_b1f57e19",
+    "en": "مساعد الازدحام",
+    "ku": "مساعد الازدحام",
+    "tr": "مساعد الازدحام"
+  },
+  "مساعد الفرملة الطارئة": {
+    "key": "attr_1c5815dd",
+    "en": "مساعد الفرملة الطارئة",
+    "ku": "مساعد الفرملة الطارئة",
+    "tr": "مساعد الفرملة الطارئة"
+  },
+  "مسبح": {
+    "key": "attr_1d2d9327",
+    "en": "Pool",
+    "ku": "Pool",
+    "tr": "Pool"
+  },
+  "مستشعرات ضغط الإطارات": {
+    "key": "attr_908b36c3",
+    "en": "مستشعرات ضغط الإطارات",
+    "ku": "مستشعرات ضغط الإطارات",
+    "tr": "مستشعرات ضغط الإطارات"
+  },
+  "مستعمل": {
+    "key": "conditionUsed",
+    "en": "Used",
+    "ku": "بەکارهێنراو",
+    "tr": "İkinci el"
+  },
+  "مستودع": {
+    "key": "propWarehouse",
+    "en": "Warehouse",
+    "ku": "Warehouse",
+    "tr": "Warehouse"
+  },
+  "مسند ذراع": {
+    "key": "attr_f4bcb528",
+    "en": "مسند ذراع",
+    "ku": "مسند ذراع",
+    "tr": "مسند ذراع"
+  },
+  "مصبوغ جزئي": {
+    "key": "attr_50eeda55",
+    "en": "Partially repainted",
+    "ku": "Partially repainted",
+    "tr": "Partially repainted"
+  },
+  "مصبوغ كلي": {
+    "key": "attr_d7f99058",
+    "en": "Fully repainted",
+    "ku": "Fully repainted",
+    "tr": "Fully repainted"
+  },
+  "مصعد": {
+    "key": "attr_c29ac455",
+    "en": "Elevator",
+    "ku": "Elevator",
+    "tr": "Elevator"
+  },
+  "مفروش": {
+    "key": "furnishedYes",
+    "en": "Furnished",
+    "ku": "دامەزراو",
+    "tr": "Mobilyalı"
+  },
+  "مقاعد مساج": {
+    "key": "attr_bc8dd527",
+    "en": "مقاعد مساج",
+    "ku": "مقاعد مساج",
+    "tr": "مقاعد مساج"
+  },
+  "مقبول": {
+    "key": "conditionFair",
+    "en": "Fair",
+    "ku": "ناوەند",
+    "tr": "Orta"
+  },
+  "مقيم": {
+    "key": "attr_4827979f",
+    "en": "Live-in",
+    "ku": "Live-in",
+    "tr": "Live-in"
+  },
+  "مكافآت": {
+    "key": "attr_4a9d2ecf",
+    "en": "Bonuses",
+    "ku": "Bonuses",
+    "tr": "Bonuses"
+  },
+  "مكتب": {
+    "key": "propOffice",
+    "en": "Office",
+    "ku": "Office",
+    "tr": "Office"
+  },
+  "مكسور الشاشة": {
+    "key": "conditionScreenBroken",
+    "en": "Screen cracked",
+    "ku": "Screen cracked",
+    "tr": "Screen cracked"
+  },
+  "ممتاز": {
+    "key": "conditionExcellent",
+    "en": "Excellent",
+    "ku": "نایاب",
+    "tr": "Mükemmel"
+  },
+  "مواد أخرى": {
+    "key": "attr_a274e886",
+    "en": "Other subjects",
+    "ku": "Other subjects",
+    "tr": "Other subjects"
+  },
+  "مواصلات": {
+    "key": "attr_8c812969",
+    "en": "Transport",
+    "ku": "Transport",
+    "tr": "Transport"
+  },
+  "موقف سيارة": {
+    "key": "attr_5830d091",
+    "en": "Parking",
+    "ku": "Parking",
+    "tr": "Parking"
+  },
+  "نصف مفروش": {
+    "key": "furnishedPartial",
+    "en": "Partially furnished",
+    "ku": "Partially furnished",
+    "tr": "Yarı mobilyalı"
+  },
+  "نظام ستارت ستوب": {
+    "key": "attr_d80ed6a2",
+    "en": "نظام ستارت ستوب",
+    "ku": "نظام ستارت ستوب",
+    "tr": "نظام ستارت ستوب"
+  },
+  "نظام صوتي Harman Kardon": {
+    "key": "attr_3b085d0f",
+    "en": "نظام صوتي Harman Kardon",
+    "ku": "نظام صوتي Harman Kardon",
+    "tr": "نظام صوتي Harman Kardon"
+  },
+  "نظيف": {
+    "key": "attr_f6cf560b",
+    "en": "Clean",
+    "ku": "Clean",
+    "tr": "Clean"
+  },
+  "نقل أثاث": {
+    "key": "attr_301b8203",
+    "en": "Moving",
+    "ku": "Moving",
+    "tr": "Moving"
+  },
+  "نوافذ كهربائية": {
+    "key": "attr_3edd4576",
+    "en": "نوافذ كهربائية",
+    "ku": "نوافذ كهربائية",
+    "tr": "نوافذ كهربائية"
+  },
+  "هايبرد": {
+    "key": "fuelHybrid",
+    "en": "Hybrid",
+    "ku": "Hybrid",
+    "tr": "Hibrit"
+  },
+  "هندسة البرمجيات": {
+    "key": "attr_f0f27452",
+    "en": "Software engineering",
+    "ku": "Software engineering",
+    "tr": "Software engineering"
+  },
+  "هيل هولدر": {
+    "key": "attr_d50cbb11",
+    "en": "هيل هولدر",
+    "ku": "هيل هولدر",
+    "tr": "هيل هولدر"
+  },
+  "وجبات": {
+    "key": "attr_a5d7347c",
+    "en": "Meals",
+    "ku": "Meals",
+    "tr": "Meals"
+  },
+  "وردي": {
+    "key": "colorPink",
+    "en": "Pink",
+    "ku": "پەمبە",
+    "tr": "Pembe"
+  },
+  "وضع القيادة": {
+    "key": "attr_da3d03ec",
+    "en": "وضع القيادة",
+    "ku": "وضع القيادة",
+    "tr": "وضع القيادة"
+  },
+  "وكالة": {
+    "key": "attr_065a7470",
+    "en": "Power of attorney",
+    "ku": "Power of attorney",
+    "tr": "Power of attorney"
+  },
+  "ياباني": {
+    "key": "attr_f5e2c57f",
+    "en": "Japanese",
+    "ku": "Japanese",
+    "tr": "Japanese"
+  },
+  "يدوي": {
+    "key": "transManual",
+    "en": "Manual",
+    "ku": "Manual",
+    "tr": "Manuel"
+  },
+  "يومي كامل": {
+    "key": "attr_1111f817",
+    "en": "Full day",
+    "ku": "Full day",
+    "tr": "Full day"
+  }
+}

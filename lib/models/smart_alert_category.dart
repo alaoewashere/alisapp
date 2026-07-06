@@ -1,3 +1,4 @@
+import '../l10n/app_localizations.dart';
 import '../core/utils/category_tree.dart';
 import '../shared/models/category_model.dart';
 
@@ -22,12 +23,16 @@ bool isSmartAlertYearCategoryName(String name) {
   return RegExp(r'^(19|20)\d{2}$').hasMatch(name.trim());
 }
 
-String smartAlertPickerLabelForParent(CategoryModel? parent, int nextDepth) {
-  if (parent == null) return 'الفئة الرئيسية';
-  if (isVehicleBrandListParent(parent)) return 'الصانع';
-  if (parent.icon == 'brand') return 'الموديل';
-  if (nextDepth == 1) return 'الفئة الفرعية';
-  return 'التفصيل';
+String smartAlertPickerLabelForParent(
+  CategoryModel? parent,
+  int nextDepth,
+  AppLocalizations l10n,
+) {
+  if (parent == null) return l10n.mainCategory;
+  if (isVehicleBrandListParent(parent)) return l10n.brandLabel;
+  if (parent.icon == 'brand') return l10n.modelLabel;
+  if (nextDepth == 1) return l10n.subCategory;
+  return l10n.categoryDetail;
 }
 
 List<CategoryModel> childrenOf(
@@ -64,9 +69,7 @@ SmartAlertCategoryFields categoryFieldsFromPath(List<CategoryModel> path) {
       year = int.tryParse(node.nameAr.trim());
       continue;
     }
-    if (subcategoryNode == null) {
-      subcategoryNode = node;
-    }
+    subcategoryNode ??= node;
   }
 
   return SmartAlertCategoryFields(

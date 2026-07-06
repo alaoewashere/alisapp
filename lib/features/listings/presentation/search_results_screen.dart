@@ -3,10 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../core/constants/app_governorates.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/enum_localizations.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/web/sello_dom_probe.dart';
 import '../../../shared/widgets/app_back_button.dart';
-import '../../../core/utils/arabic_number.dart';
 import '../../../shared/models/filter_model.dart';
 import '../../../shared/widgets/error_widget.dart';
 import '../../../shared/widgets/shimmer_loading.dart';
@@ -27,6 +32,7 @@ class SearchResultsScreen extends ConsumerWidget {
     final results = ref.watch(searchResultsProvider);
     final isGrid = ref.watch(searchViewModeProvider);
     final categoriesAsync = ref.watch(allCategoriesProvider);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +42,7 @@ class SearchResultsScreen extends ConsumerWidget {
           child: Text(
             filter.query?.trim().isNotEmpty == true
                 ? filter.query!.trim()
-                : 'نتائج البحث',
+                : strings.searchResultsTitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -76,6 +82,7 @@ class SearchResultsScreen extends ConsumerWidget {
             totalCount: results.totalCount,
             sortBy: filter.sortBy,
             isGrid: isGrid,
+            strings: strings,
             onSortChanged: (sort) {
               final updated = filter.copyWith(sortBy: sort);
               ref.read(filterProvider.notifier).setFilter(updated);
@@ -100,7 +107,7 @@ class SearchResultsScreen extends ConsumerWidget {
               ),
             ),
           if (filter.activeFilterCount > 0)
-            _ActiveFiltersRow(filter: filter),
+            _ActiveFiltersRow(filter: filter, strings: strings),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () =>
@@ -117,6 +124,7 @@ class SearchResultsScreen extends ConsumerWidget {
                   results: results,
                   isGrid: isGrid,
                   filter: filter,
+                  strings: strings,
                   onClearFilters: () {
                     ref.read(filterProvider.notifier).resetFilters();
                     ref
@@ -138,6 +146,7 @@ class _ResultsHeaderBar extends StatelessWidget {
     required this.totalCount,
     required this.sortBy,
     required this.isGrid,
+    required this.strings,
     required this.onSortChanged,
     required this.onToggleView,
   });
@@ -145,6 +154,7 @@ class _ResultsHeaderBar extends StatelessWidget {
   final int totalCount;
   final SearchSortBy sortBy;
   final bool isGrid;
+  final AppLocalizations strings;
   final ValueChanged<SearchSortBy> onSortChanged;
   final VoidCallback onToggleView;
 
@@ -160,7 +170,7 @@ class _ResultsHeaderBar extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              '${arabicNumber(totalCount)} نتيجة',
+              strings.resultsCount(totalCount),
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
@@ -171,7 +181,7 @@ class _ResultsHeaderBar extends StatelessWidget {
                 .map(
                   (s) => DropdownMenuItem(
                     value: s,
-                    child: Text(s.labelAr),
+                    child: Text(s.localizedLabel(strings)),
                   ),
                 )
                 .toList(),
@@ -186,12 +196,14 @@ class _ResultsHeaderBar extends StatelessWidget {
 }
 
 class _ActiveFiltersRow extends ConsumerWidget {
-  const _ActiveFiltersRow({required this.filter});
+  const _ActiveFiltersRow({required this.filter, required this.strings});
 
   final FilterModel filter;
+  final AppLocalizations strings;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final chips = <Widget>[];
 
     void removeAndSearch(FilterModel updated) {
@@ -201,7 +213,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
 
     if (filter.categoryId != null) {
       chips.add(_FilterChip(
-        label: 'فئة',
+        label: strings.filterCategoryLabel,
         onRemove: () => removeAndSearch(
           filter.copyWith(clearCategory: true, clearSubcategory: true),
         ),
@@ -209,7 +221,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
     }
     if (filter.governorate != null) {
       chips.add(_FilterChip(
-        label: governorateNameAr(filter.governorate!),
+        label: governorateDisplayName(filter.governorate!, localeCode),
         onRemove: () =>
             removeAndSearch(filter.copyWith(clearGovernorate: true)),
       ));
@@ -222,7 +234,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
     }
     if (filter.minPrice != null || filter.maxPrice != null) {
       chips.add(_FilterChip(
-        label: 'السعر',
+        label: strings.priceLabel,
         onRemove: () => removeAndSearch(
           filter.copyWith(clearMinPrice: true, clearMaxPrice: true),
         ),
@@ -230,7 +242,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
     }
     if (filter.condition != FilterCondition.all) {
       chips.add(_FilterChip(
-        label: filter.condition.labelAr,
+        label: filter.condition.localizedLabel(strings),
         onRemove: () => removeAndSearch(
           filter.copyWith(condition: FilterCondition.all),
         ),
@@ -238,14 +250,14 @@ class _ActiveFiltersRow extends ConsumerWidget {
     }
     if (filter.isFeaturedOnly) {
       chips.add(_FilterChip(
-        label: 'مميز',
+        label: strings.featuredOnlyLabel,
         onRemove: () =>
             removeAndSearch(filter.copyWith(isFeaturedOnly: false)),
       ));
     }
     if (filter.isNegotiableOnly) {
       chips.add(_FilterChip(
-        label: 'قابل للتفاوض',
+        label: strings.negotiableOnlyLabel,
         onRemove: () =>
             removeAndSearch(filter.copyWith(isNegotiableOnly: false)),
       ));
@@ -259,7 +271,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
         children: [
           ...chips,
           ActionChip(
-            label: const Text('مسح الكل'),
+            label: Text(strings.clearAllFilters),
             onPressed: () {
               ref.read(filterProvider.notifier).resetFilters();
               ref.read(searchResultsProvider.notifier).search(
@@ -298,12 +310,14 @@ class _ResultsBody extends StatelessWidget {
     required this.results,
     required this.isGrid,
     required this.filter,
+    required this.strings,
     required this.onClearFilters,
   });
 
   final SearchResultsState results;
   final bool isGrid;
   final FilterModel filter;
+  final AppLocalizations strings;
   final VoidCallback onClearFilters;
 
   @override
@@ -331,31 +345,52 @@ class _ResultsBody extends StatelessWidget {
     }
 
     if (results.items.isEmpty) {
+      final query = filter.query?.trim();
+      final domProbeText = _searchEmptyDomProbeText(query);
       return ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              children: [
-                Icon(Icons.search_off,
-                    size: 72, color: Theme.of(context).colorScheme.outline),
-                const SizedBox(height: 12),
-                Text(
-                  filter.query != null
-                      ? 'لا توجد نتائج لـ ${filter.query}'
-                      : 'لا توجد نتائج',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const Text('حاول تغيير كلمة البحث أو الفلاتر'),
-                if (filter.activeFilterCount > 0) ...[
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: onClearFilters,
-                    child: const Text('مسح الفلاتر'),
+          _SearchEmptyDomSync(text: domProbeText),
+          Semantics(
+            label: strings.noResults,
+            container: true,
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.search_off,
+                    size: 72,
+                    color: Theme.of(context).colorScheme.outline,
                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    strings.noResultsFound,
+                    key: const Key('search_empty_results_message'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  if (query != null && query.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      strings.noResultsForQuery(query),
+                      key: const Key('search_empty_results_detail'),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  Text(
+                    strings.tryDifferentSearchOrFilters,
+                    textAlign: TextAlign.center,
+                  ),
+                  if (filter.activeFilterCount > 0) ...[
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: onClearFilters,
+                      child: Text(strings.clearFilters),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ],
@@ -399,9 +434,9 @@ class _ResultsBody extends StatelessWidget {
         itemCount: itemCount,
         itemBuilder: (context, index) {
           if (index >= results.items.length) {
-            return const Padding(
-              padding: EdgeInsets.all(16),
-              child: Center(child: Text('جاري تحميل المزيد...')),
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(child: Text(strings.loadingMore)),
             );
           }
           return AnimationConfiguration.staggeredList(
@@ -418,4 +453,53 @@ class _ResultsBody extends StatelessWidget {
       ),
     );
   }
+}
+
+String _searchEmptyDomProbeText(String? query) {
+  final buffer = StringBuffer(AppStrings.noResults)
+    ..writeln()
+    ..writeln('لم يتم العثور على نتائج');
+  if (query != null && query.isNotEmpty) {
+    buffer.writeln('لم يتم العثور على نتائج لـ «$query»');
+  }
+  return buffer.toString().trim();
+}
+
+class _SearchEmptyDomSync extends StatefulWidget {
+  const _SearchEmptyDomSync({required this.text});
+
+  final String text;
+
+  @override
+  State<_SearchEmptyDomSync> createState() => _SearchEmptyDomSyncState();
+}
+
+class _SearchEmptyDomSyncState extends State<_SearchEmptyDomSync> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncDom());
+  }
+
+  @override
+  void didUpdateWidget(covariant _SearchEmptyDomSync oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _syncDom());
+    }
+  }
+
+  @override
+  void dispose() {
+    syncSearchEmptyStateDom(null);
+    super.dispose();
+  }
+
+  void _syncDom() {
+    if (!mounted) return;
+    syncSearchEmptyStateDom(widget.text);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }

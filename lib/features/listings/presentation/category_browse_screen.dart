@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/category_tree.dart';
 import '../../../shared/models/category_model.dart';
@@ -29,6 +31,8 @@ class CategoryBrowseScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allAsync = ref.watch(allCategoriesProvider);
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -46,10 +50,12 @@ class CategoryBrowseScreen extends ConsumerWidget {
           title: allAsync.when(
             data: (all) {
               final current = categoryById(categoryId, all);
-              return Text(current?.nameAr ?? 'الفئات');
+              return Text(
+                current?.localizedName(localeCode) ?? strings.categories,
+              );
             },
-            loading: () => const Text('الفئات'),
-            error: (_, _) => const Text('الفئات'),
+            loading: () => Text(strings.categories),
+            error: (_, _) => Text(strings.categories),
           ),
         ),
         body: allAsync.when(
@@ -123,6 +129,8 @@ class _CategoryTreeBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final current = categoryById(categoryId, all);
     final childrenAsync =
         ref.watch(categoryBrowseChildrenProvider(listParentId));
@@ -144,7 +152,7 @@ class _CategoryTreeBody extends ConsumerWidget {
         if (children.isEmpty) {
           return Center(
             child: Text(
-              'لا توجد فئات فرعية',
+              strings.noSubcategories,
               style: AppFonts.cairo(color: AppColors.textMuted),
             ),
           );
@@ -155,7 +163,8 @@ class _CategoryTreeBody extends ConsumerWidget {
           orElse: () => const <int, int>{},
         );
         final countsLoading = countsAsync.isLoading;
-        final categoryName = current?.nameAr ?? 'الفئات';
+        final categoryName =
+            current?.localizedName(localeCode) ?? strings.categories;
         final typeParam =
             (listingType ?? defaultListingTypeForCategory(current))?.value;
         final allListingsCount = subtreeListingCount(
@@ -164,11 +173,15 @@ class _CategoryTreeBody extends ConsumerWidget {
           directCounts,
         );
 
+        final path = buildCategoryPath(categoryId, all);
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (path.length > 1)
+              _CategoryBreadcrumb(path: path, localeCode: localeCode),
             CategoryAllListingsRow(
-              categoryNameAr: categoryName,
+              categoryName: categoryName,
               listingCount: countsLoading ? null : allListingsCount,
               loading: countsLoading,
               onTap: () {
@@ -194,6 +207,61 @@ class _CategoryTreeBody extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Tappable path (root › … › current) so users stay oriented in deep trees
+/// and can jump back to any level.
+class _CategoryBreadcrumb extends StatelessWidget {
+  const _CategoryBreadcrumb({required this.path, required this.localeCode});
+
+  final List<CategoryModel> path;
+  final String localeCode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      alignment: AlignmentDirectional.centerStart,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (var i = 0; i < path.length; i++) ...[
+              if (i > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Icon(
+                    Icons.chevron_left,
+                    size: 14,
+                    color: AppColors.textMuted.withValues(alpha: 0.5),
+                  ),
+                ),
+              GestureDetector(
+                onTap: i == path.length - 1
+                    ? null
+                    : () => context.push(
+                          AppRoutes.categoryBrowsePath(path[i].id),
+                        ),
+                child: Text(
+                  path[i].localizedName(localeCode),
+                  style: AppFonts.cairo(
+                    fontSize: 12.5,
+                    fontWeight: i == path.length - 1
+                        ? FontWeight.w800
+                        : FontWeight.w500,
+                    color: i == path.length - 1
+                        ? AppColors.volt
+                        : AppColors.textMuted,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

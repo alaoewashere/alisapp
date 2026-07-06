@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/features/home/models/home_listings_feed_type.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 
 void main() {
   group('HomeListingsFeedType', () {
@@ -22,9 +24,26 @@ void main() {
       }
     });
 
-    test('titles are Arabic', () {
-      expect(HomeListingsFeedType.featured.titleAr, 'إعلانات مميزة');
-      expect(HomeListingsFeedType.latest.titleAr, 'أحدث الإعلانات');
+    test('localizedTitle returns strings for each locale', () {
+      final ar = lookupAppLocalizations(const Locale('ar'));
+      final en = lookupAppLocalizations(const Locale('en'));
+
+      expect(
+        HomeListingsFeedType.featured.localizedTitle(ar),
+        ar.featuredListingsTitle,
+      );
+      expect(
+        HomeListingsFeedType.latest.localizedTitle(ar),
+        ar.homeFeedLatestTitle,
+      );
+      expect(
+        HomeListingsFeedType.featured.localizedTitle(en),
+        en.featuredListingsTitle,
+      );
+      expect(
+        HomeListingsFeedType.latest.localizedTitle(en),
+        en.homeFeedLatestTitle,
+      );
     });
   });
 }

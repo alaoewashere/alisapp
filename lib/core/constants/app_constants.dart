@@ -1,8 +1,8 @@
 class AppConstants {
   AppConstants._();
 
-  static const appNameAr = 'Sello';
-  static const appNameEn = 'Sello';
+  static const appNameAr = 'سـوقك';
+  static const appNameEn = 'SOUQAK';
   static const bundleId = 'com.iraq.marketplace.souqiq';
   static const countryCode = '+964';
   static const maxListingPhotos = 10;

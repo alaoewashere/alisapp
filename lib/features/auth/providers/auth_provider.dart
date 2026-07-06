@@ -251,6 +251,10 @@ class AuthNotifier extends Notifier<AuthFlowState> {
         );
 
     switch (result) {
+      case Success(value: false):
+        // Email confirmation required — not yet authenticated.
+        state = state.copyWith(status: AuthFlowStatus.initial, clearError: true);
+        return const Success(false);
       case Success():
         ref.invalidate(currentProfileProvider);
         state = state.copyWith(

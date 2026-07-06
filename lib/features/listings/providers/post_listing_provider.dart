@@ -8,6 +8,7 @@ import '../../../core/constants/app_governorates.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/car_paint_panels.dart';
 import '../../../core/constants/iraq_neighborhoods.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/moderation/moderation_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/utils/image_compression.dart';
@@ -86,6 +87,7 @@ class PostListingState {
     this.videoProcessingProgress = 0,
     this.isVideoProcessing = false,
     this.freePostsUsedThisMonth = -1,
+    this.freePostsUnlimitedUntil,
   });
 
   final int currentStep;
@@ -139,16 +141,31 @@ class PostListingState {
   final double videoProcessingProgress;
   final bool isVideoProcessing;
   final int freePostsUsedThisMonth;
+  final DateTime? freePostsUnlimitedUntil;
 
   bool get freePostQuotaLoaded => freePostsUsedThisMonth >= 0;
+
+  bool get isFreePostsUnlimitedPromoActive =>
+      freePostsUnlimitedUntil != null &&
+      DateTime.now().isBefore(freePostsUnlimitedUntil!);
 
   int get freePostsRemaining =>
       freePostQuotaLoaded ? remainingFreePosts(freePostsUsedThisMonth) : 0;
 
+  /// Max photos allowed for the currently selected package.
+  int get maxPhotos =>
+      (listingPackage == ListingPackage.pro ||
+              listingPackage == ListingPackage.premium)
+          ? 15
+          : AppConstants.maxListingPhotos;
+
   bool get standardRequiresPaidPublish =>
       listingPackage == ListingPackage.standard &&
       freePostQuotaLoaded &&
-      standardListingRequiresPayment(freePostsUsedThisMonth);
+      standardListingRequiresPayment(
+        freePostsUsedThisMonth,
+        unlimitedUntil: freePostsUnlimitedUntil,
+      );
 
   CategoryModel? get effectiveCategory =>
       selectedCategory ?? selectedSubcategory;
@@ -233,6 +250,7 @@ class PostListingState {
     double? videoProcessingProgress,
     bool? isVideoProcessing,
     int? freePostsUsedThisMonth,
+    DateTime? freePostsUnlimitedUntil,
     bool clearVideo = false,
     bool clearError = false,
     bool clearCategory = false,
@@ -313,6 +331,8 @@ class PostListingState {
       isVideoProcessing: isVideoProcessing ?? this.isVideoProcessing,
       freePostsUsedThisMonth:
           freePostsUsedThisMonth ?? this.freePostsUsedThisMonth,
+      freePostsUnlimitedUntil:
+          freePostsUnlimitedUntil ?? this.freePostsUnlimitedUntil,
     );
   }
 }
@@ -464,7 +484,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
       state.categoryDrillStack.length - 1,
     );
     final newPathLength =
-        state.categoryPath.length > 0 ? state.categoryPath.length - 1 : 0;
+        state.categoryPath.isNotEmpty ? state.categoryPath.length - 1 : 0;
 
     state = state.copyWith(
       categoryDrillStack: newStack,
@@ -832,9 +852,10 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   Future<void> addImage(File file) async {
-    if (state.images.length >= AppConstants.maxListingPhotos) {
+    final strings = ref.read(appLocalizationsProvider);
+    if (state.images.length >= state.maxPhotos) {
       state = state.copyWith(
-        error: 'الحد الأقصى ${AppConstants.maxListingPhotos} صور',
+        error: strings.maxPhotosLimit(state.maxPhotos.toString()),
       );
       return;
     }
@@ -845,20 +866,22 @@ class PostListingNotifier extends Notifier<PostListingState> {
         clearError: true,
       );
     } catch (_) {
-      state = state.copyWith(error: 'تعذّر معالجة الصورة');
+      state = state.copyWith(error: strings.imageProcessFailed);
     }
   }
 
   Future<void> addImages(List<File> files) async {
     if (files.isEmpty) return;
+    final strings = ref.read(appLocalizationsProvider);
     var images = [...state.images];
+    final limit = state.maxPhotos;
     for (final file in files) {
-      if (images.length >= AppConstants.maxListingPhotos) break;
+      if (images.length >= limit) break;
       try {
         final compressed = await compressListingImage(file);
         images = [...images, compressed];
       } catch (_) {
-        state = state.copyWith(error: 'تعذّر معالجة الصورة');
+        state = state.copyWith(error: strings.imageProcessFailed);
         return;
       }
     }
@@ -880,6 +903,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
 
   Future<void> setPendingVideo(File file) async {
     if (!state.listingPackage.allowsListingVideo) return;
+    final strings = ref.read(appLocalizationsProvider);
 
     state = state.copyWith(
       isVideoProcessing: true,
@@ -893,7 +917,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
       final validation = await videoService.validateVideo(file);
       if (!validation.isValid) {
         throw VideoUploadException(
-          validation.errorMessage ?? 'فيديو غير صالح',
+          validation.errorMessage ?? strings.invalidVideoError,
         );
       }
 
@@ -912,7 +936,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
       state = state.copyWith(
         isVideoProcessing: false,
         videoProcessingProgress: 0,
-        error: e is VideoUploadException ? e.message : 'تعذّر معالجة الفيديو',
+        error: e is VideoUploadException ? e.message : strings.videoProcessFailed,
       );
       rethrow;
     }
@@ -973,6 +997,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   void setListingPackage(ListingPackage package) {
+    if (!ListingPackageConfig.isSelectable(package)) return;
     state = state.copyWith(
       listingPackage: package,
       clearVideo: !package.allowsListingVideo,
@@ -984,11 +1009,13 @@ class PostListingNotifier extends Notifier<PostListingState> {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
     try {
-      final used =
-          await ref.read(listingsRepositoryProvider).fetchMonthlyFreePostCount(
-                userId,
-              );
-      state = state.copyWith(freePostsUsedThisMonth: used);
+      final repo = ref.read(listingsRepositoryProvider);
+      final used = await repo.fetchMonthlyFreePostCount(userId);
+      final unlimitedUntil = await repo.fetchFreePostsUnlimitedUntil();
+      state = state.copyWith(
+        freePostsUsedThisMonth: used,
+        freePostsUnlimitedUntil: unlimitedUntil,
+      );
     } catch (e, stackTrace) {
       debugPrint('refreshFreePostQuota failed: $e\n$stackTrace');
     }
@@ -1000,8 +1027,9 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   String? _validateCategory() {
+    final strings = ref.read(appLocalizationsProvider);
     if (state.selectedCategory == null || state.categoryPath.isEmpty) {
-      return 'اختر الفئة';
+      return strings.chooseCategoryError;
     }
     return null;
   }
@@ -1033,15 +1061,17 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   String? _validateContactPreferences() {
+    final strings = ref.read(appLocalizationsProvider);
     if (state.contactPreference == null) {
-      return 'اختر تفضيل التواصل';
+      return strings.chooseContactPreferenceError;
     }
     return null;
   }
 
   String? _validateLocation() {
+    final strings = ref.read(appLocalizationsProvider);
     if (state.governorate == null || state.governorate!.trim().isEmpty) {
-      return 'اختر المحافظة';
+      return strings.chooseGovernorateError;
     }
     return null;
   }
@@ -1055,7 +1085,8 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   String? _validatePhotos() {
-    if (state.images.isEmpty) return 'يرجى إضافة صورة واحدة على الأقل';
+    final strings = ref.read(appLocalizationsProvider);
+    if (state.images.isEmpty) return strings.addPhotoRequired;
     return null;
   }
 
@@ -1075,128 +1106,138 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   String? _validateTitleFields() {
+    final strings = ref.read(appLocalizationsProvider);
     if (state.title.trim().length < 5) {
-      return 'العنوان يجب أن يكون 5 أحرف على الأقل';
+      return strings.titleMinLengthError;
     }
     if (state.title.trim().length > 100) {
-      return 'العنوان طويل جداً (100 حرف كحد أقصى)';
+      return strings.titleTooLongError;
     }
     if (state.description.trim().length > 2000) {
-      return 'الوصف طويل جداً (2000 حرف كحد أقصى)';
+      return strings.descriptionTooLongError;
     }
     return null;
   }
 
   String? _validateGenericDetails() {
-    if (state.price == null || state.price! <= 0) return 'أدخل سعراً صالحاً';
-    if (state.condition == null) return 'اختر حالة المنتج';
+    final strings = ref.read(appLocalizationsProvider);
+    if (state.price == null || state.price! <= 0) return strings.enterValidPriceError;
+    if (state.condition == null) return strings.chooseProductConditionError;
     return null;
   }
 
   String? _validateVehicleDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final vehicle = state.vehicleDetails;
-    if (state.condition == null) return 'اختر الحالة';
+    if (state.condition == null) return strings.chooseConditionError;
     if (vehicle.fuel == null || vehicle.fuel!.isEmpty) {
-      return 'اختر نوع الوقود';
+      return strings.chooseFuelTypeError;
     }
     if (vehicle.transmission == null || vehicle.transmission!.isEmpty) {
-      return 'اختر ناقل الحركة';
+      return strings.chooseTransmissionError;
     }
-    if (state.price == null || state.price! <= 0) return 'أدخل سعراً صالحاً';
+    if (state.price == null || state.price! <= 0) return strings.enterValidPriceError;
     return null;
   }
 
   String? _validateRealEstateDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final details = state.realEstateDetails;
     if (details.propertyType == null || details.propertyType!.isEmpty) {
-      return 'اختر نوع العقار';
+      return strings.choosePropertyTypeError;
     }
     if (details.offerType == null || details.offerType!.isEmpty) {
-      return 'اختر نوع العرض';
+      return strings.chooseOfferTypeError;
     }
     if (details.areaSqm == null || details.areaSqm! <= 0) {
-      return 'أدخل المساحة بالمتر المربع';
+      return strings.enterAreaSqmError;
     }
-    if (state.price == null || state.price! <= 0) return 'أدخل سعراً صالحاً';
+    if (state.price == null || state.price! <= 0) return strings.enterValidPriceError;
     return null;
   }
 
   String? _validateElectronicsDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final details = state.electronicsDetails;
     if (details.condition == null || details.condition!.isEmpty) {
-      return 'اختر الحالة';
+      return strings.chooseConditionError;
     }
-    if (state.price == null || state.price! <= 0) return 'أدخل سعراً صالحاً';
+    if (state.price == null || state.price! <= 0) return strings.enterValidPriceError;
     return null;
   }
 
   String? _validateGeneralDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final details = state.generalDetails;
     if (details.itemCondition == null || details.itemCondition!.isEmpty) {
-      return 'اختر الحالة';
+      return strings.chooseConditionError;
     }
     if (details.deliveryAvailable == true &&
         (details.deliveryCost == null || details.deliveryCost!.isEmpty)) {
-      return 'اختر تكلفة التوصيل';
+      return strings.chooseDeliveryCostError;
     }
-    if (state.price == null || state.price! <= 0) return 'أدخل سعراً صالحاً';
+    if (state.price == null || state.price! <= 0) return strings.enterValidPriceError;
     return null;
   }
 
   String? _validateTutoringDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final details = state.tutoringDetails;
     if (details.subject == null || details.subject!.isEmpty) {
-      return 'اختر المادة';
+      return strings.chooseSubjectError;
     }
-    if (details.stages.isEmpty) return 'اختر المرحلة الدراسية';
+    if (details.stages.isEmpty) return strings.chooseStudyStageError;
     if (details.sessionType == null || details.sessionType!.isEmpty) {
-      return 'اختر طريقة التدريس';
+      return strings.chooseTeachingMethodError;
     }
     if (details.pricePerHour == null || details.pricePerHour! <= 0) {
-      return 'أدخل سعراً صالحاً للساعة';
+      return strings.enterValidHourlyPriceError;
     }
     return null;
   }
 
   String? _validateJobDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final details = state.jobDetails;
     if (details.jobType == null || details.jobType!.isEmpty) {
-      return 'اختر نوع الدوام';
+      return strings.chooseJobTypeError;
     }
     if (details.sector == null || details.sector!.isEmpty) {
-      return 'اختر القطاع';
+      return strings.chooseSectorError;
     }
     if (details.salaryMin == null || details.salaryMin! <= 0) {
-      return 'أدخل الراتب الأدنى';
+      return strings.enterMinSalaryError;
     }
     if (details.salaryMax != null && details.salaryMax! < details.salaryMin!) {
-      return 'الراتب الأعلى يجب أن يكون أكبر من الأدنى';
+      return strings.salaryMaxMustExceedMinError;
     }
     return null;
   }
 
   String? _validateAnimalDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final type =
         deriveAnimalDetailsFromPath(state.categoryPath).animalType;
     if (type == null || type.isEmpty) {
-      return 'اختر نوع الحيوان من الفئات';
+      return strings.chooseAnimalTypeFromCategoriesError;
     }
-    if (state.price == null || state.price! <= 0) return 'أدخل سعراً صالحاً';
+    if (state.price == null || state.price! <= 0) return strings.enterValidPriceError;
     return null;
   }
 
   String? _validateHomeServiceDetails() {
+    final strings = ref.read(appLocalizationsProvider);
     final serviceType =
         deriveHomeServiceDetailsFromPath(state.categoryPath).serviceType;
     if (serviceType == null || serviceType.isEmpty) {
-      return 'اختر نوع الخدمة من الفئات';
+      return strings.chooseServiceTypeFromCategoriesError;
     }
     final details = state.homeServiceDetails;
     if (details.availability == null || details.availability!.isEmpty) {
-      return 'اختر أوقات العمل';
+      return strings.chooseWorkHoursError;
     }
     if (details.salaryExpected == null || details.salaryExpected! <= 0) {
-      return 'أدخل الراتب المتوقع';
+      return strings.enterExpectedSalaryError;
     }
     return null;
   }
@@ -1285,6 +1326,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
   }
 
   Future<List<String>> uploadImages(String userId) async {
+    final strings = ref.read(appLocalizationsProvider);
     final paths = <String>[];
     final batchId = DateTime.now().millisecondsSinceEpoch;
     final repo = ref.read(listingsRepositoryProvider);
@@ -1293,14 +1335,17 @@ class PostListingNotifier extends Notifier<PostListingState> {
       isLoading: true,
       uploadTotal: state.images.length,
       uploadIndex: 0,
-      statusMessage: 'جاري رفع الصور...',
+      statusMessage: strings.uploadingPhotosSimple,
       clearError: true,
     );
 
     for (var i = 0; i < state.images.length; i++) {
       state = state.copyWith(
         uploadIndex: i + 1,
-        statusMessage: 'جاري رفع الصور... (${i + 1}/${state.images.length})',
+        statusMessage: strings.uploadingPhotos(
+          (i + 1).toString(),
+          state.images.length.toString(),
+        ),
       );
       final path = await repo.uploadListingImage(
         userId: userId,
@@ -1313,7 +1358,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
 
     state = state.copyWith(
       uploadedImagePaths: paths,
-      statusMessage: 'جاري نشر الإعلان...',
+      statusMessage: strings.publishingListing,
     );
     return paths;
   }
@@ -1326,7 +1371,10 @@ class PostListingNotifier extends Notifier<PostListingState> {
     if (profile != null && isUserPostingBanned(profile)) {
       return PublishListingOutcome(
         moderationDialog: ModerationDialogVariant.postingBan,
-        postingBanMessage: postingBanMessageAr(profile),
+        postingBanMessage: postingBanMessage(
+          ref.read(appLocalizationsProvider),
+          profile,
+        ),
       );
     }
 
@@ -1368,7 +1416,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
       if (_requiresPublishCondition() && condition == null) {
         state = state.copyWith(
           isLoading: false,
-          error: 'اختر حالة المنتج',
+          error: ref.read(appLocalizationsProvider).chooseProductConditionError,
         );
         return const PublishListingOutcome();
       }
@@ -1435,15 +1483,15 @@ class PostListingNotifier extends Notifier<PostListingState> {
       if (state.pendingVideoFile != null &&
           state.listingPackage.allowsListingVideo) {
         state = state.copyWith(
-          statusMessage: 'جاري رفع الفيديو... 0%',
+          statusMessage: ref.read(appLocalizationsProvider).uploadingVideoProgress('0'),
         );
         final upload = await ref.read(videoServiceProvider).uploadVideo(
               videoFile: state.pendingVideoFile!,
               listingId: id,
               onProgress: (p) {
                 state = state.copyWith(
-                  statusMessage:
-                      'جاري رفع الفيديو... ${(p * 100).round()}%',
+                  statusMessage: ref.read(appLocalizationsProvider)
+                      .uploadingVideoProgress((p * 100).round().toString()),
                 );
               },
             );
@@ -1534,7 +1582,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
       }
       state = state.copyWith(
         isLoading: false,
-        error: 'تعذّر نشر الإعلان. حاول مرة أخرى.',
+        error: ref.read(appLocalizationsProvider).publishListingFailedError,
         statusMessage: null,
       );
       return const PublishListingOutcome();
@@ -1546,7 +1594,9 @@ class PostListingNotifier extends Notifier<PostListingState> {
     if (userId == null) return null;
 
     if (state.effectiveCategory == null) {
-      state = state.copyWith(error: 'اختر الفئة على الأقل');
+      state = state.copyWith(
+        error: ref.read(appLocalizationsProvider).chooseCategoryMinimumError,
+      );
       return null;
     }
 
@@ -1581,7 +1631,9 @@ class PostListingNotifier extends Notifier<PostListingState> {
       final id = await ref.read(listingsRepositoryProvider).createListingRecord(
             userId: userId,
             categoryId: state.effectiveCategory!.id,
-            title: state.title.trim().isEmpty ? 'مسودة' : state.title.trim(),
+            title: state.title.trim().isEmpty
+                ? ref.read(appLocalizationsProvider).draftTitleFallback
+                : state.title.trim(),
             description: state.description.trim(),
             price: state.price ?? 0,
             isNegotiable: state.isNegotiable,
@@ -1612,7 +1664,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
       debugPrint('saveDraft failed: $e\n$stackTrace');
       state = state.copyWith(
         isLoading: false,
-        error: 'تعذّر حفظ المسودة',
+        error: ref.read(appLocalizationsProvider).saveDraftFailedError,
         statusMessage: null,
       );
       return null;
@@ -1643,11 +1695,31 @@ final categoryBrowseChildrenProvider =
   return ref.read(categoriesRepositoryProvider).fetchChildren(parentId);
 });
 
+// autoDispose: counts must refetch on re-entry (e.g. after new listings get
+// approved) instead of sticking at whatever they were the first time this
+// listingType key was fetched.
 final categoryListingCountsProvider =
-    FutureProvider.family<Map<int, int>, String?>((ref, listingType) async {
+    FutureProvider.autoDispose.family<Map<int, int>, String?>((ref, listingType) async {
   return ref
       .watch(categoriesRepositoryProvider)
       .fetchListingCountsByCategory(listingType: listingType);
+});
+
+/// Real trim options for a vehicle brand slug (e.g. 'veh_auto_br_toyota').
+/// Empty for brands without a curated list — UI falls back to generic options.
+final vehicleTrimOptionsProvider =
+    FutureProvider.autoDispose.family<List<String>, String>((ref, brandSlug) async {
+  return ref
+      .watch(categoriesRepositoryProvider)
+      .fetchVehicleTrimOptions(brandSlug);
+});
+
+/// Real engine options for a vehicle brand slug. Empty for uncovered brands.
+final vehicleEngineOptionsProvider =
+    FutureProvider.autoDispose.family<List<String>, String>((ref, brandSlug) async {
+  return ref
+      .watch(categoriesRepositoryProvider)
+      .fetchVehicleEngineOptions(brandSlug);
 });
 
 final imagePickerServiceProvider = Provider((ref) => ImagePicker());

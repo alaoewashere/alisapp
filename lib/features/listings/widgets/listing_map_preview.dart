@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/config/maps_config.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../widgets/map_picker_sheet.dart';
 
 class ListingMapPreview extends StatelessWidget {
@@ -43,7 +44,7 @@ class ListingMapPreview extends StatelessWidget {
         ),
         TextButton(
           onPressed: () => _openFullMap(context),
-          child: const Text('عرض على الخريطة'),
+          child: Text(context.l10n.viewOnMapLabel),
         ),
       ],
     );

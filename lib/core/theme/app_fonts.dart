@@ -160,4 +160,19 @@ abstract final class AppFonts {
   }
 
   static TextTheme cairoTextTheme(TextTheme base) => sansTextTheme(base);
+
+  /// Arabic display title «سـوقك» — Thmanyah Serif Display Bold only.
+  static TextStyle brandNameArDisplay({
+    double? fontSize,
+    Color? color,
+    double? height,
+    double? letterSpacing,
+  }) =>
+      serifDisplay(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: color,
+        height: height,
+        letterSpacing: letterSpacing,
+      );
 }

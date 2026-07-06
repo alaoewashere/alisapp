@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/category_locale.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/models/category_model.dart';
 
 /// Sahibinden-style browse rows — visual config keyed by category slug.
@@ -112,7 +114,11 @@ int _browseDisplayOrder(
 }
 
 /// Merges static browse styles with live Supabase categories (slug match).
-List<BrowseCategoryItem> buildBrowseCategoryItems(List<CategoryModel> all) {
+List<BrowseCategoryItem> buildBrowseCategoryItems(
+  List<CategoryModel> all,
+  String localeCode,
+  AppLocalizations strings,
+) {
   final bySlug = {for (final c in all) c.slug: c};
   final childrenByParent = <int, List<CategoryModel>>{};
   for (final c in all.where((c) => c.parentId != null)) {
@@ -130,10 +136,14 @@ List<BrowseCategoryItem> buildBrowseCategoryItems(List<CategoryModel> all) {
     if (parent != null) {
       final subs = childrenByParent[parent.id] ?? [];
       if (subs.isNotEmpty) {
-        return subs.take(4).map((c) => c.nameAr).join(' ، ');
+        return subs
+            .take(4)
+            .map((c) => c.localizedName(localeCode))
+            .join(' ، ');
       }
     }
-    return style.fallbackSubtitle;
+    final localized = browseCategorySubtitle(style.slug, strings);
+    return localized.isNotEmpty ? localized : style.fallbackSubtitle;
   }
 
   final items = browseCategoryStyles.map((style) {

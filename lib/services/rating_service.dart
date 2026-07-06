@@ -45,24 +45,6 @@ class RatingService {
       throw const RatingException('اختر عدد النجوم من 1 إلى 5');
     }
 
-    final profile = await _client
-        .from('profiles')
-        .select('created_at')
-        .eq('id', reviewerId)
-        .maybeSingle();
-
-    if (profile != null) {
-      final createdAt = DateTime.tryParse(profile['created_at'] as String? ?? '');
-      if (createdAt != null) {
-        final age = DateTime.now().difference(createdAt).inDays;
-        if (age < ratingMinAccountAgeDays) {
-          throw const RatingException(
-            'يجب أن يمر 7 أيام على إنشاء حسابك لتتمكن من التقييم',
-          );
-        }
-      }
-    }
-
     final todayStart = DateTime.now();
     final utcStart = DateTime.utc(todayStart.year, todayStart.month, todayStart.day);
     final todayCount = await _client

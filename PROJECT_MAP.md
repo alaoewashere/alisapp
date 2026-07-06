@@ -13,7 +13,7 @@ Living architecture document for the Iraq Classifieds Marketplace.
 | **App name (AR)** | Sello |
 | **App name (EN)** | Sello |
 | **Target** | Android & iOS |
-| **Locale** | Arabic RTL (`ar_IQ`) |
+| **Locale** | ar (default), en, ku (Sorani), tr — ARB gen-l10n (`lib/l10n/`) |
 | **Currency** | IQD (no decimals) |
 | **Reference** | sahibinden.com |
 
@@ -48,6 +48,7 @@ Living architecture document for the Iraq Classifieds Marketplace.
 | UI polish | shimmer, timeago, url_launcher, country_picker | latest |
 | Config | flutter_dotenv | `.env` (`SUPABASE_*`, `GOOGLE_MAPS_API_KEY`, `GROQ_API_KEY`, optional `ONESIGNAL_APP_ID`) |
 | Testing | flutter_test, mocktail | SDK + `^1.0.5` |
+| Integration (E2E) | patrol `^4.6.1` + patrol_cli | `patrol_test/` — guest home/search flows |
 
 ### Config (`.env` for local dev)
 ```bash
@@ -69,13 +70,14 @@ flutter run
 
 | Control | Implementation |
 |---|---|
-| **RLS column guards** | `20260720000000_security_rls_guards.sql` — triggers on `listings`, `profiles`, `messages`; `public_profiles` view |
+| **RLS column guards** | `20260720000000_security_rls_guards.sql` — triggers on `listings`, `profiles`, `messages`; `public_profiles` view (`security_invoker=true`, Jun 2026) |
 | **Public listings** | `20260724000000_listings_public_approved_rls.sql` — public SELECT `status = approved`; `Admins read all listings`; app feeds use `.eq('status', 'approved')` in `ListingsRepository` + favorites inner join |
 | **Storage** | `20260720000001_security_storage.sql` — owner-scoped writes for listing media; admin-only `brand-logos` |
 | **OTP** | Rate limiting via `otp_throttle`; CORS allowlist in edge functions; `get_auth_user_id_by_phone` RPC |
 | **RPC hardening** | `20260720000002_security_rpc.sql` — view/contact increments only on public listings; rating notification auth |
 | **Purchases** | `verify-purchase` edge function + `pending_purchases`; client INSERT revoked on `listing_purchases`/`boosts` — **deployed** to remote (Jun 2026) |
-| **Secrets** | No `.env` in release bundle; `groq-proxy` edge function; `env.json.example` for `--dart-define-from-file` |
+| **Checkout (FuratPay)** | `furatpay-initiate` edge function + `orders.furatpay_invoice_id`; `FURATPAY_API_KEY` server-only; **deployed** (Jun 2026) |
+| **Secrets** | No `.env` in release bundle; `groq-proxy` + `furatpay-initiate` edge functions; `env.json.example` for `--dart-define-from-file` |
 | **Monitoring** | Optional `SENTRY_DSN` dart-define; `SecureLog` scrubs PII in logs |
 | **Verification** | `supabase/tests/security_policies.sql`; `test/security_hardening_test.dart` |
 | **Remote DB** | Security migrations `20260720000000`–`000003` + `phone_verification` (`phone_verifications`, `profiles.phone_verified`) applied to project `riaazqhgknsnymjzzjou` (Jun 2026) |
@@ -222,6 +224,8 @@ Home → category filter → listing grid → ListingDetail (gallery, contact, r
 
 ### Search (guest OK)
 SearchScreen → category browse list (Sahibinden-style) OR text search (≥2 chars) → FilterSheet → results grid  
+**No-match empty state:** `SearchResultsScreen` shows `لا توجد نتائج` + `لم يتم العثور على نتائج لـ «query»`; web injects screen-reader-only DOM text inside `<flutter-view>` for TestSprite/Playwright (`sello_dom_probe`).  
+**Patrol E2E:** `patrol_test/guest_search_empty_state_test.dart` (search tab → no-match query → empty state); `./scripts/run_patrol_tests.sh` with `env.json` (`PLATFORM=ios|web|android`, not `--platform`).  
 **Category drill-down:** tap العقارات or السيارات → `CategoryBrowseScreen` (`/categories/:id`) → nested branches → leaf → `ListingsScreen`. Children loaded via `fetchChildren(parent_id)` (not in-memory tree only); `fetchAll()` paginates past PostgREST 1000-row cap.
 
 ### Listing density heat map (guest OK) — COMPLETE
@@ -270,6 +274,15 @@ Search bell / profile «تنبيهاتي الذكية» / search-results banner 
 
 Free users: max 3 active alerts; Pro/Premium purchasers (`listing_purchases`): unlimited
 
+### Marketplace checkout (FuratPay) — edge function ready; client TBD
+Buyer creates row in `orders` (RLS: buyer insert/select) → app invokes `furatpay-initiate` with `{ order_id, payment_service_id }` + JWT → edge function:
+1. `POST https://api.furatpay.com/invoice` (`x-api-key` from `FURATPAY_API_KEY` secret)
+2. Persists `invoice.id` → `orders.furatpay_invoice_id`
+3. `POST /public/invoice/pay` with client `payment_service_id`
+4. Returns `{ redirect_url, invoice_id, order_id }` — API key never sent to client
+
+Settings debug **Start payment** button remains disconnected until Flutter client is wired.
+
 ---
 
 ## DATA MODEL
@@ -289,7 +302,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
 - **Home feature** — COMPLETE
   - `shared/models/category_model.dart` — id, nameAr/Ku/En, icon, parentId, displayName()
   - `shared/models/listing_model.dart` — ListingModel, FilterModel, images, formattedPrice, timeAgo
-  - `features/listings/data/listings_repository.dart` — featured, recent, by category, search; package sort; RPC view/contact counts
+  - `features/listings/data/listings_repository.dart` — featured, recent, by category, search; package sort; RPC view/contact counts; **listing title/description translated in `_mapListings` before UI** (via `core/utils/listing_translation.dart` + `TranslationService` cache)
   - `core/utils/listing_package_utils.dart` — expiry, packageWeight, sortListingsByPackagePriority
   - `shared/widgets/pro_listing_badge.dart` — «بروفايل موثق» card + detail chip
   - `features/listings/widgets/listing_owner_package_panel.dart` — owner stats, auto-renew, expiry
@@ -478,7 +491,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `features/chat/widgets/message_bubble.dart` — gradient sent / white received bubbles, image support, read receipts
   - `test/chat_screen_redesign_test.dart`, `test/listing_context_card_test.dart`
   - `features/chat/widgets/onesignal_handler.dart` — push init + player id sync + deep link
-  - `core/utils/chat_date_utils.dart` — اليوم / أمس / Arabic date separators; `formatConversationTimeAr`
+  - `core/utils/chat_date_utils.dart` — localized today/yesterday/date separators; `formatConversationTime`, `formatMessageTime`
   - `supabase/migrations/20260530000000_initial_schema.sql` + `20260530000006_chat_enhancements.sql` — conversations/messages (no duplicate migration)
   - `shared/widgets/app_bottom_nav.dart` — unread badge on رسائلي tab
 - **Auth feature (Phone OTP + Google + Guest)** — COMPLETE
@@ -533,7 +546,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - `features/profile/providers/user_subscription_tier_provider.dart` — infers tier from `listing_purchases`
   - `features/profile/widgets/language_sheet.dart` — dark bottom sheet locale picker (ar/en/ku/tr)
   - `features/profile/widgets/settings_tile.dart` — reusable settings row
-  - `core/providers/locale_provider.dart` — persisted locale, instant RTL/LTR switch
+  - `core/providers/locale_provider.dart` — `LanguageNotifier` / `localeProvider`; persists to `app_locale` (fallback `app_language`); instant RTL/LTR switch
   - `core/providers/session_reset.dart` — invalidate all user providers on logout/delete
   - `shared/widgets/webview_screen.dart` — FAQ, privacy, terms (webview_flutter)
   - `supabase/migrations/20260530000008_profile_settings.sql` — profiles.is_deleted, RLS updates
@@ -558,6 +571,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
   - Migration `20260530000005_profiles_rls_fix.sql` recreates profiles RLS policies
 
 ### PENDING
+- **Localization sweep (in progress Jun 2026)** — ARB + `appLocalizationsProvider` wired; home/auth/settings/chat/profile localized; ~500 Arabic literals remain in listing forms, legal bodies, verification, domain utils
 - Run migration `20260602000000_real_estate_categories.sql` in Supabase (العقارات full tree)
 - Run migration `20260603000000_vehicles_categories.sql` in Supabase (السيارات full tree)
 - Run migration `20260606000000_listing_type.sql` in Supabase (`listing_type` + filtered counts RPC)
@@ -570,7 +584,7 @@ Lifecycle: `availability` = `active` | `sold` | `deleted`
 - App Store / Play Store release assets
 
 ### FLAGGED (post-MVP)
-- Full Kurdish/English UI translations (locale switch works; strings remain Arabic)
+- Remaining UI localization (listing post/edit step forms, filter sheet, search results, heatmap, legal document bodies, auth phone-login sheet, password-reset email screen, listing detail bottom bar)
 - Light/dark theme toggle (app now ships a single dark "fintech" theme; no runtime switch)
 - ~~Paid/promoted listings UI (boost sheet)~~ — **COMPLETE** (Jun 2026): My Listings 🚀 boost sheet
 - Seller phone reveal

@@ -1,13 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../shared/widgets/package_badge.dart';
 import '../../../shared/models/listing_model.dart';
 import '../data/listings_repository.dart';
 import '../providers/listing_detail_provider.dart';
 
-/// Owner insights — views, contacts, and auto-renew (pro/premium).
+/// Owner controls — package badge + auto-renew (pro/premium).
+/// View / contact stats live in the advanced analytics panel above.
 class ListingOwnerPackagePanel extends ConsumerStatefulWidget {
   const ListingOwnerPackagePanel({super.key, required this.listing});
 
@@ -53,17 +57,15 @@ class _ListingOwnerPackagePanelState
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final listing = widget.listing;
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final pending = listing.isPendingModeration;
-    final showRenew =
-        listing.isProListing || listing.isPremiumListing;
+    final showRenew = listing.isProListing || listing.isPremiumListing;
     final expiresAt = listing.expiresAt;
     final daysLeft = expiresAt?.difference(DateTime.now()).inDays;
 
-    final package = PackageBadge.packageForListing(listing) ??
-        ListingPackage.standard;
+    final package =
+        PackageBadge.packageForListing(listing) ?? ListingPackage.standard;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -75,188 +77,149 @@ class _ListingOwnerPackagePanelState
             size: PackageBadgeSize.medium,
           ),
         ),
-        const SizedBox(height: 10),
-        if (pending)
-          Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: scheme.tertiaryContainer.withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: 0.35),
+        if (pending) ...[
+          const SizedBox(height: 10),
+          _PendingStatsNotice(message: strings.listingPendingReviewStats),
+        ],
+        if (showRenew) ...[
+          const SizedBox(height: 10),
+          _AutoRenewCard(
+            enabled: _autoRenew,
+            pending: pending,
+            subtitle: pending
+                ? strings.autoRenewAfterApproval
+                : expiresAt != null
+                    ? (daysLeft != null && daysLeft > 0
+                        ? strings.expiresInDays('$daysLeft')
+                        : strings.statusExpired)
+                    : null,
+            isExpiringSoon: daysLeft != null && daysLeft <= 3,
+            title: strings.autoRenewLabel,
+            onChanged: pending ? null : _toggleAutoRenew,
+          ),
+        ],
+        const SizedBox(height: 14),
+      ],
+    );
+  }
+}
+
+/// Pending-review hint shown above the owner controls.
+class _PendingStatsNotice extends StatelessWidget {
+  const _PendingStatsNotice({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.pending.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.pending.withValues(alpha: 0.30)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.hourglass_top_rounded, color: AppColors.pending, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: AppFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+                height: 1.4,
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.hourglass_top_rounded,
-                  color: scheme.onTertiaryContainer,
-                  size: 22,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'إعلانك قيد المراجعة — الإحصائيات تُحدَّث تلقائياً بعد النشر',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onTertiaryContainer,
-                      fontWeight: FontWeight.w600,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
-        Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                scheme.primaryContainer.withValues(alpha: 0.45),
-                scheme.surfaceContainerHighest.withValues(alpha: 0.35),
-              ],
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: scheme.outlineVariant),
-          ),
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  child: _InsightStat(
-                    icon: Icons.visibility_rounded,
-                    value: '${listing.viewsCount}',
-                    label: 'مشاهدة',
-                    iconColor: scheme.primary,
-                  ),
-                ),
-                VerticalDivider(
-                  width: 1,
-                  thickness: 1,
-                  color: scheme.outlineVariant,
-                ),
-                Expanded(
-                  child: _InsightStat(
-                    icon: Icons.forum_rounded,
-                    value: '${listing.contactCount}',
-                    label: 'تواصل',
-                    iconColor: scheme.secondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Polished auto-renew control — icon chip, title, expiry subtitle, switch.
+class _AutoRenewCard extends StatelessWidget {
+  const _AutoRenewCard({
+    required this.enabled,
+    required this.pending,
+    required this.title,
+    required this.subtitle,
+    required this.isExpiringSoon,
+    required this.onChanged,
+  });
+
+  final bool enabled;
+  final bool pending;
+  final String title;
+  final String? subtitle;
+  final bool isExpiringSoon;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = enabled ? AppColors.volt : AppColors.textMuted;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.fieldCarbon,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: enabled
+              ? AppColors.volt.withValues(alpha: 0.30)
+              : AppColors.glassBorder,
         ),
-        if (showRenew)
+      ),
+      child: Row(
+        children: [
           Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              color: scheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: scheme.outlineVariant),
+              color: accent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(Icons.autorenew_rounded, color: accent, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.autorenew_rounded, color: scheme.primary, size: 22),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'التجديد التلقائي',
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    CupertinoSwitch(
-                      value: _autoRenew,
-                      activeTrackColor: scheme.primary,
-                      onChanged: pending ? null : _toggleAutoRenew,
-                    ),
-                  ],
-                ),
-                if (pending) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    'يُفعَّل بعد موافقة الإدارة على الإعلان',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
+                Text(
+                  title,
+                  style: AppFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
                   ),
-                ] else if (expiresAt != null) ...[
-                  const SizedBox(height: 6),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
                   Text(
-                    daysLeft != null && daysLeft > 0
-                        ? 'ينتهي بعد $daysLeft يوم'
-                        : 'منتهي الصلاحية',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: daysLeft != null && daysLeft <= 3
-                          ? scheme.error
-                          : scheme.onSurfaceVariant,
+                    subtitle!,
+                    style: AppFonts.cairo(
+                      fontSize: 11,
                       fontWeight: FontWeight.w500,
+                      color: isExpiringSoon && !pending
+                          ? AppColors.rejected
+                          : AppColors.textMuted,
                     ),
                   ),
                 ],
               ],
             ),
           ),
-      ],
-    );
-  }
-}
-
-class _InsightStat extends StatelessWidget {
-  const _InsightStat({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.iconColor,
-  });
-
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color iconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
+          const SizedBox(width: 8),
+          CupertinoSwitch(
+            value: enabled,
+            activeTrackColor: AppColors.volt,
+            onChanged: onChanged,
           ),
-          child: Icon(icon, size: 20, color: iconColor),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-            height: 1,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: textTheme.labelMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

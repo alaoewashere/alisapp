@@ -125,9 +125,12 @@ void main() {
     expect(find.text('فهمت'), findsOneWidget);
   });
 
-  test('markHeatmapTutorialSeen persists flag', () async {
-    expect(await hasSeenHeatmapTutorial(), isFalse);
-    await markHeatmapTutorialSeen();
-    expect(await hasSeenHeatmapTutorial(), isTrue);
+  test('markHeatmapTutorialSeen persists per-user flag', () async {
+    const userA = 'user-a';
+    const userB = 'user-b';
+    expect(await hasSeenHeatmapTutorial(userA), isFalse);
+    await markHeatmapTutorialSeen(userA);
+    expect(await hasSeenHeatmapTutorial(userA), isTrue);
+    expect(await hasSeenHeatmapTutorial(userB), isFalse);
   });
 }

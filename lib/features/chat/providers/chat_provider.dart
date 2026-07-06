@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/utils/secure_log.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../shared/models/conversation_model.dart';
 import '../../../shared/models/message_model.dart';
@@ -94,20 +99,52 @@ class ChatNotifier extends Notifier<AsyncValue<void>> {
           listingTitle: listingTitle,
         );
 
-    if (result.isNew) {
-      final intro = 'مرحباً، أنا مهتم بإعلانك: $listingTitle';
-      await ref.read(chatRepositoryProvider).sendMessage(
-            conversationId: result.conversation.id,
-            senderId: buyerId,
-            content: intro,
-          );
-      await ref.read(listingsRepositoryProvider).incrementContacts(listingId);
-      SecureLog.debug(
-        'chat: sent listing intro for conversation ${result.conversation.id}',
-      );
-    }
+    // Navigation only needs the conversation id — sharing the listing card is
+    // "nice to have on arrival", not something worth making the user wait 3-4
+    // extra network round-trips for. Fire it in the background instead.
+    unawaited(
+      _shareListingCardIfNeeded(
+        conversationId: result.conversation.id,
+        listingId: listingId,
+        listingTitle: listingTitle,
+        buyerId: buyerId,
+      ),
+    );
 
     return result.conversation;
+  }
+
+  // One thread per person, but each listing they've messaged about gets its
+  // own card the first time it comes up — so re-contacting about the SAME
+  // listing doesn't spam a duplicate, and a NEW listing in an existing
+  // thread still shows up clearly instead of being silently dropped.
+  Future<void> _shareListingCardIfNeeded({
+    required String conversationId,
+    required String listingId,
+    required String listingTitle,
+    required String buyerId,
+  }) async {
+    try {
+      final alreadyShared = await ref.read(chatRepositoryProvider).hasSharedListing(
+            conversationId: conversationId,
+            listingId: listingId,
+          );
+      if (alreadyShared) return;
+
+      final locale = normalizeAppLocale(ref.read(localeProvider));
+      final strings = lookupAppLocalizations(locale);
+      final intro = strings.chatListingIntro(listingTitle);
+      await ref.read(chatRepositoryProvider).sendListingCardMessage(
+            conversationId: conversationId,
+            senderId: buyerId,
+            listingId: listingId,
+            introText: intro,
+          );
+      await ref.read(listingsRepositoryProvider).incrementContacts(listingId);
+      SecureLog.debug('chat: shared listing card for conversation $conversationId');
+    } catch (e, stackTrace) {
+      SecureLog.debug('chat: failed to share listing card: $e\n$stackTrace');
+    }
   }
 
   Future<ConversationModel> getOrCreateConversation({
@@ -169,6 +206,9 @@ class ChatNotifier extends Notifier<AsyncValue<void>> {
           conversationId: conversationId,
           currentUserId: userId,
         );
+    // Refresh the unread badge + conversation list so they clear right away.
+    ref.invalidate(unreadCountProvider);
+    ref.invalidate(conversationsStreamProvider);
   }
 
   Future<void> deleteConversation(String conversationId) async {

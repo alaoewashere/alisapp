@@ -1,0 +1,64 @@
+version: "2"
+type: frontend
+tech_stack:
+  - Dart
+  - Flutter 3.44
+  - Riverpod
+  - Go Router
+  - Supabase
+routes:
+  - path: /
+    file: lib/features/home/presentation/home_screen.dart
+    auth_required: false
+    description: Home feed with categories, featured and latest listings
+  - path: /search
+    file: lib/features/listings/presentation/search_screen.dart
+    auth_required: false
+    description: Search and smart alerts entry
+  - path: /listing/:id
+    file: lib/features/listings/presentation/listing_detail_screen.dart
+    auth_required: false
+    description: Listing detail with gallery and seller info
+  - path: /phone
+    file: lib/features/auth/presentation/login_screen.dart
+    auth_required: false
+    description: Phone OTP login entry
+  - path: /profile
+    file: lib/features/profile/presentation/profile_screen.dart
+    auth_required: true
+    description: User profile and account menu
+features:
+  - name: Guest Home Browse
+    description: Guest users can browse home, categories, and listing details
+    files:
+      - lib/features/home/presentation/home_screen.dart
+      - lib/features/home/widgets/listing_card.dart
+    entry_route: /
+    user_interactions:
+      - Scroll home feed
+      - Tap category
+      - Open listing detail from card
+    auth_required: false
+  - name: Search Listings
+    description: Search for listings by keyword and filters
+    files:
+      - lib/features/listings/presentation/search_screen.dart
+    entry_route: /search
+    user_interactions:
+      - Enter search query
+      - View search results
+    auth_required: false
+  - name: Listing Detail
+    description: View listing photos, price, seller, and related listings
+    files:
+      - lib/features/listings/presentation/listing_detail_screen.dart
+    entry_route: /listing/:id
+    user_interactions:
+      - View gallery
+      - Scroll seller other listings row
+      - Tap contact seller requires auth
+    auth_required: false
+known_limitations:
+  - issue: OneSignal push may log errors on web
+    location: lib/features/chat/widgets/onesignal_handler.dart
+    impact: Non-fatal; core browse flows still work

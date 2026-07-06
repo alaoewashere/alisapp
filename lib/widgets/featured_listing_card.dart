@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../core/l10n/l10n_provider.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/cached_network_image_utils.dart';
 import '../core/utils/listing_display_title.dart';
@@ -28,6 +29,7 @@ class FeaturedListingCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     return GestureDetector(
       onTap: () => context.push('/listing/${listing.id}'),
       child: Container(
@@ -105,7 +107,7 @@ class FeaturedListingCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    listing.formattedPrice,
+                    listing.formattedPriceFor(strings),
                     style: AppFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

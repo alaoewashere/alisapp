@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:Sello/l10n/app_localizations.dart';
 import 'package:Sello/models/smart_alert.dart';
 import 'package:Sello/models/smart_alert_category.dart';
 import 'package:Sello/shared/models/category_model.dart';
@@ -104,6 +106,16 @@ void main() {
       expect(alert.make, 'BMW');
       expect(alert.triggerCount, 4);
       expect(alert.isActive, isTrue);
+    });
+  });
+
+  group('smartAlertPickerLabelForParent', () {
+    test('returns localized main category label for root picker', () {
+      final en = lookupAppLocalizations(const Locale('en'));
+      final ar = lookupAppLocalizations(const Locale('ar'));
+
+      expect(smartAlertPickerLabelForParent(null, 0, en), 'Main Category');
+      expect(smartAlertPickerLabelForParent(null, 0, ar), 'الفئة الرئيسية');
     });
   });
 

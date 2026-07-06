@@ -2,6 +2,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../core/constants/verification_constants.dart';
 import '../../core/utils/currency_formatter.dart';
+import '../../l10n/app_localizations.dart';
 import '../../core/utils/video_utils.dart';
 import 'animal_listing_metadata.dart';
 import 'electronics_listing_metadata.dart';
@@ -229,6 +230,7 @@ class ListingModel {
     this.currency = 'IQD',
     this.isNegotiable = false,
     this.condition,
+    this.listingType = ListingType.sale,
     required this.city,
     required this.governorate,
     this.latitude,
@@ -276,6 +278,7 @@ class ListingModel {
   final String currency;
   final bool isNegotiable;
   final ListingCondition? condition;
+  final ListingType listingType;
   final String city;
   final String governorate;
   final double? latitude;
@@ -403,6 +406,8 @@ class ListingModel {
 
   String get formattedPrice => formatIQD(price);
 
+  String formattedPriceFor(AppLocalizations l10n) => formatIQDWithL10n(price, l10n);
+
   String get timeAgo => timeago.format(createdAt, locale: 'ar');
 
   String get categoryBreadcrumb {
@@ -461,6 +466,7 @@ class ListingModel {
     String? currency,
     bool? isNegotiable,
     ListingCondition? condition,
+    ListingType? listingType,
     String? city,
     String? governorate,
     double? latitude,
@@ -504,6 +510,7 @@ class ListingModel {
       currency: currency ?? this.currency,
       isNegotiable: isNegotiable ?? this.isNegotiable,
       condition: condition ?? this.condition,
+      listingType: listingType ?? this.listingType,
       city: city ?? this.city,
       governorate: governorate ?? this.governorate,
       latitude: latitude ?? this.latitude,
@@ -572,6 +579,7 @@ class ListingModel {
       currency: json['currency'] as String? ?? 'IQD',
       isNegotiable: json['is_negotiable'] as bool? ?? false,
       condition: ListingConditionX.fromString(json['condition'] as String?),
+      listingType: ListingType.fromValue(json['listing_type'] as String?),
       city: json['city'] as String,
       governorate: json['governorate'] as String,
       latitude: (json['latitude'] as num?)?.toDouble(),

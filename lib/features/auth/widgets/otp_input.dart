@@ -117,6 +117,7 @@ class OtpInputState extends ConsumerState<OtpInput> {
         children: List.generate(length, (index) {
           return SizedBox(
             width: 48,
+            height: 62,
             child: Focus(
               onKeyEvent: (_, event) => _onKeyEvent(index, event),
               child: TextField(
@@ -124,15 +125,20 @@ class OtpInputState extends ConsumerState<OtpInput> {
                 focusNode: _focusNodes[index],
                 enabled: widget.enabled,
                 textAlign: TextAlign.center,
+                textAlignVertical: TextAlignVertical.center,
                 textDirection: TextDirection.ltr,
                 keyboardType: TextInputType.number,
                 maxLength: 1,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: const TextStyle(
+                  fontSize: 22,
+                  height: 1.0,
+                ),
                 inputFormatters: [
                   WesternDigitsInputFormatter(maxLength: 1),
                 ],
                 decoration: InputDecoration(
                   counterText: '',
+                  contentPadding: EdgeInsets.zero,
                   filled: true,
                   fillColor: AuthFormStyles.fieldFill,
                   border: OutlineInputBorder(

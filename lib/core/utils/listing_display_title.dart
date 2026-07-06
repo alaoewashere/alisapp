@@ -1,3 +1,4 @@
+import '../../l10n/app_localizations.dart';
 import '../../shared/models/category_model.dart';
 import '../../shared/models/listing_model.dart';
 import 'animal_listing_utils.dart';
@@ -10,14 +11,14 @@ import 'tutoring_listing_utils.dart';
 import 'vehicle_listing_utils.dart';
 
 /// User-written title when present; otherwise a metadata-based fallback.
-String listingDisplayTitle(ListingModel listing) {
+String listingDisplayTitle(ListingModel listing, [AppLocalizations? l10n]) {
   final userTitle = listing.titleAr.trim();
   if (userTitle.isNotEmpty) return userTitle;
-  return buildListingFallbackTitle(listing);
+  return buildListingFallbackTitle(listing, l10n);
 }
 
 /// Builds a basic title from listing metadata for legacy rows with no title.
-String buildListingFallbackTitle(ListingModel listing) {
+String buildListingFallbackTitle(ListingModel listing, [AppLocalizations? l10n]) {
   final path = _categoryPathForListing(listing);
 
   if (listing.isVehicleListing && listing.vehicleMetadata != null) {
@@ -47,7 +48,7 @@ String buildListingFallbackTitle(ListingModel listing) {
 
   return listing.categoryNameAr?.trim().isNotEmpty == true
       ? listing.categoryNameAr!.trim()
-      : 'إعلان';
+      : (l10n?.listingFallbackTitle ?? 'Listing');
 }
 
 List<CategoryModel> _categoryPathForListing(ListingModel listing) {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/car_paint_panels.dart';
+import '../../../../core/l10n/car_paint_locale.dart';
+import '../../../../core/l10n/l10n_provider.dart';
 import 'car_paint_calibrator.dart';
 import 'car_paint_panel_overlay.dart';
 import 'car_paint_panel_layout.dart';
@@ -105,6 +107,7 @@ class CarPaintWidget extends StatelessWidget {
   }
 
   void _showPicker(BuildContext context, CarPaintPanelLayout panel) {
+    final strings = context.l10n;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.fieldCarbon,
@@ -119,7 +122,7 @@ class CarPaintWidget extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  panel.nameAr,
+                  carPaintPanelLabel(strings, panel.id),
                   style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.pureWhite,
@@ -131,28 +134,28 @@ class CarPaintWidget extends StatelessWidget {
                 sheetContext,
                 panel,
                 CarPaintCondition.original,
-                'أصلي',
+                strings.bodyPartOriginal,
                 CarPaintColors.original,
               ),
               _conditionTile(
                 sheetContext,
                 panel,
                 CarPaintCondition.localPaint,
-                'بوية محلية',
+                strings.bodyPartLocalPaint,
                 CarPaintColors.localPaint,
               ),
               _conditionTile(
                 sheetContext,
                 panel,
                 CarPaintCondition.painted,
-                'مصبوغة',
+                strings.bodyPartPainted,
                 CarPaintColors.painted,
               ),
               _conditionTile(
                 sheetContext,
                 panel,
                 CarPaintCondition.replaced,
-                'مستبدلة',
+                strings.bodyPartReplaced,
                 CarPaintColors.replaced,
               ),
               const SizedBox(height: 16),

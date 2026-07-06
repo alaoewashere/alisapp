@@ -1,7 +1,10 @@
 import '../../../features/listings/constants/vehicle_listing_options.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/listing_model.dart';
 import '../../../shared/models/vehicle_listing_metadata.dart';
+import '../l10n/enum_localizations.dart';
+import '../l10n/listing_attribute_locale.dart';
 
 /// True when the selected category path is under المركبات (`cars` root).
 bool isVehicleCategoryPath(List<CategoryModel> path) {
@@ -104,13 +107,17 @@ Map<String, dynamic> vehicleMetadataForStorage(VehicleListingMetadata vehicle) {
   return vehicle.toJson();
 }
 
-/// Formatted mileage for vehicle stat cards (e.g. "22,000 كم").
-String formatVehicleMileageDisplay(int mileage, MileageUnit unit) {
+/// Formatted mileage for vehicle stat cards (e.g. "22,000 KM").
+String formatVehicleMileageDisplay(
+  int mileage,
+  MileageUnit unit,
+  AppLocalizations l10n,
+) {
   final formatted = mileage.toString().replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
         (m) => '${m[1]},',
       );
-  return '$formatted ${unit.labelAr}';
+  return '$formatted ${unit.localizedLabel(l10n)}';
 }
 
 /// Cylinder count label for stat card (e.g. "4 أسطوانة").
@@ -138,29 +145,30 @@ bool hasVehicleCoreStats(VehicleListingMetadata vehicle) {
 List<MapEntry<String, String>> vehicleDetailRows(
   VehicleListingMetadata vehicle,
   ListingCondition? condition,
+  AppLocalizations l10n,
 ) {
   final rows = <MapEntry<String, String>>[];
 
   void add(String label, String? value) {
     if (value == null || value.trim().isEmpty) return;
-    rows.add(MapEntry(label, value.trim()));
+    rows.add(MapEntry(label, localizeListingAttribute(value.trim(), l10n)));
   }
 
-  add('الحالة', vehicleConditionLabel(condition));
-  add('وضع الطلاء', vehicle.paintParts);
-  add('الوقود', vehicle.fuel);
-  add('بلد الاستيراد', vehicle.importCountry);
-  add('اللوحة', vehicle.plate);
-  add('ناقل الحركة', vehicle.transmission);
-  add('عدد المقاعد', vehicle.seatNumber);
-  add('مادة المقاعد', vehicle.seatMaterial);
+  add(l10n.fieldCondition, vehicleConditionLabel(condition));
+  add(l10n.fieldPaintCondition, vehicle.paintParts);
+  add(l10n.fieldFuel, vehicle.fuel);
+  add(l10n.fieldImportCountry, vehicle.importCountry);
+  add(l10n.fieldPlate, vehicle.plate);
+  add(l10n.fieldTransmission, vehicle.transmission);
+  add(l10n.fieldSeats, vehicle.seatNumber);
+  add(l10n.fieldSeatMaterial, vehicle.seatMaterial);
 
   if (vehicle.color != null) {
     final colorLabel = VehicleCarColors.isOtherLabel(vehicle.color) &&
             vehicle.customColor.isNotEmpty
         ? vehicle.customColor
         : vehicle.color;
-    add('اللون', colorLabel);
+    add(l10n.fieldColor, colorLabel);
   }
 
   return rows;

@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:Sello/core/constants/browse_categories.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 import 'package:Sello/shared/models/category_model.dart';
 
 void main() {
@@ -27,7 +29,8 @@ void main() {
       ),
     ];
 
-    final items = buildBrowseCategoryItems(all);
+    final strings = lookupAppLocalizations(const Locale('ar'));
+    final items = buildBrowseCategoryItems(all, 'ar', strings);
     final realEstate = items.firstWhere((i) => i.style.slug == 'real_estate');
 
     expect(realEstate.categoryId, 1);
@@ -44,11 +47,12 @@ void main() {
       ),
     ];
 
-    final items = buildBrowseCategoryItems(all);
+    final strings = lookupAppLocalizations(const Locale('ar'));
+    final items = buildBrowseCategoryItems(all, 'ar', strings);
     final cars = items.firstWhere((i) => i.style.slug == 'cars');
 
     expect(cars.categoryId, 2);
-    expect(cars.subtitle, contains('دراجات'));
+    expect(cars.subtitle, strings.categorySubtitleVehicles);
   });
 
   test('buildBrowseCategoryItems sorts by display_order from DB', () {
@@ -76,7 +80,9 @@ void main() {
       ),
     ];
 
-    final slugs = buildBrowseCategoryItems(all).map((i) => i.style.slug).toList();
+    final strings = lookupAppLocalizations(const Locale('ar'));
+    final slugs =
+        buildBrowseCategoryItems(all, 'ar', strings).map((i) => i.style.slug).toList();
     expect(slugs.indexOf('real_estate'), lessThan(slugs.indexOf('cars')));
     expect(slugs.indexOf('cars'), lessThan(slugs.indexOf('electronics')));
   });

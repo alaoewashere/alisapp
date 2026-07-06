@@ -5,23 +5,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
+import '../../core/utils/auth_navigation.dart';
 import '../../core/utils/result.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../shared/widgets/app_back_button.dart';
 import 'widgets/otp_four_box_input.dart';
 
 class EmailVerifyScreen extends ConsumerStatefulWidget {
-  const EmailVerifyScreen({super.key, required this.email});
+  const EmailVerifyScreen({
+    super.key,
+    required this.email,
+    this.purpose = 'reset',
+  });
 
   final String email;
+  final String purpose;
 
   @override
   ConsumerState<EmailVerifyScreen> createState() => _EmailVerifyScreenState();
 }
 
 class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
+  // Matches the email OTP length configured in the Supabase project dashboard.
+  static const _codeLength = 8;
+
   final _otpController = TextEditingController();
   final _otpKey = GlobalKey<OtpFourBoxInputState>();
   Timer? _timer;
@@ -66,7 +76,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'تم إرسال رمز جديد',
+              ref.read(appLocalizationsProvider).newOtpSent,
               style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
@@ -80,7 +90,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
 
   Future<void> _verify() async {
     final code = _otpController.text;
-    if (code.length != OtpFourBoxInputState.length) return;
+    if (code.length != _codeLength) return;
 
     setState(() => _verifying = true);
     final result = await ref.read(authNotifierProvider.notifier).verifyEmailOTP(
@@ -92,7 +102,12 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
 
     switch (result) {
       case Success():
-        context.push(AppRoutes.resetPassword);
+        if (widget.purpose == 'signup') {
+          final route = await resolvePostAuthRoute(ref);
+          if (mounted) context.go(route);
+        } else {
+          context.push(AppRoutes.resetPassword);
+        }
       case Failure():
         await _otpKey.currentState?.shake();
         _otpKey.currentState?.clear();
@@ -100,7 +115,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'رمز غير صحيح',
+              ref.read(appLocalizationsProvider).otpInvalidCode,
               style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
@@ -110,8 +125,9 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     final canVerify =
-        _otpController.text.length == OtpFourBoxInputState.length && !_verifying;
+        _otpController.text.length == _codeLength && !_verifying;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -126,7 +142,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
             onPressed: _verifying ? null : () => context.pop(),
           ),
           title: Text(
-            'التحقق من البريد',
+            strings.emailVerifyTitle,
             style: AppFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -140,7 +156,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
             children: [
               const SizedBox(height: 32),
               Text(
-                'أدخل الرمز الذي أرسلناه إلى',
+                strings.otpSentToEmailPrompt,
                 style: AppFonts.cairo(
                   fontSize: 14,
                   color: const Color(0xFF888888),
@@ -159,6 +175,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
               OtpFourBoxInput(
                 key: _otpKey,
                 controller: _otpController,
+                length: _codeLength,
               ),
               const SizedBox(height: 24),
               if (_secondsLeft > 0)
@@ -174,7 +191,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
                 TextButton(
                   onPressed: _verifying ? null : _resend,
                   child: Text(
-                    'إعادة الإرسال',
+                    strings.resendOtp,
                     style: AppFonts.cairo(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -205,7 +222,7 @@ class _EmailVerifyScreenState extends ConsumerState<EmailVerifyScreen> {
                           ),
                         )
                       : Text(
-                          'التحقق',
+                          strings.otpVerifyButton,
                           style: AppFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

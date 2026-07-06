@@ -2,35 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:Sello/features/chat/widgets/listing_context_card.dart';
-import 'package:Sello/shared/models/conversation_model.dart';
+import 'package:Sello/l10n/app_localizations.dart';
 
 void main() {
-  ConversationModel sampleConversation({
-    String? listingTitle,
-    String? listingImage,
-    double? listingPrice,
-  }) {
-    return ConversationModel(
-      id: 'conv-1',
-      listingId: 'listing-1',
-      buyerId: 'buyer-1',
-      sellerId: 'seller-1',
-      listingTitle: listingTitle ?? 'سيارة تويota كامري 2020',
-      listingImage: listingImage,
-      listingPrice: listingPrice ?? 25000000,
-      otherUserName: 'أحمد',
-      createdAt: DateTime(2026, 6, 8),
+  Widget wrap(Widget child) {
+    return MaterialApp(
+      locale: const Locale('ar'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(body: child),
     );
   }
 
   group('ListingContextCard', () {
     testWidgets('shows listing title, price, and badge', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ListingContextCard(
-              conversation: sampleConversation(),
-            ),
+        wrap(
+          const ListingContextCard(
+            listingId: 'listing-1',
+            title: 'سيارة تويota كامري 2020',
+            price: 25000000,
           ),
         ),
       );
@@ -40,28 +31,27 @@ void main() {
       expect(find.text('إعلان'), findsOneWidget);
     });
 
-    testWidgets('hides when listing title is missing', (tester) async {
+    testWidgets('hides price when missing', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ListingContextCard(
-              conversation: sampleConversation(listingTitle: ''),
-            ),
+        wrap(
+          const ListingContextCard(
+            listingId: 'listing-1',
+            title: 'سيارة تويota كامري 2020',
           ),
         ),
       );
 
       expect(find.byType(ListingContextCard), findsOneWidget);
-      expect(find.text('إعلان'), findsNothing);
+      expect(find.text('إعلان'), findsOneWidget);
     });
 
     testWidgets('shows placeholder when image is missing', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ListingContextCard(
-              conversation: sampleConversation(listingImage: null),
-            ),
+        wrap(
+          const ListingContextCard(
+            listingId: 'listing-1',
+            title: 'سيارة تويota كامري 2020',
+            imageUrl: null,
           ),
         ),
       );

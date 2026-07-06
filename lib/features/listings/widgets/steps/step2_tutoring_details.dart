@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../shared/models/tutoring_listing_metadata.dart';
 import '../../constants/listing_form_options.dart';
 import '../../constants/tutoring_listing_options.dart';
@@ -46,17 +47,18 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
   Widget build(BuildContext context) {
     final details = ref.watch(postListingProvider).tutoringDetails;
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return Step2FormShell(
-      title: 'تفاصيل الدرس',
+      title: strings.tutoringDetailsTitle,
       children: [
         Step2SearchableDropdown(
-          label: 'المادة *',
+          label: strings.subjectRequiredLabel,
           value: details.subject,
           items: TutoringListingOptions.subjects,
           onChanged: (v) => _update((d) => d.copyWith(subject: v)),
         ),
-        Text('المرحلة الدراسية *', style: theme.textTheme.titleSmall),
+        Text(strings.studyStageRequiredLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2MultiChipSelector(
           options: TutoringListingOptions.stages,
@@ -76,7 +78,7 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
           },
         ),
         const SizedBox(height: 12),
-        Text('المنهج', style: theme.textTheme.titleSmall),
+        Text(strings.curriculumLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: TutoringListingOptions.curricula,
@@ -84,7 +86,7 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
           onSelected: (v) => _update((d) => d.copyWith(curriculum: v)),
         ),
         const SizedBox(height: 12),
-        Text('طريقة التدريس *', style: theme.textTheme.titleSmall),
+        Text(strings.teachingMethodRequiredLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: TutoringListingOptions.sessionTypes,
@@ -92,7 +94,7 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
           onSelected: (v) => _update((d) => d.copyWith(sessionType: v)),
         ),
         const SizedBox(height: 12),
-        Text('الجنس المقبول', style: theme.textTheme.titleSmall),
+        Text(strings.acceptedGenderLabel, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Step2ChipSelector(
           options: TutoringListingOptions.genders,
@@ -101,7 +103,7 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
         ),
         const SizedBox(height: 12),
         Step2IqdField(
-          label: 'السعر/ساعة *',
+          label: strings.pricePerHourRequiredLabel,
           controller: _priceController,
           onChanged: (v) {
             _update(
@@ -113,7 +115,7 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
         ),
         const SizedBox(height: 12),
         Step2IntDropdown(
-          label: 'سنوات الخبرة',
+          label: strings.yearsExperienceLabel,
           value: details.experienceYears,
           min: 0,
           max: 40,
@@ -124,7 +126,7 @@ class _Step2TutoringDetailsState extends ConsumerState<Step2TutoringDetails> {
           ),
         ),
         Step2LabeledDropdown(
-          label: 'المؤهل العلمي',
+          label: strings.educationQualificationLabel,
           value: details.qualifications,
           items: TutoringListingOptions.qualifications,
           onChanged: (v) => _update((d) => d.copyWith(qualifications: v)),

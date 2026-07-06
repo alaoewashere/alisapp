@@ -4,6 +4,7 @@ import type {
   ListingRow,
   ProfileRow,
   ReportRow,
+  SupportMessageRow,
 } from "@/lib/types/database.types";
 
 export type SellerLite = Pick<ProfileRow, "id" | "display_name" | "full_name">;
@@ -55,4 +56,13 @@ export interface ReportWithRelations
   listing:
     | Pick<ListingRow, "id" | "title" | "status" | "availability" | "user_id">
     | null;
+}
+
+export type SupportUserLite = Pick<
+  ProfileRow,
+  "id" | "display_name" | "full_name" | "phone"
+>;
+
+export interface SupportMessageWithUser extends SupportMessageRow {
+  user: SupportUserLite | null;
 }

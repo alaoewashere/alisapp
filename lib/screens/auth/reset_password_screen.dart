@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
+import '../../core/l10n/l10n_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/router/app_router.dart';
 import '../../core/utils/result.dart';
@@ -60,7 +61,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'تم تغيير كلمة المرور',
+              ref.read(appLocalizationsProvider).passwordChangedSuccess,
               style: AppFonts.cairo(fontWeight: FontWeight.w600),
             ),
           ),
@@ -74,6 +75,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -82,8 +84,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AuthDarkHeader(
-              title: 'كلمة المرور الجديدة',
-              subtitle: 'أدخل كلمة مرور جديدة لحسابك',
+              title: strings.newPasswordTitle,
+              subtitle: strings.newPasswordSubtitle,
               leading: AppBackButton(
                 onPressed: _submitting ? null : () => context.pop(),
               ),
@@ -101,7 +103,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     AuthPillField(
-                      label: 'كلمة المرور الجديدة',
+                      label: strings.newPasswordTitle,
                       controller: _passwordController,
                       hintText: '••••••••',
                       obscureText: _obscurePassword,
@@ -120,7 +122,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     ),
                     const SizedBox(height: 20),
                     AuthPillField(
-                      label: 'تأكيد كلمة المرور',
+                      label: strings.confirmPasswordLabel,
                       controller: _confirmController,
                       hintText: '••••••••',
                       obscureText: _obscureConfirm,
@@ -140,7 +142,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     ),
                     const SizedBox(height: 32),
                     AuthPrimaryButton(
-                      label: 'تأكيد',
+                      label: strings.confirm,
                       loading: _submitting,
                       loginStyle: true,
                       onPressed: _submitting ? null : _submit,

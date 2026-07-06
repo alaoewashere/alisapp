@@ -149,12 +149,17 @@ class ChatRepository {
       throw ArgumentError('Cannot chat with yourself');
     }
 
+    // One thread per PERSON (not per listing): reuse any existing conversation
+    // between these two users, whichever direction the buyer/seller roles are.
     final existing = await _client
         .from('conversations')
         .select(_conversationSelect)
-        .eq('listing_id', listingId)
-        .eq('buyer_id', buyerId)
-        .eq('seller_id', sellerId)
+        .or(
+          'and(buyer_id.eq.$buyerId,seller_id.eq.$sellerId),'
+          'and(buyer_id.eq.$sellerId,seller_id.eq.$buyerId)',
+        )
+        .order('last_message_at', ascending: false)
+        .limit(1)
         .maybeSingle();
 
     if (existing != null) {
@@ -182,6 +187,75 @@ class ChatRepository {
     );
   }
 
+  /// Distinct buyers (with public profile) who messaged about [listingId] — for
+  /// the "who did you sell to?" picker. Ordered by most-recent conversation.
+  Future<List<Map<String, dynamic>>> getListingBuyers({
+    required String listingId,
+    required String sellerId,
+  }) async {
+    final data = await _client
+        .from('conversations')
+        .select('buyer_id, last_message_at')
+        .eq('listing_id', listingId)
+        .eq('seller_id', sellerId)
+        .order('last_message_at', ascending: false);
+
+    final seen = <String>{};
+    final ids = <String>[];
+    for (final row in data as List) {
+      final id = (row as Map)['buyer_id'] as String?;
+      if (id != null && seen.add(id)) ids.add(id);
+    }
+    if (ids.isEmpty) return const [];
+
+    final profiles = await fetchPublicProfiles(_client, ids);
+    final byId = {for (final p in profiles) p['id'] as String: p};
+    return [for (final id in ids) if (byId[id] != null) byId[id]!];
+  }
+
+  // Listing snapshots don't change once shared into a chat — cache per id.
+  final Map<String, Map<String, dynamic>?> _listingSnapshotCache = {};
+
+  Future<Map<String, dynamic>?> _listingSnapshot(String listingId) async {
+    if (_listingSnapshotCache.containsKey(listingId)) {
+      return _listingSnapshotCache[listingId];
+    }
+    final data = await _client
+        .from('listings')
+        .select(
+          'title_ar, title, price_iqd, price, listing_images(storage_path, url, sort_order, is_primary)',
+        )
+        .eq('id', listingId)
+        .maybeSingle();
+    if (data == null) {
+      _listingSnapshotCache[listingId] = null;
+      return null;
+    }
+    final map = Map<String, dynamic>.from(data);
+    final snapshot = {
+      'listing_title': map['title_ar'] as String? ?? map['title'] as String?,
+      'listing_image': _listingImageFromRow(map),
+      'listing_price': (map['price_iqd'] as num?)?.toDouble() ??
+          (map['price'] as num?)?.toDouble(),
+    };
+    _listingSnapshotCache[listingId] = snapshot;
+    return snapshot;
+  }
+
+  Future<List<MessageModel>> _mapMessages(List<dynamic> rows) async {
+    final result = <MessageModel>[];
+    for (final row in rows) {
+      final map = Map<String, dynamic>.from(row as Map);
+      final listingId = map['listing_id'] as String?;
+      if (listingId != null) {
+        final snapshot = await _listingSnapshot(listingId);
+        if (snapshot != null) map.addAll(snapshot);
+      }
+      result.add(MessageModel.fromJson(map));
+    }
+    return result;
+  }
+
   Future<List<MessageModel>> getMessages(String conversationId) async {
     final data = await _client
         .from('messages')
@@ -189,9 +263,7 @@ class ChatRepository {
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true);
 
-    return (data as List)
-        .map((e) => MessageModel.fromJson(Map<String, dynamic>.from(e as Map)))
-        .toList();
+    return _mapMessages(data as List);
   }
 
   Future<MessageModel> sendMessage({
@@ -219,6 +291,50 @@ class ChatRepository {
     return MessageModel.fromJson(Map<String, dynamic>.from(data));
   }
 
+  /// Whether this listing was already shared as a card in this conversation —
+  /// used to avoid spamming a duplicate card every time "Message Seller" is
+  /// tapped again for a listing already introduced in this thread.
+  Future<bool> hasSharedListing({
+    required String conversationId,
+    required String listingId,
+  }) async {
+    final data = await _client
+        .from('messages')
+        .select('id')
+        .eq('conversation_id', conversationId)
+        .eq('listing_id', listingId)
+        .limit(1);
+    return (data as List).isNotEmpty;
+  }
+
+  /// Shares a listing into the chat as its own message — appears inline in
+  /// the timeline (not a single frozen banner), so a buyer can message the
+  /// same seller about several listings in one thread and each stays clear.
+  Future<MessageModel> sendListingCardMessage({
+    required String conversationId,
+    required String senderId,
+    required String listingId,
+    required String introText,
+  }) async {
+    final data = await _client.from('messages').insert({
+      'conversation_id': conversationId,
+      'sender_id': senderId,
+      'body': introText,
+      'content': introText,
+      'listing_id': listingId,
+    }).select().single();
+
+    await _client.from('conversations').update({
+      'last_message': introText,
+      'last_message_at': DateTime.now().toIso8601String(),
+    }).eq('id', conversationId);
+
+    final map = Map<String, dynamic>.from(data);
+    final snapshot = await _listingSnapshot(listingId);
+    if (snapshot != null) map.addAll(snapshot);
+    return MessageModel.fromJson(map);
+  }
+
   Future<void> markMessagesAsRead({
     required String conversationId,
     required String currentUserId,
@@ -237,11 +353,7 @@ class ChatRepository {
         .stream(primaryKey: ['id'])
         .eq('conversation_id', conversationId)
         .order('created_at')
-        .map(
-          (rows) => rows
-              .map((e) => MessageModel.fromJson(Map<String, dynamic>.from(e)))
-              .toList(),
-        );
+        .asyncMap(_mapMessages);
   }
 
   Stream<List<ConversationModel>> subscribeToConversations(String userId) {

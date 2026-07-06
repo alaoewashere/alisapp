@@ -31,8 +31,16 @@ class ListingPackageOption {
 }
 
 abstract final class ListingPackageConfig {
-  /// Fee when posting standard tier after monthly free quota is used.
-  static const paidStandardPriceIqd = 10000;
+  /// When false, only standard tier is selectable; pro/premium show "Coming soon".
+  static const proAndPremiumEnabled = false;
+
+  /// Fee when posting standard tier after the free quota is used.
+  static const paidStandardPriceIqd = 5000;
+
+  static bool isSelectable(ListingPackage package) {
+    if (package == ListingPackage.standard) return true;
+    return proAndPremiumEnabled;
+  }
 
   static const options = [
     ListingPackageOption(
@@ -54,7 +62,7 @@ abstract final class ListingPackageConfig {
     ListingPackageOption(
       package: ListingPackage.pro,
       labelAr: 'إعلان برو',
-      priceIqd: 16000,
+      priceIqd: 8000,
       durationLabelAr: '60 يوم',
       features: [
         ListingPackageFeature(
@@ -66,6 +74,22 @@ abstract final class ListingPackageConfig {
           description: 'يظهر قبل الإعلانات العادية في نفس الفئة',
         ),
         ListingPackageFeature(
+          title: 'تجديد تلقائي أسبوعي',
+          description: 'يعود إعلانك لأعلى الفئة تلقائياً كل أسبوع',
+        ),
+        ListingPackageFeature(
+          title: 'صور وفيديو أكثر',
+          description: 'أضف حتى 15 صورة وفيديو واحد للإعلان',
+        ),
+        ListingPackageFeature(
+          title: 'زر واتساب مباشر',
+          description: 'تواصل فوري عبر واتساب من بطاقة الإعلان',
+        ),
+        ListingPackageFeature(
+          title: 'إطار وشارة برو',
+          description: 'إطار مميّز وشارة "برو" تبرز إعلانك في البحث',
+        ),
+        ListingPackageFeature(
           title: 'إحصائيات',
           description: 'مشاهدات وتواصل مع الإعلان',
         ),
@@ -74,7 +98,7 @@ abstract final class ListingPackageConfig {
     ListingPackageOption(
       package: ListingPackage.premium,
       labelAr: 'إعلان مميز',
-      priceIqd: 20000,
+      priceIqd: 12000,
       durationLabelAr: '90 يوم',
       features: [
         ListingPackageFeature(
@@ -84,6 +108,18 @@ abstract final class ListingPackageConfig {
         ListingPackageFeature(
           title: 'أعلى ترتيب',
           description: 'أولوية قصوى في نتائج البحث والفئة',
+        ),
+        ListingPackageFeature(
+          title: 'تجديد تلقائي يومي',
+          description: 'يعود إعلانك لأعلى الفئة تلقائياً كل يوم',
+        ),
+        ListingPackageFeature(
+          title: 'إشعار للمشترين المهتمين',
+          description: 'إشعار يصل للمهتمين بفئة إعلانك',
+        ),
+        ListingPackageFeature(
+          title: 'إحصائيات متقدمة',
+          description: 'تحليلات مفصّلة: مصادر المشاهدات وأوقات الذروة',
         ),
         ListingPackageFeature(
           title: 'تعزيز دفع',

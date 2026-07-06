@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/l10n/category_locale.dart';
+import '../core/l10n/l10n_provider.dart';
 import '../core/utils/arabic_number.dart';
 
 const _starGold = Color(0xFFF5A623);
@@ -27,7 +30,7 @@ Widget starDisplay({
   );
 }
 
-class StarDisplay extends StatelessWidget {
+class StarDisplay extends ConsumerWidget {
   const StarDisplay({
     super.key,
     required this.rating,
@@ -46,8 +49,13 @@ class StarDisplay extends StatelessWidget {
   final TextStyle? textStyle;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (count <= 0) return const SizedBox.shrink();
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
+    final countLabel = localeCode == 'ar'
+        ? arabicNumber(count)
+        : '$count';
 
     final labelStyle = textStyle ??
         AppFonts.cairo(
@@ -68,7 +76,7 @@ class StarDisplay extends StatelessWidget {
         if (showCount) ...[
           SizedBox(width: starSize * 0.25),
           Text(
-            '(${arabicNumber(count)} تقييم)',
+            strings.ratingsCount(countLabel),
             style: labelStyle.copyWith(
               fontWeight: FontWeight.w500,
               color: AppColors.textMuted,

@@ -91,11 +91,13 @@ class AppFieldGroupLabel extends StatelessWidget {
     required this.label,
     this.required = false,
     this.optional = false,
+    this.optionalLabel = '',
   });
 
   final String label;
   final bool required;
   final bool optional;
+  final String optionalLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +126,7 @@ class AppFieldGroupLabel extends StatelessWidget {
                 color: AppColors.surfaceMuted,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text('اختياري', style: AppTextStyles.caption),
+              child: Text(optionalLabel, style: AppTextStyles.caption),
             ),
           ],
         ],
@@ -162,7 +164,7 @@ class AppFieldCharCounter extends StatelessWidget {
 class AppListingFormSectionDivider extends StatelessWidget {
   const AppListingFormSectionDivider({
     super.key,
-    this.label = 'تفاصيل الإعلان',
+    required this.label,
   });
 
   final String label;

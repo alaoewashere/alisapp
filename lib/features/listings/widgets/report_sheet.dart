@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/models/report_model.dart';
 import '../data/listings_repository.dart';
+
+String _localizedReportReason(AppLocalizations strings, String reason) {
+  return switch (reason) {
+    ReportReasons.duplicate => strings.reportReasonDuplicate,
+    ReportReasons.misleadingPrice => strings.reportReasonMisleadingPrice,
+    ReportReasons.fakePhotos => strings.reportReasonFakePhotos,
+    ReportReasons.inappropriate => strings.reportReasonInappropriate,
+    ReportReasons.fraud => strings.reportReasonFraud,
+    ReportReasons.other => strings.reportReasonOther,
+    _ => reason,
+  };
+}
 
 class ReportSheet extends ConsumerStatefulWidget {
   const ReportSheet({super.key, required this.listingId});
@@ -26,6 +40,7 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
   }
 
   Future<void> _submit() async {
+    final strings = ref.read(appLocalizationsProvider);
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return;
 
@@ -35,7 +50,7 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
 
     if (reason == null || reason.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اختر سبباً أو اكتب تفاصيل البلاغ')),
+        SnackBar(content: Text(strings.reportChooseReason)),
       );
       return;
     }
@@ -52,12 +67,12 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إرسال البلاغ. شكراً لمساعدتك.')),
+        SnackBar(content: Text(strings.reportSubmittedThanks)),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذّر إرسال البلاغ')),
+        SnackBar(content: Text(strings.reportSubmitFailed)),
       );
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -66,6 +81,8 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(appLocalizationsProvider);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.viewInsetsOf(context).bottom,
@@ -78,17 +95,23 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'الإبلاغ عن الإعلان',
+                strings.reportThisListing,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              ...ReportReasons.options.map(
-                (reason) => RadioListTile<String>(
-                  title: Text(reason),
-                  value: reason,
-                  groupValue: _selected,
-                  onChanged: (v) => setState(() => _selected = v),
+              RadioGroup<String>(
+                groupValue: _selected,
+                onChanged: (v) => setState(() => _selected = v),
+                child: Column(
+                  children: ReportReasons.options
+                      .map(
+                        (reason) => RadioListTile<String>(
+                          title: Text(_localizedReportReason(strings, reason)),
+                          value: reason,
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
               if (_selected == ReportReasons.other) ...[
@@ -97,9 +120,9 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
                   controller: _otherController,
                   maxLines: 3,
                   textDirection: TextDirection.rtl,
-                  decoration: const InputDecoration(
-                    labelText: 'تفاصيل البلاغ',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: strings.reportDetailsLabel,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -112,7 +135,7 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('إرسال البلاغ'),
+                    : Text(strings.submitReport),
               ),
             ],
           ),

@@ -1,48 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 import 'app.dart';
-import 'core/config/groq_config.dart';
-import 'core/config/maps_config.dart';
+import 'app_bootstrap.dart';
 import 'core/constants/app_strings.dart';
 import 'core/supabase/supabase_client.dart';
-import 'core/utils/secure_log.dart';
-import 'features/chat/widgets/onesignal_handler.dart';
-
-Future<void> _bootstrap() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  timeago.setLocaleMessages('ar', timeago.ArMessages());
-
-  try {
-    await dotenv.load(fileName: '.env');
-  } catch (_) {
-    if (kDebugMode) {
-      SecureLog.debug(
-        'dotenv: no bundled .env — use --dart-define-from-file=env.json for release',
-      );
-    }
-  }
-
-  await initializeSupabase();
-  await SharedPreferences.getInstance();
-
-  final oneSignalAppId = const String.fromEnvironment('ONESIGNAL_APP_ID').isNotEmpty
-      ? const String.fromEnvironment('ONESIGNAL_APP_ID')
-      : dotenv.env['ONESIGNAL_APP_ID'];
-  await OneSignalService.initialize(oneSignalAppId);
-  if (kDebugMode && oneSignalAppId != null && oneSignalAppId.isNotEmpty) {
-    SecureLog.debug('OneSignal: initialized');
-  } else if (kDebugMode) {
-    SecureLog.debug('OneSignal: ONESIGNAL_APP_ID not set — push disabled');
-  }
-  MapsConfig.logStatus();
-  GroqConfig.logStatus();
-}
 
 Future<void> main() async {
   const sentryDsn = String.fromEnvironment('SENTRY_DSN');
@@ -59,7 +22,7 @@ Future<void> main() async {
         };
       },
       appRunner: () async {
-        await _bootstrap();
+        await bootstrapSelloApp();
         runApp(
           ProviderScope(
             child: SupabaseConfig.isConfigured
@@ -72,7 +35,7 @@ Future<void> main() async {
     return;
   }
 
-  await _bootstrap();
+  await bootstrapSelloApp();
   runApp(
     ProviderScope(
       child: SupabaseConfig.isConfigured
@@ -81,7 +44,6 @@ Future<void> main() async {
     ),
   );
 }
-
 
 class _SetupRequiredApp extends StatelessWidget {
   const _SetupRequiredApp();

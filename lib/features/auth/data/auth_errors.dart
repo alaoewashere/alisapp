@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/utils/secure_log.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Logs raw auth errors in development for debugging Supabase responses.
 void logAuthError(Object error, [StackTrace? stackTrace]) {
@@ -22,8 +23,8 @@ void logAuthError(Object error, [StackTrace? stackTrace]) {
   }
 }
 
-/// Maps Supabase auth errors to clear Arabic messages for users.
-String authErrorMessage(Object error) {
+/// Maps Supabase auth errors to localized user messages.
+String authErrorMessage(Object error, AppLocalizations l10n) {
   logAuthError(error);
 
   if (error is AuthException) {
@@ -31,21 +32,21 @@ String authErrorMessage(Object error) {
     final message = error.message.toLowerCase();
 
     if (_isNetworkError(error, message, code)) {
-      return 'تحقق من الاتصال بالإنترنت';
+      return l10n.authNetworkError;
     }
     if (_isRateLimited(code, message, error.statusCode)) {
-      return _rateLimitMessage(error.message);
+      return _rateLimitMessage(error.message, l10n);
     }
     if (message.contains('invalid login credentials') ||
         code.contains('invalid_credentials')) {
-      return 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+      return l10n.authInvalidCredentials;
     }
     if (code.contains('email_address_invalid') ||
         code.contains('invalid_email') ||
         (message.contains('email') &&
             message.contains('invalid') &&
             !message.contains('credentials'))) {
-      return 'البريد الإلكتروني غير صالح';
+      return l10n.authInvalidEmail;
     }
     if (message.contains('user already registered') ||
         message.contains('already registered') ||
@@ -53,7 +54,7 @@ String authErrorMessage(Object error) {
         message.contains('email address is already') ||
         code.contains('user_already_exists') ||
         code.contains('email_exists')) {
-      return 'هذا البريد مسجل مسبقاً';
+      return l10n.authEmailExists;
     }
     if (code.contains('weak_password') ||
         message.contains('weak password') ||
@@ -64,45 +65,31 @@ String authErrorMessage(Object error) {
                 message.contains('contain at least one') ||
                 message.contains('pwned') ||
                 message.contains('easy to guess')))) {
-      return weakPasswordMessage;
+      return l10n.validationWeakPassword;
     }
     if (message.contains('email not confirmed')) {
-      return 'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول.';
+      return l10n.authEmailNotConfirmed;
     }
     if (message.contains('signup') && message.contains('disabled')) {
-      return 'التسجيل غير متاح حالياً.';
-    }
-    if (message.contains('messaging service') &&
-        message.contains('no phone numbers')) {
-      return 'خدمة Twilio لا تحتوي على أرقام إرسال.\n'
-          'Twilio → Messaging → Services → souqiq-otp → Sender Pool → Add Senders';
+      return l10n.authSignupDisabled;
     }
     if (code.contains('sms_send_failed') ||
         (message.contains('sms') && message.contains('fail'))) {
-      return 'تعذّر إرسال الرسالة. تحقق من إعدادات SMS في Supabase.';
+      return l10n.authSmsFailed;
     }
     if (message.contains('phone') && message.contains('invalid')) {
-      return 'رقم الهاتف غير صالح. استخدم الصيغة +9647XXXXXXXX.';
-    }
-    if (message.contains('twilio')) {
-      return 'مزود SMS غير مُعدّ في Supabase. راجع supabase/README.md';
+      return l10n.authPhoneInvalidFormat;
     }
 
-    return error.message.isNotEmpty
-        ? error.message
-        : 'حدث خطأ أثناء المصادقة. حاول مرة أخرى.';
+    return error.message.isNotEmpty ? error.message : l10n.authGenericError;
   }
 
   if (_isNetworkError(error, error.toString().toLowerCase(), '')) {
-    return 'تحقق من الاتصال بالإنترنت';
+    return l10n.authNetworkError;
   }
 
-  return 'تعذّر إكمال العملية. حاول مرة أخرى.';
+  return l10n.authOperationFailed;
 }
-
-const weakPasswordMessage =
-    'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، '
-    'حرفاً كبيراً وصغيراً، رقماً، ورمزاً خاصاً';
 
 bool _isRateLimited(String code, String message, String? statusCode) {
   if (statusCode == '429') return true;
@@ -114,14 +101,14 @@ bool _isRateLimited(String code, String message, String? statusCode) {
       message.contains('you can only request this after');
 }
 
-String _rateLimitMessage(String rawMessage) {
+String _rateLimitMessage(String rawMessage, AppLocalizations l10n) {
   final secondsMatch =
       RegExp(r'after (\d+) seconds?', caseSensitive: false).firstMatch(rawMessage);
   final seconds = secondsMatch?.group(1);
   if (seconds != null) {
-    return 'طلبات كثيرة. انتظر $seconds ثانية ثم حاول مرة أخرى.';
+    return l10n.authRateLimitSeconds(seconds);
   }
-  return 'طلبات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.';
+  return l10n.authRateLimitGeneric;
 }
 
 bool _isNetworkError(Object error, String message, String code) {

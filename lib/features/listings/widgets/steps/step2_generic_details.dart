@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/l10n/l10n_provider.dart';
 import '../../../../core/utils/digit_input_formatter.dart';
 import '../../../../theme/app_form_fields.dart';
 import '../../../../theme/app_text_styles.dart';
@@ -42,6 +42,7 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
     final theme = Theme.of(context);
+    final strings = ref.watch(appLocalizationsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -51,7 +52,7 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'تفاصيل الإعلان',
+              strings.listingDetailsTitle,
               style: AppTextStyles.headline.copyWith(fontSize: 20),
             ),
             if (state.categoryPath.isNotEmpty) ...[
@@ -66,7 +67,7 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
             ],
             const SizedBox(height: 16),
             const Step2TitleDescriptionFields(),
-            Text('نوع الإعلان *', style: theme.textTheme.titleSmall),
+            Text(strings.listingTypeLabel, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             SegmentedButton<ListingType>(
               segments: ListingType.values
@@ -83,18 +84,18 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
               },
             ),
             const SizedBox(height: 16),
-            AppFieldGroupLabel(label: 'السعر', required: true),
+            AppFieldGroupLabel(label: strings.priceLabel, required: true),
             AppFormFieldGroup(
               children: [
                 TextField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
-                  inputFormatters: [appDigitsOnly()],
+                  inputFormatters: [appThousands()],
                   textDirection: TextDirection.ltr,
                   style: AppTextStyles.price.copyWith(fontSize: 15),
                   decoration: AppFormDecorations.underline(
                     hintText: '0',
-                    suffixText: 'د.ع',
+                    suffixText: strings.currencyIqd,
                   ),
                   onChanged: (v) {
                     final parsed = double.tryParse(v.replaceAll(',', ''));
@@ -106,18 +107,18 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('قابل للتفاوض'),
+              title: Text(strings.negotiable),
               value: state.isNegotiable,
               onChanged: (v) => notifier.updateField('isNegotiable', v),
             ),
             const SizedBox(height: 8),
-            Text('الحالة *', style: theme.textTheme.titleSmall),
+            Text(strings.conditionLabel, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: _ConditionToggle(
-                    label: 'جديد',
+                    label: strings.conditionNew,
                     selected: state.condition == ListingCondition.newItem,
                     onTap: () => notifier.updateField(
                       'condition',
@@ -128,7 +129,7 @@ class _Step2GenericDetailsState extends ConsumerState<Step2GenericDetails> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _ConditionToggle(
-                    label: 'مستعمل',
+                    label: strings.conditionUsed,
                     selected: state.condition == ListingCondition.used,
                     onTap: () => notifier.updateField(
                       'condition',

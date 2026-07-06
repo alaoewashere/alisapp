@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/l10n/enum_localizations.dart';
+import '../../core/l10n/l10n_provider.dart';
 import '../models/listing_model.dart';
 
 /// Visual size preset for [PackageBadge].
@@ -11,8 +14,8 @@ enum PackageBadgeSize {
   large,
 }
 
-/// Luxury metallic pill for listing package tiers (مجاني / برو / مميز).
-class PackageBadge extends StatelessWidget {
+/// Luxury metallic pill for listing package tiers (Free / Pro / Premium).
+class PackageBadge extends ConsumerWidget {
   const PackageBadge({
     super.key,
     required this.package,
@@ -34,10 +37,11 @@ class PackageBadge extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
     final spec = _sizeSpec(size);
     final style = _PackageBadgeStyle.forPackage(package);
-    final label = package.badgeLabelAr;
+    final label = package.localizedBadge(strings);
     final includeStar = showStar ?? package == ListingPackage.premium;
 
     final badge = ClipRRect(

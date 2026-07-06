@@ -6,6 +6,7 @@ import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/video_utils.dart';
 import '../../../services/video_service.dart';
 import '../providers/post_listing_provider.dart';
@@ -17,6 +18,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(postListingProvider);
     final notifier = ref.read(postListingProvider.notifier);
+    final strings = ref.watch(appLocalizationsProvider);
     final canUpload = state.listingPackage.allowsListingVideo;
 
     return Padding(
@@ -42,7 +44,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'أضف فيديو توضيحي (حتى 60 ثانية)',
+                      strings.addDemoVideoTitle,
                       style: AppFonts.sans(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -55,8 +57,8 @@ class ListingVideoUploadSection extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 canUpload
-                    ? 'متاح لمشتركي Pro و Premium فقط'
-                    : 'ترقّ إلى Pro 🔒',
+                    ? strings.proSubscribersOnly
+                    : strings.upgradeToProLock,
                 style: AppFonts.sans(
                   fontSize: 12,
                   color: canUpload
@@ -75,7 +77,9 @@ class ListingVideoUploadSection extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'جاري معالجة الفيديو... ${(state.videoProcessingProgress * 100).round()}%',
+                  strings.processingVideoProgress(
+                    (state.videoProcessingProgress * 100).round().toString(),
+                  ),
                   textAlign: TextAlign.center,
                   style: AppFonts.cairo(
                     fontSize: 13,
@@ -97,7 +101,9 @@ class ListingVideoUploadSection extends ConsumerWidget {
                       ? () => _pickVideo(context, ref, ImageSource.gallery)
                       : () => notifier.goToStep(state.packageStep),
                   icon: Icon(canUpload ? Icons.video_library_outlined : Icons.lock),
-                  label: Text(canUpload ? 'اختر فيديو' : 'ترقّ إلى Pro 🔒'),
+                  label: Text(
+                    canUpload ? strings.chooseVideoLabel : strings.upgradeToProLock,
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: canUpload ? AppColors.volt : AppColors.premiumGold,
                     side: BorderSide(
@@ -116,7 +122,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
                   TextButton.icon(
                     onPressed: () => _pickVideo(context, ref, ImageSource.camera),
                     icon: const Icon(Icons.videocam, size: 18),
-                    label: const Text('تسجيل فيديو'),
+                    label: Text(strings.recordVideoLabel),
                   ),
                 ],
               ],
@@ -132,6 +138,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
     WidgetRef ref,
     ImageSource source,
   ) async {
+    final strings = ref.read(appLocalizationsProvider);
     final picked = await ImagePicker().pickVideo(
       source: source,
       maxDuration: const Duration(seconds: 90),
@@ -150,7 +157,7 @@ class ListingVideoUploadSection extends ConsumerWidget {
     } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذّر معالجة الفيديو')),
+          SnackBar(content: Text(strings.videoProcessFailed)),
         );
       }
     }

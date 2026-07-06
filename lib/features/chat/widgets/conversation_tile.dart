@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/l10n/category_locale.dart';
+import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/chat_date_utils.dart';
 import '../../../shared/models/conversation_model.dart';
 import 'chat_user_avatar.dart';
 import 'message_bubble.dart';
 
 /// Modern card-style row for a single conversation in the inbox.
-class ConversationTile extends StatelessWidget {
+class ConversationTile extends ConsumerWidget {
   const ConversationTile({
     super.key,
     required this.conversation,
@@ -21,7 +24,9 @@ class ConversationTile extends StatelessWidget {
   final VoidCallback onLongPress;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strings = ref.watch(appLocalizationsProvider);
+    final localeCode = ref.watch(categoryLocaleCodeProvider);
     final hasUnread = conversation.unreadCount > 0;
     final time = conversation.lastMessageTime ?? conversation.createdAt;
     final lastTime = conversation.lastMessageTime ?? conversation.createdAt;
@@ -64,7 +69,7 @@ class ConversationTile extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              conversation.otherUserName ?? 'مستخدم',
+                              conversation.otherUserName ?? strings.defaultUser,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppFonts.cairo(
@@ -78,7 +83,11 @@ class ConversationTile extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            formatConversationTimeAr(time),
+                            formatConversationTime(
+                              time,
+                              strings,
+                              languageCode: localeCode,
+                            ),
                             style: AppFonts.cairo(
                               fontSize: 10,
                               color: AppColors.textMuted,
@@ -91,7 +100,8 @@ class ConversationTile extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              conversation.lastMessage ?? 'ابدأ المحادثة',
+                              conversation.lastMessage ??
+                                  strings.startChatDefault,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppFonts.tajawal(
