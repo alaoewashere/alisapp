@@ -7,7 +7,7 @@
 	<key>signingStyle</key><string>manual</string>
 	<key>signingCertificate</key><string>Apple Distribution</string>
 	<key>provisioningProfiles</key>
-	<dict><key>com.iraq.marketplace.souqiq</key><string>SOUQAK App Store CLI</string></dict>
+	<dict><key>com.iraq.marketplace.souqiq</key><string>SOUQAK AppStore</string></dict>
 	<key>destination</key><string>export</string>
 	<key>uploadSymbols</key><true/>
 </dict>
