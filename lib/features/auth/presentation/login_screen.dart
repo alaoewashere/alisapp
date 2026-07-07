@@ -97,7 +97,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final auth = ref.watch(authNotifierProvider);
     final googleLoading = ref.watch(isGoogleSignInLoadingProvider);
     final appleLoading = ref.watch(isAppleSignInLoadingProvider);
-    final oauthLoading = googleLoading || appleLoading;
+    final facebookLoading = ref.watch(isFacebookSignInLoadingProvider);
+    final oauthLoading = googleLoading || appleLoading || facebookLoading;
     final emailLoading = auth.status == AuthFlowStatus.loading &&
         auth.phone == null &&
         auth.oauthLoading == null;
@@ -236,6 +237,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: AuthSocialLoginRow(
                             googleLoading: googleLoading,
                             appleLoading: appleLoading,
+                            facebookLoading: facebookLoading,
                             onGooglePressed: canSubmit
                                 ? () => ref
                                     .read(authNotifierProvider.notifier)
@@ -245,6 +247,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ? () => ref
                                     .read(authNotifierProvider.notifier)
                                     .signInWithApple()
+                                : null,
+                            onFacebookPressed: canSubmit
+                                ? () => ref
+                                    .read(authNotifierProvider.notifier)
+                                    .signInWithFacebook()
                                 : null,
                             showPhone: _phoneLoginEnabled,
                             onPhonePressed: canSubmit

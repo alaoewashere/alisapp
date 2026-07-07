@@ -20,6 +20,7 @@ enum AuthFlowStatus {
 enum OAuthLoading {
   google,
   apple,
+  facebook,
 }
 
 class AuthFlowState {
@@ -366,6 +367,29 @@ class AuthNotifier extends Notifier<AuthFlowState> {
     }
   }
 
+  Future<Result<bool>> signInWithFacebook() async {
+    state = state.copyWith(
+      status: AuthFlowStatus.loading,
+      isGuest: false,
+      clearError: true,
+      oauthLoading: OAuthLoading.facebook,
+    );
+
+    final result = await ref.read(authRepositoryProvider).signInWithFacebook();
+
+    switch (result) {
+      case Success():
+        return const Success(true);
+      case Failure(:final message):
+        state = state.copyWith(
+          status: AuthFlowStatus.error,
+          errorMessage: message,
+          clearOAuthLoading: true,
+        );
+        return Failure(message);
+    }
+  }
+
   Future<Result<bool>> signInWithApple() async {
     state = state.copyWith(
       status: AuthFlowStatus.loading,
@@ -481,4 +505,10 @@ final isAppleSignInLoadingProvider = Provider<bool>((ref) {
   final auth = ref.watch(authNotifierProvider);
   return auth.status == AuthFlowStatus.loading &&
       auth.oauthLoading == OAuthLoading.apple;
+});
+
+final isFacebookSignInLoadingProvider = Provider<bool>((ref) {
+  final auth = ref.watch(authNotifierProvider);
+  return auth.status == AuthFlowStatus.loading &&
+      auth.oauthLoading == OAuthLoading.facebook;
 });

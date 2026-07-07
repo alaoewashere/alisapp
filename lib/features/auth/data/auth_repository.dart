@@ -490,6 +490,24 @@ class AuthRepository {
     }
   }
 
+  Future<Result<bool>> signInWithFacebook() async {
+    try {
+      if (kDebugMode) {
+        debugPrint('signInWithFacebook → launching OAuth');
+      }
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.facebook,
+        redirectTo: AppConstants.authRedirectUri,
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+      return const Success(true);
+    } on AuthException catch (e) {
+      return Failure(authErrorMessage(e, _strings()), cause: e);
+    } catch (e) {
+      return Failure(authErrorMessage(e, _strings()), cause: e);
+    }
+  }
+
   Future<Result<bool>> signInWithApple() async {
     try {
       if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {

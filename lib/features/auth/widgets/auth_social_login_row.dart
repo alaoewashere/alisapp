@@ -11,6 +11,7 @@ class AuthSocialLoginRow extends StatelessWidget {
     this.onApplePressed,
     this.appleLoading = false,
     this.onFacebookPressed,
+    this.facebookLoading = false,
     this.onPhonePressed,
     this.showPhone = true,
   });
@@ -20,6 +21,7 @@ class AuthSocialLoginRow extends StatelessWidget {
   final VoidCallback? onApplePressed;
   final bool appleLoading;
   final VoidCallback? onFacebookPressed;
+  final bool facebookLoading;
   final VoidCallback? onPhonePressed;
   final bool showPhone;
 
@@ -49,6 +51,7 @@ class AuthSocialLoginRow extends StatelessWidget {
         const SizedBox(width: _gap),
         _SocialIconButton(
           assetPath: 'assets/icons/facebook.svg',
+          loading: facebookLoading,
           onPressed: onFacebookPressed,
         ),
         if (showPhone) ...[
