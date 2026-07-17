@@ -1215,19 +1215,20 @@ class ListingsRepository {
         .order('bumped_at', ascending: false);
   }
 
+  /// Builds filter chain only — never call order/limit/range before this returns.
+  ///
   /// Listings are tagged at the leaf (brand/model) category level, but users
   /// filter at any ancestor (e.g. "Vehicles" or "Mercedes-Benz"). Large
   /// branches can have thousands of descendant ids, so instead of pulling
   /// them all to the client and sending a huge `category_id IN (...)` list
   /// (which was slow enough to look like an infinite load), the containment
-  /// check runs inside Postgres via this set-returning RPC.
-  dynamic _listingsQuerySourceForCategory(int categoryId, String select) {
-    return _client
-        .rpc('listings_under_category', params: {'root_id': categoryId})
-        .select(select);
-  }
-
-  /// Builds filter chain only — never call order/limit/range before this returns.
+  /// check runs inside Postgres via the `listings_under_category` RPC.
+  ///
+  /// `.rpc(fn).select(cols)` returns a `PostgrestTransformBuilder` (no
+  /// `.eq()`/`.gte()`/etc.), unlike `.from(table).select(cols)` which stays
+  /// filterable — so for the RPC path, `.select()` must be the LAST call,
+  /// after every filter. That's why this method branches on categoryId
+  /// instead of picking the select column list upfront like the old code did.
   Future<dynamic> _filteredListingsQuery({
     int? categoryId,
     String? listingType,
@@ -1235,9 +1236,13 @@ class ListingsRepository {
     String select = _listingSelect,
   }) async {
     final effectiveCategoryId = filter?.effectiveCategoryId ?? categoryId;
+    final isRpc = effectiveCategoryId != null;
 
-    dynamic query = effectiveCategoryId != null
-        ? _listingsQuerySourceForCategory(effectiveCategoryId, select)
+    dynamic query = isRpc
+        ? _client.rpc(
+            'listings_under_category',
+            params: {'root_id': effectiveCategoryId},
+          )
         : _client.from('listings').select(select);
 
     query = query.eq('status', 'approved').eq('availability', 'active');
@@ -1246,7 +1251,8 @@ class ListingsRepository {
       query = query.eq('listing_type', listingType);
     }
 
-    return _applyFilters(query, filter);
+    query = await _applyFilters(query, filter);
+    return isRpc ? query.select(select) : query;
   }
 
   Future<dynamic> _applyFilters(dynamic query, FilterModel? filters) async {
