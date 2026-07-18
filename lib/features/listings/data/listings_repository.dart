@@ -162,7 +162,7 @@ class ListingsRepository {
     int pageSize = AppConstants.listingsPageSize,
     String? userIdForFavorites,
   }) async {
-    final filteredQuery = await _filteredListingsQuery(
+    final filteredQuery = _filteredListingsQuery(
       categoryId: int.parse(categoryId),
       listingType: listingType,
       filter: filter,
@@ -183,7 +183,7 @@ class ListingsRepository {
     int pageSize = AppConstants.listingsPageSize,
     String? userIdForFavorites,
   }) async {
-    final filteredQuery = await _filteredListingsQuery(filter: filter);
+    final filteredQuery = _filteredListingsQuery(filter: filter);
 
     final data = await _applySorting(filteredQuery, filter.sortBy).range(
       page * pageSize,
@@ -196,7 +196,7 @@ class ListingsRepository {
   }
 
   Future<int> countSearchResults(FilterModel filter) async {
-    final filteredQuery = await _filteredListingsQuery(filter: filter, select: 'id');
+    final filteredQuery = _filteredListingsQuery(filter: filter, select: 'id');
     final data = await filteredQuery;
     return (data as List).length;
   }
@@ -251,7 +251,7 @@ class ListingsRepository {
     FilterModel filters = const FilterModel(),
     String? userIdForFavorites,
   }) async {
-    final filteredQuery = await _filteredListingsQuery(filter: filters);
+    final filteredQuery = _filteredListingsQuery(filter: filters);
 
     final data = await filteredQuery
         .order('bumped_at', ascending: false)
@@ -1217,6 +1217,17 @@ class ListingsRepository {
 
   /// Builds filter chain only — never call order/limit/range before this returns.
   ///
+  /// Deliberately NOT async. `PostgrestBuilder implements Future<T>` (see
+  /// postgrest package source) — its `.then()` triggers the actual HTTP
+  /// request. If this function were `async` and returned a builder as its
+  /// tail expression, Dart's async machinery adopts/awaits it right there,
+  /// so the caller's `await _filteredListingsQuery(...)` would receive the
+  /// already-fetched rows instead of the builder — breaking any further
+  /// `.select()`/`.order()`/`.range()` chaining with "NoSuchMethodError:
+  /// List has no instance method '...'". Staying synchronous all the way
+  /// through means the builder is only ever executed once, by the caller's
+  /// single final `await` after `.order().range()` is chained on.
+  ///
   /// Listings are tagged at the leaf (brand/model) category level, but users
   /// filter at any ancestor (e.g. "Vehicles" or "Mercedes-Benz"). Large
   /// branches can have thousands of descendant ids, so instead of pulling
@@ -1229,12 +1240,12 @@ class ListingsRepository {
   /// filterable — so for the RPC path, `.select()` must be the LAST call,
   /// after every filter. That's why this method branches on categoryId
   /// instead of picking the select column list upfront like the old code did.
-  Future<dynamic> _filteredListingsQuery({
+  dynamic _filteredListingsQuery({
     int? categoryId,
     String? listingType,
     FilterModel? filter,
     String select = _listingSelect,
-  }) async {
+  }) {
     final effectiveCategoryId = filter?.effectiveCategoryId ?? categoryId;
     final isRpc = effectiveCategoryId != null;
 
@@ -1251,11 +1262,19 @@ class ListingsRepository {
       query = query.eq('listing_type', listingType);
     }
 
-    query = await _applyFilters(query, filter);
+    query = _applyFilters(query, filter);
     return isRpc ? query.select(select) : query;
   }
 
-  Future<dynamic> _applyFilters(dynamic query, FilterModel? filters) async {
+  /// Deliberately NOT async: `query` is a lazy Postgrest builder, itself
+  /// Future-like. An `async` wrapper here that gets `await`-ed by a caller
+  /// forces the builder to execute immediately and resolve to the actual
+  /// rows — so any `.select()`/`.order()` chained on the result afterward
+  /// (as `_filteredListingsQuery` does for the RPC path) fails with
+  /// "NoSuchMethodError: List has no instance method 'select'". Keeping this
+  /// synchronous means it only ever chains filters onto the builder without
+  /// ever triggering execution.
+  dynamic _applyFilters(dynamic query, FilterModel? filters) {
     if (filters == null) return query;
 
     if (filters.query != null && filters.query!.trim().isNotEmpty) {
