@@ -14,6 +14,7 @@ import '../../core/supabase/supabase_client.dart';
 import '../../core/utils/result.dart';
 import '../../core/providers/session_reset.dart';
 import '../../shared/widgets/app_back_button.dart';
+import '../../features/payment/payment_method_sheet.dart';
 import '../../features/payment/zaincash_checkout_screen.dart';
 import '../../features/payment/zaincash_service.dart';
 import '../../features/profile/providers/profile_provider.dart';
@@ -200,58 +201,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   /// Shows the list of available payment methods. ZainCash is live; the others
   /// are placeholders shown as "قريباً" until those merchant accounts exist.
-  void _startPaymentCheckout() {
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Text(
-                  'اختر طريقة الدفع',
-                  style: AppFonts.cairo(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: _labelDark,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _PaymentMethodTile(
-                icon: Icons.account_balance_wallet_outlined,
-                title: 'ZainCash',
-                subtitle: 'محفظة زين كاش',
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  _startZainCashCheckout();
-                },
-              ),
-              const SizedBox(height: 10),
-              const _PaymentMethodTile(
-                icon: Icons.credit_card,
-                title: 'بطاقة كي (Qi Card)',
-                subtitle: 'قريباً',
-                enabled: false,
-              ),
-              const SizedBox(height: 10),
-              const _PaymentMethodTile(
-                icon: Icons.payment,
-                title: 'Visa / Mastercard',
-                subtitle: 'قريباً',
-                enabled: false,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<void> _startPaymentCheckout() async {
+    final chose = await showPaymentMethodSheet(context);
+    if (chose && mounted) _startZainCashCheckout();
   }
 
   Future<void> _startZainCashCheckout() async {
@@ -627,83 +579,6 @@ class _SettingsAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return UserAvatar(avatarSeed: avatarSeed, size: size);
-  }
-}
-
-class _PaymentMethodTile extends StatelessWidget {
-  const _PaymentMethodTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.onTap,
-    this.enabled = true,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = enabled ? AppColors.textDark : AppColors.textMuted;
-    return Material(
-      color: AppColors.fieldCarbon,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: enabled ? onTap : null,
-        child: Opacity(
-          opacity: enabled ? 1 : 0.6,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(icon, color: AppColors.primary, size: 22),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: AppFonts.cairo(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: color,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: AppFonts.cairo(
-                          fontSize: 12,
-                          color: const Color(0xFF888888),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (enabled)
-                  const Icon(Icons.chevron_left, color: Color(0xFFBBBBBB))
-                else
-                  const Icon(Icons.lock_outline,
-                      color: Color(0xFFBBBBBB), size: 18),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 
