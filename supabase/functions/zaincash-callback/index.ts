@@ -32,11 +32,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const payload = await verifyJwt(token, cfg.secret)
+    const payload = await verifyJwt(token, cfg.clientSecret)
     if (!payload) {
       return redirectTo(sentinel('failed', ''))
     }
 
+    // NOTE: field names below are carried over from the old v1 integration
+    // and not yet confirmed against a real v2 callback payload (ZainCash's
+    // public docs describe the flow but not the exact JWT claim names for
+    // this API version). Log the full payload once during the first live
+    // test transaction and adjust these lookups if they come back empty.
+    console.log('zaincash callback payload', JSON.stringify(payload))
     const orderId = String(payload.orderid ?? payload.orderId ?? '')
     const rawStatus = String(payload.status ?? 'failed')
     const status =

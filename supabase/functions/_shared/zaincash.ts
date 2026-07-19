@@ -1,59 +1,59 @@
-// Server-side ZainCash helpers. The secret lives ONLY here (in env), never in
-// the mobile app. Signs the JWT, calls the gateway, verifies redirect tokens.
+// Server-side ZainCash helpers. The client secret lives ONLY here (in env),
+// never in the mobile app.
+//
+// ZainCash moved this merchant onto their Payment Gateway API v2, which is a
+// different integration entirely from the classic v1 API (HMAC-signed JWT
+// request, form-urlencoded body, `/transaction/init` directly on
+// test.zaincash.iq): v2 uses OAuth2 client_credentials for auth and a JSON
+// REST body at `/api/v2/payment-gateway/transaction/init`. Discovered via
+// docs.zaincash.iq (v2 developer guide) after the v1-shaped request 404'd
+// against the `pg-api.zaincash.iq` host ZainCash assigned this merchant.
 
 export interface ZainCashConfig {
-  merchantId: string
-  msisdn: string
-  secret: string
+  clientId: string
+  clientSecret: string
   isTest: boolean
   serviceType: string
   lang: string
-  redirectUrl: string // ZainCash redirects the WebView here (our callback fn)
+  successUrl: string // ZainCash redirects here on success (our callback fn)
+  failureUrl: string // ZainCash redirects here on failure (our callback fn)
   returnUrl: string // where the callback bounces the WebView so the app closes it
+  baseUrlOverride?: string // set when ZainCash assigns a merchant-specific gateway host
 }
 
-// Defaults are ZainCash's PUBLIC sandbox credentials — safe for testing, they
-// never move real money. Override every value with env vars in production.
 export function loadZainCashConfig(): ZainCashConfig {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+  const callbackUrl =
+    Deno.env.get('ZAINCASH_CALLBACK_URL') ??
+    `${supabaseUrl}/functions/v1/zaincash-callback`
   return {
-    merchantId:
-      Deno.env.get('ZAINCASH_MERCHANT_ID') ?? '5ffacf6612b5777c6d44266f',
-    msisdn: Deno.env.get('ZAINCASH_MSISDN') ?? '9647835077893',
-    secret:
-      Deno.env.get('ZAINCASH_SECRET') ??
-      '$2y$10$hBbAZo2GfSSvyqAyV2SaqOfYewgYpfR1O19gIh4SqyGWdmySZYPuS',
+    clientId: Deno.env.get('ZAINCASH_CLIENT_ID') ?? '',
+    clientSecret: Deno.env.get('ZAINCASH_CLIENT_SECRET') ?? '',
     isTest: (Deno.env.get('ZAINCASH_IS_TEST') ?? 'true') !== 'false',
-    serviceType: Deno.env.get('ZAINCASH_SERVICE_TYPE') ?? 'Sello Marketplace',
+    serviceType: Deno.env.get('ZAINCASH_SERVICE_TYPE') ?? 'SOUQAK',
     lang: Deno.env.get('ZAINCASH_LANG') ?? 'ar',
-    redirectUrl:
-      Deno.env.get('ZAINCASH_REDIRECT_URL') ??
-      `${supabaseUrl}/functions/v1/zaincash-callback`,
+    // Both point at our own callback fn by default — it inspects the signed
+    // JWT's own status field, so one handler covers success and failure.
+    successUrl: Deno.env.get('ZAINCASH_SUCCESS_URL') ?? callbackUrl,
+    failureUrl: Deno.env.get('ZAINCASH_FAILURE_URL') ?? callbackUrl,
     returnUrl:
       Deno.env.get('ZAINCASH_RETURN_URL') ??
       'https://sello.app/zaincash/return',
+    baseUrlOverride: Deno.env.get('ZAINCASH_BASE_URL') || undefined,
   }
 }
 
 export function baseUrl(cfg: ZainCashConfig): string {
-  return cfg.isTest ? 'https://test.zaincash.iq' : 'https://api.zaincash.iq'
+  if (cfg.baseUrlOverride) return cfg.baseUrlOverride
+  return cfg.isTest
+    ? 'https://pg-api-uat.zaincash.iq'
+    : 'https://pg-api.zaincash.iq'
 }
 
-export function payUrl(cfg: ZainCashConfig, transactionId: string): string {
-  return `${baseUrl(cfg)}/transaction/pay?id=${transactionId}`
-}
-
-// --- base64url ----------------------------------------------------------
-
-function b64urlEncode(bytes: Uint8Array): string {
-  let bin = ''
-  for (const b of bytes) bin += String.fromCharCode(b)
-  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-
-function b64urlEncodeString(s: string): string {
-  return b64urlEncode(new TextEncoder().encode(s))
-}
+// --- base64url ------------------------------------------------------------
+// Only needed to verify (not sign) the JWT ZainCash attaches to the redirect
+// back to `successUrl`/`failureUrl` — v2 no longer requires us to sign a JWT
+// for the init request itself (that's replaced by the OAuth2 bearer token).
 
 function b64urlDecode(input: string): Uint8Array {
   const padded = input.replace(/-/g, '+').replace(/_/g, '/')
@@ -75,22 +75,6 @@ async function hmacKey(secret: string): Promise<CryptoKey> {
 
 // --- JWT (HS256) --------------------------------------------------------
 
-export async function signJwt(
-  payload: Record<string, unknown>,
-  secret: string,
-): Promise<string> {
-  const header = b64urlEncodeString(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-  const body = b64urlEncodeString(JSON.stringify(payload))
-  const data = `${header}.${body}`
-  const key = await hmacKey(secret)
-  const sig = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    new TextEncoder().encode(data),
-  )
-  return `${data}.${b64urlEncode(new Uint8Array(sig))}`
-}
-
 export async function verifyJwt(
   token: string,
   secret: string,
@@ -110,9 +94,47 @@ export async function verifyJwt(
 
 // --- gateway calls ------------------------------------------------------
 
+interface TokenResult {
+  ok: boolean
+  accessToken?: string
+  error?: string
+}
+
+// v2 auth: OAuth2 client_credentials grant. No caching across invocations —
+// edge functions are short-lived/stateless, and token volume here is low
+// enough that fetching a fresh one per checkout isn't worth the complexity.
+async function getAccessToken(cfg: ZainCashConfig): Promise<TokenResult> {
+  const res = await fetch(`${baseUrl(cfg)}/oauth2/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: cfg.clientId,
+      client_secret: cfg.clientSecret,
+    }),
+  })
+
+  const rawBody = await res.text()
+  let data: Record<string, unknown> = {}
+  try {
+    data = JSON.parse(rawBody)
+  } catch {
+    // logged below
+  }
+
+  if (res.ok && typeof data.access_token === 'string') {
+    return { ok: true, accessToken: data.access_token }
+  }
+  console.error(
+    `zaincash /oauth2/token -> HTTP ${res.status} url=${baseUrl(cfg)}/oauth2/token body=${rawBody.slice(0, 500)}`,
+  )
+  return { ok: false, error: 'token_failed' }
+}
+
 export interface InitResult {
   ok: boolean
   transactionId?: string
+  redirectUrl?: string
   error?: string
 }
 
@@ -120,38 +142,68 @@ export async function initTransaction(
   cfg: ZainCashConfig,
   params: { amount: number; orderId: string; serviceType?: string },
 ): Promise<InitResult> {
-  const now = Math.floor(Date.now() / 1000)
-  const token = await signJwt(
+  const token = await getAccessToken(cfg)
+  if (!token.ok || !token.accessToken) {
+    return { ok: false, error: token.error ?? 'token_failed' }
+  }
+
+  const res = await fetch(
+    `${baseUrl(cfg)}/api/v2/payment-gateway/transaction/init`,
     {
-      amount: params.amount,
-      serviceType: params.serviceType ?? cfg.serviceType,
-      msisdn: cfg.msisdn,
-      orderId: params.orderId,
-      redirectUrl: cfg.redirectUrl,
-      iat: now,
-      exp: now + 60 * 60 * 4,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token.accessToken}`,
+      },
+      body: JSON.stringify({
+        language: cfg.lang,
+        // Must be a standard 36-char UUID (ZainCash rejects our own
+        // `sello-<id>-<uuid>` order id format here) — orderId below carries
+        // our own reference instead, which the gateway accepts as any string.
+        externalReferenceId: crypto.randomUUID(),
+        orderId: params.orderId,
+        serviceType: params.serviceType ?? cfg.serviceType,
+        amount: { value: String(params.amount), currency: 'IQD' },
+        redirectUrls: {
+          successUrl: cfg.successUrl,
+          failureUrl: cfg.failureUrl,
+        },
+      }),
     },
-    cfg.secret,
   )
 
-  const res = await fetch(`${baseUrl(cfg)}/transaction/init`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      token,
-      merchantId: cfg.merchantId,
-      lang: cfg.lang,
-    }),
-  })
-
-  const data = await res.json().catch(() => ({}))
-  if (res.ok && data?.id) {
-    return { ok: true, transactionId: String(data.id) }
+  const rawBody = await res.text()
+  let data: Record<string, unknown> = {}
+  try {
+    data = JSON.parse(rawBody)
+  } catch {
+    // Non-JSON response (e.g. an HTML error page from a proxy/gateway) —
+    // rawBody is still logged below so the real cause is visible.
   }
-  const err = data?.err
+
+  const redirectUrl =
+    typeof data.redirectUrl === 'string' ? data.redirectUrl : undefined
+  const details = data.transactionDetails as
+    | Record<string, unknown>
+    | undefined
+  const transactionId =
+    details && typeof details.transactionId === 'string'
+      ? details.transactionId
+      : undefined
+
+  if (res.ok && redirectUrl && transactionId) {
+    return { ok: true, transactionId, redirectUrl }
+  }
+
+  // Log full detail server-side; the client only ever sees the short `message`.
+  console.error(
+    `zaincash /transaction/init -> HTTP ${res.status} url=${baseUrl(cfg)}/api/v2/payment-gateway/transaction/init body=${rawBody.slice(0, 500)}`,
+  )
   const message =
-    err && typeof err === 'object'
-      ? String(err.msg ?? err.name ?? JSON.stringify(err))
-      : String(err ?? 'init_failed')
+    typeof data.message === 'string'
+      ? data.message
+      : typeof data.error === 'string'
+      ? data.error
+      : 'init_failed'
   return { ok: false, error: message }
 }

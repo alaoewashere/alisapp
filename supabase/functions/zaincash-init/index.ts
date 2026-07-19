@@ -5,7 +5,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 import { corsHeaders, jsonResponse } from '../_shared/security.ts'
-import { initTransaction, loadZainCashConfig, payUrl } from '../_shared/zaincash.ts'
+import { initTransaction, loadZainCashConfig } from '../_shared/zaincash.ts'
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('Origin')
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
       {
         order_id: orderId,
         transaction_id: init.transactionId,
-        pay_url: payUrl(cfg, init.transactionId),
+        pay_url: init.redirectUrl,
         return_url: cfg.returnUrl,
       },
       200,
