@@ -32,7 +32,7 @@ class ListingPackageOption {
 
 abstract final class ListingPackageConfig {
   /// When false, only standard tier is selectable; pro/premium show "Coming soon".
-  static const proAndPremiumEnabled = false;
+  static const proAndPremiumEnabled = true;
 
   /// Fee when posting standard tier after the free quota is used.
   static const paidStandardPriceIqd = 5000;

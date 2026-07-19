@@ -3,9 +3,6 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 
 import { corsHeaders, jsonResponse } from '../_shared/security.ts'
 
-// Opt-in for local/dev only. Production must approve via admin or validate store receipts.
-const AUTO_APPROVE = Deno.env.get('PURCHASE_AUTO_APPROVE') === 'true'
-
 Deno.serve(async (req) => {
   const origin = req.headers.get('Origin')
 
@@ -44,6 +41,11 @@ Deno.serve(async (req) => {
     const userName = (body?.user_name as string | undefined) ?? ''
     const userPhone = body?.user_phone as string | undefined
     const userEmail = body?.user_email as string | undefined
+    // ZainCash order id from a completed checkout — required. Every path that
+    // reaches this function (pro, premium, or standard-over-quota) is a paid
+    // package; free-tier posts never call verify-purchase at all (see
+    // PostListingNotifier.publishListing). So there is no legitimate
+    // "no payment reference" case here anymore.
     const paymentReference = body?.payment_reference as string | undefined
 
     if (!listingId || !packageType || price == null) {
@@ -51,6 +53,9 @@ Deno.serve(async (req) => {
     }
     if (!['pro', 'premium', 'standard'].includes(packageType)) {
       return jsonResponse({ error: 'invalid_package_type' }, 400, origin)
+    }
+    if (!paymentReference) {
+      return jsonResponse({ error: 'payment_reference_required' }, 400, origin)
     }
 
     const admin = createClient(supabaseUrl, serviceRoleKey, {
@@ -70,6 +75,34 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'not_listing_owner' }, 403, origin)
     }
 
+    // Verify the referenced ZainCash order actually belongs to this user,
+    // is marked paid (the callback function is the only thing that ever
+    // sets that, after checking ZainCash's signed redirect token), and
+    // covers at least the expected price — never trust the client's
+    // claimed price alone.
+    const { data: order, error: orderError } = await admin
+      .from('zaincash_orders')
+      .select('id, user_id, amount, status, listing_id')
+      .eq('order_id', paymentReference)
+      .maybeSingle()
+
+    if (orderError || !order) {
+      return jsonResponse({ error: 'payment_not_found' }, 404, origin)
+    }
+    if (order.user_id !== userData.user.id) {
+      return jsonResponse({ error: 'payment_not_owned' }, 403, origin)
+    }
+    if (order.status !== 'paid') {
+      return jsonResponse({ error: 'payment_not_completed' }, 402, origin)
+    }
+    if (Number(order.amount) < price) {
+      return jsonResponse({ error: 'payment_amount_mismatch' }, 402, origin)
+    }
+    // A single ZainCash order can only activate one package purchase.
+    if (order.listing_id && order.listing_id !== listingId) {
+      return jsonResponse({ error: 'payment_already_used' }, 409, origin)
+    }
+
     const { data: pending, error: pendingError } = await admin
       .from('pending_purchases')
       .insert({
@@ -80,7 +113,7 @@ Deno.serve(async (req) => {
         user_name: userName,
         user_phone: userPhone,
         user_email: userEmail,
-        payment_reference: paymentReference ?? null,
+        payment_reference: paymentReference,
         status: 'pending',
       })
       .select('id')
@@ -91,29 +124,32 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: 'pending_insert_failed' }, 500, origin)
     }
 
-    if (AUTO_APPROVE) {
-      const { data: purchaseId, error: approveError } = await admin.rpc(
-        'approve_pending_purchase',
-        { p_pending_id: pending.id },
-      )
+    // Payment is independently verified above (not a client-supplied flag),
+    // so it's safe to approve immediately rather than wait on an admin.
+    const { data: purchaseId, error: approveError } = await admin.rpc(
+      'approve_pending_purchase',
+      { p_pending_id: pending.id },
+    )
 
-      if (approveError) {
-        console.error('auto approve failed', approveError.message)
-        return jsonResponse(
-          { status: 'pending', pending_id: pending.id, error: 'auto_approve_failed' },
-          202,
-          origin,
-        )
-      }
-
+    if (approveError) {
+      console.error('auto approve failed', approveError.message)
       return jsonResponse(
-        { status: 'approved', pending_id: pending.id, purchase_id: purchaseId },
-        200,
+        { status: 'pending', pending_id: pending.id, error: 'auto_approve_failed' },
+        202,
         origin,
       )
     }
 
-    return jsonResponse({ status: 'pending', pending_id: pending.id }, 202, origin)
+    await admin
+      .from('zaincash_orders')
+      .update({ listing_id: listingId })
+      .eq('id', order.id)
+
+    return jsonResponse(
+      { status: 'approved', pending_id: pending.id, purchase_id: purchaseId },
+      200,
+      origin,
+    )
   } catch (err) {
     const message = err instanceof Error ? err.message : 'unknown_error'
     console.error('verify-purchase error', message)

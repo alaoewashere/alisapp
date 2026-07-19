@@ -892,6 +892,7 @@ class ListingsRepository {
     required String userName,
     String? userPhone,
     String? userEmail,
+    String? paymentReference,
   }) async {
     final response = await _client.functions.invoke(
       'verify-purchase',
@@ -902,6 +903,7 @@ class ListingsRepository {
         'user_name': userName,
         'user_phone': userPhone,
         'user_email': userEmail,
+        'payment_reference': paymentReference,
       },
     );
 
@@ -1114,6 +1116,13 @@ class ListingsRepository {
   }
 
   /// Applies a paid boost / package upgrade on an owned listing.
+  ///
+  /// [paymentReference] (a ZainCash order id from a completed checkout) is
+  /// required whenever this is a real paid upgrade — verified server-side
+  /// before anything changes. Purchase verification runs FIRST, and the
+  /// listing's is_featured/is_boosted/metadata only update after it
+  /// succeeds — recording the purchase after already flipping those flags
+  /// would leave a listing boosted even if payment verification then failed.
   Future<void> applyListingBoost({
     required String listingId,
     required String userId,
@@ -1126,7 +1135,22 @@ class ListingsRepository {
     required String userName,
     String? userPhone,
     String? userEmail,
+    String? paymentReference,
   }) async {
+    final packageType = targetPackage.purchasePackageType;
+    if (packageType != null && priceIqd > 0) {
+      await recordListingPurchase(
+        userId: userId,
+        listingId: listingId,
+        packageType: packageType,
+        price: priceIqd,
+        userName: userName,
+        userPhone: userPhone,
+        userEmail: userEmail,
+        paymentReference: paymentReference,
+      );
+    }
+
     final metadata = Map<String, dynamic>.from(currentMetadata);
     if (upgradePackage) {
       metadata['listing_package'] = targetPackage.value;
@@ -1154,19 +1178,6 @@ class ListingsRepository {
 
     if ((data as List).isEmpty) {
       throw StateError('تعذّر تحديث الإعلان');
-    }
-
-    final packageType = targetPackage.purchasePackageType;
-    if (packageType != null && priceIqd > 0) {
-      await recordListingPurchase(
-        userId: userId,
-        listingId: listingId,
-        packageType: packageType,
-        price: priceIqd,
-        userName: userName,
-        userPhone: userPhone,
-        userEmail: userEmail,
-      );
     }
   }
 

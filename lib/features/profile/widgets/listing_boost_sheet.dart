@@ -12,6 +12,7 @@ import '../../../core/supabase/supabase_client.dart';
 import '../../listings/data/listings_repository.dart';
 import '../data/profile_repository.dart';
 import '../../listings/constants/listing_package_config.dart';
+import '../../payment/require_zaincash_payment.dart';
 import '../utils/listing_boost_utils.dart';
 
 Future<void> showListingBoostSheet(
@@ -44,6 +45,18 @@ Future<void> showListingBoostSheet(
         final userId = ref.read(currentUserIdProvider);
         if (userId == null) return;
 
+        String? paymentReference;
+        if (option.priceIqd > 0) {
+          paymentReference = await requireZainCashPayment(
+            sheetContext,
+            amountIqd: option.priceIqd,
+            listingId: listing.id,
+            serviceType: 'SOUQAK - ${option.targetPackage.name} boost',
+          );
+          if (paymentReference == null) return;
+          if (!sheetContext.mounted) return;
+        }
+
         await ref.read(listingsRepositoryProvider).applyListingBoost(
               listingId: listing.id,
               userId: userId,
@@ -56,6 +69,7 @@ Future<void> showListingBoostSheet(
               userName: profile?.fullName ?? '',
               userPhone: profile?.phone,
               userEmail: profile?.email,
+              paymentReference: paymentReference,
             );
         if (sheetContext.mounted) Navigator.pop(sheetContext);
         onSuccess();

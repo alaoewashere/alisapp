@@ -25,6 +25,8 @@ import '../widgets/steps/step4_photos.dart';
 import '../widgets/steps/step5_review.dart';
 import '../widgets/steps/step_contact_preferences.dart';
 import '../widgets/steps/step_listing_package.dart';
+import '../../payment/require_zaincash_payment.dart';
+import '../../../shared/models/listing_model.dart';
 
 class PostListingScreen extends ConsumerWidget {
   const PostListingScreen({super.key});
@@ -156,8 +158,21 @@ class PostListingScreen extends ConsumerWidget {
 
     final state = ref.read(postListingProvider);
     final strings = ref.read(appLocalizationsProvider);
-    if (state.standardRequiresPaidPublish) {
-      final price = ListingPackageConfig.paidStandardPriceIqd;
+
+    // Pro/premium are always paid; standard is only paid once the free
+    // quota (or first-month-free window) is used up. Either way, payment
+    // must settle via ZainCash BEFORE the listing is ever created — publish
+    // is not called at all if the user cancels or the payment fails.
+    final requiresPayment = state.listingPackage == ListingPackage.pro ||
+        state.listingPackage == ListingPackage.premium ||
+        state.standardRequiresPaidPublish;
+
+    String? paymentReference;
+    if (requiresPayment) {
+      final price = ListingPackageConfig.purchasePriceIqd(
+        state.listingPackage,
+        standardOverQuota: state.standardRequiresPaidPublish,
+      );
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
@@ -178,10 +193,20 @@ class PostListingScreen extends ConsumerWidget {
         ),
       );
       if (confirmed != true) return;
+      if (!context.mounted) return;
+
+      paymentReference = await requireZainCashPayment(
+        context,
+        amountIqd: price,
+        serviceType: 'SOUQAK - ${state.listingPackage.name}',
+      );
+      if (paymentReference == null) return;
+      if (!context.mounted) return;
     }
 
-    final outcome =
-        await ref.read(postListingProvider.notifier).publishListing();
+    final outcome = await ref
+        .read(postListingProvider.notifier)
+        .publishListing(paymentReference: paymentReference);
     if (!context.mounted) return;
 
     if (outcome.moderationDialog != null) {

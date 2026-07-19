@@ -1011,7 +1011,20 @@ class PostListingNotifier extends Notifier<PostListingState> {
     try {
       final repo = ref.read(listingsRepositoryProvider);
       final used = await repo.fetchMonthlyFreePostCount(userId);
-      final unlimitedUntil = await repo.fetchFreePostsUnlimitedUntil();
+      final promoUntil = await repo.fetchFreePostsUnlimitedUntil();
+
+      // New accounts get unlimited free standard posting for their first 30
+      // days — separate from (and typically longer-lived than) the one-time
+      // launch-week promo. Whichever grants free posting further out wins.
+      final profile = await ref.read(currentProfileProvider.future);
+      final firstMonthUntil = profile?.createdAt.add(const Duration(days: 30));
+
+      DateTime? unlimitedUntil = promoUntil;
+      if (firstMonthUntil != null &&
+          (unlimitedUntil == null || firstMonthUntil.isAfter(unlimitedUntil))) {
+        unlimitedUntil = firstMonthUntil;
+      }
+
       state = state.copyWith(
         freePostsUsedThisMonth: used,
         freePostsUnlimitedUntil: unlimitedUntil,
@@ -1363,7 +1376,12 @@ class PostListingNotifier extends Notifier<PostListingState> {
     return paths;
   }
 
-  Future<PublishListingOutcome> publishListing() async {
+  /// [paymentReference] is the ZainCash order id from a completed checkout —
+  /// required for any paid package (pro, premium, or standard-over-quota).
+  /// The caller must run the ZainCash flow to a paid result BEFORE calling
+  /// this, since verify-purchase rejects publishing otherwise; this method
+  /// never collects payment itself, it only forwards proof of it.
+  Future<PublishListingOutcome> publishListing({String? paymentReference}) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) return const PublishListingOutcome();
 
@@ -1526,6 +1544,7 @@ class PostListingNotifier extends Notifier<PostListingState> {
                     : '—',
                 userPhone: profile?.phone,
                 userEmail: email,
+                paymentReference: paymentReference,
               );
         } catch (e, stackTrace) {
           // Listing is already saved; package activation can be retried by admin.
