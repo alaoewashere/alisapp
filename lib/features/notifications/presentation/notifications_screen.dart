@@ -15,6 +15,24 @@ import '../../../shared/widgets/shimmer_loading.dart';
 import '../models/app_notification.dart';
 import '../providers/notifications_provider.dart';
 
+/// Ids swiped-to-delete but not yet confirmed removed by the backend.
+/// Dismissible requires the widget to be gone from the tree the instant its
+/// dismiss animation finishes — waiting on the async delete + provider
+/// refetch is too slow and throws "still part of the tree". Filtering the
+/// list by this set removes it immediately; the real delete still runs in
+/// the background via [NotificationsActions.delete].
+class _LocallyDismissedIds extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => const {};
+
+  void add(String id) => state = {...state, id};
+}
+
+final _locallyDismissedIdsProvider =
+    NotifierProvider<_LocallyDismissedIds, Set<String>>(
+      _LocallyDismissedIds.new,
+    );
+
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
@@ -85,7 +103,11 @@ class NotificationsScreen extends ConsumerWidget {
               ),
             ],
           ),
-          data: (items) {
+          data: (allItems) {
+            final dismissedIds = ref.watch(_locallyDismissedIdsProvider);
+            final items = dismissedIds.isEmpty
+                ? allItems
+                : allItems.where((n) => !dismissedIds.contains(n.id)).toList();
             if (items.isEmpty) return const _EmptyNotifications();
             return ListView.separated(
               padding: const EdgeInsets.all(12),
@@ -117,8 +139,10 @@ class _NotificationTile extends ConsumerWidget {
       direction: DismissDirection.horizontal,
       background: _dismissBackground(),
       secondaryBackground: _dismissBackground(),
-      onDismissed: (_) =>
-          ref.read(notificationsActionsProvider).delete(notification.id),
+      onDismissed: (_) {
+        ref.read(_locallyDismissedIdsProvider.notifier).add(notification.id);
+        ref.read(notificationsActionsProvider).delete(notification.id);
+      },
       child: Material(
         color: unread
             ? AppColors.volt.withValues(alpha: 0.06)
