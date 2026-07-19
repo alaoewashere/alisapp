@@ -1,13 +1,10 @@
 import '../../shared/models/listing_model.dart';
 
-/// Expiry duration when a listing is created, by package tier.
+/// Expiry duration when a listing is created — 30 days for every package
+/// tier, matching both the package selection screen's duration label and
+/// approve_pending_purchase's server-side expires_at calculation.
 DateTime calculateListingExpiry(ListingPackage package) {
-  final now = DateTime.now();
-  return switch (package) {
-    ListingPackage.premium => now.add(const Duration(days: 35)),
-    ListingPackage.pro => now.add(const Duration(days: 25)),
-    ListingPackage.standard => now.add(const Duration(days: 20)),
-  };
+  return DateTime.now().add(const Duration(days: 30));
 }
 
 /// Sort weight for package priority (higher = shown first).

@@ -63,7 +63,7 @@ abstract final class ListingPackageConfig {
       package: ListingPackage.pro,
       labelAr: 'إعلان برو',
       priceIqd: 8000,
-      durationLabelAr: '60 يوم',
+      durationLabelAr: '30 يوم',
       features: [
         ListingPackageFeature(
           title: 'شارة بروفايل موثق',
@@ -99,7 +99,7 @@ abstract final class ListingPackageConfig {
       package: ListingPackage.premium,
       labelAr: 'إعلان مميز',
       priceIqd: 12000,
-      durationLabelAr: '90 يوم',
+      durationLabelAr: '30 يوم',
       features: [
         ListingPackageFeature(
           title: 'كروسيل المميز',
