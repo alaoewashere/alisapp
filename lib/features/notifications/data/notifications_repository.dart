@@ -51,4 +51,8 @@ class NotificationsRepository {
         .eq('user_id', userId)
         .eq('is_read', false);
   }
+
+  Future<void> delete(String notificationId) async {
+    await _client.from('notifications').delete().eq('id', notificationId);
+  }
 }

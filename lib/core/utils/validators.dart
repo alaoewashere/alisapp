@@ -150,23 +150,18 @@ class Validators {
     return null;
   }
 
-  /// Matches Supabase Auth password policy (lower, upper, digit, symbol).
+  /// Matches Supabase Auth password policy (letters + digits, no symbol or
+  /// case requirement — set as `letters_digits` in the project's auth config).
   static String? signUpPassword(String? value, {int minLength = 8}) {
     final basic = password(value, minLength: minLength);
     if (basic != null) return basic;
 
     final text = value!;
-    if (!RegExp(r'[a-z]').hasMatch(text)) {
-      return 'أضف حرفاً صغيراً (a-z) إلى كلمة المرور';
-    }
-    if (!RegExp(r'[A-Z]').hasMatch(text)) {
-      return 'أضف حرفاً كبيراً (A-Z) إلى كلمة المرور';
+    if (!RegExp(r'[a-zA-Z]').hasMatch(text)) {
+      return 'أضف حرفاً (a-z) إلى كلمة المرور';
     }
     if (!RegExp(r'[0-9]').hasMatch(text)) {
       return 'أضف رقماً (0-9) إلى كلمة المرور';
-    }
-    if (!RegExp(r'[^a-zA-Z0-9]').hasMatch(text)) {
-      return 'أضف رمزاً خاصاً (!@#...) إلى كلمة المرور';
     }
     return null;
   }

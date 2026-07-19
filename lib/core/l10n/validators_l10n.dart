@@ -65,13 +65,8 @@ class ValidatorsL10n {
       {int minLength = 8}) {
     final result = Validators.signUpPassword(value, minLength: minLength);
     if (result == null) return null;
-    if (result.contains('صغير')) return l10n.validationPasswordLowercase;
-    if (result.contains('كبير')) return l10n.validationPasswordUppercase;
+    if (result.contains('حرفاً')) return l10n.validationPasswordLetter;
     if (result.contains('رقماً')) return l10n.validationPasswordDigit;
-    if (result.contains('رمزاً')) return l10n.validationPasswordSymbol;
-    if (result.contains('8 أحرف') || result.contains('أحرف')) {
-      return l10n.validationWeakPassword;
-    }
     return password(value, l10n, minLength: minLength);
   }
 

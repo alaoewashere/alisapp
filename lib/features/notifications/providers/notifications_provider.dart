@@ -41,6 +41,11 @@ class NotificationsActions {
     await _ref.read(notificationsRepositoryProvider).markAllAsRead(userId);
     _ref.invalidate(notificationsProvider);
   }
+
+  Future<void> delete(String id) async {
+    await _ref.read(notificationsRepositoryProvider).delete(id);
+    _ref.invalidate(notificationsProvider);
+  }
 }
 
 final notificationsActionsProvider = Provider<NotificationsActions>((ref) {

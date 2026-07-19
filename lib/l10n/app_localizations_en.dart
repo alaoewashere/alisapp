@@ -3216,6 +3216,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get validationPasswordLetter => 'Add a letter (a-z)';
+
+  @override
   String get validationPasswordLowercase => 'Add a lowercase letter (a-z)';
 
   @override
@@ -3235,7 +3238,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validationWeakPassword =>
-      'Password must be at least 8 characters with upper, lower, digit, and symbol';
+      'Password must be at least 8 characters with a letter and a digit';
 
   @override
   String get authNetworkError => 'Check your internet connection';

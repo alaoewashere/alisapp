@@ -112,95 +112,122 @@ class _NotificationTile extends ConsumerWidget {
     final visual = notification.visualFor(AppColors.volt);
     final unread = !notification.isRead;
 
-    return Material(
-      color: unread
-          ? AppColors.volt.withValues(alpha: 0.06)
-          : AppColors.fieldCarbon,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
+    return Dismissible(
+      key: ValueKey(notification.id),
+      direction: DismissDirection.horizontal,
+      background: _dismissBackground(),
+      secondaryBackground: _dismissBackground(),
+      onDismissed: (_) =>
+          ref.read(notificationsActionsProvider).delete(notification.id),
+      child: Material(
+        color: unread
+            ? AppColors.volt.withValues(alpha: 0.06)
+            : AppColors.fieldCarbon,
         borderRadius: BorderRadius.circular(16),
-        onTap: () async {
-          if (unread) {
-            await ref
-                .read(notificationsActionsProvider)
-                .markAsRead(notification.id);
-          }
-          if (notification.hasListing && context.mounted) {
-            context.push('/listing/${notification.listingId}');
-          }
-        },
-        child: Ink(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: unread
-                  ? AppColors.volt.withValues(alpha: 0.25)
-                  : AppColors.glassBorder,
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: visual.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(visual.icon, size: 22, color: visual.color),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () async {
+            if (unread) {
+              await ref
+                  .read(notificationsActionsProvider)
+                  .markAsRead(notification.id);
+            }
+            if (notification.hasListing && context.mounted) {
+              context.push('/listing/${notification.listingId}');
+            }
+          },
+          child: Ink(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: unread
+                    ? AppColors.volt.withValues(alpha: 0.25)
+                    : AppColors.glassBorder,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      notification.title,
-                      style: AppFonts.cairo(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                    if (notification.body.isNotEmpty) ...[
-                      const SizedBox(height: 3),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: visual.color.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(visual.icon, size: 22, color: visual.color),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        notification.body,
+                        notification.title,
                         style: AppFonts.cairo(
-                          fontSize: 12.5,
-                          color: AppColors.textMuted,
-                          height: 1.4,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      if (notification.body.isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          notification.body,
+                          style: AppFonts.cairo(
+                            fontSize: 12.5,
+                            color: AppColors.textMuted,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 6),
+                      Text(
+                        formatListingTimeAgo(notification.createdAt, langCode),
+                        style: AppFonts.cairo(
+                          fontSize: 11,
+                          color: AppColors.textMuted.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
-                    const SizedBox(height: 6),
-                    Text(
-                      formatListingTimeAgo(notification.createdAt, langCode),
-                      style: AppFonts.cairo(
-                        fontSize: 11,
-                        color: AppColors.textMuted.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (unread) ...[
-                const SizedBox(width: 8),
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  width: 9,
-                  height: 9,
-                  decoration: const BoxDecoration(
-                    color: AppColors.volt,
-                    shape: BoxShape.circle,
                   ),
                 ),
+                if (unread) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    width: 9,
+                    height: 9,
+                    decoration: const BoxDecoration(
+                      color: AppColors.volt,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _dismissBackground() {
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: AppColors.rejected.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.rejected.withValues(alpha: 0.3)),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(Icons.delete_outline, color: AppColors.rejected),
+          Icon(Icons.delete_outline, color: AppColors.rejected),
+        ],
       ),
     );
   }
@@ -249,10 +276,8 @@ class _NotificationsShimmer extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       itemCount: 6,
       separatorBuilder: (_, _) => const SizedBox(height: 8),
-      itemBuilder: (_, _) => const ShimmerBox(
-        width: double.infinity,
-        height: 84,
-      ),
+      itemBuilder: (_, _) =>
+          const ShimmerBox(width: double.infinity, height: 84),
     );
   }
 }

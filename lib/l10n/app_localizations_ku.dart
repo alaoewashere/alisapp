@@ -3218,6 +3218,9 @@ class AppLocalizationsKu extends AppLocalizations {
   }
 
   @override
+  String get validationPasswordLetter => 'پیتێک زیاد بکە (a-z)';
+
+  @override
   String get validationPasswordLowercase => 'پیتی بچووک زیاد بکە (a-z)';
 
   @override
@@ -3237,7 +3240,7 @@ class AppLocalizationsKu extends AppLocalizations {
 
   @override
   String get validationWeakPassword =>
-      'وشەی نهێنی لانیکەم ٨ پیت بێت لەگەڵ پیتی گەورە و بچووک و ژمارە و هێما';
+      'وشەی نهێنی لانیکەم ٨ پیت بێت لەگەڵ پیتێک و ژمارەیەک';
 
   @override
   String get authNetworkError => 'پەیوەندی ئینتەرنێت بپشکنە';

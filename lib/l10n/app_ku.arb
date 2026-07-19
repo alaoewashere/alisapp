@@ -1427,13 +1427,14 @@
       }
     }
   },
+  "validationPasswordLetter": "پیتێک زیاد بکە (a-z)",
   "validationPasswordLowercase": "پیتی بچووک زیاد بکە (a-z)",
   "validationPasswordUppercase": "پیتی گەورە زیاد بکە (A-Z)",
   "validationPasswordDigit": "ژمارە زیاد بکە (0-9)",
   "validationPasswordSymbol": "هێما تایبەت زیاد بکە (!@#...)",
   "validationConfirmPasswordRequired": "وشەی نهێنی دووبارە بنووسە",
   "validationPasswordMismatch": "وشەکانی نهێنی یەکناگرنەوە",
-  "validationWeakPassword": "وشەی نهێنی لانیکەم ٨ پیت بێت لەگەڵ پیتی گەورە و بچووک و ژمارە و هێما",
+  "validationWeakPassword": "وشەی نهێنی لانیکەم ٨ پیت بێت لەگەڵ پیتێک و ژمارەیەک",
   "authNetworkError": "پەیوەندی ئینتەرنێت بپشکنە",
   "authRateLimitGeneric": "داواکاری زۆر. یەک خولەک چاوەڕوان بە.",
   "authRateLimitSeconds": "داواکاری زۆر. {seconds} چرکە چاوەڕوان بە.",

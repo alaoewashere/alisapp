@@ -1443,13 +1443,14 @@
       }
     }
   },
+  "validationPasswordLetter": "أضف حرفاً (a-z) إلى كلمة المرور",
   "validationPasswordLowercase": "أضف حرفاً صغيراً (a-z) إلى كلمة المرور",
   "validationPasswordUppercase": "أضف حرفاً كبيراً (A-Z) إلى كلمة المرور",
   "validationPasswordDigit": "أضف رقماً (0-9) إلى كلمة المرور",
   "validationPasswordSymbol": "أضف رمزاً خاصاً (!@#...) إلى كلمة المرور",
   "validationConfirmPasswordRequired": "أكّد كلمة المرور",
   "validationPasswordMismatch": "كلمتا المرور غير متطابقتين",
-  "validationWeakPassword": "كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، حرفاً كبيراً وصغيراً، رقماً، ورمزاً خاصاً",
+  "validationWeakPassword": "كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، مع حرف ورقم",
   "authNetworkError": "تحقق من الاتصال بالإنترنت",
   "authRateLimitGeneric": "طلبات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.",
   "authRateLimitSeconds": "طلبات كثيرة. انتظر {seconds} ثانية ثم حاول مرة أخرى.",

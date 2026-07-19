@@ -1427,13 +1427,14 @@
       }
     }
   },
+  "validationPasswordLetter": "Bir harf ekleyin (a-z)",
   "validationPasswordLowercase": "Küçük harf ekleyin (a-z)",
   "validationPasswordUppercase": "Büyük harf ekleyin (A-Z)",
   "validationPasswordDigit": "Rakam ekleyin (0-9)",
   "validationPasswordSymbol": "Özel karakter ekleyin (!@#...)",
   "validationConfirmPasswordRequired": "Şifrenizi onaylayın",
   "validationPasswordMismatch": "Şifreler eşleşmiyor",
-  "validationWeakPassword": "Şifre en az 8 karakter; büyük, küçük harf, rakam ve sembol içermeli",
+  "validationWeakPassword": "Şifre en az 8 karakter olmalı, bir harf ve bir rakam içermeli",
   "authNetworkError": "İnternet bağlantınızı kontrol edin",
   "authRateLimitGeneric": "Çok fazla istek. Bir dakika bekleyin.",
   "authRateLimitSeconds": "Çok fazla istek. {seconds} saniye bekleyin.",

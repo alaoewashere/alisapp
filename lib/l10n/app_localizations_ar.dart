@@ -3196,6 +3196,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get validationPasswordLetter => 'أضف حرفاً (a-z) إلى كلمة المرور';
+
+  @override
   String get validationPasswordLowercase =>
       'أضف حرفاً صغيراً (a-z) إلى كلمة المرور';
 
@@ -3218,7 +3221,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationWeakPassword =>
-      'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، حرفاً كبيراً وصغيراً، رقماً، ورمزاً خاصاً';
+      'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، مع حرف ورقم';
 
   @override
   String get authNetworkError => 'تحقق من الاتصال بالإنترنت';

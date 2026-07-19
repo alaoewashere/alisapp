@@ -3221,6 +3221,9 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get validationPasswordLetter => 'Bir harf ekleyin (a-z)';
+
+  @override
   String get validationPasswordLowercase => 'Küçük harf ekleyin (a-z)';
 
   @override
@@ -3240,7 +3243,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get validationWeakPassword =>
-      'Şifre en az 8 karakter; büyük, küçük harf, rakam ve sembol içermeli';
+      'Şifre en az 8 karakter olmalı, bir harf ve bir rakam içermeli';
 
   @override
   String get authNetworkError => 'İnternet bağlantınızı kontrol edin';

@@ -1429,13 +1429,14 @@
       }
     }
   },
+  "validationPasswordLetter": "Add a letter (a-z)",
   "validationPasswordLowercase": "Add a lowercase letter (a-z)",
   "validationPasswordUppercase": "Add an uppercase letter (A-Z)",
   "validationPasswordDigit": "Add a digit (0-9)",
   "validationPasswordSymbol": "Add a special character (!@#...)",
   "validationConfirmPasswordRequired": "Confirm your password",
   "validationPasswordMismatch": "Passwords do not match",
-  "validationWeakPassword": "Password must be at least 8 characters with upper, lower, digit, and symbol",
+  "validationWeakPassword": "Password must be at least 8 characters with a letter and a digit",
   "authNetworkError": "Check your internet connection",
   "authRateLimitGeneric": "Too many requests. Wait a minute and try again.",
   "authRateLimitSeconds": "Too many requests. Wait {seconds} seconds and try again.",

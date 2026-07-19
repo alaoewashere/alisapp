@@ -6162,6 +6162,12 @@ abstract class AppLocalizations {
   /// **'كلمة المرور يجب أن تكون {count} أحرف على الأقل'**
   String validationPasswordMinLength(int count);
 
+  /// No description provided for @validationPasswordLetter.
+  ///
+  /// In ar, this message translates to:
+  /// **'أضف حرفاً (a-z) إلى كلمة المرور'**
+  String get validationPasswordLetter;
+
   /// No description provided for @validationPasswordLowercase.
   ///
   /// In ar, this message translates to:
@@ -6201,7 +6207,7 @@ abstract class AppLocalizations {
   /// No description provided for @validationWeakPassword.
   ///
   /// In ar, this message translates to:
-  /// **'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، حرفاً كبيراً وصغيراً، رقماً، ورمزاً خاصاً'**
+  /// **'كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، مع حرف ورقم'**
   String get validationWeakPassword;
 
   /// No description provided for @authNetworkError.
