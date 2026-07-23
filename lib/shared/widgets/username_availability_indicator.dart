@@ -64,11 +64,6 @@ class UsernameAvailabilityIndicator extends ConsumerWidget {
           ],
         );
       case UsernameState.tooShort:
-        return Text(
-          strings.usernameRules,
-          textAlign: TextAlign.center,
-          style: AppFonts.cairo(fontSize: 13, color: const Color(0xFF888888)),
-        );
       case UsernameState.idle:
         return const SizedBox.shrink();
     }
