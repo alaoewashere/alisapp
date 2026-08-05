@@ -2,7 +2,6 @@ import '../../../core/utils/cached_network_image_utils.dart';
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/pressable_scale.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -19,6 +18,7 @@ import '../../../shared/widgets/listing_card_favorite_button.dart';
 import '../../../shared/widgets/package_badge.dart';
 import '../../../shared/widgets/verified_badge.dart';
 import '../../../widgets/star_display.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 const _cardRadius = 16.0;
 const _imageHeight = 130.0;
@@ -77,7 +77,7 @@ class ListingCard extends ConsumerWidget {
   final ListingModel listing;
 
   void _openDetail(BuildContext context) {
-    context.push('/listing/${listing.id}');
+    context.pushGuarded('/listing/${listing.id}');
   }
 
   @override

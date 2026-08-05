@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../core/l10n/l10n_provider.dart';
@@ -10,6 +9,7 @@ import '../core/utils/listing_display_title.dart';
 import '../shared/models/listing_model.dart';
 import '../shared/widgets/listing_card_favorite_button.dart';
 import '../shared/widgets/package_badge.dart';
+import '../core/utils/navigation_guard.dart';
 
 /// Compact gold-accent card for the home premium listings carousel.
 class FeaturedListingCard extends ConsumerWidget {
@@ -31,7 +31,7 @@ class FeaturedListingCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = ref.watch(appLocalizationsProvider);
     return GestureDetector(
-      onTap: () => context.push('/listing/${listing.id}'),
+      onTap: () => context.pushGuarded('/listing/${listing.id}'),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,

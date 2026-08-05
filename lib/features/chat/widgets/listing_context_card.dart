@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 /// Inline listing preview shown in the message timeline at the point a
 /// listing was actually shared — not a single banner frozen to whichever
@@ -30,7 +30,7 @@ class ListingContextCard extends StatelessWidget {
     final price = this.price;
 
     return GestureDetector(
-      onTap: () => context.push('/listing/$listingId'),
+      onTap: () => context.pushGuarded('/listing/$listingId'),
       child: Container(
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.all(12),

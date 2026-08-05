@@ -1,7 +1,6 @@
 import '../../../core/utils/cached_network_image_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../core/l10n/category_locale.dart';
@@ -16,6 +15,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../auth/widgets/guest_bottom_sheet.dart';
 import '../../favorites/providers/favorites_provider.dart';
 import '../../home/providers/home_provider.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 class ListingListTile extends ConsumerWidget {
   const ListingListTile({super.key, required this.listing});
@@ -40,7 +40,7 @@ class ListingListTile extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: InkWell(
-        onTap: () => context.push('/listing/${listing.id}'),
+        onTap: () => context.pushGuarded('/listing/${listing.id}'),
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(

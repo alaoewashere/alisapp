@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/l10n/l10n_provider.dart';
@@ -14,6 +13,7 @@ import '../widgets/active_users_strip.dart';
 import '../widgets/conversation_tile.dart';
 import '../../../shared/widgets/app_bottom_nav.dart';
 import '../../../shared/widgets/sello_app_bar.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 class ConversationsScreen extends ConsumerWidget {
   const ConversationsScreen({super.key});
@@ -38,7 +38,7 @@ class ConversationsScreen extends ConsumerWidget {
               Text(strings.loginToViewMessages),
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: () => context.push(AppRoutes.phone),
+                onPressed: () => context.pushGuarded(AppRoutes.phone),
                 child: Text(strings.signInLink),
               ),
             ],
@@ -82,7 +82,7 @@ class ConversationsScreen extends ConsumerWidget {
                 activeCount: activeCount,
                 onUserTap: (user) {
                   if (user.conversationId != null) {
-                    context.push('/chat/${user.conversationId}');
+                    context.pushGuarded('/chat/${user.conversationId}');
                   }
                 },
               ),
@@ -100,7 +100,7 @@ class ConversationsScreen extends ConsumerWidget {
                     final conversation = conversations[index];
                     return ConversationTile(
                       conversation: conversation,
-                      onTap: () => context.push('/chat/${conversation.id}'),
+                      onTap: () => context.pushGuarded('/chat/${conversation.id}'),
                       onLongPress: () =>
                           _showDeleteDialog(context, ref, conversation.id),
                     );

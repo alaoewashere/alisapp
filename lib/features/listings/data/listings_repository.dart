@@ -1316,6 +1316,80 @@ class ListingsRepository {
     if (filters.isNegotiableOnly) {
       query = query.eq('is_negotiable', true);
     }
+
+    // Car-category filters — stored in listings.metadata (JSONB). No-ops
+    // outside "سيارات" since only vehicle listings ever set these keys.
+    if (filters.minYear != null) {
+      query = query.gte('metadata->>year::int', filters.minYear!);
+    }
+    if (filters.maxYear != null) {
+      query = query.lte('metadata->>year::int', filters.maxYear!);
+    }
+    if (filters.fuel != null) {
+      query = query.eq('metadata->>fuel', filters.fuel!);
+    }
+    if (filters.transmission != null) {
+      query = query.eq('metadata->>transmission', filters.transmission!);
+    }
+    if (filters.vehicleColor != null) {
+      query = query.eq('metadata->>color', filters.vehicleColor!);
+    }
+    if (filters.minMileage != null) {
+      query = query.gte('metadata->>mileage::int', filters.minMileage!);
+    }
+    if (filters.maxMileage != null) {
+      query = query.lte('metadata->>mileage::int', filters.maxMileage!);
+    }
+    // TODO(car-filters): the post-listing car form doesn't collect these
+    // metadata keys yet — filters below are wired and inert until it does.
+    if (filters.bodyType != null) {
+      query = query.eq('metadata->>body_type', filters.bodyType!);
+    }
+    if (filters.driveType != null) {
+      query = query.eq('metadata->>drive_type', filters.driveType!);
+    }
+    if (filters.doors != null) {
+      query = query.eq('metadata->>doors', filters.doors!);
+    }
+    if (filters.minEnginePowerHp != null) {
+      query = query.gte('metadata->>engine_power_hp::int', filters.minEnginePowerHp!);
+    }
+    if (filters.maxEnginePowerHp != null) {
+      query = query.lte('metadata->>engine_power_hp::int', filters.maxEnginePowerHp!);
+    }
+    if (filters.minEngineCapacityCc != null) {
+      query = query.gte(
+        'metadata->>engine_capacity_cc::int',
+        filters.minEngineCapacityCc!,
+      );
+    }
+    if (filters.maxEngineCapacityCc != null) {
+      query = query.lte(
+        'metadata->>engine_capacity_cc::int',
+        filters.maxEngineCapacityCc!,
+      );
+    }
+    if (filters.hasWarranty != null) {
+      query = query.eq('metadata->>has_warranty', filters.hasWarranty!.toString());
+    }
+    if (filters.hasAccidentHistory != null) {
+      query = query.eq(
+        'metadata->>has_accident_history',
+        filters.hasAccidentHistory!.toString(),
+      );
+    }
+    if (filters.hasHeavyDamage != null) {
+      query = query.eq(
+        'metadata->>has_heavy_damage',
+        filters.hasHeavyDamage!.toString(),
+      );
+    }
+    if (filters.plateType != null) {
+      query = query.eq('metadata->>plate_type', filters.plateType!);
+    }
+    if (filters.sellerType != null) {
+      query = query.eq('metadata->>seller_type', filters.sellerType!);
+    }
     return query;
   }
 

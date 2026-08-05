@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -8,6 +7,7 @@ import '../../../core/constants/verification_constants.dart';
 import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/models/profile_model.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 /// Profile entry banner for seller verification status.
 class VerificationStatusBanner extends ConsumerWidget {
@@ -61,7 +61,7 @@ class VerificationStatusBanner extends ConsumerWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton(
-              onPressed: () => context.push(AppRoutes.verificationIntro),
+              onPressed: () => context.pushGuarded(AppRoutes.verificationIntro),
               child: Text(
                 strings.retry,
                 style: AppFonts.cairo(
@@ -79,7 +79,7 @@ class VerificationStatusBanner extends ConsumerWidget {
       color: AppColors.pending.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.verificationIntro),
+        onTap: () => context.pushGuarded(AppRoutes.verificationIntro),
         borderRadius: BorderRadius.circular(14),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),

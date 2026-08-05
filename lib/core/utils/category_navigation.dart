@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../router/app_router.dart';
 import '../../shared/models/category_model.dart';
 import 'category_tree.dart';
+import 'navigation_guard.dart';
 
 /// Opens the category tree browser for deep-tree roots, otherwise listings grid.
 void openCategoryDestination(BuildContext context, CategoryModel category) {
   if (categoryBrowseRootSlugs.contains(category.slug)) {
-    context.push(AppRoutes.categoryBrowsePath(category.id));
+    context.pushGuarded(AppRoutes.categoryBrowsePath(category.id));
     return;
   }
 
@@ -16,13 +16,13 @@ void openCategoryDestination(BuildContext context, CategoryModel category) {
 
   if (isVehicleSharedBrandTreeEntry(category) ||
       isVehicleBrandListParent(category)) {
-    context.push(
+    context.pushGuarded(
       AppRoutes.categoryBrowsePath(category.id, listingType: listingType),
     );
     return;
   }
 
-  context.push(
+  context.pushGuarded(
     AppRoutes.listingsPath('${category.id}', listingType: listingType),
   );
 }
@@ -39,11 +39,11 @@ void openCategoryById(
       listingType ?? defaultListingTypeForCategory(category)?.value;
 
   if (category != null && shouldNavigateToCategoryBrowse(category, all)) {
-    context.push(
+    context.pushGuarded(
       AppRoutes.categoryBrowsePath(categoryId, listingType: typeParam),
     );
   } else {
-    context.push(
+    context.pushGuarded(
       AppRoutes.listingsPath('$categoryId', listingType: typeParam),
     );
   }

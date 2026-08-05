@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
@@ -30,6 +29,7 @@ import '../widgets/home_top_bar_icon_button.dart';
 import '../widgets/listing_card.dart';
 import '../widgets/recent_listings_row.dart';
 import '../../notifications/providers/notifications_provider.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -163,7 +163,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: HomeTopBarIconButton(
                         icon: Icons.favorite_border_rounded,
                         tooltip: strings.favoritesTooltip,
-                        onTap: () => context.push(AppRoutes.favorites),
+                        onTap: () => context.pushGuarded(AppRoutes.favorites),
                       ),
                     ),
                     leadingWidth: 56,
@@ -302,7 +302,7 @@ class _NotificationsBell extends ConsumerWidget {
         HomeTopBarIconButton(
           icon: Icons.notifications_none_rounded,
           tooltip: strings.notifications,
-          onTap: () => context.push(AppRoutes.notifications),
+          onTap: () => context.pushGuarded(AppRoutes.notifications),
         ),
         if (unread > 0)
           Positioned(
@@ -352,7 +352,7 @@ class _HomeCategoriesHeader extends StatelessWidget {
           ),
           const Spacer(),
           TextButton(
-            onPressed: () => context.push(AppRoutes.search),
+            onPressed: () => context.pushGuarded(AppRoutes.search),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.accent,
               padding: EdgeInsets.zero,
@@ -573,7 +573,7 @@ class _HomeFeaturedSection extends ConsumerWidget {
         return FeaturedListingsCarousel(
           listings: listings,
           viewAllLink: HomeSectionViewAllLink(
-            onPressed: () => context.push(
+            onPressed: () => context.pushGuarded(
               AppRoutes.homeFeedPath(HomeListingsFeedType.featured),
             ),
           ),
@@ -604,7 +604,7 @@ class _HomeRecentListingsHeader extends StatelessWidget {
           ),
           const Spacer(),
           HomeSectionViewAllLink(
-            onPressed: () => context.push(
+            onPressed: () => context.pushGuarded(
               AppRoutes.homeFeedPath(HomeListingsFeedType.latest),
             ),
           ),

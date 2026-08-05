@@ -12,6 +12,7 @@ import '../../core/theme/app_decorations.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../features/chat/providers/chat_provider.dart';
+import '../../core/utils/navigation_guard.dart';
 
 /// Layout metrics for the floating shell bottom nav (positioning only).
 abstract final class AppBottomNavLayout {
@@ -114,7 +115,7 @@ class AppBottomNav extends ConsumerWidget {
                       selected: index == 0,
                       onTap: () {
                         HapticFeedback.selectionClick();
-                        context.go(AppRoutes.home);
+                        context.goGuarded(AppRoutes.home);
                       },
                     ),
                     _NavItem(
@@ -124,7 +125,7 @@ class AppBottomNav extends ConsumerWidget {
                       selected: index == 1,
                       onTap: () {
                         HapticFeedback.selectionClick();
-                        context.go(AppRoutes.search);
+                        context.goGuarded(AppRoutes.search);
                       },
                     ),
                     _CenterAddButton(
@@ -132,7 +133,7 @@ class AppBottomNav extends ConsumerWidget {
                         HapticFeedback.selectionClick();
                         final authed = await requireAuth(context, ref);
                         if (authed && context.mounted) {
-                          context.push(AppRoutes.post);
+                          context.pushGuarded(AppRoutes.post);
                         }
                       },
                     ),
@@ -147,7 +148,7 @@ class AppBottomNav extends ConsumerWidget {
                           showGuestBottomSheet(context);
                           return;
                         }
-                        context.go(AppRoutes.conversations);
+                        context.goGuarded(AppRoutes.conversations);
                       },
                     ),
                     _NavItem(
@@ -160,7 +161,7 @@ class AppBottomNav extends ConsumerWidget {
                           showGuestBottomSheet(context);
                           return;
                         }
-                        context.go(AppRoutes.profile);
+                        context.goGuarded(AppRoutes.profile);
                       },
                     ),
                   ],

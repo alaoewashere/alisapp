@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/l10n/enum_localizations.dart';
@@ -20,6 +19,7 @@ import '../providers/user_subscription_tier_provider.dart';
 import '../../listings/constants/listing_package_config.dart';
 import '../utils/listing_boost_utils.dart';
 import 'listing_boost_sheet.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 class MyListingTile extends ConsumerWidget {
   const MyListingTile({
@@ -62,7 +62,7 @@ class MyListingTile extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => context.push('/listing/${listing.id}'),
+          onTap: () => context.pushGuarded('/listing/${listing.id}'),
           borderRadius: BorderRadius.circular(_cardRadius),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -292,7 +292,7 @@ class _ActionsRow extends ConsumerWidget {
                 .cloneListingForRepost(listing.id, userId);
             _refresh(ref);
             if (context.mounted) {
-              context.push(AppRoutes.editListingPath(newId));
+              context.pushGuarded(AppRoutes.editListingPath(newId));
             }
           } catch (e) {
             if (context.mounted) {

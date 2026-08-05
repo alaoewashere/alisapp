@@ -27,6 +27,7 @@ import '../../verification/widgets/verification_status_banner.dart';
 import '../../../shared/widgets/verified_badge.dart';
 import '../../../shared/widgets/app_bottom_nav.dart';
 import '../../../widgets/star_display.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key, this.userId});
@@ -57,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
               Text(strings.loginToAccessProfile),
               const SizedBox(height: 24),
               FilledButton(
-                onPressed: () => context.push(AppRoutes.login),
+                onPressed: () => context.pushGuarded(AppRoutes.login),
                 child: Text(strings.login),
               ),
             ],
@@ -173,7 +174,7 @@ class ProfileScreen extends ConsumerWidget {
                         emptyOwnMessage: strings.noListingsYet,
                         emptyOtherMessage: strings.noActiveListings,
                         addFirstLabel: strings.addFirstListing,
-                        onAdd: () => context.push(AppRoutes.post),
+                        onAdd: () => context.pushGuarded(AppRoutes.post),
                       ),
                     );
                   }
@@ -282,7 +283,7 @@ class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
                   ),
                 IconButton(
                   icon: const Icon(Icons.settings_outlined),
-                  onPressed: () => context.push(AppRoutes.settings),
+                  onPressed: () => context.pushGuarded(AppRoutes.settings),
                 ),
               ],
             ),
@@ -293,7 +294,7 @@ class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
                   profile: profile,
                   statsAsync: widget.statsAsync,
                   isOwnProfile: true,
-                  onAvatarTap: () => context.push(AppRoutes.editProfile),
+                  onAvatarTap: () => context.pushGuarded(AppRoutes.editProfile),
                 ),
               ),
             ),
@@ -306,8 +307,8 @@ class _OwnProfileViewState extends ConsumerState<_OwnProfileView> {
             SliverToBoxAdapter(
               child: _OwnProfileMenu(
                 statsAsync: widget.statsAsync,
-                onMyListings: () => context.push(AppRoutes.myListings),
-                onSmartAlerts: () => context.push(AppRoutes.smartAlerts),
+                onMyListings: () => context.pushGuarded(AppRoutes.myListings),
+                onSmartAlerts: () => context.pushGuarded(AppRoutes.smartAlerts),
               ),
             ),
             AppBottomNavSliverSpacer(),
@@ -451,7 +452,7 @@ class _ProfileHeaderCard extends StatelessWidget {
               rating: profile.avgRating,
               count: profile.ratingCount,
               starSize: 16,
-              onTap: () => context.push('/ratings/${profile.id}'),
+              onTap: () => context.pushGuarded('/ratings/${profile.id}'),
             ),
           ],
           if (_locationLine.isNotEmpty) ...[

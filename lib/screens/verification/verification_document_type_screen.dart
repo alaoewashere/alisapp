@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../core/l10n/l10n_provider.dart';
@@ -8,6 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/verification_constants.dart';
 import '../../core/router/app_router.dart';
 import '../../shared/widgets/sello_app_bar.dart';
+import '../../core/utils/navigation_guard.dart';
 
 /// Screen 2 — pick document type.
 class VerificationDocumentTypeScreen extends ConsumerWidget {
@@ -54,7 +54,7 @@ class VerificationDocumentTypeScreen extends ConsumerWidget {
                 key: ValueKey(documentTypes[i].type),
                 label: documentTypes[i].label,
                 icon: documentTypes[i].icon,
-                onTap: () => context.push(
+                onTap: () => context.pushGuarded(
                   '${AppRoutes.verificationUpload}?type=${documentTypes[i].type}',
                 ),
               ),

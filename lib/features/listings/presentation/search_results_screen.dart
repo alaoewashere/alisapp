@@ -22,6 +22,7 @@ import '../providers/search_provider.dart';
 import '../widgets/filter_sheet.dart';
 import '../../../screens/smart_alerts/my_alerts_screen.dart';
 import '../widgets/listing_list_tile.dart';
+import '../../../core/utils/navigation_guard.dart';
 
 class SearchResultsScreen extends ConsumerWidget {
   const SearchResultsScreen({super.key});
@@ -38,7 +39,7 @@ class SearchResultsScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: AppBackButton(onPressed: () => context.pop()),
         title: GestureDetector(
-          onTap: () => context.push(AppRoutes.search),
+          onTap: () => context.pushGuarded(AppRoutes.search),
           child: Text(
             filter.query?.trim().isNotEmpty == true
                 ? filter.query!.trim()

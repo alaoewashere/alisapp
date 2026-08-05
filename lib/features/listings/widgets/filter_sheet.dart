@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/iraq_neighborhoods.dart';
 import '../../../core/theme/app_fonts.dart';
-import '../../../core/constants/app_governorates.dart';
 import '../../../core/l10n/category_locale.dart';
 import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/category_tree.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/digit_input_formatter.dart';
+import '../../../core/utils/vehicle_listing_utils.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/filter_model.dart';
+import '../constants/vehicle_listing_options.dart';
 import '../providers/post_listing_provider.dart' show allCategoriesProvider;
 import '../providers/search_provider.dart';
+import 'steps/step2_form_common.dart' show Step2GovernoratePicker, Step2NeighborhoodPicker;
 
 void showFilterSheet(
   BuildContext context,
@@ -45,6 +49,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   late final TextEditingController _maxController;
   double _sliderMin = 0;
   double _sliderMax = 50000000;
+  bool _priceInUsd = false;
 
   // Full drill path (e.g. [Vehicles, Cars, Mercedes-Benz]) — kept visible as
   // a breadcrumb so the selection is never hidden, and rebuilt from the
@@ -113,8 +118,16 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   }
 
   void _syncPriceFromFields() {
-    final min = double.tryParse(_minController.text.replaceAll(',', ''));
-    final max = double.tryParse(_maxController.text.replaceAll(',', ''));
+    final rawMin = double.tryParse(_minController.text.replaceAll(',', ''));
+    final rawMax = double.tryParse(_maxController.text.replaceAll(',', ''));
+    // Fields show whatever currency is toggled; draft.minPrice/maxPrice and
+    // the backend `price` column are always IQD — convert on the way in.
+    final min = rawMin == null
+        ? null
+        : (_priceInUsd ? rawMin * kApproxIqdPerUsd : rawMin);
+    final max = rawMax == null
+        ? null
+        : (_priceInUsd ? rawMax * kApproxIqdPerUsd : rawMax);
     _updateDraft(_draft.copyWith(
       minPrice: min,
       maxPrice: max,
@@ -184,6 +197,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                         setState(() {
                           _sliderMin = 0;
                           _sliderMax = 50000000;
+                          _priceInUsd = false;
                           _categoryPath = [];
                         });
                       },
@@ -216,34 +230,61 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  Text(strings.governorate, style: theme.textTheme.titleSmall),
+                  Text('الموقع', style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
-                  DropdownButtonFormField<String?>(
-                    initialValue: _draft.governorate,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                    ),
-                    items: [
-                      DropdownMenuItem(
-                        value: null,
-                        child: Text(strings.allGovernorates),
-                      ),
-                      ...iraqiGovernorates.map(
-                        (g) => DropdownMenuItem(
-                          value: g.slug,
-                          child: Text(g.displayName(localeCode)),
-                        ),
-                      ),
-                    ],
+                  Step2GovernoratePicker(
+                    value: _draft.governorate,
                     onChanged: (v) => _updateDraft(
                       _draft.copyWith(
                         governorate: v,
                         clearGovernorate: v == null,
+                        clearAreaName: true,
                       ),
                     ),
                   ),
+                  Step2NeighborhoodPicker(
+                    governorateSlug: _draft.governorate,
+                    selectedSlug: _draft.areaName == null
+                        ? null
+                        : neighborhoodByNameAr(_draft.areaName!)?.slug,
+                    onChanged: (slug) {
+                      final area = slug == null ? null : neighborhoodBySlug(slug);
+                      _updateDraft(_draft.copyWith(
+                        areaName: area?.nameAr,
+                        clearAreaName: area == null,
+                      ));
+                    },
+                  ),
                   const SizedBox(height: 20),
-                  Text(strings.priceRangeLabel, style: theme.textTheme.titleSmall),
+                  Row(
+                    children: [
+                      Text(strings.priceRangeLabel, style: theme.textTheme.titleSmall),
+                      const Spacer(),
+                      _CurrencyToggle(
+                        isUsd: _priceInUsd,
+                        onChanged: (usd) {
+                          // Re-render the already-typed numbers in the new
+                          // currency — draft.minPrice/maxPrice (IQD) don't
+                          // change, only how the fields display them.
+                          setState(() {
+                            _priceInUsd = usd;
+                            if (_draft.minPrice != null) {
+                              final v = usd
+                                  ? _draft.minPrice! / kApproxIqdPerUsd
+                                  : _draft.minPrice!;
+                              _minController.text = v.round().toString();
+                            }
+                            if (_draft.maxPrice != null) {
+                              final v = usd
+                                  ? _draft.maxPrice! / kApproxIqdPerUsd
+                                  : _draft.maxPrice!;
+                              _maxController.text = v.round().toString();
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -255,7 +296,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                           style: theme.textTheme.bodyLarge,
                           decoration: InputDecoration(
                             labelText: strings.fromLabel,
-                            suffixText: strings.currencyIqd,
+                            suffixText: _priceInUsd ? 'USD' : strings.currencyIqd,
                           ),
                           onChanged: (_) => _syncPriceFromFields(),
                         ),
@@ -269,7 +310,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                           style: theme.textTheme.bodyLarge,
                           decoration: InputDecoration(
                             labelText: strings.toLabel,
-                            suffixText: strings.currencyIqd,
+                            suffixText: _priceInUsd ? 'USD' : strings.currencyIqd,
                           ),
                           onChanged: (_) => _syncPriceFromFields(),
                         ),
@@ -285,8 +326,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     max: 50000000,
                     divisions: 100,
                     onChanged: (range) {
-                      _minController.text = range.start.round().toString();
-                      _maxController.text = range.end.round().toString();
+                      // Slider always drags in IQD; fields show the toggled
+                      // currency.
+                      final displayStart =
+                          _priceInUsd ? range.start / kApproxIqdPerUsd : range.start;
+                      final displayEnd =
+                          _priceInUsd ? range.end / kApproxIqdPerUsd : range.end;
+                      _minController.text = displayStart.round().toString();
+                      _maxController.text = displayEnd.round().toString();
                       setState(() {
                         _sliderMin = range.start;
                         _sliderMax = range.end;
@@ -317,6 +364,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                       );
                     }).toList(),
                   ),
+                  if (isAutomobileCarListingPath(_categoryPath)) ...[
+                    const SizedBox(height: 20),
+                    _CarFilters(draft: _draft, onChanged: _updateDraft),
+                  ],
                   const SizedBox(height: 16),
                   Text(strings.additionalOptions, style: theme.textTheme.titleSmall),
                   SwitchListTile(
@@ -451,6 +502,275 @@ class _CategoryDrillDown extends StatelessWidget {
                 },
               ),
             ),
+      ],
+    );
+  }
+}
+
+/// IQD/USD toggle for the price fields. Conversion uses [kApproxIqdPerUsd] —
+/// there's no per-listing USD price column, IQD stays the source of truth.
+class _CurrencyToggle extends StatelessWidget {
+  const _CurrencyToggle({required this.isUsd, required this.onChanged});
+
+  final bool isUsd;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<bool>(
+      showSelectedIcon: false,
+      segments: const [
+        ButtonSegment(value: false, label: Text('د.ع')),
+        ButtonSegment(value: true, label: Text('USD')),
+      ],
+      selected: {isUsd},
+      onSelectionChanged: (s) => onChanged(s.first),
+    );
+  }
+}
+
+/// سيارات-only filters — hidden entirely outside that category path.
+/// Reuses [VehicleListingOptions] / [VehicleCarColors] so the labels match
+/// what post-listing already collects; ranges reuse the same digit-only
+/// TextField pattern as the price section above.
+class _CarFilters extends StatelessWidget {
+  const _CarFilters({required this.draft, required this.onChanged});
+
+  final FilterModel draft;
+  final ValueChanged<FilterModel> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    Widget sectionLabel(String text) =>
+        Padding(
+          padding: const EdgeInsets.only(top: 16, bottom: 8),
+          child: Text(text, style: theme.textTheme.titleSmall),
+        );
+
+    Widget chipGroup<T>({
+      required List<T> options,
+      required T? selected,
+      required String Function(T) labelOf,
+      required ValueChanged<T?> onSelect,
+    }) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 4,
+        children: options.map((o) {
+          final isSelected = selected == o;
+          return ChoiceChip(
+            label: Text(labelOf(o)),
+            selected: isSelected,
+            onSelected: (_) => onSelect(isSelected ? null : o),
+          );
+        }).toList(),
+      );
+    }
+
+    Widget rangeRow({
+      required Key minKey,
+      required Key maxKey,
+      required String? minValue,
+      required String? maxValue,
+      required String unit,
+      required void Function(int?) onMinChanged,
+      required void Function(int?) onMaxChanged,
+    }) {
+      return Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              key: minKey,
+              initialValue: minValue,
+              keyboardType: TextInputType.number,
+              inputFormatters: [appDigitsOnly()],
+              decoration: InputDecoration(
+                labelText: 'الحد الأدنى',
+                suffixText: unit,
+              ),
+              onChanged: (v) => onMinChanged(int.tryParse(v)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextFormField(
+              key: maxKey,
+              initialValue: maxValue,
+              keyboardType: TextInputType.number,
+              inputFormatters: [appDigitsOnly()],
+              decoration: InputDecoration(
+                labelText: 'الحد الأعلى',
+                suffixText: unit,
+              ),
+              onChanged: (v) => onMaxChanged(int.tryParse(v)),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Divider(),
+        sectionLabel('سنة الصنع'),
+        rangeRow(
+          minKey: const ValueKey('car_year_min'),
+          maxKey: const ValueKey('car_year_max'),
+          minValue: draft.minYear?.toString(),
+          maxValue: draft.maxYear?.toString(),
+          unit: '',
+          onMinChanged: (v) => onChanged(
+            draft.copyWith(minYear: v, clearMinYear: v == null),
+          ),
+          onMaxChanged: (v) => onChanged(
+            draft.copyWith(maxYear: v, clearMaxYear: v == null),
+          ),
+        ),
+        sectionLabel('نوع الوقود'),
+        chipGroup<String>(
+          options: VehicleListingOptions.fuelOptions,
+          selected: draft.fuel,
+          labelOf: (o) => o,
+          onSelect: (v) => onChanged(draft.copyWith(fuel: v, clearFuel: v == null)),
+        ),
+        sectionLabel('ناقل الحركة'),
+        chipGroup<String>(
+          options: VehicleListingOptions.transmissionOptions,
+          selected: draft.transmission,
+          labelOf: (o) => o,
+          onSelect: (v) => onChanged(
+            draft.copyWith(transmission: v, clearTransmission: v == null),
+          ),
+        ),
+        sectionLabel('الممشى'),
+        rangeRow(
+          minKey: const ValueKey('car_mileage_min'),
+          maxKey: const ValueKey('car_mileage_max'),
+          minValue: draft.minMileage?.toString(),
+          maxValue: draft.maxMileage?.toString(),
+          unit: 'كم',
+          onMinChanged: (v) => onChanged(
+            draft.copyWith(minMileage: v, clearMinMileage: v == null),
+          ),
+          onMaxChanged: (v) => onChanged(
+            draft.copyWith(maxMileage: v, clearMaxMileage: v == null),
+          ),
+        ),
+        sectionLabel('نوع الهيكل'),
+        chipGroup<String>(
+          options: const [
+            'سيدان', 'SUV', 'كروس أوفر', 'هاتشباك', 'كوبيه', 'بيك أب', 'فان',
+            'ستيشن', 'مكشوفة',
+          ],
+          selected: draft.bodyType,
+          labelOf: (o) => o,
+          onSelect: (v) =>
+              onChanged(draft.copyWith(bodyType: v, clearBodyType: v == null)),
+        ),
+        sectionLabel('قوة المحرك'),
+        rangeRow(
+          minKey: const ValueKey('car_power_min'),
+          maxKey: const ValueKey('car_power_max'),
+          minValue: draft.minEnginePowerHp?.toString(),
+          maxValue: draft.maxEnginePowerHp?.toString(),
+          unit: 'HP',
+          onMinChanged: (v) => onChanged(
+            draft.copyWith(minEnginePowerHp: v, clearMinEnginePowerHp: v == null),
+          ),
+          onMaxChanged: (v) => onChanged(
+            draft.copyWith(maxEnginePowerHp: v, clearMaxEnginePowerHp: v == null),
+          ),
+        ),
+        sectionLabel('سعة المحرك'),
+        rangeRow(
+          minKey: const ValueKey('car_cc_min'),
+          maxKey: const ValueKey('car_cc_max'),
+          minValue: draft.minEngineCapacityCc?.toString(),
+          maxValue: draft.maxEngineCapacityCc?.toString(),
+          unit: 'CC',
+          onMinChanged: (v) => onChanged(
+            draft.copyWith(
+              minEngineCapacityCc: v,
+              clearMinEngineCapacityCc: v == null,
+            ),
+          ),
+          onMaxChanged: (v) => onChanged(
+            draft.copyWith(
+              maxEngineCapacityCc: v,
+              clearMaxEngineCapacityCc: v == null,
+            ),
+          ),
+        ),
+        sectionLabel('نظام الدفع'),
+        chipGroup<String>(
+          options: const ['دفع أمامي', 'دفع خلفي', 'دفع رباعي'],
+          selected: draft.driveType,
+          labelOf: (o) => o,
+          onSelect: (v) =>
+              onChanged(draft.copyWith(driveType: v, clearDriveType: v == null)),
+        ),
+        sectionLabel('عدد الأبواب'),
+        chipGroup<String>(
+          options: const ['2', '3', '4', '5'],
+          selected: draft.doors,
+          labelOf: (o) => o,
+          onSelect: (v) => onChanged(draft.copyWith(doors: v, clearDoors: v == null)),
+        ),
+        sectionLabel('اللون الخارجي'),
+        chipGroup<String>(
+          options: VehicleCarColors.options.map((c) => c.labelAr).toList(),
+          selected: draft.vehicleColor,
+          labelOf: (o) => o,
+          onSelect: (v) => onChanged(
+            draft.copyWith(vehicleColor: v, clearVehicleColor: v == null),
+          ),
+        ),
+        sectionLabel('يوجد ضمان'),
+        chipGroup<bool>(
+          options: const [true, false],
+          selected: draft.hasWarranty,
+          labelOf: (o) => o ? 'نعم' : 'لا',
+          onSelect: (v) => onChanged(
+            draft.copyWith(hasWarranty: v, clearHasWarranty: v == null),
+          ),
+        ),
+        sectionLabel('حادث سابق'),
+        chipGroup<bool>(
+          options: const [true, false],
+          selected: draft.hasAccidentHistory,
+          labelOf: (o) => o ? 'نعم' : 'لا',
+          onSelect: (v) => onChanged(
+            draft.copyWith(hasAccidentHistory: v, clearHasAccidentHistory: v == null),
+          ),
+        ),
+        sectionLabel('سجل ضرر جسيم'),
+        chipGroup<bool>(
+          options: const [true, false],
+          selected: draft.hasHeavyDamage,
+          labelOf: (o) => o ? 'نعم' : 'لا',
+          onSelect: (v) => onChanged(
+            draft.copyWith(hasHeavyDamage: v, clearHasHeavyDamage: v == null),
+          ),
+        ),
+        sectionLabel('نوع اللوحة'),
+        chipGroup<String>(
+          options: const ['عراقية', 'إقليم كردستان', 'مؤقتة', 'دبلوماسية'],
+          selected: draft.plateType,
+          labelOf: (o) => o,
+          onSelect: (v) =>
+              onChanged(draft.copyWith(plateType: v, clearPlateType: v == null)),
+        ),
+        sectionLabel('نوع البائع'),
+        chipGroup<String>(
+          options: const ['المالك', 'معرض سيارات', 'وكيل معتمد'],
+          selected: draft.sellerType,
+          labelOf: (o) => o,
+          onSelect: (v) =>
+              onChanged(draft.copyWith(sellerType: v, clearSellerType: v == null)),
+        ),
       ],
     );
   }

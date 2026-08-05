@@ -11,6 +11,7 @@ import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../features/auth/widgets/guest_bottom_sheet.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/utils/navigation_guard.dart';
 import '../../../core/utils/category_navigation.dart';
 import '../../../core/utils/category_tree.dart';
 import '../../../core/utils/secure_log.dart';
@@ -88,7 +89,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       showGuestBottomSheet(context);
       return;
     }
-    context.push(AppRoutes.smartAlerts);
+    context.pushGuarded(AppRoutes.smartAlerts);
   }
 
   @override
@@ -108,7 +109,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         .copyWith(query: q.isEmpty ? null : q);
     ref.read(filterProvider.notifier).setFilter(filter);
     ref.read(searchResultsProvider.notifier).search(filter);
-    context.push(AppRoutes.searchResults);
+    context.pushGuarded(AppRoutes.searchResults);
   }
 
   Future<void> _openCategory(
@@ -147,7 +148,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final filter = FilterModel(query: item.style.nameAr);
     ref.read(filterProvider.notifier).setFilter(filter);
     ref.read(searchResultsProvider.notifier).search(filter, log: false);
-    if (mounted) context.push(AppRoutes.searchResults);
+    if (mounted) context.pushGuarded(AppRoutes.searchResults);
   }
 
   void _openFilters() {
@@ -155,7 +156,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       context,
       ref,
       onApplied: () {
-        if (mounted) context.push(AppRoutes.searchResults);
+        if (mounted) context.pushGuarded(AppRoutes.searchResults);
       },
     );
   }

@@ -20,6 +20,7 @@ import '../../features/payment/zaincash_service.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../shared/widgets/shimmer_loading.dart';
 import '../../widgets/user_avatar.dart';
+import '../../core/utils/navigation_guard.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -63,7 +64,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
       final user = supabase.auth.currentUser;
       if (user == null) {
-        if (mounted) context.go(AppRoutes.phone);
+        if (mounted) context.goGuarded(AppRoutes.phone);
         return;
       }
 
@@ -131,7 +132,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final container = ref.container;
     await supabase.auth.signOut();
     invalidateSessionProviders(container);
-    if (mounted) context.go(AppRoutes.phone);
+    if (mounted) context.goGuarded(AppRoutes.phone);
   }
 
   Future<void> _confirmDeleteAccount() async {
@@ -189,14 +190,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           );
           return;
       }
-      if (mounted) context.go(AppRoutes.phone);
+      if (mounted) context.goGuarded(AppRoutes.phone);
       return;
     }
 
     final container = ref.container;
     await supabase.auth.signOut();
     invalidateSessionProviders(container);
-    if (mounted) context.go(AppRoutes.phone);
+    if (mounted) context.goGuarded(AppRoutes.phone);
   }
 
   /// Shows the list of available payment methods. ZainCash is live; the others
@@ -330,7 +331,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               name: _name,
               email: _email,
               avatarSeed: _avatarSeed,
-              onTap: () => context.push(AppRoutes.editProfile),
+              onTap: () => context.pushGuarded(AppRoutes.editProfile),
             ),
             const SizedBox(height: 24),
             Padding(
@@ -348,19 +349,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 _SettingsRow(
                   icon: Icons.person_outline,
                   label: strings.accountDetails,
-                  onTap: () => context.push(AppRoutes.editProfile),
+                  onTap: () => context.pushGuarded(AppRoutes.editProfile),
                 ),
                 const _SettingsDivider(),
                 _SettingsRow(
                   icon: Icons.lock_outline,
                   label: strings.passwordSettings,
-                  onTap: () => context.push(AppRoutes.resetPassword),
+                  onTap: () => context.pushGuarded(AppRoutes.resetPassword),
                 ),
                 const _SettingsDivider(),
                 _SettingsRow(
                   icon: Icons.notifications_none,
                   label: strings.notifications,
-                  onTap: () => context.push(AppRoutes.notificationsSettings),
+                  onTap: () => context.pushGuarded(AppRoutes.notificationsSettings),
                 ),
                 const _SettingsDivider(),
                 _SettingsRow(
@@ -384,7 +385,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ],
                   ),
-                  onTap: () => context.push('${AppRoutes.language}?onboarding=false'),
+                  onTap: () => context.pushGuarded('${AppRoutes.language}?onboarding=false'),
                 ),
               ],
             ),
@@ -415,7 +416,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 _SettingsRow(
                   icon: Icons.support_agent_outlined,
                   label: strings.contactSupport,
-                  onTap: () => context.push(AppRoutes.supportChat),
+                  onTap: () => context.pushGuarded(AppRoutes.supportChat),
                 ),
                 const _SettingsDivider(),
                 _SettingsRow(
