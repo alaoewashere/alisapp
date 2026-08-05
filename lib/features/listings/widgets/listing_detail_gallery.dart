@@ -107,20 +107,17 @@ class _ListingDetailGalleryState extends State<ListingDetailGallery> {
             itemBuilder: (_, i) {
               final width = MediaQuery.sizeOf(context).width;
               final height = MediaQuery.sizeOf(context).height * 0.55;
-              // BoxFit.contain (not cover) — portrait phone photos must show in
-              // full, not get cropped into a landscape-looking box.
-              final image = ColoredBox(
-                color: Colors.black,
-                child: cachedListingImage(
-                  context: context,
-                  imageUrl: urls[i],
-                  width: width,
-                  height: height,
-                  fit: BoxFit.contain,
-                  placeholder: (_, _) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (_, _, _) => const Icon(Icons.broken_image),
-                ),
+              // BoxFit.cover: fill the slot with the actual photo, no
+              // letterbox bars — matches how the user uploaded it.
+              final image = cachedListingImage(
+                context: context,
+                imageUrl: urls[i],
+                width: width,
+                height: height,
+                fit: BoxFit.cover,
+                placeholder: (_, _) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (_, _, _) => const Icon(Icons.broken_image),
               );
               return GestureDetector(
                 onTap: () => _openZoom(i),

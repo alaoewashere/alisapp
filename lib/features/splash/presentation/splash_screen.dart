@@ -10,6 +10,7 @@ import '../../../core/providers/locale_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../onboarding/onboarding_prefs.dart';
+import '../../listings/providers/post_listing_provider.dart' show allCategoriesProvider;
 
 /// First-launch splash — a slow, choreographed Souqak brand reveal, then home.
 class SplashScreen extends ConsumerStatefulWidget {
@@ -85,6 +86,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         _progress.forward();
       }
     });
+    // Warm the categories cache now — splash already has a fixed 4.2s dead
+    // window, so the search tab's first paint doesn't eat this fetch cost.
+    ref.read(allCategoriesProvider);
     Future<void>.delayed(const Duration(milliseconds: 4200), _navigateNext);
   }
 
