@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/utils/navigation_guard.dart';
 import '../../../l10n/app_localizations.dart';
 
 const _sheetBackground = Color(0xFF18181A);
@@ -60,7 +60,13 @@ Future<void> showGuestBottomSheet(BuildContext context) {
               FilledButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  context.push(AppRoutes.phone);
+                  // Deferred: pushing on the same Navigator synchronously
+                  // after pop() races the sheet's removal from the page
+                  // list — see filter_sheet.dart's _apply() for the full
+                  // explanation of the duplicate-key crash this avoids.
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => context.pushGuarded(AppRoutes.phone),
+                  );
                 },
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.volt,

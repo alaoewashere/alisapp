@@ -117,6 +117,16 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     ref.read(filterDraftProvider.notifier).updateDraft(draft);
   }
 
+  /// RangeSlider requires start <= end. _sliderMin/_sliderMax can drift out
+  /// of order (typed input, currency conversion, a stale reopened draft) —
+  /// order them here so the widget itself can never assert on it, no
+  /// matter how the state upstream got there.
+  RangeValues _safeSliderValues() {
+    final a = _sliderMin.clamp(0.0, 50000000.0);
+    final b = _sliderMax.clamp(0.0, 50000000.0);
+    return a <= b ? RangeValues(a, b) : RangeValues(b, a);
+  }
+
   void _syncPriceFromFields() {
     final rawMin = double.tryParse(_minController.text.replaceAll(',', ''));
     final rawMax = double.tryParse(_maxController.text.replaceAll(',', ''));
@@ -128,6 +138,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     final max = rawMax == null
         ? null
         : (_priceInUsd ? rawMax * kApproxIqdPerUsd : rawMax);
+    // Don't reorder/rewrite the fields while the user is mid-keystroke —
+    // that fights their typing (e.g. min temporarily > a stale max while
+    // they're still entering digits). The RangeSlider below defensively
+    // orders start/end itself, and _apply() normalizes once on submit.
     _updateDraft(_draft.copyWith(
       minPrice: min,
       maxPrice: max,
@@ -140,11 +154,41 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     });
   }
 
+  /// Swap any min/max pair that ended up inverted so the query sent to the
+  /// backend (and the reopened sheet's fields) is always sane, regardless
+  /// of the order the user filled the two sides in.
+  FilterModel _normalizeRanges(FilterModel f) {
+    T? lo<T extends num>(T? a, T? b) => (a != null && b != null && a > b) ? b : a;
+    T? hi<T extends num>(T? a, T? b) => (a != null && b != null && a > b) ? a : b;
+    return f.copyWith(
+      minPrice: lo(f.minPrice, f.maxPrice),
+      maxPrice: hi(f.minPrice, f.maxPrice),
+      minYear: lo(f.minYear, f.maxYear),
+      maxYear: hi(f.minYear, f.maxYear),
+      minMileage: lo(f.minMileage, f.maxMileage),
+      maxMileage: hi(f.minMileage, f.maxMileage),
+      minEnginePowerHp: lo(f.minEnginePowerHp, f.maxEnginePowerHp),
+      maxEnginePowerHp: hi(f.minEnginePowerHp, f.maxEnginePowerHp),
+      minEngineCapacityCc: lo(f.minEngineCapacityCc, f.maxEngineCapacityCc),
+      maxEngineCapacityCc: hi(f.minEngineCapacityCc, f.maxEngineCapacityCc),
+    );
+  }
+
   void _apply() {
+    _draft = _normalizeRanges(_draft);
     ref.read(filterProvider.notifier).setFilter(_draft);
     ref.read(searchResultsProvider.notifier).search(_draft, log: false);
     Navigator.pop(context);
-    widget.onApplied?.call();
+    // onApplied (search_screen.dart) pushes AppRoutes.searchResults on this
+    // same Navigator. Firing it synchronously right after pop() races the
+    // sheet's removal — the pushed Page can land before the popped one is
+    // out of the page list, both keyed by the same route → GoRouter's
+    // "!keyReservation.contains(key)" duplicate-key assertion. Deferring to
+    // the next frame lets the pop settle first.
+    final onApplied = widget.onApplied;
+    if (onApplied != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => onApplied());
+    }
   }
 
   @override
@@ -318,10 +362,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     ],
                   ),
                   RangeSlider(
-                    values: RangeValues(
-                      _sliderMin.clamp(0, 50000000),
-                      _sliderMax.clamp(0, 50000000),
-                    ),
+                    values: _safeSliderValues(),
                     min: 0,
                     max: 50000000,
                     divisions: 100,

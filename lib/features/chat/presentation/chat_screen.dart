@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../core/utils/navigation_guard.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -200,7 +202,13 @@ class _ChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               title: Text(strings.viewListing),
               onTap: () {
                 Navigator.pop(ctx);
-                context.push('/listing/${conversation.listingId}');
+                // Deferred: pushing on the same Navigator synchronously
+                // after pop() races the sheet's removal from the page
+                // list — see filter_sheet.dart's _apply() for the full
+                // explanation of the duplicate-key crash this avoids.
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => context.pushGuarded('/listing/${conversation.listingId}'),
+                );
               },
             ),
             ListTile(
