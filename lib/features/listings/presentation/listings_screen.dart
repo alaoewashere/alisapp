@@ -6,6 +6,7 @@ import '../../../core/l10n/category_locale.dart';
 import '../../../core/l10n/l10n_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/category_tree.dart';
+import '../../../core/utils/navigation_guard.dart';
 import '../../../shared/models/filter_model.dart';
 import '../../home/providers/home_provider.dart';
 import '../../home/widgets/listing_card.dart';
@@ -66,7 +67,15 @@ class ListingsScreen extends ConsumerWidget {
               showFilterSheet(
                 context,
                 ref,
-                onApplied: () => context.push(AppRoutes.searchResults),
+                // Deferred: FilterSheet._apply() already pops the sheet's
+                // modal route right before calling onApplied. Pushing on
+                // the same Navigator synchronously right after that pop
+                // races its removal from the page list — both Pages can
+                // end up sharing the same derived key → GoRouter's
+                // "!keyReservation.contains(key)" duplicate-key assertion.
+                onApplied: () => WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => context.pushGuarded(AppRoutes.searchResults),
+                ),
               );
             },
           ),
