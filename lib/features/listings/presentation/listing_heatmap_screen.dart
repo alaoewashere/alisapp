@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -12,6 +11,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/utils/arabic_number.dart';
 import '../../../core/utils/listing_heatmap_utils.dart';
+import '../../../core/utils/navigation_guard.dart';
 import '../../../features/auth/widgets/auth_form_styles.dart';
 import '../../../l10n/app_localizations.dart';
 import '../utils/heatmap_map_markers.dart';
@@ -488,7 +488,7 @@ class _HeatmapViewState extends ConsumerState<_HeatmapView> {
     ref.read(filterProvider.notifier).setFilter(filter);
     await ref.read(searchResultsProvider.notifier).search(filter);
     if (context.mounted) {
-      context.go(AppRoutes.searchResults);
+      context.goGuarded(AppRoutes.searchResults);
     }
   }
 

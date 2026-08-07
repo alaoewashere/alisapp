@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import '../../../core/utils/navigation_guard.dart';
 import 'package:Sello/core/theme/app_fonts.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -114,13 +114,13 @@ class _CategoryTreeBody extends ConsumerWidget {
 
     if (openBrowse) {
       if (context.mounted) {
-        context.push(
+        context.pushGuarded(
           AppRoutes.categoryBrowsePath(category.id, listingType: typeParam),
         );
       }
     } else {
       if (context.mounted) {
-        context.push(
+        context.pushGuarded(
           AppRoutes.listingsPath('${category.id}', listingType: typeParam),
         );
       }
@@ -186,7 +186,7 @@ class _CategoryTreeBody extends ConsumerWidget {
               loading: countsLoading,
               onTap: () {
                 if (context.mounted) {
-                  context.push(
+                  context.pushGuarded(
                     AppRoutes.listingsPath(
                       '$categoryId',
                       listingType: typeParam,
@@ -242,7 +242,7 @@ class _CategoryBreadcrumb extends StatelessWidget {
               GestureDetector(
                 onTap: i == path.length - 1
                     ? null
-                    : () => context.push(
+                    : () => context.pushGuarded(
                           AppRoutes.categoryBrowsePath(path[i].id),
                         ),
                 child: Text(
